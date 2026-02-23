@@ -25,9 +25,7 @@ export function parseMarcusHash() {
  * @param {Object} state
  * @param {Array} state.worldviews
  * @param {Object} state.credences
- * @param {string} state.selectedMethod
- * @param {number} state.totalBudget
- * @param {Object} state.methodOptions
+ * @param {Array} state.stages - Array of { id, method, budget, options }
  * @returns {Promise<{ url: string, id: string }>}
  */
 export async function generateMarcusShareUrl(state) {
@@ -38,9 +36,7 @@ export async function generateMarcusShareUrl(state) {
     sessionId,
     worldviews: state.worldviews,
     credences: state.credences,
-    selectedMethod: state.selectedMethod,
-    totalBudget: state.totalBudget,
-    methodOptions: state.methodOptions,
+    stages: state.stages,
   };
 
   const response = await fetch(endpoints.share, {
@@ -84,13 +80,22 @@ export async function parseMarcusShareUrl() {
       return { error: 'Invalid share data format' };
     }
 
-    return {
+    // Support both new (stages) and old (selectedMethod/totalBudget/methodOptions) format
+    const result = {
       worldviews: data.worldviews,
       credences: data.credences,
-      selectedMethod: data.selectedMethod,
-      totalBudget: data.totalBudget,
-      methodOptions: data.methodOptions,
     };
+
+    if (data.stages) {
+      result.stages = data.stages;
+    } else if (data.selectedMethod) {
+      // Backward compat: old share URLs without stages
+      result.selectedMethod = data.selectedMethod;
+      result.totalBudget = data.totalBudget;
+      result.methodOptions = data.methodOptions;
+    }
+
+    return result;
   } catch {
     return { error: 'Failed to load shared configuration' };
   }

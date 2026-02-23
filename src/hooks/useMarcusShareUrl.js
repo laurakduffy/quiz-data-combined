@@ -19,18 +19,10 @@ function copyToClipboardFallback(text) {
  * @param {Object} options
  * @param {Array} options.worldviews
  * @param {Object} options.credences
- * @param {string} options.selectedMethod
- * @param {number} options.totalBudget
- * @param {Object} options.methodOptions
+ * @param {Array} options.stages
  * @returns {{ copied: boolean, loading: boolean, error: string|null, handleShare: Function }}
  */
-export function useMarcusShareUrl({
-  worldviews,
-  credences,
-  selectedMethod,
-  totalBudget,
-  methodOptions,
-}) {
+export function useMarcusShareUrl({ worldviews, credences, stages }) {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,9 +34,7 @@ export function useMarcusShareUrl({
     const urlPromise = generateMarcusShareUrl({
       worldviews,
       credences,
-      selectedMethod,
-      totalBudget,
-      methodOptions,
+      stages,
     }).then(({ url }) => url);
 
     try {
@@ -67,7 +57,7 @@ export function useMarcusShareUrl({
     } finally {
       setLoading(false);
     }
-  }, [worldviews, credences, selectedMethod, totalBudget, methodOptions]);
+  }, [worldviews, credences, stages]);
 
   return { copied, loading, error, handleShare };
 }

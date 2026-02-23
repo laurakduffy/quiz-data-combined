@@ -1051,9 +1051,16 @@ function voteLexicographicMaximin(
 // ITERATION LOOP
 // =============================================================================
 
-function allocateBudget(data, votingMethod, totalBudget, { incrementSize = 10, ...kwargs } = {}) {
+function allocateBudget(
+  data,
+  votingMethod,
+  totalBudget,
+  { incrementSize = 10, initialFunding = null, ...kwargs } = {}
+) {
   const funding = {};
-  for (const projectId of Object.keys(data)) funding[projectId] = 0;
+  for (const projectId of Object.keys(data)) {
+    funding[projectId] = initialFunding?.[projectId] ?? 0;
+  }
   let remaining = totalBudget;
 
   while (remaining > 0) {
@@ -1111,7 +1118,8 @@ export function computeMarcusAllocation(
   methodKey,
   totalBudget,
   incrementSize,
-  extraOptions = {}
+  extraOptions = {},
+  initialFunding = null
 ) {
   // Strip display-only fields (name, color) from project data
   const cleanData = {};
@@ -1127,6 +1135,7 @@ export function computeMarcusAllocation(
 
   const { funding } = allocateBudget(cleanData, votingMethod, totalBudget, {
     incrementSize,
+    initialFunding,
     customWorldviews: worldviews,
     ...extraOptions,
   });
@@ -1138,4 +1147,62 @@ export function computeMarcusAllocation(
   }
 
   return { allocations, funding };
+}
+
+/**
+ * Compute allocation across multiple sequential stages.
+ * Each stage picks up where the previous left off (diminishing returns compound).
+ *
+ * @param {Object} projectData - Project definitions (from marcusMode.json)
+ * @param {Array} worldviews - Array of worldview objects with credences
+ * @param {Array} stages - Array of { method, budget, options }
+ * @param {number} incrementSize - Step size in $M
+ * @returns {{ allocations: Object, funding: Object, stageResults: Array }}
+ */
+export function computeMultiStageAllocation(projectData, worldviews, stages, incrementSize) {
+  // Strip display-only fields once
+  const cleanData = {};
+  for (const [id, project] of Object.entries(projectData)) {
+    const { name, color, ...data } = project;
+    cleanData[id] = data;
+  }
+
+  const cumulativeFunding = {};
+  for (const projectId of Object.keys(cleanData)) {
+    cumulativeFunding[projectId] = 0;
+  }
+
+  const stageResults = [];
+
+  for (const stage of stages) {
+    const votingMethod = METHOD_MAP[stage.method];
+    if (!votingMethod) {
+      throw new Error(`Unknown voting method: ${stage.method}`);
+    }
+
+    const { funding } = allocateBudget(cleanData, votingMethod, stage.budget, {
+      incrementSize,
+      initialFunding: cumulativeFunding,
+      customWorldviews: worldviews,
+      ...(stage.options || {}),
+    });
+
+    // Stage contribution = funding after - funding before
+    const stageContribution = {};
+    for (const projectId of Object.keys(cleanData)) {
+      stageContribution[projectId] = funding[projectId] - cumulativeFunding[projectId];
+      cumulativeFunding[projectId] = funding[projectId];
+    }
+
+    stageResults.push({ funding: stageContribution });
+  }
+
+  // Compute final allocations as percentages of total funding
+  const totalFunded = Object.values(cumulativeFunding).reduce((s, v) => s + v, 0);
+  const allocations = {};
+  for (const [projectId, amount] of Object.entries(cumulativeFunding)) {
+    allocations[projectId] = totalFunded > 0 ? (amount / totalFunded) * 100 : 0;
+  }
+
+  return { allocations, funding: cumulativeFunding, stageResults };
 }

@@ -79,7 +79,7 @@ async function createShare(event, db) {
 
   let dataToStore;
   if (type === 'marcus') {
-    const { worldviews, credences, selectedMethod, totalBudget, methodOptions } = body;
+    const { worldviews, credences, stages, selectedMethod, totalBudget, methodOptions } = body;
     if (!worldviews) {
       return {
         statusCode: 400,
@@ -87,7 +87,15 @@ async function createShare(event, db) {
         body: JSON.stringify({ error: 'Missing worldviews' }),
       };
     }
-    dataToStore = { type, worldviews, credences, selectedMethod, totalBudget, methodOptions };
+    // Support both new (stages) and old (selectedMethod/totalBudget/methodOptions) format
+    dataToStore = { type, worldviews, credences };
+    if (stages) {
+      dataToStore.stages = stages;
+    } else {
+      dataToStore.selectedMethod = selectedMethod;
+      dataToStore.totalBudget = totalBudget;
+      dataToStore.methodOptions = methodOptions;
+    }
   } else {
     const { worldviews, activeWorldviewId } = body;
     if (!worldviews || !activeWorldviewId) {
