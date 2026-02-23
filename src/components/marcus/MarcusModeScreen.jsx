@@ -13,7 +13,7 @@ function MarcusModeScreen() {
     credences,
     lockedKeys,
     setLockedKeys,
-    selectedMethod,
+    stages,
     results,
     addWorldview,
     removeWorldview,
@@ -22,11 +22,10 @@ function MarcusModeScreen() {
     updateDiscountFactor,
     applyPreset,
     reorderWorldviews,
-    setSelectedMethod,
-    totalBudget,
-    setTotalBudget,
-    methodOptions,
-    setMethodOptions,
+    addStage,
+    removeStage,
+    updateStage,
+    updateStageOption,
     hydrateFromShare,
   } = useMarcusState();
 
@@ -73,9 +72,7 @@ function MarcusModeScreen() {
   } = useMarcusShareUrl({
     worldviews,
     credences,
-    selectedMethod,
-    totalBudget,
-    methodOptions,
+    stages,
   });
 
   if (hydrating) {
@@ -121,12 +118,12 @@ function MarcusModeScreen() {
         </div>
         <div className={styles.resultsSide}>
           <ResultsPanel
-            selectedMethod={selectedMethod}
-            onMethodChange={setSelectedMethod}
-            totalBudget={totalBudget}
-            onBudgetChange={setTotalBudget}
-            methodOptions={methodOptions}
-            onMethodOptionsChange={setMethodOptions}
+            stages={stages}
+            onStageMethodChange={(i, value) => updateStage(i, 'method', value)}
+            onStageBudgetChange={(i, value) => updateStage(i, 'budget', value)}
+            onStageOptionChange={updateStageOption}
+            onAddStage={addStage}
+            onRemoveStage={removeStage}
             results={results}
           />
           <ShareButton

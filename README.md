@@ -65,7 +65,7 @@ npm run dev
 
 ### Backend Development
 
-The app uses Netlify serverless functions and a Turso (SQLite) database for share URLs.
+The share API runs as an AWS Lambda in production and a Netlify function locally. Both use a Turso (SQLite) database.
 
 ```bash
 # Initialize local dev database (first time only)
@@ -78,6 +78,36 @@ netlify dev
 ```
 
 Local development uses a SQLite file (`dev.db`) instead of the production Turso database. The `.env` file (gitignored) configures this automatically.
+
+### Deploying the Lambda
+
+The share API Lambda is deployed manually (the GitHub Action is disabled):
+
+```bash
+cd lambda/share && npm ci && cd ..
+sam build
+sam deploy \
+  --stack-name quiz-demo-share \
+  --capabilities CAPABILITY_IAM \
+  --resolve-s3 \
+  --parameter-overrides \
+    TursoDatabaseUrl="<turso-url>" \
+    TursoAuthToken="<turso-token>" \
+  --no-confirm-changeset \
+  --no-fail-on-empty-changeset
+```
+
+If SAM deploy fails with a CloudFormation validation error, deploy code directly:
+
+```bash
+cd lambda/.aws-sam/build/ShareFunction
+zip -r /tmp/lambda-share.zip .
+aws lambda update-function-code \
+  --function-name quiz-demo-share \
+  --zip-file fileb:///tmp/lambda-share.zip
+```
+
+Requires AWS CLI credentials (`aws configure`) and SAM CLI.
 
 ### Code Quality
 

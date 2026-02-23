@@ -106,7 +106,11 @@ All visual/UX design decisions are handled by the UX team, not implementation. M
 ## Hosting & Backend
 
 ### Hosting
-Deployed on **Netlify** (migrated from GitHub Pages). Config in `netlify.toml`.
+- **Frontend**: GitHub Pages at `https://rethinkpriorities.github.io/quiz-demo/`
+- **Share API**: AWS Lambda Function URL (deployed via SAM CLI)
+- **Local dev**: Netlify dev (`netlify dev`) or Vite (`npm run dev`)
+
+Config: `netlify.toml` (local dev), `lambda/template.yaml` (AWS).
 
 ### Database (Turso)
 SQLite database hosted on Turso for share URL persistence.
@@ -114,7 +118,7 @@ SQLite database hosted on Turso for share URL persistence.
 | Environment | Database | Config |
 |-------------|----------|--------|
 | Local dev | `dev.db` (SQLite file) | `.env` → `file:dev.db` |
-| Production | Turso cloud | Netlify env vars |
+| Production | Turso cloud | Lambda env vars (set via SAM deploy) |
 
 **Local setup:**
 ```bash
@@ -123,12 +127,45 @@ netlify dev                       # Run frontend + functions at localhost:8888
 ```
 
 **Credentials:**
-- Production credentials stored in 1Password and Netlify dashboard
+- Production credentials stored in 1Password
+- `VITE_API_URL` set in GitHub repo secrets (points Lambda Function URL to frontend build)
+- Turso credentials passed to Lambda via `--parameter-overrides` on deploy
 - Local `.env` file (gitignored) points to local SQLite
 
 ### Serverless Functions
-JavaScript functions in `netlify/functions/`. Currently:
-- `share.js` - Create/retrieve share URLs (`POST/GET /api/share`)
+Two copies of the share function (kept in sync):
+- `netlify/functions/share.js` — Local dev with `netlify dev`
+- `lambda/share/index.mjs` — Production (AWS Lambda)
+
+### Deploying the Lambda
+
+The Lambda auto-deploy GitHub Action is disabled — deploy manually from CLI:
+
+```bash
+cd lambda/share && npm ci && cd ..
+sam build
+sam deploy \
+  --stack-name quiz-demo-share \
+  --capabilities CAPABILITY_IAM \
+  --resolve-s3 \
+  --parameter-overrides \
+    TursoDatabaseUrl="<turso-url>" \
+    TursoAuthToken="<turso-token>" \
+  --no-confirm-changeset \
+  --no-fail-on-empty-changeset
+```
+
+**If SAM deploy fails** with `EarlyValidation::PropertyValidation` (CloudFormation validation hook issue), deploy the code directly:
+
+```bash
+cd lambda/.aws-sam/build/ShareFunction
+zip -r /tmp/lambda-share.zip .
+aws lambda update-function-code \
+  --function-name quiz-demo-share \
+  --zip-file fileb:///tmp/lambda-share.zip
+```
+
+Requires AWS CLI configured with credentials (`aws configure`). Turso credentials are already set on the existing Lambda from the initial SAM deploy.
 
 ### Database Migrations
 Migrations are idempotent SQL files in `migrations/`. Uses `CREATE TABLE IF NOT EXISTS` pattern.

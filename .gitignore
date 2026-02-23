@@ -29,6 +29,9 @@ dist-ssr
 # Netlify
 .netlify/
 
+# AWS SAM build artifacts
+.aws-sam/
+
 # Environment variables
 .env
 

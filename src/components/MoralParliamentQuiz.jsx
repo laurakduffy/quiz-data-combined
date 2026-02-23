@@ -8,6 +8,7 @@ import ResultsScreen from './ResultsScreen';
 import MoralMarketplaceScreen from './MoralMarketplaceScreen';
 import MarcusModeScreen from './marcus/MarcusModeScreen';
 import CalculationDebugger from './CalculationDebugger';
+import { useState, useEffect } from 'react';
 import { useQuiz } from '../context/useQuiz';
 import { QUESTION_TYPES } from '../constants/config';
 import features from '../../config/features.json';
@@ -26,15 +27,23 @@ const toastStyle = {
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
 };
 
-// Hash-based route: #table or #table&s=<id> renders Marcus Mode
-const isMarcusRoute = window.location.hash.startsWith('#table');
-
 /**
  * Main quiz router component.
  * Renders the appropriate screen based on current step from context.
  */
 function MoralParliamentQuiz() {
   const { currentStep, currentQuestion, setDebugConfig, shareUrlError, isHydrating } = useQuiz();
+
+  // Hash-based route: #table or #table&s=<id> renders Marcus Mode
+  const [isMarcusRoute, setIsMarcusRoute] = useState(() =>
+    window.location.hash.startsWith('#table')
+  );
+
+  useEffect(() => {
+    const onHashChange = () => setIsMarcusRoute(window.location.hash.startsWith('#table'));
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   // Hash route: #table renders Marcus Mode directly
   if (isMarcusRoute) {

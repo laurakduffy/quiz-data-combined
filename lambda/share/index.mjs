@@ -75,17 +75,38 @@ async function createShare(event, db) {
   }
 
   const body = JSON.parse(bodyStr);
-  const { worldviews, activeWorldviewId, sessionId, quizVersion } = body;
+  const { type, sessionId, quizVersion } = body;
 
-  if (!worldviews || !activeWorldviewId) {
-    return {
-      statusCode: 400,
-      headers: responseHeaders,
-      body: JSON.stringify({ error: 'Missing worldviews or activeWorldviewId' }),
-    };
+  let dataToStore;
+  if (type === 'marcus') {
+    const { worldviews, credences, stages, selectedMethod, totalBudget, methodOptions } = body;
+    if (!worldviews) {
+      return {
+        statusCode: 400,
+        headers: responseHeaders,
+        body: JSON.stringify({ error: 'Missing worldviews' }),
+      };
+    }
+    // Support both new (stages) and old (selectedMethod/totalBudget/methodOptions) format
+    dataToStore = { type, worldviews, credences };
+    if (stages) {
+      dataToStore.stages = stages;
+    } else {
+      dataToStore.selectedMethod = selectedMethod;
+      dataToStore.totalBudget = totalBudget;
+      dataToStore.methodOptions = methodOptions;
+    }
+  } else {
+    const { worldviews, activeWorldviewId } = body;
+    if (!worldviews || !activeWorldviewId) {
+      return {
+        statusCode: 400,
+        headers: responseHeaders,
+        body: JSON.stringify({ error: 'Missing worldviews or activeWorldviewId' }),
+      };
+    }
+    dataToStore = { worldviews, activeWorldviewId };
   }
-
-  const dataToStore = { worldviews, activeWorldviewId };
 
   // Generate unique short ID (retry on collision)
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -159,6 +180,15 @@ async function getShare(event, db) {
     quizVersion: row.quiz_version,
     createdAt: row.created_at,
   };
+
+  // Marcus format: return full stored data
+  if (storedData.type === 'marcus') {
+    return {
+      statusCode: 200,
+      headers: responseHeaders,
+      body: JSON.stringify({ ...baseResponse, ...storedData }),
+    };
+  }
 
   // Worldviews format: has worldviews and activeWorldviewId
   if (storedData.worldviews && storedData.activeWorldviewId) {
