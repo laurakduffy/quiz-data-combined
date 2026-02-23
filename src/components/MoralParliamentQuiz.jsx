@@ -26,6 +26,9 @@ const toastStyle = {
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
 };
 
+// Hash-based route: #table or #table&s=<id> renders Marcus Mode
+const isMarcusRoute = window.location.hash.startsWith('#table');
+
 /**
  * Main quiz router component.
  * Renders the appropriate screen based on current step from context.
@@ -33,12 +36,17 @@ const toastStyle = {
 function MoralParliamentQuiz() {
   const { currentStep, currentQuestion, setDebugConfig, shareUrlError, isHydrating } = useQuiz();
 
+  // Hash route: #table renders Marcus Mode directly
+  if (isMarcusRoute) {
+    return <MarcusModeScreen />;
+  }
+
   // Show nothing while hydrating to avoid flash of welcome screen
   if (isHydrating) {
     return null;
   }
 
-  // Marcus Mode: dense single-page layout bypassing all navigation
+  // Marcus Mode feature flag: dense single-page layout bypassing all navigation
   if (features.ui?.marcusMode === true) {
     return <MarcusModeScreen />;
   }

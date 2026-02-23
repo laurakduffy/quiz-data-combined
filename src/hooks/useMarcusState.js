@@ -5,14 +5,14 @@ import marcusConfig from '../../config/marcusMode.json';
 import worldviewPresets from '../../config/worldviewPresets.json';
 
 const STORAGE_KEY = 'marcus_state';
-const STATE_VERSION = 5;
+const STATE_VERSION = 6;
 
 function createWorldview(presetId) {
   if (presetId) {
     const preset = marcusConfig.presets.find((p) => p.id === presetId);
     if (preset) {
       const { id, name, ...data } = preset;
-      return { ...JSON.parse(JSON.stringify(data)), name, presetId: id };
+      return { ...JSON.parse(JSON.stringify(data)), name, presetId: id, uid: crypto.randomUUID() };
     }
   }
   const template = worldviewPresets.defaultWorldview;
@@ -20,6 +20,7 @@ function createWorldview(presetId) {
     ...JSON.parse(JSON.stringify(template)),
     name: 'Custom',
     presetId: null,
+    uid: crypto.randomUUID(),
   };
 }
 
@@ -236,6 +237,52 @@ export function useMarcusState() {
     );
   }, []);
 
+  const reorderWorldviews = useCallback((fromIndex, toIndex) => {
+    setWorldviews((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+
+      // Remap credences: values follow their worldview
+      setCredences((prevCreds) => {
+        const newCreds = {};
+        const oldOrder = prev.map((_, i) => i);
+        const reordered = [...oldOrder];
+        const [movedIdx] = reordered.splice(fromIndex, 1);
+        reordered.splice(toIndex, 0, movedIdx);
+        for (let newIdx = 0; newIdx < reordered.length; newIdx++) {
+          newCreds[newIdx] = prevCreds[reordered[newIdx]] ?? 0;
+        }
+        return newCreds;
+      });
+
+      // Remap locked keys to match new positions
+      setLockedKeys((prevLocked) => {
+        const oldOrder = prev.map((_, i) => i);
+        const reordered = [...oldOrder];
+        const [movedIdx] = reordered.splice(fromIndex, 1);
+        reordered.splice(toIndex, 0, movedIdx);
+        // Build reverse map: oldIndex -> newIndex
+        const reverseMap = {};
+        for (let newIdx = 0; newIdx < reordered.length; newIdx++) {
+          reverseMap[reordered[newIdx]] = newIdx;
+        }
+        return prevLocked.map((k) => String(reverseMap[Number(k)] ?? k));
+      });
+
+      return next;
+    });
+  }, []);
+
+  const hydrateFromShare = useCallback((shareData) => {
+    if (shareData.worldviews) setWorldviews(shareData.worldviews);
+    if (shareData.credences) setCredences(shareData.credences);
+    if (shareData.selectedMethod) setSelectedMethod(shareData.selectedMethod);
+    if (shareData.totalBudget != null) setTotalBudget(shareData.totalBudget);
+    if (shareData.methodOptions) setMethodOptions(shareData.methodOptions);
+    setLockedKeys([]);
+  }, []);
+
   return {
     worldviews,
     credences,
@@ -250,9 +297,11 @@ export function useMarcusState() {
     updateWorldview,
     updateDiscountFactor,
     applyPreset,
+    reorderWorldviews,
     setSelectedMethod,
     setTotalBudget,
     methodOptions,
     setMethodOptions,
+    hydrateFromShare,
   };
 }

@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
-import { Lock } from 'lucide-react';
+import { Lock, GripVertical } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useSliderDrag } from '../../hooks/useSliderDrag';
 import { useLockedSlider } from '../../hooks/useLockedSlider';
 import marcusConfig from '../../../config/marcusMode.json';
@@ -87,6 +89,7 @@ function CredenceSlider({
 }
 
 function WorldviewColumn({
+  id,
   worldview,
   index,
   rows,
@@ -102,6 +105,9 @@ function WorldviewColumn({
   onRemove,
   canRemove,
 }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
   const handlePresetChange = (e) => {
     const value = e.target.value;
     onApplyPreset(index, value === 'custom' ? null : value);
@@ -259,10 +265,29 @@ function WorldviewColumn({
     return null;
   }
 
+  const sortableStyle = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
   return (
-    <div className={styles.worldviewColumn}>
-      {/* Header: preset selector + remove */}
+    <div
+      className={`${styles.worldviewColumn}${isDragging ? ` ${styles.dragging}` : ''}`}
+      ref={setNodeRef}
+      style={sortableStyle}
+    >
+      {/* Header: drag handle + preset selector + remove */}
       <div className={styles.columnHeader}>
+        <button
+          type="button"
+          className={styles.dragHandle}
+          {...attributes}
+          {...listeners}
+          tabIndex={-1}
+        >
+          <GripVertical size={12} />
+        </button>
         <select
           className={styles.presetSelect}
           value={worldview.presetId || 'custom'}

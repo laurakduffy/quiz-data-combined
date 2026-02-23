@@ -1,3 +1,13 @@
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import WorldviewColumn from './WorldviewColumn';
 import marcusConfig from '../../../config/marcusMode.json';
 import styles from '../../styles/components/MarcusModeV2.module.css';
@@ -48,7 +58,23 @@ function SpreadsheetInput({
   onApplyPreset,
   onAdd,
   onRemove,
+  onReorder,
 }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor)
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = worldviews.findIndex((wv) => wv.uid === active.id);
+    const newIndex = worldviews.findIndex((wv) => wv.uid === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      onReorder(oldIndex, newIndex);
+    }
+  };
+
   return (
     <div className={styles.spreadsheet}>
       <div className={styles.spreadsheetScroll}>
@@ -69,25 +95,38 @@ function SpreadsheetInput({
         </div>
 
         {/* Worldview columns */}
-        {worldviews.map((wv, i) => (
-          <WorldviewColumn
-            key={i}
-            worldview={wv}
-            index={i}
-            rows={ROWS}
-            columnIndex={i}
-            totalColumns={worldviews.length}
-            credences={credences}
-            lockedKeys={lockedKeys}
-            setLockedKeys={setLockedKeys}
-            onCredenceChange={onCredenceChange}
-            onUpdate={onUpdate}
-            onUpdateDiscount={onUpdateDiscount}
-            onApplyPreset={onApplyPreset}
-            onRemove={onRemove}
-            canRemove={worldviews.length > 1}
-          />
-        ))}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToHorizontalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={worldviews.map((wv) => wv.uid)}
+            strategy={horizontalListSortingStrategy}
+          >
+            {worldviews.map((wv, i) => (
+              <WorldviewColumn
+                key={wv.uid}
+                id={wv.uid}
+                worldview={wv}
+                index={i}
+                rows={ROWS}
+                columnIndex={i}
+                totalColumns={worldviews.length}
+                credences={credences}
+                lockedKeys={lockedKeys}
+                setLockedKeys={setLockedKeys}
+                onCredenceChange={onCredenceChange}
+                onUpdate={onUpdate}
+                onUpdateDiscount={onUpdateDiscount}
+                onApplyPreset={onApplyPreset}
+                onRemove={onRemove}
+                canRemove={worldviews.length > 1}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
 
         {/* Add column button */}
         <div className={styles.addColumn}>

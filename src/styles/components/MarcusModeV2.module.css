@@ -92,6 +92,10 @@
   border-right: none;
 }
 
+.worldviewColumn.dragging {
+  border-left: 1px solid var(--border-subtle);
+}
+
 /* Column header */
 .columnHeader {
   height: 40px;
@@ -101,6 +105,31 @@
   padding: 0 var(--spacing-2);
   border-bottom: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.02);
+}
+
+.dragHandle {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-gray);
+  cursor: grab;
+  width: 16px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+  touch-action: none;
+}
+
+.dragHandle:hover {
+  opacity: 0.7;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
 }
 
 .presetSelect {
@@ -499,6 +528,16 @@
   color: var(--text-gray);
   margin-top: var(--spacing-3);
   line-height: 1.4;
+}
+
+/* === SHARE BUTTON (compact) === */
+
+.shareButton {
+  margin-top: var(--spacing-4);
+  font-size: var(--text-xs) !important;
+  padding: var(--spacing-2) var(--spacing-4) !important;
+  gap: var(--spacing-2) !important;
+  letter-spacing: 0.02em !important;
 }
 
 /* === RESPONSIVE === */
