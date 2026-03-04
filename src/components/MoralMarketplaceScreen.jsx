@@ -22,7 +22,7 @@ import styles from '../styles/components/Results.module.css';
 import marketplaceStyles from '../styles/components/Marketplace.module.css';
 import copy from '../../config/copy.json';
 import features from '../../config/features.json';
-import causesConfig from '../../config/causes.json';
+import causesConfig from '../utils/causesAdapter.js';
 
 const defaultDiminishingReturns = causesConfig.diminishingReturns || 'sqrt';
 

@@ -5,7 +5,16 @@
  * All math/algorithm code is identical to the original.
  * Removed: DEFAULT_PROJECT_DATA, EXAMPLE_CUSTOM_WORLDVIEWS, showAllocation, require.main block.
  * Added: computeMarcusAllocation facade function.
+ *
+ * Core scoring functions (calculateAllProjects, adjustForExtinctionRisk,
+ * getDiminishingReturnsFactor) are imported from the shared projectScoring.js module.
  */
+
+import {
+  calculateAllProjects,
+  adjustForExtinctionRisk,
+  getDiminishingReturnsFactor,
+} from './projectScoring.js';
 
 // =============================================================================
 // HELPERS
@@ -310,51 +319,7 @@ function mecAggregateCardinalTheories(interventions, cardinalTheories, credenceD
   return { best: bestIntervention, scores: interventionScores };
 }
 
-// =============================================================================
-// CALCULATOR FUNCTIONS
-// =============================================================================
-
-function calculateSingleEffect(effectData, moralWeight, discountFactors, riskProfile) {
-  const column = getColumn(effectData.values, riskProfile);
-  return moralWeight * dotProduct(column, discountFactors);
-}
-
-function calculateProject(projectData, moralWeights, discountFactors, riskProfile) {
-  let total = 0;
-  const breakdown = {};
-  for (const [effectId, effectData] of Object.entries(projectData.effects)) {
-    const mi = moralWeights[effectData.recipient_type] || 0;
-    const value = calculateSingleEffect(effectData, mi, discountFactors, riskProfile);
-    breakdown[effectId] = value;
-    total += value;
-  }
-  return { total, breakdown };
-}
-
-function calculateAllProjects(data, moralWeights, discountFactors, riskProfile) {
-  const results = {};
-  for (const [projectId, projectData] of Object.entries(data)) {
-    results[projectId] = calculateProject(
-      projectData,
-      moralWeights,
-      discountFactors,
-      riskProfile
-    ).total;
-  }
-  return results;
-}
-
-function adjustForExtinctionRisk(projectValues, data, pExtinction) {
-  const adjusted = {};
-  for (const [projectId, value] of Object.entries(projectValues)) {
-    if (data[projectId].tags.near_term_xrisk) {
-      adjusted[projectId] = value;
-    } else {
-      adjusted[projectId] = value * (1 - pExtinction);
-    }
-  }
-  return adjusted;
-}
+// Calculator functions imported from projectScoring.js
 
 // =============================================================================
 // VOTING METHODS
@@ -372,23 +337,7 @@ const AGGREGATION_DEFAULTS = {
 
 const MSA_DEFAULT_BINARY_WORLDVIEWS = new Set(['Kantianism', 'Rawlsian Contractarianism']);
 
-function getDiminishingReturnsFactor(data, projectId, currentFunding) {
-  const stepSize = 10.0;
-  const steps = currentFunding / stepSize;
-  const nearestStep = Math.round(steps);
-  let idx;
-  if (isClose(steps, nearestStep)) {
-    idx = nearestStep;
-  } else {
-    idx = Math.floor(steps);
-  }
-  idx = Math.max(idx, 0);
-  const drArray = data[projectId].diminishing_returns;
-  if (idx >= drArray.length) {
-    return drArray[drArray.length - 1];
-  }
-  return drArray[idx];
-}
+// getDiminishingReturnsFactor imported from projectScoring.js
 
 function _buildRng(tieBreak, randomSeed) {
   if (tieBreak === 'random') {
@@ -1104,7 +1053,7 @@ const METHOD_MAP = {
 /**
  * Compute allocation for a given voting method.
  *
- * @param {Object} projectData - Project definitions (from marcusMode.json, without name/color)
+ * @param {Object} projectData - Project definitions (from projects.json, without name/color)
  * @param {Array} worldviews - Array of worldview objects
  * @param {string} methodKey - Key from votingMethods config
  * @param {number} totalBudget - Total budget in $M
@@ -1153,7 +1102,7 @@ export function computeMarcusAllocation(
  * Compute allocation across multiple sequential stages.
  * Each stage picks up where the previous left off (diminishing returns compound).
  *
- * @param {Object} projectData - Project definitions (from marcusMode.json)
+ * @param {Object} projectData - Project definitions (from projects.json)
  * @param {Array} worldviews - Array of worldview objects with credences
  * @param {Array} stages - Array of { method, budget, options }
  * @param {number} incrementSize - Step size in $M

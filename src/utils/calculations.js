@@ -29,7 +29,7 @@
  * All functions are pure (no side effects) and fully testable.
  */
 
-import causesConfig from '../../config/causes.json';
+import causesConfig from './causesAdapter.js';
 import questionsConfig from '../../config/questions.json';
 
 const { causes: CAUSES, defaultCredences: DEFAULT_CREDENCES } = causesConfig;

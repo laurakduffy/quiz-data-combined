@@ -3,37 +3,63 @@ import { calculateMoralMarketplace } from './moralMarketplace.js';
 import projectsConfig from '../../config/projects.json';
 
 /**
- * Reference implementation — inlined from import/calculation.js
- * to verify the new module produces identical outputs.
+ * Reference implementation — mirrors the new moralMarketplace.js which uses
+ * quizToWorldviews.js with corrected moral weight derivation:
+ * - Per-life-year anchoring (not full-life)
+ * - Animal anchor fallback (when DALY=0, anchor=1.0)
+ * - Mammals = min(chickens * 1.1, 1.0), not equal to chickens
+ * - X-risk option 1 changed from 0.1 to 0.9
+ *
+ * Iteration order: tf, rp, xr, aw, inv, svi, sic
  */
 const DATA = projectsConfig.projects;
 const BUDGET = projectsConfig.budget;
 
-const Q1 = [0, 0.003, 0.0172, 0.086];
-const Q2 = [0, 0.0017, 0.0086, 0.0172];
-const Q3 = [1, 0.1, 0.01, 0.001, 0];
-const Q4 = [1, 0.01, 0.001, 0.0001, 0];
-const Q5 = [
-  [1, 1, 0, 0, 0, 0],
-  [1, 1, 0.2, 0.2, 0, 0],
-  [1, 1, 0.5, 0.5, 0.2, 0.2],
-  [1, 1, 1, 1, 1, 1],
+// Option values matching quizToWorldviews.js exports
+const SVI = [0.0, 0.17, 1.0, 5.0]; // saving_vs_improving
+const SIC = [0.0, 0.1, 0.5, 1.0]; // saving_vs_income
+const AW = [1.0, 0.1, 0.01, 0.001, 0.0]; // animal_welfare fractions
+const INV = [1.0, 0.01, 0.001, 0.0001, 0.0]; // invertebrate fractions
+const TF_PROFILES = [
+  [1.0, 0.0, 0.0], // short-term only
+  [1.0, 0.2, 0.0], // short + some medium
+  [1.0, 0.5, 0.2], // short + medium + some long
+  [1.0, 1.0, 1.0], // no discounting
 ];
-const Q6 = [0, 1, 2, 3];
-const Q7 = [0.0, 0.1, 0.5, 1.0];
+const RP = [0, 1, 2, 3]; // risk profile indices
+const XR = [0.0, 0.9, 0.5, 1.0]; // p_extinction values
 
-function buildMW(q1, q2, q3, q4) {
-  const c = q1 * q3,
-    inv = q1 * q4;
+// Period interpolation: [anchor_a, anchor_b, lerp_fraction]
+const PERIOD_INTERP = [
+  ['short', 'medium', 0.0],
+  ['short', 'medium', 0.5],
+  ['medium', 'long', 0.0],
+  ['medium', 'long', 0.33],
+  ['medium', 'long', 0.67],
+  ['medium', 'long', 1.0],
+];
+
+function buildDiscountFactors(short, medium, long) {
+  const anchors = { short, medium, long };
+  return PERIOD_INTERP.map(([a, b, t]) => anchors[a] * (1 - t) + anchors[b] * t);
+}
+
+function buildMW(iSvi, iSic, iAw, iInv) {
+  const humanYlds = SVI[iSvi];
+  const animalAnchor = humanYlds > 0 ? humanYlds : 1.0;
+  const chicken = AW[iAw] * animalAnchor;
+  const shrimp = INV[iInv] * animalAnchor;
+  const fish = (chicken + shrimp) / 2.0;
+  const mammal = chicken > 0 ? Math.min(chicken * 1.1, 1.0) : 0.0;
   return {
-    human_life_years: 1,
-    human_ylds: q1,
-    human_income_doublings: q2,
-    chickens_birds: c,
-    mammals: c,
-    fish: (inv + c) / 2,
-    shrimp: inv,
-    non_shrimp_invertebrates: inv,
+    human_life_years: 1.0,
+    human_ylds: humanYlds,
+    human_income_doublings: SIC[iSic],
+    chickens_birds: chicken,
+    mammals: mammal,
+    fish,
+    shrimp,
+    non_shrimp_invertebrates: shrimp,
   };
 }
 
@@ -59,34 +85,43 @@ function adjustXR(pv, d, pe) {
   return r;
 }
 
+/**
+ * Precompute in the same order as quizToWorldviews: tf, rp, xr, aw, inv, svi, sic
+ */
 function precompute() {
   const results = [];
-  for (const q1 of Q1)
-    for (const q2 of Q2)
-      for (const q3 of Q3)
-        for (const q4 of Q4)
-          for (let q5i = 0; q5i < Q5.length; q5i++)
-            for (const q6 of Q6)
-              for (const q7 of Q7) {
-                const mw = buildMW(q1, q2, q3, q4);
+  for (let iTf = 0; iTf < TF_PROFILES.length; iTf++)
+    for (const rp of RP)
+      for (let iXr = 0; iXr < XR.length; iXr++)
+        for (let iAw = 0; iAw < AW.length; iAw++)
+          for (let iInv = 0; iInv < INV.length; iInv++)
+            for (let iSvi = 0; iSvi < SVI.length; iSvi++)
+              for (let iSic = 0; iSic < SIC.length; iSic++) {
+                const mw = buildMW(iSvi, iSic, iAw, iInv);
+                const [short, medium, long] = TF_PROFILES[iTf];
+                const df = buildDiscountFactors(short, medium, long);
                 results.push({
-                  project_values: adjustXR(calcAll(DATA, mw, Q5[q5i], q6), DATA, q7),
+                  project_values: adjustXR(calcAll(DATA, mw, df, rp), DATA, XR[iXr]),
                 });
               }
   return results;
 }
 
-function computeWV(c1, c2, c3, c4, c5, c6, c7) {
+/**
+ * Compute worldview credences in order: tf, rp, xr, aw, inv, svi, sic
+ */
+function computeWV(cTf, cRp, cXr, cAw, cInv, cSvi, cSic) {
   const wv = [];
   let idx = 0;
-  for (let i1 = 0; i1 < Q1.length; i1++)
-    for (let i2 = 0; i2 < Q2.length; i2++)
-      for (let i3 = 0; i3 < Q3.length; i3++)
-        for (let i4 = 0; i4 < Q4.length; i4++)
-          for (let i5 = 0; i5 < Q5.length; i5++)
-            for (let i6 = 0; i6 < Q6.length; i6++)
-              for (let i7 = 0; i7 < Q7.length; i7++) {
-                const cr = c1[i1] * c2[i2] * c3[i3] * c4[i4] * c5[i5] * c6[i6] * c7[i7];
+  for (let iTf = 0; iTf < cTf.length; iTf++)
+    for (let iRp = 0; iRp < cRp.length; iRp++)
+      for (let iXr = 0; iXr < cXr.length; iXr++)
+        for (let iAw = 0; iAw < cAw.length; iAw++)
+          for (let iInv = 0; iInv < cInv.length; iInv++)
+            for (let iSvi = 0; iSvi < cSvi.length; iSvi++)
+              for (let iSic = 0; iSic < cSic.length; iSic++) {
+                const cr =
+                  cTf[iTf] * cRp[iRp] * cXr[iXr] * cAw[iAw] * cInv[iInv] * cSvi[iSvi] * cSic[iSic];
                 if (cr > 0) wv.push({ result_idx: idx, credence: cr });
                 idx++;
               }
@@ -140,9 +175,12 @@ function voteFast(data, funding, increment, { packed }) {
   return r;
 }
 
-function refAllocate(c1, c2, c3, c4, c5, c6, c7) {
+/**
+ * Reference allocate using credence arrays in order: tf, rp, xr, aw, inv, svi, sic
+ */
+function refAllocate(cTf, cRp, cXr, cAw, cInv, cSvi, cSic) {
   const results = precompute();
-  const wv = computeWV(c1, c2, c3, c4, c5, c6, c7);
+  const wv = computeWV(cTf, cRp, cXr, cAw, cInv, cSvi, cSic);
   const packed = pack(results, wv);
   const funding = {};
   for (const pid of Object.keys(DATA)) funding[pid] = 0;
@@ -160,7 +198,7 @@ function refAllocate(c1, c2, c3, c4, c5, c6, c7) {
 
 // ============================================================================
 
-describe('Moral Marketplace vs import reference', () => {
+describe('Moral Marketplace vs reference (new derivation)', () => {
   it('matches reference for equal credences', () => {
     const credences = {
       disability: { livesOnly: 25, livesMore: 25, equal: 25, disabilityMore: 25 },
@@ -171,25 +209,17 @@ describe('Moral Marketplace vs import reference', () => {
       risk: { riskNeutral: 25, upsideSkepticism: 25, lossAversion: 25, both: 25 },
       xrisk: { evaluateSame: 25, discount10: 25, discount50: 25, xriskOnly: 25 },
     };
+    // Reference uses ordered arrays: tf, rp, xr, aw, inv, svi, sic
     const ref = refAllocate(
-      [0.25, 0.25, 0.25, 0.25],
-      [0.25, 0.25, 0.25, 0.25],
-      [0.2, 0.2, 0.2, 0.2, 0.2],
-      [0.2, 0.2, 0.2, 0.2, 0.2],
-      [0.25, 0.25, 0.25, 0.25],
-      [0.25, 0.25, 0.25, 0.25],
-      [0.25, 0.25, 0.25, 0.25]
+      [0.25, 0.25, 0.25, 0.25], // tf
+      [0.25, 0.25, 0.25, 0.25], // rp
+      [0.25, 0.25, 0.25, 0.25], // xr
+      [0.2, 0.2, 0.2, 0.2, 0.2], // aw
+      [0.2, 0.2, 0.2, 0.2, 0.2], // inv
+      [0.25, 0.25, 0.25, 0.25], // svi
+      [0.25, 0.25, 0.25, 0.25] // sic
     );
     const result = calculateMoralMarketplace(credences);
-
-    console.log(
-      'New:   ',
-      Object.fromEntries(Object.entries(result).map(([k, v]) => [k, v.toFixed(2)]))
-    );
-    console.log(
-      'Ref:   ',
-      Object.fromEntries(Object.entries(ref).map(([k, v]) => [k, v.toFixed(2)]))
-    );
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);
@@ -206,19 +236,17 @@ describe('Moral Marketplace vs import reference', () => {
       risk: { riskNeutral: 100, upsideSkepticism: 0, lossAversion: 0, both: 0 },
       xrisk: { evaluateSame: 100, discount10: 0, discount50: 0, xriskOnly: 0 },
     };
+    // tf, rp, xr, aw, inv, svi, sic
     const ref = refAllocate(
       [1, 0, 0, 0],
       [1, 0, 0, 0],
-      [0, 0, 0, 0, 1],
-      [0, 0, 0, 0, 1],
       [1, 0, 0, 0],
+      [0, 0, 0, 0, 1],
+      [0, 0, 0, 0, 1],
       [1, 0, 0, 0],
       [1, 0, 0, 0]
     );
     const result = calculateMoralMarketplace(credences);
-
-    console.log('New (lives-only):   ', result);
-    console.log('Ref (lives-only):   ', ref);
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);
@@ -235,25 +263,17 @@ describe('Moral Marketplace vs import reference', () => {
       risk: { riskNeutral: 100, upsideSkepticism: 0, lossAversion: 0, both: 0 },
       xrisk: { evaluateSame: 100, discount10: 0, discount50: 0, xriskOnly: 0 },
     };
+    // tf, rp, xr, aw, inv, svi, sic
     const ref = refAllocate(
-      [0, 0, 1, 0],
-      [0, 0, 0, 1],
-      [1, 0, 0, 0, 0],
-      [1, 0, 0, 0, 0],
       [0, 0, 0, 1],
       [1, 0, 0, 0],
-      [1, 0, 0, 0]
+      [1, 0, 0, 0],
+      [1, 0, 0, 0, 0],
+      [1, 0, 0, 0, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 1]
     );
     const result = calculateMoralMarketplace(credences);
-
-    console.log(
-      'New (longtermist):   ',
-      Object.fromEntries(Object.entries(result).map(([k, v]) => [k, v.toFixed(2)]))
-    );
-    console.log(
-      'Ref (longtermist):   ',
-      Object.fromEntries(Object.entries(ref).map(([k, v]) => [k, v.toFixed(2)]))
-    );
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);
@@ -270,25 +290,17 @@ describe('Moral Marketplace vs import reference', () => {
       risk: { riskNeutral: 40, upsideSkepticism: 30, lossAversion: 20, both: 10 },
       xrisk: { evaluateSame: 50, discount10: 30, discount50: 15, xriskOnly: 5 },
     };
+    // tf, rp, xr, aw, inv, svi, sic
     const ref = refAllocate(
-      [0.1, 0.4, 0.4, 0.1],
-      [0.05, 0.3, 0.5, 0.15],
-      [0.1, 0.3, 0.3, 0.2, 0.1],
-      [0.05, 0.25, 0.35, 0.25, 0.1],
-      [0.1, 0.3, 0.4, 0.2],
-      [0.4, 0.3, 0.2, 0.1],
-      [0.5, 0.3, 0.15, 0.05]
+      [0.1, 0.3, 0.4, 0.2], // tf
+      [0.4, 0.3, 0.2, 0.1], // rp
+      [0.5, 0.3, 0.15, 0.05], // xr
+      [0.1, 0.3, 0.3, 0.2, 0.1], // aw
+      [0.05, 0.25, 0.35, 0.25, 0.1], // inv
+      [0.1, 0.4, 0.4, 0.1], // svi
+      [0.05, 0.3, 0.5, 0.15] // sic
     );
     const result = calculateMoralMarketplace(credences);
-
-    console.log(
-      'New (mixed):   ',
-      Object.fromEntries(Object.entries(result).map(([k, v]) => [k, v.toFixed(2)]))
-    );
-    console.log(
-      'Ref (mixed):   ',
-      Object.fromEntries(Object.entries(ref).map(([k, v]) => [k, v.toFixed(2)]))
-    );
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);

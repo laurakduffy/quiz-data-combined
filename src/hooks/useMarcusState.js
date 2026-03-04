@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { computeMultiStageAllocation } from '../utils/marcusCalculation';
 import { adjustCredences, roundCredences } from '../utils/calculations';
 import marcusConfig from '../../config/marcusMode.json';
+import projectsConfig from '../../config/projects.json';
 import worldviewPresets from '../../config/worldviewPresets.json';
 
 const STORAGE_KEY = 'marcus_state';
@@ -203,7 +204,7 @@ export function useMarcusState() {
     const { worldviews: wvs, credences: creds, stages: stgs } = debouncedState;
     if (!wvs.length) {
       const empty = {};
-      for (const id of Object.keys(marcusConfig.projects)) empty[id] = 0;
+      for (const id of Object.keys(projectsConfig.projects)) empty[id] = 0;
       return { allocations: empty, funding: empty, stageResults: [] };
     }
 
@@ -215,10 +216,10 @@ export function useMarcusState() {
 
     try {
       const result = computeMultiStageAllocation(
-        marcusConfig.projects,
+        projectsConfig.projects,
         worldviewsWithCredences,
         stgs,
-        marcusConfig.incrementSize
+        projectsConfig.incrementSize
       );
       console.log(
         '[marcus] recalc stages',
@@ -231,7 +232,7 @@ export function useMarcusState() {
             Object.entries(result.allocations)
               .filter(([, v]) => v > 0)
               .sort((a, b) => b[1] - a[1])
-              .map(([id, v]) => [marcusConfig.projects[id].name, `${v.toFixed(1)}%`])
+              .map(([id, v]) => [projectsConfig.projects[id].name, `${v.toFixed(1)}%`])
           ),
         }
       );
@@ -239,7 +240,7 @@ export function useMarcusState() {
     } catch (e) {
       console.error('[marcus] calc error', e);
       const empty = {};
-      for (const id of Object.keys(marcusConfig.projects)) empty[id] = 0;
+      for (const id of Object.keys(projectsConfig.projects)) empty[id] = 0;
       return { allocations: empty, funding: empty, stageResults: [] };
     }
   }, [debouncedState]);

@@ -58,8 +58,10 @@ function ResultsScreen() {
   } = useQuiz();
 
   const DEFAULT_BUDGET = 10_000_000;
+  const MAX_BUDGET_MILLIONS = 1000;
   const budget = marketplaceBudget ?? DEFAULT_BUDGET;
-  const [budgetInput, setBudgetInput] = useState(budget.toLocaleString());
+  const budgetMillions = Math.round(budget / 1_000_000);
+  const [budgetInput, setBudgetInput] = useState(String(budgetMillions));
 
   const [copied, setCopied] = useState(false);
   const [shareLoading, setShareLoading] = useState(false);
@@ -104,18 +106,19 @@ function ResultsScreen() {
     setSelectedCalculations({ [side]: methodKey });
   };
 
-  // Budget input handlers
+  // Budget input handlers (value in whole millions, max 1B)
   const handleBudgetChange = (e) => {
     setBudgetInput(e.target.value);
   };
 
   const handleBudgetBlur = () => {
     const parsed = parseInt(budgetInput.replace(/[^0-9]/g, ''), 10);
-    if (!isNaN(parsed) && parsed > 0) {
-      setMarketplaceBudget(parsed);
-      setBudgetInput(parsed.toLocaleString());
+    if (!isNaN(parsed) && parsed >= 1) {
+      const clamped = Math.min(parsed, MAX_BUDGET_MILLIONS);
+      setMarketplaceBudget(clamped * 1_000_000);
+      setBudgetInput(String(clamped));
     } else {
-      setBudgetInput(budget.toLocaleString());
+      setBudgetInput(String(budgetMillions));
     }
   };
 
@@ -341,17 +344,19 @@ function ResultsScreen() {
         <div className={styles.budgetRow}>
           <label className={marketplaceStyles.settingsLabel}>
             {copy.results.budgetLabel}
-            {copy.results.budgetInfo && <InfoTooltip content={copy.results.budgetInfo} />}
             <div className={marketplaceStyles.budgetInputWrapper}>
               <span className={marketplaceStyles.currencyPrefix}>$</span>
               <input
                 type="text"
+                inputMode="numeric"
                 value={budgetInput}
                 onChange={handleBudgetChange}
                 onBlur={handleBudgetBlur}
                 onKeyDown={handleBudgetKeyDown}
                 className={marketplaceStyles.budgetInput}
+                style={{ width: '60px' }}
               />
+              <span className={marketplaceStyles.currencyPrefix}>M</span>
             </div>
           </label>
         </div>

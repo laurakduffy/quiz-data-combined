@@ -43,3 +43,5 @@ __pycache__/
 
 # Netlify dev artifacts
 deno.lock
+
+quiz_to_worldviews*

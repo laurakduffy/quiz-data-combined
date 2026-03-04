@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import causesConfig from '../../config/causes.json';
+import causesConfig from '../utils/causesAdapter.js';
 import { buildDimensionsFromQuestions, DIMINISHING_RETURNS_POWER } from '../utils/calculations.js';
 import styles from '../styles/components/Debugger.module.css';
 

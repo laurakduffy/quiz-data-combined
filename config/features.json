@@ -20,11 +20,14 @@
   },
 
   "calculations": {
-    "order": ["moralMarketplace", "mergedFavorites", "maxEV", "parliament", "maximin"],
-    "showMoralMarketplace": true,
-    "showMergedFavorites": true,
-    "showMaxEV": true,
+    "order": ["credenceWeighted", "mec", "borda"],
+    "showCredenceWeighted": true,
+    "showMec": true,
+    "showBorda": true,
+    "showMoralMarketplace": false,
+    "showMaxEV": false,
     "showParliament": false,
+    "showMergedFavorites": false,
     "showMaximin": false,
     "sideBySideComparison": true
   },

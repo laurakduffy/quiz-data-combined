@@ -1,16 +1,37 @@
 /**
  * Moral Marketplace calculation module.
  *
- * Adapted from import/calculation.js. Uses 25,600 precomputed worldview
- * combinations, effects matrices (6 time periods x 4 risk profiles),
- * per-project diminishing returns curves, and typed-array-optimized
- * parliament voting.
+ * Uses 25,600 precomputed worldview combinations, effects matrices
+ * (6 time periods x 4 risk profiles), per-project diminishing returns
+ * curves, and typed-array-optimized parliament voting.
  *
- * Precomputation runs at module level (~27ms) and is cached as a singleton.
+ * Worldview generation uses the corrected moral weight derivation from
+ * quizToWorldviews.js (per-life-year anchoring, animal anchor fallback,
+ * mammals != chickens).
+ *
+ * Precomputation is lazy (runs on first call, cached as singleton).
  */
 
 import projectsConfig from '../../config/projects.json';
 import questionsConfig from '../../config/questions.json';
+import { calculateAllProjects, adjustForExtinctionRisk } from './projectScoring.js';
+import {
+  quizToWorldviews,
+  Q_TIMEFRAMES,
+  Q_RISK_PROFILE,
+  Q_XRISK,
+  Q_ANIMAL_WELFARE,
+  Q_INVERTEBRATES,
+  Q_SAVING_VS_IMPROVING,
+  Q_SAVING_VS_INCOME,
+  SAVING_VS_IMPROVING_OPTIONS,
+  SAVING_VS_INCOME_OPTIONS,
+  ANIMAL_WELFARE_FRACTIONS,
+  INVERTEBRATE_FRACTIONS,
+  XRISK_OPTIONS,
+  TIMEFRAME_PROFILES,
+  RISK_PROFILE_OPTIONS,
+} from './quizToWorldviews.js';
 
 const {
   projects: PROJECT_DATA,
@@ -19,17 +40,29 @@ const {
 } = projectsConfig;
 
 // =============================================================================
-// QUESTION ORDER FOR MORAL MARKETPLACE
+// QUIZ QUESTION MAPPING
 // =============================================================================
 
 /**
- * The Moral Marketplace calculation requires questions in a specific order:
- * Q1=disability weights, Q2=income weights, Q3=animal weights,
- * Q4=invertebrate weights, Q5=timeframe discounts, Q6=risk profile, Q7=xrisk.
- *
- * This maps question IDs to their calculation position.
+ * Maps quiz question IDs (from questions.json) to quizToWorldviews question keys.
+ * The quiz UI uses question IDs like 'disability', 'income', etc.
+ * The worldview engine uses keys like Q_SAVING_VS_IMPROVING, Q_SAVING_VS_INCOME, etc.
  */
-const MARKETPLACE_QUESTION_ORDER = [
+const QUIZ_ID_TO_WORLDVIEW_KEY = {
+  disability: Q_SAVING_VS_IMPROVING,
+  income: Q_SAVING_VS_INCOME,
+  animal: Q_ANIMAL_WELFARE,
+  invertebrate: Q_INVERTEBRATES,
+  timeframes: Q_TIMEFRAMES,
+  risk: Q_RISK_PROFILE,
+  xrisk: Q_XRISK,
+};
+
+/**
+ * The ordered list of quiz question IDs that feed into the marketplace calculation.
+ * Must have all 7 questions for the calculation to work.
+ */
+const MARKETPLACE_QUESTION_IDS = [
   'disability',
   'income',
   'animal',
@@ -40,140 +73,59 @@ const MARKETPLACE_QUESTION_ORDER = [
 ];
 
 /**
- * Build ordered quiz option arrays from marketplaceValue fields on each option.
- * Returns an array of question mappings with their option values.
+ * Check if all required marketplace questions are configured in questions.json.
  */
-function buildQuizOptions() {
-  const questionsById = {};
-  for (const question of questionsConfig.questions) {
-    if (question.options) questionsById[question.id] = question;
-  }
-
-  const mappings = [];
-
-  for (const questionId of MARKETPLACE_QUESTION_ORDER) {
-    const question = questionsById[questionId];
-    if (!question) continue;
-
-    // Check that at least the first option has a marketplaceValue
-    if (question.options[0].marketplaceValue === undefined) continue;
-
-    const optionValues = question.options.map((opt) => opt.marketplaceValue);
-    mappings.push({ questionId, optionValues });
-  }
-
-  return mappings;
+function hasAllMarketplaceQuestions() {
+  const questionIds = new Set(
+    questionsConfig.questions
+      .filter((q) => q.options && q.options[0]?.marketplaceValue !== undefined)
+      .map((q) => q.id)
+  );
+  return MARKETPLACE_QUESTION_IDS.every((id) => questionIds.has(id));
 }
 
-const QUIZ_MAPPINGS = buildQuizOptions();
-const QUIZ_OPTIONS = QUIZ_MAPPINGS.map((m) => m.optionValues);
+const HAS_ALL_QUESTIONS = hasAllMarketplaceQuestions();
 
 // =============================================================================
-// MORAL WEIGHTS FROM QUIZ ANSWERS
+// PRECOMPUTATION (runs once, cached as singleton)
 // =============================================================================
 
-function buildMoralWeights(q1Daly, q2Income, q3ChickenMult, q4ShrimpMult) {
-  const chickens = q1Daly * q3ChickenMult;
-  const invertebrates = q1Daly * q4ShrimpMult;
-  const fish = (invertebrates + chickens) / 2;
-
-  return {
-    human_life_years: 1.0,
-    human_ylds: q1Daly,
-    human_income_doublings: q2Income,
-    chickens_birds: chickens,
-    mammals: chickens,
-    fish,
-    shrimp: invertebrates,
-    non_shrimp_invertebrates: invertebrates,
-  };
-}
-
-// =============================================================================
-// CALCULATOR FUNCTIONS
-// =============================================================================
-
-function calculateSingleEffect(effectData, moralWeight, discountFactors, riskProfile) {
-  const values = effectData.values;
-  let sum = 0;
-  for (let t = 0; t < 6; t++) {
-    sum += values[t][riskProfile] * discountFactors[t];
-  }
-  return moralWeight * sum;
-}
-
-function calculateProject(projectData, moralWeights, discountFactors, riskProfile) {
-  let total = 0;
-  for (const effectData of Object.values(projectData.effects)) {
-    const mi = moralWeights[effectData.recipient_type] ?? 0;
-    total += calculateSingleEffect(effectData, mi, discountFactors, riskProfile);
-  }
-  return total;
-}
-
-function calculateAllProjects(data, moralWeights, discountFactors, riskProfile) {
-  const result = {};
-  for (const [projectId, projectData] of Object.entries(data)) {
-    result[projectId] = calculateProject(projectData, moralWeights, discountFactors, riskProfile);
-  }
-  return result;
-}
-
-function adjustForExtinctionRisk(projectValues, data, pExtinction) {
-  const adjusted = {};
-  for (const [projectId, value] of Object.entries(projectValues)) {
-    if (data[projectId].tags.near_term_xrisk) {
-      adjusted[projectId] = value;
-    } else {
-      adjusted[projectId] = value * (1 - pExtinction);
-    }
-  }
-  return adjusted;
-}
-
-// =============================================================================
-// DIMINISHING RETURNS
-// =============================================================================
-
-function getDiminishingReturnsFactor(data, projectId, currentFunding) {
-  const idx = Math.floor(currentFunding / 10);
-  const drArray = data[projectId].diminishing_returns;
-  if (idx >= drArray.length) {
-    return drArray[drArray.length - 1];
-  }
-  return drArray[idx];
-}
-
-// =============================================================================
-// PRECOMPUTATION (runs once at module level)
-// =============================================================================
-
+/**
+ * Precompute project values for all 25,600 worldview combinations.
+ *
+ * Uses quizToWorldviews with pruningMode='none' to generate all combos,
+ * then runs calculateAllProjects + adjustForExtinctionRisk for each.
+ *
+ * The ordering is deterministic: iterates tf, rp, xr, aw, inv, svi, sic
+ * in nested loops, matching quizToWorldviews internal order.
+ */
 function precomputeAllWorldviews(data = PROJECT_DATA) {
-  if (QUIZ_OPTIONS.length < 7) {
-    // Not enough questions configured (e.g., in test environment)
-    return [];
-  }
-  const [q1Opts, q2Opts, q3Opts, q4Opts, q5Opts, q6Opts, q7Opts] = QUIZ_OPTIONS;
-  const results = [];
+  if (!HAS_ALL_QUESTIONS) return [];
 
-  for (const q1 of q1Opts) {
-    for (const q2 of q2Opts) {
-      for (const q3 of q3Opts) {
-        for (const q4 of q4Opts) {
-          for (let q5Idx = 0; q5Idx < q5Opts.length; q5Idx++) {
-            for (const q6 of q6Opts) {
-              for (const q7 of q7Opts) {
-                const moralWeights = buildMoralWeights(q1, q2, q3, q4);
-                const discountFactors = q5Opts[q5Idx];
-                const baseValues = calculateAllProjects(data, moralWeights, discountFactors, q6);
-                const adjustedValues = adjustForExtinctionRisk(baseValues, data, q7);
-                results.push({ project_values: adjustedValues });
-              }
-            }
-          }
-        }
-      }
-    }
+  // Generate all 25,600 worldview dicts (no pruning, no credence needed)
+  // We use uniform credences just to generate the full set
+  const uniformCredences = {
+    [Q_TIMEFRAMES]: [0.25, 0.25, 0.25, 0.25],
+    [Q_RISK_PROFILE]: [0.25, 0.25, 0.25, 0.25],
+    [Q_XRISK]: [0.25, 0.25, 0.25, 0.25],
+    [Q_ANIMAL_WELFARE]: [0.2, 0.2, 0.2, 0.2, 0.2],
+    [Q_INVERTEBRATES]: [0.2, 0.2, 0.2, 0.2, 0.2],
+    [Q_SAVING_VS_IMPROVING]: [0.25, 0.25, 0.25, 0.25],
+    [Q_SAVING_VS_INCOME]: [0.25, 0.25, 0.25, 0.25],
+  };
+
+  const allWorldviews = quizToWorldviews(uniformCredences, { pruningMode: 'none' });
+
+  const results = [];
+  for (const wv of allWorldviews) {
+    const baseValues = calculateAllProjects(
+      data,
+      wv.moral_weights,
+      wv.discount_factors,
+      wv.risk_profile
+    );
+    const adjustedValues = adjustForExtinctionRisk(baseValues, data, wv.p_extinction);
+    results.push({ project_values: adjustedValues });
   }
 
   return results;
@@ -192,20 +144,29 @@ function getPrecomputedResults() {
 // WORLDVIEW CREDENCES
 // =============================================================================
 
+/**
+ * Compute credences for each of the 25,600 worldview combinations.
+ * credArrays must be in the same order as the precomputed results
+ * (tf, rp, xr, aw, inv, svi, sic).
+ *
+ * @param {Array} credArrays - 7 arrays of credence fractions (sum to 1.0 each)
+ * @returns {Array} Active worldviews with { result_idx, credence }
+ */
 function computeWorldviewCredences(credArrays) {
   const worldviews = [];
   let idx = 0;
 
-  const [q1, q2, q3, q4, q5, q6, q7] = credArrays;
+  const [cTf, cRp, cXr, cAw, cInv, cSvi, cSic] = credArrays;
 
-  for (let i1 = 0; i1 < q1.length; i1++) {
-    for (let i2 = 0; i2 < q2.length; i2++) {
-      for (let i3 = 0; i3 < q3.length; i3++) {
-        for (let i4 = 0; i4 < q4.length; i4++) {
-          for (let i5 = 0; i5 < q5.length; i5++) {
-            for (let i6 = 0; i6 < q6.length; i6++) {
-              for (let i7 = 0; i7 < q7.length; i7++) {
-                const credence = q1[i1] * q2[i2] * q3[i3] * q4[i4] * q5[i5] * q6[i6] * q7[i7];
+  for (let iTf = 0; iTf < cTf.length; iTf++) {
+    for (let iRp = 0; iRp < cRp.length; iRp++) {
+      for (let iXr = 0; iXr < cXr.length; iXr++) {
+        for (let iAw = 0; iAw < cAw.length; iAw++) {
+          for (let iInv = 0; iInv < cInv.length; iInv++) {
+            for (let iSvi = 0; iSvi < cSvi.length; iSvi++) {
+              for (let iSic = 0; iSic < cSic.length; iSic++) {
+                const credence =
+                  cTf[iTf] * cRp[iRp] * cXr[iXr] * cAw[iAw] * cInv[iInv] * cSvi[iSvi] * cSic[iSic];
                 if (credence > 0) {
                   worldviews.push({ result_idx: idx, credence });
                 }
@@ -288,6 +249,82 @@ function voteParliamentFast(data, funding, increment, { packed }) {
   return allocations;
 }
 
+function voteMecFast(data, funding, increment, { packed }) {
+  const { scoreMatrix, credences, numActive, projectIds, drArrays } = packed;
+  const numProjects = projectIds.length;
+
+  const drFactors = new Float64Array(numProjects);
+  for (let p = 0; p < numProjects; p++) {
+    const idx = Math.floor(funding[projectIds[p]] / 10);
+    const arr = drArrays[p];
+    drFactors[p] = idx >= arr.length ? arr[arr.length - 1] : arr[idx];
+  }
+
+  const expectedScores = new Float64Array(numProjects);
+  for (let w = 0; w < numActive; w++) {
+    const base = w * numProjects;
+    const cred = credences[w];
+    for (let p = 0; p < numProjects; p++) {
+      expectedScores[p] += cred * scoreMatrix[base + p] * drFactors[p];
+    }
+  }
+
+  let bestP = 0;
+  for (let p = 1; p < numProjects; p++) {
+    if (expectedScores[p] > expectedScores[bestP]) bestP = p;
+  }
+
+  const allocations = {};
+  for (let p = 0; p < numProjects; p++) {
+    allocations[projectIds[p]] = p === bestP ? increment : 0;
+  }
+  return allocations;
+}
+
+function voteBordaFast(data, funding, increment, { packed }) {
+  const { scoreMatrix, credences, numActive, projectIds, drArrays } = packed;
+  const numProjects = projectIds.length;
+
+  const drFactors = new Float64Array(numProjects);
+  for (let p = 0; p < numProjects; p++) {
+    const idx = Math.floor(funding[projectIds[p]] / 10);
+    const arr = drArrays[p];
+    drFactors[p] = idx >= arr.length ? arr[arr.length - 1] : arr[idx];
+  }
+
+  const bordaScores = new Float64Array(numProjects);
+  const indices = new Array(numProjects);
+  for (let i = 0; i < numProjects; i++) indices[i] = i;
+
+  for (let w = 0; w < numActive; w++) {
+    const base = w * numProjects;
+    const cred = credences[w];
+
+    indices.sort((a, b) => {
+      const va = scoreMatrix[base + a] * drFactors[a];
+      const vb = scoreMatrix[base + b] * drFactors[b];
+      return vb - va || a - b;
+    });
+
+    for (let rank = 0; rank < numProjects; rank++) {
+      bordaScores[indices[rank]] += cred * (numProjects - 1 - rank);
+    }
+
+    for (let i = 0; i < numProjects; i++) indices[i] = i;
+  }
+
+  let bestP = 0;
+  for (let p = 1; p < numProjects; p++) {
+    if (bordaScores[p] > bordaScores[bestP]) bestP = p;
+  }
+
+  const allocations = {};
+  for (let p = 0; p < numProjects; p++) {
+    allocations[projectIds[p]] = p === bestP ? increment : 0;
+  }
+  return allocations;
+}
+
 // =============================================================================
 // BUDGET ALLOCATION LOOP
 // =============================================================================
@@ -320,27 +357,40 @@ function allocateBudget(data, votingMethod, totalBudget, opts = {}) {
 
 /**
  * Convert quiz credences from { questionId: { optionKey: value } } format
- * to ordered arrays of floats summing to 1.0 for each question.
+ * to ordered arrays of floats summing to 1.0, in the worldview engine order:
+ * [timeframes, risk_profile, xrisk, animal, invertebrate, disability, income]
  *
  * @param {Object} credences - Quiz credences keyed by question ID
- * @returns {Array} Array of 7 credence arrays, ordered by questionIndex
+ * @returns {Array} Array of 7 credence arrays
  */
 function convertCredences(credences) {
   const credArrays = [];
 
-  for (const mapping of QUIZ_MAPPINGS) {
-    const questionCredences = credences[mapping.questionId];
-    if (!questionCredences) {
-      // Default: equal split
-      const n = mapping.optionValues.length;
+  // Order must match precomputation: tf, rp, xr, aw, inv, svi, sic
+  const orderedQuizIds = [
+    'timeframes',
+    'risk',
+    'xrisk',
+    'animal',
+    'invertebrate',
+    'disability',
+    'income',
+  ];
+
+  for (const questionId of orderedQuizIds) {
+    const questionCredences = credences[questionId];
+
+    // Find the question config to get option order
+    const question = questionsConfig.questions.find((q) => q.id === questionId);
+    if (!question || !question.options) {
+      // Fallback: equal split based on expected option count
+      const n = questionId === 'animal' || questionId === 'invertebrate' ? 5 : 4;
       credArrays.push(new Array(n).fill(1 / n));
       continue;
     }
 
-    // Find the question config to get option order
-    const question = questionsConfig.questions.find((q) => q.id === mapping.questionId);
-    if (!question || !question.options) {
-      const n = mapping.optionValues.length;
+    if (!questionCredences) {
+      const n = question.options.length;
       credArrays.push(new Array(n).fill(1 / n));
       continue;
     }
@@ -364,6 +414,11 @@ function convertCredences(credences) {
 /**
  * Calculate Moral Marketplace allocation from quiz credences.
  *
+ * Uses the corrected moral weight derivation from quizToWorldviews.js:
+ * - Per-life-year anchoring (not full-life)
+ * - Animal anchor fallback (non-zero animal weights when DALY=0)
+ * - Mammals = min(chickens * 1.1, 1.0), not equal to chickens
+ *
  * @param {Object} credences - Quiz credences { questionId: { optionKey: value } }
  * @param {Object} [options] - Optional configuration
  * @param {number} [options.budget] - Budget in dollars (converted to $M internally).
@@ -371,8 +426,7 @@ function convertCredences(credences) {
  * @returns {Object} Allocation percentages { project_id: percentage }
  */
 export function calculateMoralMarketplace(credences, options = {}) {
-  if (QUIZ_MAPPINGS.length < 7) {
-    // Not enough questions configured — return empty allocation
+  if (!HAS_ALL_QUESTIONS) {
     const result = {};
     for (const projectId of Object.keys(PROJECT_DATA)) {
       result[projectId] = 0;
@@ -380,29 +434,74 @@ export function calculateMoralMarketplace(credences, options = {}) {
     return result;
   }
 
-  // Convert UI budget (dollars) to $M scale used by the calculation
   const budget = options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET;
-
-  // Convert credences to ordered arrays
   const credArrays = convertCredences(credences);
-
-  // Compute worldview credences (which of the 25,600 are active and their weights)
   const worldviews = computeWorldviewCredences(credArrays);
-
-  // Pack into typed arrays for fast parliament voting
   const packed = packForParliament(getPrecomputedResults(), worldviews, PROJECT_DATA);
 
-  // Run budget allocation with parliament voting
   const { funding } = allocateBudget(PROJECT_DATA, voteParliamentFast, budget, {
     packed,
     incrementSize: INCREMENT_SIZE,
   });
 
-  // Convert dollar funding to percentages
   const result = {};
   for (const [projectId, amount] of Object.entries(funding)) {
     result[projectId] = (amount / budget) * 100;
   }
 
+  return result;
+}
+
+export { calculateMoralMarketplace as calculateCredenceWeighted };
+
+export function calculateMec(credences, options = {}) {
+  if (!HAS_ALL_QUESTIONS) {
+    const result = {};
+    for (const projectId of Object.keys(PROJECT_DATA)) {
+      result[projectId] = 0;
+    }
+    return result;
+  }
+
+  const budget = options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET;
+  const credArrays = convertCredences(credences);
+  const worldviews = computeWorldviewCredences(credArrays);
+  const packed = packForParliament(getPrecomputedResults(), worldviews, PROJECT_DATA);
+
+  const { funding } = allocateBudget(PROJECT_DATA, voteMecFast, budget, {
+    packed,
+    incrementSize: INCREMENT_SIZE,
+  });
+
+  const result = {};
+  for (const [projectId, amount] of Object.entries(funding)) {
+    result[projectId] = (amount / budget) * 100;
+  }
+  return result;
+}
+
+export function calculateBorda(credences, options = {}) {
+  if (!HAS_ALL_QUESTIONS) {
+    const result = {};
+    for (const projectId of Object.keys(PROJECT_DATA)) {
+      result[projectId] = 0;
+    }
+    return result;
+  }
+
+  const budget = options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET;
+  const credArrays = convertCredences(credences);
+  const worldviews = computeWorldviewCredences(credArrays);
+  const packed = packForParliament(getPrecomputedResults(), worldviews, PROJECT_DATA);
+
+  const { funding } = allocateBudget(PROJECT_DATA, voteBordaFast, budget, {
+    packed,
+    incrementSize: INCREMENT_SIZE,
+  });
+
+  const result = {};
+  for (const [projectId, amount] of Object.entries(funding)) {
+    result[projectId] = (amount / budget) * 100;
+  }
   return result;
 }

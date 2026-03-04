@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import validateCausesConfig from './utils/validateCauses.js';
 import validateQuestionsConfig from './utils/validateQuestions.js';
-import causesConfig from '../config/causes.json';
+import causesConfig from './utils/causesAdapter.js';
 import questionsConfig from '../config/questions.json';
 
 // Validate configs on startup (dev mode only)

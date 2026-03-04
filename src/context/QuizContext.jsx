@@ -9,7 +9,7 @@ import {
 } from 'react';
 import questionsConfigBasic from '../../config/questions.json';
 import questionsConfigAdvanced from '../../config/questions-advanced.json';
-import causesConfig from '../../config/causes.json';
+import causesConfig from '../utils/causesAdapter.js';
 import features from '../../config/features.json';
 import { detectShareUrl, parseShareUrl, clearShareHash } from '../utils/shareUrl';
 import {
@@ -34,7 +34,12 @@ import {
   calculateMergedFavorites,
   calculateMaximin,
 } from '../utils/calculations';
-import { calculateMoralMarketplace as calculateMM } from '../utils/moralMarketplace';
+import {
+  calculateCredenceWeighted,
+  calculateMec,
+  calculateBorda,
+  calculateMoralMarketplace as calculateMM,
+} from '../utils/moralMarketplace';
 import { getEnabledMethods } from '../constants/calculationMethods';
 
 // Load questions based on advanced mode flag
@@ -954,6 +959,12 @@ export function QuizProvider({ children }) {
   // Calculate a single method by key
   const computeMethod = useCallback((key, credences, debugConfig, marketplaceBudget) => {
     switch (key) {
+      case 'credenceWeighted':
+        return calculateCredenceWeighted(credences, { budget: marketplaceBudget });
+      case 'mec':
+        return calculateMec(credences, { budget: marketplaceBudget });
+      case 'borda':
+        return calculateBorda(credences, { budget: marketplaceBudget });
       case 'moralMarketplace':
         return calculateMM(credences, { budget: marketplaceBudget });
       case 'maxEV':
