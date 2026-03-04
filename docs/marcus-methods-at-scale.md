@@ -1,6 +1,6 @@
-# Marcus Voting Methods at 25,600 Worldviews
+# Table Mode Voting Methods at 25,600 Worldviews
 
-When the quiz generates worldview combinations from 7 questions (4–5 options each), the full enumeration produces 25,600 worldviews. This document assesses which Marcus Mode voting methods are viable at that scale.
+When the quiz generates worldview combinations from 7 questions (4–5 options each), the full enumeration produces 25,600 worldviews. This document assesses which Table Mode voting methods are viable at that scale.
 
 ## Key Parameters
 
@@ -10,7 +10,7 @@ When the quiz generates worldview combinations from 7 questions (4–5 options e
 
 ## Precomputation Requirement
 
-All viable methods need the marketplace's precompute-then-lookup pattern: compute base project scores once per worldview (via `calculateAllProjects` + `adjustForExtinctionRisk`), then only multiply by DR factors in the budget loop. The current Marcus code recomputes everything from scratch each iteration — that must change.
+All viable methods need the marketplace's precompute-then-lookup pattern: compute base project scores once per worldview (via `calculateAllProjects` + `adjustForExtinctionRisk`), then only multiply by DR factors in the budget loop. The current Table Mode code recomputes everything from scratch each iteration — that must change.
 
 ## Viable Methods
 

@@ -6,6 +6,19 @@
 /* Raleway - RP Brand Font */
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap');
 
+/*
+ * Raleway uses oldstyle (non-lining) numerals — digits like 8 sit high
+ * and 9 drops below the baseline. Override just 0-9 with the system font
+ * so numbers align consistently while keeping Raleway for all other text.
+ */
+@font-face {
+  font-family: 'Raleway';
+  src:
+    local('system-ui'), local('-apple-system'), local('Segoe UI'), local('Roboto'),
+    local('Helvetica Neue'), local('Arial');
+  unicode-range: U+0030-0039, U+002C, U+002E, U+0025; /* 0-9 , . % */
+}
+
 /* Cormorant Garamond - For decorative headings */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400;1,500&display=swap');
 

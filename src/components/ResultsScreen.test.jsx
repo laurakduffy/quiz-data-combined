@@ -129,7 +129,6 @@ const createMockContextValue = (overrides = {}) => {
   const resetQuiz = overrides.resetQuiz || vi.fn();
   return {
     questionsConfig: mockQuestions,
-    causesConfig: mockCausesConfig,
     stateMap: createMockStateMap(resetQuiz),
     expandedPanel: null,
     setExpandedPanel: vi.fn(),

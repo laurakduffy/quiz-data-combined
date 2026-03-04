@@ -1,4 +1,4 @@
-import styles from '../../styles/components/MarcusModeV2.module.css';
+import styles from '../../styles/components/TableMode.module.css';
 
 function MethodOption({ optKey, optDef, currentValue, allCurrentValues, onChange }) {
   // Check showWhen condition

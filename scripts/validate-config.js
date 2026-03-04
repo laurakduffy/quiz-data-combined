@@ -15,7 +15,6 @@ const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..');
 
 // Import validators
-const { validateCausesConfig } = await import(join(projectRoot, 'src/utils/validateCauses.js'));
 const { validateQuestionsConfig } = await import(
   join(projectRoot, 'src/utils/validateQuestions.js')
 );
@@ -43,28 +42,15 @@ function loadJson(filename) {
 }
 
 // Load all config files (validates JSON syntax)
-const causesConfig = loadJson('causes.json');
 const questionsConfig = loadJson('questions.json');
 const questionsAdvancedConfig = loadJson('questions-advanced.json');
 const featuresConfig = loadJson('features.json');
 const copyConfig = loadJson('copy.json');
 
-// Validate causes.json structure
-if (causesConfig) {
-  try {
-    validateCausesConfig(causesConfig);
-    console.log('✓ causes.json validated successfully');
-  } catch (error) {
-    console.error('✗ causes.json validation failed:');
-    console.error(`  ${error.message}`);
-    hasErrors = true;
-  }
-}
-
 // Validate questions.json structure
-if (questionsConfig && causesConfig) {
+if (questionsConfig) {
   try {
-    validateQuestionsConfig(questionsConfig, causesConfig);
+    validateQuestionsConfig(questionsConfig);
     console.log('✓ questions.json validated successfully');
   } catch (error) {
     console.error('✗ questions.json validation failed:');
@@ -91,7 +77,7 @@ if (featuresConfig) {
   const errors = [];
 
   // Check expected top-level keys
-  const expectedKeys = ['ui', 'calculations', 'developer'];
+  const expectedKeys = ['ui', 'calculations'];
   for (const key of expectedKeys) {
     if (featuresConfig[key] && typeof featuresConfig[key] !== 'object') {
       errors.push(`"${key}" should be an object`);

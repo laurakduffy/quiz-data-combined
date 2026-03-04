@@ -1,12 +1,10 @@
 import DisclaimerScreen from './DisclaimerScreen';
 import WelcomeScreen from './WelcomeScreen';
-import WorldviewHub from './WorldviewHub';
 import QuestionScreen from './QuestionScreen';
 import RatioQuestion from './RatioQuestion';
 import IntermissionScreen from './IntermissionScreen';
 import ResultsScreen from './ResultsScreen';
-import MoralMarketplaceScreen from './MoralMarketplaceScreen';
-import MarcusModeScreen from './marcus/MarcusModeScreen';
+import TableModeScreen from './table/TableModeScreen';
 import CalculationDebugger from './CalculationDebugger';
 import { useState, useEffect } from 'react';
 import { useQuiz } from '../context/useQuiz';
@@ -34,20 +32,18 @@ const toastStyle = {
 function MoralParliamentQuiz() {
   const { currentStep, currentQuestion, setDebugConfig, shareUrlError, isHydrating } = useQuiz();
 
-  // Hash-based route: #table or #table&s=<id> renders Marcus Mode
-  const [isMarcusRoute, setIsMarcusRoute] = useState(() =>
-    window.location.hash.startsWith('#table')
-  );
+  // Hash-based route: #table or #table&s=<id> renders Table Mode
+  const [isTableRoute, setIsTableRoute] = useState(() => window.location.hash.startsWith('#table'));
 
   useEffect(() => {
-    const onHashChange = () => setIsMarcusRoute(window.location.hash.startsWith('#table'));
+    const onHashChange = () => setIsTableRoute(window.location.hash.startsWith('#table'));
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  // Hash route: #table renders Marcus Mode directly
-  if (isMarcusRoute) {
-    return <MarcusModeScreen />;
+  // Hash route: #table renders Table Mode directly
+  if (isTableRoute) {
+    return <TableModeScreen />;
   }
 
   // Show nothing while hydrating to avoid flash of welcome screen
@@ -55,18 +51,16 @@ function MoralParliamentQuiz() {
     return null;
   }
 
-  // Marcus Mode feature flag: dense single-page layout bypassing all navigation
-  if (features.ui?.marcusMode === true) {
-    return <MarcusModeScreen />;
+  // Table Mode feature flag: dense single-page layout bypassing all navigation
+  if (features.ui?.tableMode === true) {
+    return <TableModeScreen />;
   }
 
   // Determine which screen to render
   function getScreenContent() {
     if (currentStep === 'disclaimer') return <DisclaimerScreen />;
     if (currentStep === 'welcome') return <WelcomeScreen />;
-    if (currentStep === 'hub') return <WorldviewHub />;
     if (currentStep === 'results') return <ResultsScreen />;
-    if (currentStep === 'marketplace') return <MoralMarketplaceScreen />;
     if (!currentQuestion) return null;
 
     // Route ratio questions to RatioQuestion component
@@ -85,9 +79,7 @@ function MoralParliamentQuiz() {
     <>
       {shareUrlError && <div style={toastStyle}>{shareUrlError}</div>}
       {getScreenContent()}
-      {features.developer?.calculationDebugger && (
-        <CalculationDebugger onConfigChange={setDebugConfig} />
-      )}
+      <CalculationDebugger onConfigChange={setDebugConfig} />
     </>
   );
 }

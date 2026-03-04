@@ -75,7 +75,7 @@ describe('QuizContext - Intermission Progress Calculation', () => {
 
   it('excludes intermission from totalQuestions count', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: true } },
     }));
@@ -92,7 +92,7 @@ describe('QuizContext - Intermission Progress Calculation', () => {
 
   it('shows correct question number when on first question', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: true } },
     }));
@@ -113,7 +113,7 @@ describe('QuizContext - Intermission Progress Calculation', () => {
 
   it('shows correct question number when on intermission', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: true } },
     }));
@@ -139,7 +139,7 @@ describe('QuizContext - Intermission Progress Calculation', () => {
 
   it('shows correct question number after intermission', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: true } },
     }));
@@ -167,7 +167,7 @@ describe('QuizContext - Intermission Progress Calculation', () => {
 
   it('calculates correct progress percentage excluding intermission', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: true } },
     }));
@@ -205,7 +205,7 @@ describe('QuizContext - Intermission Feature Flag', () => {
 
   it('filters out intermission questions when questionTypes is disabled', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: false } },
     }));
@@ -223,7 +223,7 @@ describe('QuizContext - Intermission Feature Flag', () => {
 
   it('navigates directly from q1 to q2 when questionTypes is disabled', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: false } },
     }));
@@ -249,7 +249,7 @@ describe('QuizContext - Intermission Feature Flag', () => {
 
   it('includes intermission in navigation when questionTypes is enabled', async () => {
     vi.doMock('../../config/questions.json', () => ({ default: mockQuestionsWithIntermission }));
-    vi.doMock('../../config/causes.json', () => ({ default: mockCauses }));
+
     vi.doMock('../../config/features.json', () => ({
       default: { ui: { questionTypes: true } },
     }));

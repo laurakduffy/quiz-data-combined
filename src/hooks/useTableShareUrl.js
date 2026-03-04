@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { generateMarcusShareUrl } from '../utils/marcusShareUrl';
+import { generateTableShareUrl } from '../utils/tableShareUrl';
 
 /**
  * Fallback clipboard copy using execCommand.
@@ -14,7 +14,7 @@ function copyToClipboardFallback(text) {
 }
 
 /**
- * Hook for Marcus Mode share URL generation and clipboard copy.
+ * Hook for Table Mode share URL generation and clipboard copy.
  *
  * @param {Object} options
  * @param {Array} options.worldviews
@@ -22,7 +22,7 @@ function copyToClipboardFallback(text) {
  * @param {Array} options.stages
  * @returns {{ copied: boolean, loading: boolean, error: string|null, handleShare: Function }}
  */
-export function useMarcusShareUrl({ worldviews, credences, stages }) {
+export function useTableShareUrl({ worldviews, credences, stages }) {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -31,7 +31,7 @@ export function useMarcusShareUrl({ worldviews, credences, stages }) {
     setError(null);
     setLoading(true);
 
-    const urlPromise = generateMarcusShareUrl({
+    const urlPromise = generateTableShareUrl({
       worldviews,
       credences,
       stages,

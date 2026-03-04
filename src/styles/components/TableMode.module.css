@@ -48,7 +48,7 @@
 }
 
 .labelHeader {
-  height: 40px;
+  height: 52px;
   display: flex;
   align-items: center;
   padding: 0 var(--spacing-3);
@@ -83,8 +83,8 @@
 /* Worldview column */
 .worldviewColumn {
   flex-shrink: 0;
-  min-width: 80px;
-  max-width: 120px;
+  min-width: 90px;
+  max-width: 130px;
   border-right: 1px solid var(--border-subtle);
 }
 
@@ -98,13 +98,18 @@
 
 /* Column header */
 .columnHeader {
-  height: 40px;
+  height: 52px;
   display: flex;
-  align-items: center;
-  gap: var(--spacing-1);
-  padding: 0 var(--spacing-2);
+  flex-direction: column;
+  padding: var(--spacing-1) var(--spacing-2);
   border-bottom: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.02);
+}
+
+.columnHeaderControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .dragHandle {
@@ -133,7 +138,7 @@
 }
 
 .presetSelect {
-  flex: 1;
+  width: 100%;
   min-width: 0;
   background: transparent;
   border: 1px solid transparent;
@@ -142,7 +147,7 @@
   font-size: var(--text-xs);
   font-weight: var(--font-medium);
   font-family: var(--font-heading);
-  padding: var(--spacing-1);
+  padding: 0 var(--spacing-1);
   cursor: pointer;
 }
 

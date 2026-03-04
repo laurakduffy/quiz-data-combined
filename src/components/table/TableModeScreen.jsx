@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useMarcusState } from '../../hooks/useMarcusState';
-import { useMarcusShareUrl } from '../../hooks/useMarcusShareUrl';
-import { parseMarcusShareUrl } from '../../utils/marcusShareUrl';
+import { useTableState } from '../../hooks/useTableState';
+import { useTableShareUrl } from '../../hooks/useTableShareUrl';
+import { parseTableShareUrl } from '../../utils/tableShareUrl';
 import SpreadsheetInput from './SpreadsheetInput';
 import ResultsPanel from './ResultsPanel';
 import ShareButton from '../ui/ShareButton';
-import styles from '../../styles/components/MarcusModeV2.module.css';
+import styles from '../../styles/components/TableMode.module.css';
 
-function MarcusModeScreen() {
+function TableModeScreen() {
   const {
     worldviews,
     credences,
@@ -27,7 +27,7 @@ function MarcusModeScreen() {
     updateStage,
     updateStageOption,
     hydrateFromShare,
-  } = useMarcusState();
+  } = useTableState();
 
   const [hydrating, setHydrating] = useState(false);
   const [shareError, setShareError] = useState(null);
@@ -38,7 +38,7 @@ function MarcusModeScreen() {
     async function hydrate() {
       setHydrating(true);
       try {
-        const data = await parseMarcusShareUrl();
+        const data = await parseTableShareUrl();
         if (cancelled) return;
         if (data?.error) {
           setShareError(data.error);
@@ -69,7 +69,7 @@ function MarcusModeScreen() {
     loading,
     error: shareUrlError,
     handleShare,
-  } = useMarcusShareUrl({
+  } = useTableShareUrl({
     worldviews,
     credences,
     stages,
@@ -139,4 +139,4 @@ function MarcusModeScreen() {
   );
 }
 
-export default MarcusModeScreen;
+export default TableModeScreen;

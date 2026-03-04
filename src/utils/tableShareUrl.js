@@ -2,11 +2,11 @@ import { getOrCreateSessionId } from './session';
 import { endpoints } from '../config/api';
 
 /**
- * Parse the hash fragment for Marcus Mode.
+ * Parse the hash fragment for Table Mode.
  * Supports: #table, #table&s=<id>
  * @returns {{ isTable: boolean, shareId: string|null }}
  */
-export function parseMarcusHash() {
+export function parseTableHash() {
   const hash = window.location.hash;
   if (!hash.startsWith('#table')) return { isTable: false, shareId: null };
 
@@ -18,8 +18,8 @@ export function parseMarcusHash() {
 }
 
 /**
- * Generate a share URL for Marcus Mode state.
- * Posts state to /api/share with type: 'marcus' and returns a URL
+ * Generate a share URL for Table Mode state.
+ * Posts state to /api/share with type: 'table' and returns a URL
  * with #table&s=<id> hash.
  *
  * @param {Object} state
@@ -28,11 +28,11 @@ export function parseMarcusHash() {
  * @param {Array} state.stages - Array of { id, method, budget, options }
  * @returns {Promise<{ url: string, id: string }>}
  */
-export async function generateMarcusShareUrl(state) {
+export async function generateTableShareUrl(state) {
   const sessionId = getOrCreateSessionId();
 
   const payload = {
-    type: 'marcus',
+    type: 'table',
     sessionId,
     worldviews: state.worldviews,
     credences: state.credences,
@@ -59,11 +59,11 @@ export async function generateMarcusShareUrl(state) {
 }
 
 /**
- * Parse a Marcus share URL: detect hash, fetch data, validate type.
- * @returns {Promise<Object|null>} Marcus state or { error } or null
+ * Parse a Table Mode share URL: detect hash, fetch data, validate type.
+ * @returns {Promise<Object|null>} Table state or { error } or null
  */
-export async function parseMarcusShareUrl() {
-  const { shareId } = parseMarcusHash();
+export async function parseTableShareUrl() {
+  const { shareId } = parseTableHash();
   if (!shareId) return null;
 
   try {
@@ -76,7 +76,7 @@ export async function parseMarcusShareUrl() {
     }
 
     const data = await response.json();
-    if (data.type !== 'marcus') {
+    if (data.type !== 'table' && data.type !== 'marcus') {
       return { error: 'Invalid share data format' };
     }
 

@@ -67,6 +67,15 @@ function createRng(seed) {
     choice(arr) {
       return arr[Math.floor(this.next() * arr.length)];
     },
+    weightedChoice(indices, weights) {
+      const total = weights.reduce((s, w) => s + w, 0);
+      let r = this.next() * total;
+      for (let i = 0; i < indices.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return indices[i];
+      }
+      return indices[indices.length - 1];
+    },
   };
 }
 
@@ -328,6 +337,7 @@ function mecAggregateCardinalTheories(interventions, cardinalTheories, credenceD
 const AGGREGATION_DEFAULTS = {
   met_threshold: 0.5,
   nash_disagreement_point: 'zero_spending',
+  default_random_seed: 0,
   msa_permissibility_mode: 'winner_take_all',
   msa_top_k: 2,
   msa_within_percent: 0.1,
@@ -560,7 +570,8 @@ function _nashDisagreementUtilities(
   credences,
   disagreementPoint,
   tieBreak = 'deterministic',
-  rng = null
+  rng = null,
+  randomSeed = null
 ) {
   const nWorldviews = worldviewScores.length;
   const projects = nWorldviews > 0 ? Object.keys(worldviewScores[0]) : [];
@@ -575,6 +586,17 @@ function _nashDisagreementUtilities(
   }
 
   if (disagreementPoint === 'random_dictator') {
+    const totalCredence = arraySum(credences);
+    if (totalCredence <= 0) return new Array(nWorldviews).fill(0.0);
+    const seed = randomSeed ?? AGGREGATION_DEFAULTS.default_random_seed;
+    const samplingRng = createRng(seed);
+    const indices = Array.from({ length: nWorldviews }, (_, i) => i);
+    const dictatorIdx = samplingRng.weightedChoice(indices, credences);
+    const dictatorProject = bestProjects[dictatorIdx];
+    return worldviewScores.map((scores) => scores[dictatorProject]);
+  }
+
+  if (disagreementPoint === 'budget_by_credence') {
     const utilities = [];
     for (let i = 0; i < nWorldviews; i++) {
       let baseline = 0;
@@ -607,7 +629,7 @@ function _nashDisagreementUtilities(
 
   throw new Error(
     'Unknown disagreement_point. Use one of: ' +
-      'zero_spending, anti_utopia, random_dictator, exclusionary_proportional_split.'
+      'zero_spending, anti_utopia, random_dictator, budget_by_credence, exclusionary_proportional_split.'
   );
 }
 
@@ -635,7 +657,8 @@ function voteNashBargaining(
     credences,
     disagreementPoint,
     tieBreak,
-    rng
+    rng,
+    randomSeed
   );
 
   const feasibleScores = {};
@@ -1129,7 +1152,9 @@ export function computeMultiStageAllocation(projectData, worldviews, stages, inc
       throw new Error(`Unknown voting method: ${stage.method}`);
     }
 
-    const { funding } = allocateBudget(cleanData, votingMethod, stage.budget, {
+    // Hard ceiling: never run with more than $1B ($1000M) regardless of input
+    const stageBudget = Math.min(stage.budget, 1000);
+    const { funding } = allocateBudget(cleanData, votingMethod, stageBudget, {
       incrementSize,
       initialFunding: cumulativeFunding,
       customWorldviews: worldviews,

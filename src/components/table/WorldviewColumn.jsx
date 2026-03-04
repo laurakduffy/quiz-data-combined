@@ -4,8 +4,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useSliderDrag } from '../../hooks/useSliderDrag';
 import { useLockedSlider } from '../../hooks/useLockedSlider';
-import marcusConfig from '../../../config/marcusMode.json';
-import styles from '../../styles/components/MarcusModeV2.module.css';
+import tableConfig from '../../../config/tableMode.json';
+import styles from '../../styles/components/TableMode.module.css';
 
 function CredenceSlider({
   index,
@@ -235,7 +235,7 @@ function WorldviewColumn({
             onChange={(e) => onUpdate(index, 'risk_profile', Number(e.target.value))}
             {...cellProps}
           >
-            {marcusConfig.riskProfileOptions.map((opt) => (
+            {tableConfig.riskProfileOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -277,39 +277,41 @@ function WorldviewColumn({
       ref={setNodeRef}
       style={sortableStyle}
     >
-      {/* Header: drag handle + preset selector + remove */}
+      {/* Header: controls row + preset label */}
       <div className={styles.columnHeader}>
-        <button
-          type="button"
-          className={styles.dragHandle}
-          {...attributes}
-          {...listeners}
-          tabIndex={-1}
-        >
-          <GripVertical size={12} />
-        </button>
+        <div className={styles.columnHeaderControls}>
+          <button
+            type="button"
+            className={styles.dragHandle}
+            {...attributes}
+            {...listeners}
+            tabIndex={-1}
+          >
+            <GripVertical size={12} />
+          </button>
+          {canRemove && (
+            <button
+              type="button"
+              className={styles.removeButton}
+              onClick={() => onRemove(index)}
+              title="Remove worldview"
+            >
+              ×
+            </button>
+          )}
+        </div>
         <select
           className={styles.presetSelect}
           value={worldview.presetId || 'custom'}
           onChange={handlePresetChange}
         >
-          {marcusConfig.presets.map((p) => (
+          {tableConfig.presets.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
             </option>
           ))}
           <option value="custom">Custom</option>
         </select>
-        {canRemove && (
-          <button
-            type="button"
-            className={styles.removeButton}
-            onClick={() => onRemove(index)}
-            title="Remove worldview"
-          >
-            ×
-          </button>
-        )}
       </div>
 
       {/* Data rows — same order/count as label rows */}

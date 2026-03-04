@@ -6,6 +6,13 @@ import { getEnabledMethods } from '../constants/calculationMethods';
 import styles from '../styles/components/Intermission.module.css';
 import resultStyles from '../styles/components/Results.module.css';
 import copy from '../../config/copy.json';
+import projectsConfig from '../../config/projects.json';
+
+// Build causeEntries from projects.json for ResultCard display
+const causeEntries = Object.entries(projectsConfig.projects).map(([key, project]) => [
+  key,
+  { name: project.name, color: project.color },
+]);
 
 /**
  * Intermission screen that displays partial results and contextual copy.
@@ -17,15 +24,12 @@ function IntermissionScreen() {
     questionNumber,
     progressPercentage,
     calculationResults,
-    causesConfig,
     goBack,
     goForward,
-    marketplaceBudget,
   } = useQuiz();
 
   if (!currentQuestion) return null;
 
-  const causeEntries = Object.entries(causesConfig);
   const enabledMethods = getEnabledMethods();
 
   return (
@@ -46,7 +50,6 @@ function IntermissionScreen() {
                 results={calculationResults[method.key]}
                 evs={method.hasEvs ? calculationResults[method.key].evs : null}
                 causeEntries={causeEntries}
-                budget={marketplaceBudget}
               />
             ))}
           </div>

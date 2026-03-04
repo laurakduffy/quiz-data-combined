@@ -9,8 +9,8 @@ import {
 } from 'react';
 import questionsConfigBasic from '../../config/questions.json';
 import questionsConfigAdvanced from '../../config/questions-advanced.json';
-import causesConfig from '../utils/causesAdapter.js';
 import features from '../../config/features.json';
+import projectsConfig from '../../config/projects.json';
 import { detectShareUrl, parseShareUrl, clearShareHash } from '../utils/shareUrl';
 import {
   getOrCreateSessionId,
@@ -28,26 +28,13 @@ import {
   QUESTION_TYPES,
 } from '../constants/config';
 import SessionConflictModal from '../components/ui/SessionConflictModal';
-import {
-  calculateMaxEV,
-  calculateVarianceVoting,
-  calculateMergedFavorites,
-  calculateMaximin,
-} from '../utils/calculations';
-import {
-  calculateCredenceWeighted,
-  calculateMec,
-  calculateBorda,
-  calculateMoralMarketplace as calculateMM,
-} from '../utils/moralMarketplace';
+import { calculateCredenceWeighted, calculateMec, calculateBorda } from '../utils/moralMarketplace';
 import { getEnabledMethods } from '../constants/calculationMethods';
 
 // Load questions based on advanced mode flag
 const isAdvancedMode = features.advanced === true;
 const questionsConfig = isAdvancedMode ? questionsConfigAdvanced : questionsConfigBasic;
 const { questions: rawQuestions } = questionsConfig;
-const { causes: CAUSES, defaultCredences } = causesConfig;
-
 // Feature flag check - used to filter intermission questions
 const isQuestionTypesEnabled = features.ui?.questionTypes !== false;
 
@@ -228,12 +215,11 @@ function createInitialWorldviewNames() {
   return Object.fromEntries(INITIAL_WORLDVIEW_IDS.map((id) => [id, `Worldview ${id}`]));
 }
 
-const DEFAULT_MARKETPLACE_BUDGET = 900_000_000;
+const DEFAULT_MARKETPLACE_BUDGET = projectsConfig.budget;
 
 // Determine initial step based on feature flags
 const getInitialStep = () => {
   if (features.ui?.disclaimerPage) return 'disclaimer';
-  if (isAdvancedMode) return 'hub';
   return 'welcome';
 };
 
@@ -380,9 +366,6 @@ function quizReducer(state, action) {
       };
     }
 
-    case ACTIONS.SET_MARKETPLACE_BUDGET:
-      return { ...state, marketplaceBudget: action.payload };
-
     case ACTIONS.MARK_WORLDVIEW_COMPLETED: {
       const worldviewId = action.payload;
       if (!state.worldviews[worldviewId]) {
@@ -440,7 +423,6 @@ function quizReducer(state, action) {
         credences: legacyCredences,
         currentStep: sessionStep,
         selectedCalculations: sourceSelectedCalculations,
-        marketplaceBudget: sourceMarketplaceBudget,
       } = action.payload;
 
       // Helper to restore a single question's state
@@ -492,8 +474,7 @@ function quizReducer(state, action) {
 
       // New worldviews format
       if (sourceWorldviews && sourceActiveId) {
-        // In advanced mode, restore to hub; in basic mode, restore to results
-        const urlRestoreStep = isAdvancedMode ? 'hub' : 'results';
+        const urlRestoreStep = 'results';
         return {
           ...state,
           currentStep: isUrlRestore ? urlRestoreStep : sessionStep,
@@ -501,7 +482,6 @@ function quizReducer(state, action) {
           worldviewNames: restoreWorldviewNames(sourceWorldviewNames, sourceWorldviews),
           activeWorldviewId: sourceActiveId,
           selectedCalculations: sourceSelectedCalculations || state.selectedCalculations,
-          marketplaceBudget: sourceMarketplaceBudget || DEFAULT_MARKETPLACE_BUDGET,
         };
       }
 
@@ -531,7 +511,6 @@ function quizReducer(state, action) {
         },
         worldviewNames: createInitialWorldviewNames(),
         activeWorldviewId: '1',
-        marketplaceBudget: DEFAULT_MARKETPLACE_BUDGET,
       };
     }
 
@@ -543,6 +522,9 @@ function quizReducer(state, action) {
 
     case ACTIONS.CLEAR_JUST_COMPLETED_WORLDVIEW:
       return { ...state, justCompletedWorldview: null };
+
+    case ACTIONS.SET_MARKETPLACE_BUDGET:
+      return { ...state, marketplaceBudget: action.payload };
 
     case ACTIONS.SET_SELECTED_CALCULATIONS:
       return {
@@ -745,11 +727,11 @@ export function QuizProvider({ children }) {
   // Persistence effect: save state to sessionStorage on changes (debounced)
   useEffect(() => {
     // Don't save during hydration or if on disclaimer/welcome screens
-    // (Marcus Mode bypasses navigation, so always save when it's enabled)
-    const isMarcusMode = features.ui?.marcusMode === true;
+    // (Table Mode bypasses navigation, so always save when it's enabled)
+    const isTableMode = features.ui?.tableMode === true;
     if (
       isHydrating ||
-      (!isMarcusMode && (state.currentStep === 'welcome' || state.currentStep === 'disclaimer'))
+      (!isTableMode && (state.currentStep === 'welcome' || state.currentStep === 'disclaimer'))
     )
       return;
 
@@ -766,7 +748,6 @@ export function QuizProvider({ children }) {
         worldviewNames: state.worldviewNames,
         activeWorldviewId: state.activeWorldviewId,
         selectedCalculations: state.selectedCalculations,
-        marketplaceBudget: state.marketplaceBudget,
       });
     }, 300);
 
@@ -781,7 +762,6 @@ export function QuizProvider({ children }) {
     state.worldviewNames,
     state.activeWorldviewId,
     state.selectedCalculations,
-    state.marketplaceBudget,
     isHydrating,
   ]);
 
@@ -844,12 +824,12 @@ export function QuizProvider({ children }) {
     dispatch({ type: ACTIONS.SET_SELECTED_CALCULATIONS, payload: selections });
   }, []);
 
-  const setWorldviewName = useCallback((worldviewId, name) => {
-    dispatch({ type: ACTIONS.SET_WORLDVIEW_NAME, payload: { worldviewId, name } });
-  }, []);
-
   const setMarketplaceBudget = useCallback((budget) => {
     dispatch({ type: ACTIONS.SET_MARKETPLACE_BUDGET, payload: budget });
+  }, []);
+
+  const setWorldviewName = useCallback((worldviewId, name) => {
+    dispatch({ type: ACTIONS.SET_WORLDVIEW_NAME, payload: { worldviewId, name } });
   }, []);
 
   const setJustCompletedWorldview = useCallback((worldviewId) => {
@@ -877,8 +857,7 @@ export function QuizProvider({ children }) {
   const getPrevStep = useCallback(
     (questionId) => {
       const index = getQuestionIndex(questionId);
-      // In advanced mode, first question goes back to hub; otherwise to welcome
-      const firstStep = isAdvancedMode ? 'hub' : 'welcome';
+      const firstStep = 'welcome';
       return index === 0 ? firstStep : questions[index - 1].id;
     },
     [getQuestionIndex]
@@ -887,8 +866,7 @@ export function QuizProvider({ children }) {
   const getNextStep = useCallback(
     (questionId) => {
       const index = getQuestionIndex(questionId);
-      // In advanced mode, last question goes to hub; otherwise to results
-      const lastStep = isAdvancedMode ? 'hub' : 'results';
+      const lastStep = 'results';
       return index === questions.length - 1 ? lastStep : questions[index + 1].id;
     },
     [getQuestionIndex]
@@ -912,21 +890,8 @@ export function QuizProvider({ children }) {
     if (nextStep === 'results') {
       saveOriginals();
     }
-    // In advanced mode, mark the worldview as completed when returning to hub
-    if (isAdvancedMode && nextStep === 'hub') {
-      markWorldviewCompleted(state.activeWorldviewId);
-      setJustCompletedWorldview(state.activeWorldviewId);
-    }
     goToStep(nextStep);
-  }, [
-    state.currentStep,
-    state.activeWorldviewId,
-    goToStep,
-    getNextStep,
-    saveOriginals,
-    markWorldviewCompleted,
-    setJustCompletedWorldview,
-  ]);
+  }, [state.currentStep, goToStep, getNextStep, saveOriginals]);
 
   // Derive questions from active worldview for backward compatibility
   const activeQuestions = useMemo(
@@ -957,24 +922,14 @@ export function QuizProvider({ children }) {
   );
 
   // Calculate a single method by key
-  const computeMethod = useCallback((key, credences, debugConfig, marketplaceBudget) => {
+  const computeMethod = useCallback((key, credences, debugConfig, budget) => {
     switch (key) {
       case 'credenceWeighted':
-        return calculateCredenceWeighted(credences, { budget: marketplaceBudget });
+        return calculateCredenceWeighted(credences, { budget });
       case 'mec':
-        return calculateMec(credences, { budget: marketplaceBudget });
+        return calculateMec(credences, { budget });
       case 'borda':
-        return calculateBorda(credences, { budget: marketplaceBudget });
-      case 'moralMarketplace':
-        return calculateMM(credences, { budget: marketplaceBudget });
-      case 'maxEV':
-        return calculateMaxEV(credences, debugConfig);
-      case 'parliament':
-        return calculateVarianceVoting(credences, debugConfig);
-      case 'mergedFavorites':
-        return calculateMergedFavorites(credences, debugConfig);
-      case 'maximin':
-        return calculateMaximin(credences, debugConfig);
+        return calculateBorda(credences, { budget });
       default:
         return null;
     }
@@ -1157,8 +1112,6 @@ export function QuizProvider({ children }) {
 
       // Config (static)
       questionsConfig: questionsWithColors,
-      causesConfig: CAUSES,
-      defaultCredences,
 
       // Worldview management
       worldviewIds,
@@ -1177,9 +1130,9 @@ export function QuizProvider({ children }) {
       resetQuiz,
       setDebugConfig,
       switchWorldview,
+      setMarketplaceBudget,
       setSelectedCalculations,
       setWorldviewName,
-      setMarketplaceBudget,
       clearJustCompletedWorldview,
 
       // Navigation helpers
@@ -1234,9 +1187,9 @@ export function QuizProvider({ children }) {
       resetQuiz,
       setDebugConfig,
       switchWorldview,
+      setMarketplaceBudget,
       setSelectedCalculations,
       setWorldviewName,
-      setMarketplaceBudget,
       clearJustCompletedWorldview,
       getQuestionIndex,
       getPrevStep,

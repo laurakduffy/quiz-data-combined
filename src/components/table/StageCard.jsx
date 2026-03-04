@@ -1,6 +1,6 @@
 import MethodOption from './MethodOption';
-import marcusConfig from '../../../config/marcusMode.json';
-import styles from '../../styles/components/MarcusModeV2.module.css';
+import tableConfig from '../../../config/tableMode.json';
+import styles from '../../styles/components/TableMode.module.css';
 
 function StageCard({
   stage,
@@ -11,7 +11,7 @@ function StageCard({
   onOptionChange,
   onRemove,
 }) {
-  const methodConfig = marcusConfig.votingMethods.find((m) => m.key === stage.method);
+  const methodConfig = tableConfig.votingMethods.find((m) => m.key === stage.method);
 
   // Resolve current values for all options of the selected method
   const currentValues = {};
@@ -23,7 +23,7 @@ function StageCard({
 
   const handleBudgetChange = (e) => {
     const val = e.target.value === '' ? 0 : Number(e.target.value);
-    if (!isNaN(val) && val >= 0) onBudgetChange(index, val);
+    if (!isNaN(val) && val >= 0) onBudgetChange(index, Math.min(val, 1000));
   };
 
   const handleOptionChange = (optKey, value) => {
@@ -63,7 +63,7 @@ function StageCard({
           value={stage.method}
           onChange={(e) => onMethodChange(index, e.target.value)}
         >
-          {marcusConfig.votingMethods.map((m) => (
+          {tableConfig.votingMethods.map((m) => (
             <option key={m.key} value={m.key}>
               {m.name}
             </option>

@@ -1,4 +1,4 @@
-import styles from '../../styles/components/MarcusModeV2.module.css';
+import styles from '../../styles/components/TableMode.module.css';
 
 function AllocationBar({ name, percentage, funding, color }) {
   return (

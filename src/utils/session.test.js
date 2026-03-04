@@ -10,7 +10,7 @@ describe('session persistence', () => {
     const state = {
       currentStep: 'results',
       activeWorldviewId: '1',
-      selectedCalculations: { left: 'maxEV', right: 'parliament' },
+      selectedCalculations: { left: 'credenceWeighted', right: 'mec' },
       worldviews: {
         1: {
           questions: {
@@ -39,7 +39,7 @@ describe('session persistence', () => {
     const state = {
       currentStep: 'results',
       activeWorldviewId: '1',
-      selectedCalculations: { left: 'maxEV', right: 'parliament' },
+      selectedCalculations: { left: 'credenceWeighted', right: 'mec' },
       worldviews: {
         1: {
           questions: {
@@ -57,6 +57,6 @@ describe('session persistence', () => {
     saveQuizState(state);
     const loaded = loadQuizState();
 
-    expect(loaded.selectedCalculations).toEqual({ left: 'maxEV', right: 'parliament' });
+    expect(loaded.selectedCalculations).toEqual({ left: 'credenceWeighted', right: 'mec' });
   });
 });

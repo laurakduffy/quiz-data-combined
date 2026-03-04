@@ -47,6 +47,7 @@
             { "value": "zero_spending", "label": "Zero Spending", "ignoresCredences": true },
             { "value": "anti_utopia", "label": "Anti-Utopia", "ignoresCredences": true },
             { "value": "random_dictator", "label": "Random Dictator" },
+            { "value": "budget_by_credence", "label": "Budget by Credence" },
             { "value": "exclusionary_proportional_split", "label": "Exclusionary Proportional Split" }
           ]
         }
@@ -135,7 +136,7 @@
     },
     {
       "id": "non_util_consequentialism",
-      "name": "Non-utilitarian Consequentialism",
+      "name": "Consequentialism (Non-Utilitarian)",
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 1,

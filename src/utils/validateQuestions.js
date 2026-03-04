@@ -157,10 +157,6 @@ export function validateQuestionsConfig(questionsConfig, causesConfig) {
     throw new Error('Questions config is missing or null');
   }
 
-  if (!causesConfig) {
-    throw new Error('Causes config is required for questions validation');
-  }
-
   if (!questionsConfig.questions || !Array.isArray(questionsConfig.questions)) {
     errors.push('Missing or invalid questions array');
   } else if (questionsConfig.questions.length === 0) {

@@ -49,6 +49,53 @@
   margin-bottom: var(--spacing-4);
 }
 
+.budgetLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--text-sm);
+  color: var(--text-gray);
+  font-family: var(--font-body);
+}
+
+.budgetInputWrapper {
+  display: flex;
+  align-items: center;
+  background: var(--overlay-subtle);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0 var(--spacing-3);
+}
+
+.budgetInputWrapper:focus-within {
+  border-color: var(--border-medium);
+}
+
+.currencyPrefix {
+  color: var(--text-gray);
+  font-size: var(--text-sm);
+}
+
+.budgetInput {
+  padding: var(--spacing-2) var(--spacing-2);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  width: 120px;
+  text-align: right;
+}
+
+.budgetInput:focus {
+  outline: none;
+}
+
+.budgetUnit {
+  color: var(--text-gray);
+  font-size: var(--text-sm);
+}
+
 .resultsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;

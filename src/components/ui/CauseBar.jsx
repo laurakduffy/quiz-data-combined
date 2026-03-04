@@ -78,7 +78,9 @@ const CauseBar = ({
             background: color,
           }}
         >
-          {percentage > 15 && <span className={styles.barLabel}>{percentage.toFixed(0)}%</span>}
+          {dollarAmount && percentage > 15 && (
+            <span className={styles.barLabel}>{percentage.toFixed(0)}%</span>
+          )}
         </div>
       </div>
     </div>

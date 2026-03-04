@@ -39,6 +39,9 @@ const {
   incrementSize: INCREMENT_SIZE,
 } = projectsConfig;
 
+// Hard ceiling: never run calculations with more than $1B regardless of input
+const MAX_BUDGET_M = 1000;
+
 // =============================================================================
 // QUIZ QUESTION MAPPING
 // =============================================================================
@@ -293,24 +296,27 @@ function voteBordaFast(data, funding, increment, { packed }) {
   }
 
   const bordaScores = new Float64Array(numProjects);
-  const indices = new Array(numProjects);
-  for (let i = 0; i < numProjects; i++) indices[i] = i;
+  // Precompute adjusted values per worldview, then rank by counting
+  // how many projects score higher (avoids Array.prototype.sort overhead
+  // in the hot loop — ~2.3M sort calls replaced with typed-array comparisons)
+  const vals = new Float64Array(numProjects);
 
   for (let w = 0; w < numActive; w++) {
     const base = w * numProjects;
     const cred = credences[w];
 
-    indices.sort((a, b) => {
-      const va = scoreMatrix[base + a] * drFactors[a];
-      const vb = scoreMatrix[base + b] * drFactors[b];
-      return vb - va || a - b;
-    });
-
-    for (let rank = 0; rank < numProjects; rank++) {
-      bordaScores[indices[rank]] += cred * (numProjects - 1 - rank);
+    for (let p = 0; p < numProjects; p++) {
+      vals[p] = scoreMatrix[base + p] * drFactors[p];
     }
 
-    for (let i = 0; i < numProjects; i++) indices[i] = i;
+    for (let p = 0; p < numProjects; p++) {
+      let rank = 0;
+      const vp = vals[p];
+      for (let q = 0; q < numProjects; q++) {
+        if (vals[q] > vp || (vals[q] === vp && q < p)) rank++;
+      }
+      bordaScores[p] += cred * (numProjects - 1 - rank);
+    }
   }
 
   let bestP = 0;
@@ -434,7 +440,7 @@ export function calculateMoralMarketplace(credences, options = {}) {
     return result;
   }
 
-  const budget = options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET;
+  const budget = Math.min(options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET, MAX_BUDGET_M);
   const credArrays = convertCredences(credences);
   const worldviews = computeWorldviewCredences(credArrays);
   const packed = packForParliament(getPrecomputedResults(), worldviews, PROJECT_DATA);
@@ -463,7 +469,7 @@ export function calculateMec(credences, options = {}) {
     return result;
   }
 
-  const budget = options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET;
+  const budget = Math.min(options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET, MAX_BUDGET_M);
   const credArrays = convertCredences(credences);
   const worldviews = computeWorldviewCredences(credArrays);
   const packed = packForParliament(getPrecomputedResults(), worldviews, PROJECT_DATA);
@@ -489,7 +495,7 @@ export function calculateBorda(credences, options = {}) {
     return result;
   }
 
-  const budget = options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET;
+  const budget = Math.min(options.budget ? options.budget / 1_000_000 : TOTAL_BUDGET, MAX_BUDGET_M);
   const credArrays = convertCredences(credences);
   const worldviews = computeWorldviewCredences(credArrays);
   const packed = packForParliament(getPrecomputedResults(), worldviews, PROJECT_DATA);

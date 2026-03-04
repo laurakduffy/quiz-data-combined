@@ -78,7 +78,7 @@ async function createShare(event, db) {
   const { type, sessionId, quizVersion } = body;
 
   let dataToStore;
-  if (type === 'marcus') {
+  if (type === 'table' || type === 'marcus') {
     const { worldviews, credences, stages, selectedMethod, totalBudget, methodOptions } = body;
     if (!worldviews) {
       return {
@@ -190,8 +190,8 @@ async function getShare(event, db) {
     createdAt: row.created_at,
   };
 
-  // Marcus format: return full stored data
-  if (storedData.type === 'marcus') {
+  // Table/Marcus format: return full stored data
+  if (storedData.type === 'table' || storedData.type === 'marcus') {
     return {
       statusCode: 200,
       headers,

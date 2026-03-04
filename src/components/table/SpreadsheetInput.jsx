@@ -9,8 +9,8 @@ import {
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import WorldviewColumn from './WorldviewColumn';
-import marcusConfig from '../../../config/marcusMode.json';
-import styles from '../../styles/components/MarcusModeV2.module.css';
+import tableConfig from '../../../config/tableMode.json';
+import styles from '../../styles/components/TableMode.module.css';
 
 /**
  * Build the flat list of row descriptors. Both the label column and
@@ -23,16 +23,16 @@ function buildRows() {
   rows.push({ type: 'data', field: 'credence', label: 'Weight' });
 
   rows.push({ type: 'sectionTitle', label: 'Moral Weights' });
-  for (const mw of marcusConfig.moralWeightKeys) {
+  for (const mw of tableConfig.moralWeightKeys) {
     rows.push({ type: 'data', field: `moral_weights.${mw.key}`, label: mw.label });
   }
 
   rows.push({ type: 'sectionTitle', label: 'Discount Factors' });
-  for (let i = 0; i < marcusConfig.discountFactorLabels.length; i++) {
+  for (let i = 0; i < tableConfig.discountFactorLabels.length; i++) {
     rows.push({
       type: 'data',
       field: `discount_factor.${i}`,
-      label: marcusConfig.discountFactorLabels[i],
+      label: tableConfig.discountFactorLabels[i],
     });
   }
 
