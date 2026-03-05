@@ -13,9 +13,9 @@
   "discountFactorLabels": ["0-5 years", "5-10 years", "10-20 years", "20-100 years", "100-500 years", "500+ years"],
   "riskProfileOptions": [
     { "value": 0, "label": "Neutral" },
-    { "value": 1, "label": "Upside" },
-    { "value": 2, "label": "Downside" },
-    { "value": 3, "label": "Combined" }
+    { "value": 1, "label": "Adjusted 1" },
+    { "value": 2, "label": "Adjusted 2" },
+    { "value": 3, "label": "Adjusted 3" }
   ],
   "votingMethods": [
     { "key": "credenceWeighted", "name": "Credence-Weighted" },
