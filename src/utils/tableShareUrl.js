@@ -96,7 +96,8 @@ export async function parseTableShareUrl() {
     }
 
     return result;
-  } catch {
+  } catch (err) {
+    console.error('[Share] Failed to load table share data:', err);
     return { error: 'Failed to load shared configuration' };
   }
 }

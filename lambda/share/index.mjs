@@ -29,8 +29,10 @@ async function getDbClient() {
   return createClient({ url, authToken });
 }
 
-// Only set Content-Type; CORS headers are handled by AWS Function URL config
 const responseHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Content-Type': 'application/json',
 };
 

@@ -99,7 +99,8 @@ async function fetchShareData(shortId) {
     }
 
     return await response.json();
-  } catch {
+  } catch (err) {
+    console.error('[Share] Failed to fetch share data:', err);
     return null;
   }
 }

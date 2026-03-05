@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTableState } from '../../hooks/useTableState';
 import { useTableShareUrl } from '../../hooks/useTableShareUrl';
-import { parseTableShareUrl } from '../../utils/tableShareUrl';
+import { parseTableShareUrl, parseTableHash } from '../../utils/tableShareUrl';
 import SpreadsheetInput from './SpreadsheetInput';
 import ResultsPanel from './ResultsPanel';
 import ShareButton from '../ui/ShareButton';
@@ -62,6 +62,32 @@ function TableModeScreen() {
     return () => {
       cancelled = true;
     };
+  }, [hydrateFromShare]);
+
+  // Listen for hashchange to handle share URLs pasted into existing tabs
+  useEffect(() => {
+    const handleHashChange = async () => {
+      const { shareId } = parseTableHash();
+      if (!shareId) return;
+
+      const data = await parseTableShareUrl();
+      if (data?.error) {
+        setShareError(data.error);
+        window.setTimeout(() => setShareError(null), 5000);
+      } else if (data) {
+        hydrateFromShare(data);
+      }
+      // Clear share param from hash
+      if (window.location.hash.includes('&s=')) {
+        window.history.replaceState(
+          null,
+          '',
+          window.location.pathname + window.location.search + '#table'
+        );
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, [hydrateFromShare]);
 
   const {

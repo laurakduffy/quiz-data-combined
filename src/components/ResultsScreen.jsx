@@ -159,31 +159,27 @@ function ResultsScreen() {
 
     setShareLoading(true);
 
-    // Create the URL promise before any async work
     const shareOptions = {
       selectedCalculations: isCalculationSelectEnabled ? selectedCalculations : null,
       worldviewNames,
     };
-    const urlPromise = generateShareUrl(worldviewsForShare, activeWorldviewId, shareOptions).then(
-      ({ url }) => url
-    );
 
     try {
-      // Safari requires ClipboardItem with a Promise to maintain user gesture context
-      if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
-        const blobPromise = urlPromise.then((url) => new Blob([url], { type: 'text/plain' }));
-        await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blobPromise })]);
-      } else {
-        // Fallback for browsers without ClipboardItem
-        const url = await urlPromise;
-        try {
+      const { url } = await generateShareUrl(worldviewsForShare, activeWorldviewId, shareOptions);
+
+      try {
+        if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(url);
-        } catch {
+        } else {
           copyToClipboardFallback(url);
         }
+      } catch {
+        copyToClipboardFallback(url);
       }
+
       showCopiedFeedback();
     } catch (err) {
+      console.error('[Share] Failed to generate share URL:', err);
       setShareError(err.message || 'Failed to create share link');
       window.setTimeout(() => setShareError(null), 5000);
     } finally {

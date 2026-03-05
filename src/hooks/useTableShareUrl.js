@@ -31,27 +31,27 @@ export function useTableShareUrl({ worldviews, credences, stages }) {
     setError(null);
     setLoading(true);
 
-    const urlPromise = generateTableShareUrl({
-      worldviews,
-      credences,
-      stages,
-    }).then(({ url }) => url);
-
     try {
-      if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
-        const blobPromise = urlPromise.then((url) => new Blob([url], { type: 'text/plain' }));
-        await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blobPromise })]);
-      } else {
-        const url = await urlPromise;
-        try {
+      const { url } = await generateTableShareUrl({
+        worldviews,
+        credences,
+        stages,
+      });
+
+      try {
+        if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(url);
-        } catch {
+        } else {
           copyToClipboardFallback(url);
         }
+      } catch {
+        copyToClipboardFallback(url);
       }
+
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      console.error('[Share] Failed to generate share URL:', err);
       setError(err.message || 'Failed to create share link');
       window.setTimeout(() => setError(null), 5000);
     } finally {
