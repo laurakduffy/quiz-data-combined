@@ -38,7 +38,7 @@ function buildRows() {
 
   rows.push({ type: 'sectionTitle', label: 'Risk' });
   rows.push({ type: 'data', field: 'risk_profile', label: 'Risk Profile' });
-  rows.push({ type: 'data', field: 'p_extinction', label: 'Non-xrisk discount' });
+  rows.push({ type: 'data', field: 'p_extinction', label: 'Discount non-AI risk funds' });
 
   return rows;
 }
