@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Settings } from 'lucide-react';
 import { useTableState } from '../../hooks/useTableState';
 import { useTableShareUrl } from '../../hooks/useTableShareUrl';
 import { parseTableShareUrl, parseTableHash } from '../../utils/tableShareUrl';
 import SpreadsheetInput from './SpreadsheetInput';
 import ResultsPanel from './ResultsPanel';
 import ShareButton from '../ui/ShareButton';
+import SettingsModal from '../ui/SettingsModal';
+import features from '../../../config/features.json';
 import styles from '../../styles/components/TableMode.module.css';
 
 /**
@@ -44,6 +47,7 @@ function TableModeScreen() {
 
   const [hydrating, setHydrating] = useState(false);
   const [shareError, setShareError] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   /**
    * Fetch share data from the URL hash and hydrate table state.
@@ -149,15 +153,27 @@ function TableModeScreen() {
             onRemoveStage={removeStage}
             results={results}
           />
-          <ShareButton
-            loading={loading}
-            copied={copied}
-            error={shareUrlError}
-            onClick={handleShare}
-            className={styles.shareButton}
-          />
+          <div className={styles.actionButtons}>
+            <ShareButton
+              loading={loading}
+              copied={copied}
+              error={shareUrlError}
+              onClick={handleShare}
+              className={styles.shareButton}
+            />
+            {features.ui?.settingsModal && (
+              <button
+                className={styles.settingsButton}
+                onClick={() => setShowSettings(true)}
+                title="Settings"
+              >
+                <Settings size={16} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
   );
 }

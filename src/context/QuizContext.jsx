@@ -7,10 +7,8 @@ import {
   useState,
   useRef,
 } from 'react';
-import questionsConfigBasic from '../../config/questions.json';
-import questionsConfigAdvanced from '../../config/questions-advanced.json';
+import questionsConfig from '../../config/questions.json';
 import features from '../../config/features.json';
-import projectsConfig from '../../config/projects.json';
 import { detectShareUrl, parseShareUrl, clearShareHash } from '../utils/shareUrl';
 import {
   getOrCreateSessionId,
@@ -30,10 +28,8 @@ import {
 import SessionConflictModal from '../components/ui/SessionConflictModal';
 import { calculateCredenceWeighted, calculateMec, calculateBorda } from '../utils/moralMarketplace';
 import { getEnabledMethods } from '../constants/calculationMethods';
+import { useDataset } from './DatasetContext';
 
-// Load questions based on advanced mode flag
-const isAdvancedMode = features.advanced === true;
-const questionsConfig = isAdvancedMode ? questionsConfigAdvanced : questionsConfigBasic;
 const { questions: rawQuestions } = questionsConfig;
 // Feature flag check - used to filter intermission questions
 const isQuestionTypesEnabled = features.ui?.questionTypes !== false;
@@ -175,9 +171,9 @@ function createInitialQuestionsState() {
 const MAX_WORLDVIEWS = 6;
 
 /**
- * Initial worldview IDs - start with just 1 in advanced mode, 3 in basic mode.
+ * Initial worldview IDs.
  */
-const INITIAL_WORLDVIEW_IDS = isAdvancedMode ? ['1'] : ['1', '2', '3'];
+const INITIAL_WORLDVIEW_IDS = ['1', '2', '3'];
 
 /**
  * Create initial worldviews structure.
@@ -215,8 +211,6 @@ function createInitialWorldviewNames() {
   return Object.fromEntries(INITIAL_WORLDVIEW_IDS.map((id) => [id, `Worldview ${id}`]));
 }
 
-const DEFAULT_MARKETPLACE_BUDGET = projectsConfig.budget;
-
 // Determine initial step based on feature flags
 const getInitialStep = () => {
   if (features.ui?.disclaimerPage) return 'disclaimer';
@@ -231,7 +225,7 @@ const initialState = {
   expandedPanel: null,
   debugConfig: null,
   selectedCalculations: { left: null, right: null },
-  marketplaceBudget: DEFAULT_MARKETPLACE_BUDGET,
+  marketplaceBudget: null,
   justCompletedWorldview: null, // ID of worldview just completed (for hub alert)
 };
 
@@ -543,6 +537,7 @@ function quizReducer(state, action) {
 export const QuizContext = createContext(null);
 
 export function QuizProvider({ children }) {
+  const { dataset } = useDataset();
   const [state, dispatch] = useReducer(quizReducer, initialState);
   const [shareUrlError, setShareUrlError] = useState(null);
   const [isHydrating, setIsHydrating] = useState(true);
@@ -922,18 +917,27 @@ export function QuizProvider({ children }) {
   );
 
   // Calculate a single method by key
-  const computeMethod = useCallback((key, credences, debugConfig, budget) => {
-    switch (key) {
-      case 'credenceWeighted':
-        return calculateCredenceWeighted(credences, { budget });
-      case 'mec':
-        return calculateMec(credences, { budget });
-      case 'borda':
-        return calculateBorda(credences, { budget });
-      default:
-        return null;
-    }
-  }, []);
+  const computeMethod = useCallback(
+    (key, credences, debugConfig, budget) => {
+      const opts = {
+        budget: budget || dataset.budget,
+        projectData: dataset.projects,
+        datasetId: dataset.id,
+        incrementSize: dataset.incrementSize,
+      };
+      switch (key) {
+        case 'credenceWeighted':
+          return calculateCredenceWeighted(credences, opts);
+        case 'mec':
+          return calculateMec(credences, opts);
+        case 'borda':
+          return calculateBorda(credences, opts);
+        default:
+          return null;
+      }
+    },
+    [dataset]
+  );
 
   // Determine which methods actually need computing
   const neededMethods = useMemo(() => {
@@ -1103,13 +1107,11 @@ export function QuizProvider({ children }) {
       expandedPanel: state.expandedPanel,
       debugConfig: state.debugConfig,
       selectedCalculations: state.selectedCalculations,
-      marketplaceBudget: state.marketplaceBudget,
+      marketplaceBudget: state.marketplaceBudget ?? dataset.budget,
       justCompletedWorldview: state.justCompletedWorldview,
       shareUrlError,
       isHydrating,
       sessionId,
-      isAdvancedMode,
-
       // Config (static)
       questionsConfig: questionsWithColors,
 

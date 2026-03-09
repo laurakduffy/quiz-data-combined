@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useSliderDrag } from '../../hooks/useSliderDrag';
 import { useLockedSlider } from '../../hooks/useLockedSlider';
+import { useDataset } from '../../context/DatasetContext';
 import tableConfig from '../../../config/tableMode.json';
 import styles from '../../styles/components/TableMode.module.css';
 
@@ -105,6 +106,7 @@ function WorldviewColumn({
   onRemove,
   canRemove,
 }) {
+  const { dataset } = useDataset();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
@@ -235,7 +237,7 @@ function WorldviewColumn({
             onChange={(e) => onUpdate(index, 'risk_profile', Number(e.target.value))}
             {...cellProps}
           >
-            {tableConfig.riskProfileOptions.map((opt) => (
+            {dataset.riskProfileOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>

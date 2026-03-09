@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ResultsScreen from './ResultsScreen';
 import { QuizContext } from '../context/QuizContext';
+import { DatasetProvider } from '../context/DatasetContext';
 
 // Mock the features config
 vi.mock('../../config/features.json', () => ({
@@ -25,28 +26,6 @@ const mockResults = {
   animalWelfare: 30,
   gcr: 20,
   evs: { globalHealth: 100, animalWelfare: 50, gcr: 75 },
-};
-
-// Mock causes config
-const mockCausesConfig = {
-  globalHealth: {
-    name: 'Global Health',
-    color: '#f2cc8f',
-    points: 100,
-    scaleFactor: 1,
-  },
-  animalWelfare: {
-    name: 'Animal Welfare',
-    color: '#81b29a',
-    points: 100,
-    scaleFactor: 10,
-  },
-  gcr: {
-    name: 'GCR (Future)',
-    color: '#3d5a80',
-    points: 100,
-    scaleFactor: 100,
-  },
 };
 
 // Mock questions matching the new config structure
@@ -156,9 +135,11 @@ const createMockContextValue = (overrides = {}) => {
 
 const renderWithContext = (contextValue) => {
   return render(
-    <QuizContext.Provider value={contextValue}>
-      <ResultsScreen />
-    </QuizContext.Provider>
+    <DatasetProvider>
+      <QuizContext.Provider value={contextValue}>
+        <ResultsScreen />
+      </QuizContext.Provider>
+    </DatasetProvider>
   );
 };
 
@@ -236,11 +217,15 @@ describe('ResultsScreen - Reset Button Disabled', () => {
     vi.resetModules();
     const { default: ResultsScreenWithDisabledFlag } = await import('./ResultsScreen.jsx');
     const { QuizContext: QuizContextReimported } = await import('../context/QuizContext.jsx');
+    const { DatasetProvider: DatasetProviderReimported } =
+      await import('../context/DatasetContext.jsx');
 
     render(
-      <QuizContextReimported.Provider value={createMockContextValue()}>
-        <ResultsScreenWithDisabledFlag />
-      </QuizContextReimported.Provider>
+      <DatasetProviderReimported>
+        <QuizContextReimported.Provider value={createMockContextValue()}>
+          <ResultsScreenWithDisabledFlag />
+        </QuizContextReimported.Provider>
+      </DatasetProviderReimported>
     );
 
     const resetButton = screen.queryByRole('button', { name: /start over/i });

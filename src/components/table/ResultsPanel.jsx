@@ -1,7 +1,7 @@
 import AllocationBar from './AllocationBar';
 import StageCard from './StageCard';
+import { useDataset } from '../../context/DatasetContext';
 import tableConfig from '../../../config/tableMode.json';
-import projectsConfig from '../../../config/projects.json';
 import styles from '../../styles/components/TableMode.module.css';
 
 const MAX_TOTAL_BUDGET = 1000;
@@ -15,7 +15,8 @@ function ResultsPanel({
   onRemoveStage,
   results,
 }) {
-  const projectEntries = Object.entries(projectsConfig.projects);
+  const { dataset } = useDataset();
+  const projectEntries = Object.entries(dataset.projects);
   const totalBudget = stages.reduce((sum, s) => sum + s.budget, 0);
   const canAddStage = totalBudget < MAX_TOTAL_BUDGET;
 

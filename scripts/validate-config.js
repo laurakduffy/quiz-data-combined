@@ -4,7 +4,7 @@
  * Validates all config JSON files
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import process from 'node:process';
@@ -43,10 +43,8 @@ function loadJson(filename) {
 
 // Load all config files (validates JSON syntax)
 const questionsConfig = loadJson('questions.json');
-const questionsAdvancedConfig = loadJson('questions-advanced.json');
 const featuresConfig = loadJson('features.json');
 const copyConfig = loadJson('copy.json');
-const projectsConfig = loadJson('projects.json');
 const tableModeConfig = loadJson('tableMode.json');
 
 // Validate questions.json structure
@@ -58,19 +56,6 @@ if (questionsConfig) {
     console.error('✗ questions.json validation failed:');
     console.error(`  ${error.message}`);
     hasErrors = true;
-  }
-}
-
-// Validate questions-advanced.json structure
-// Note: Advanced mode uses ratio questions with different schema, so we only
-// validate JSON syntax here. Full validation when advanced mode is enabled.
-if (questionsAdvancedConfig) {
-  // Basic structure check - must have questions array
-  if (!Array.isArray(questionsAdvancedConfig.questions)) {
-    console.error('✗ questions-advanced.json: missing "questions" array');
-    hasErrors = true;
-  } else {
-    console.log('✓ questions-advanced.json validated (JSON syntax + structure)');
   }
 }
 
@@ -146,60 +131,63 @@ if (copyConfig) {
   }
 }
 
-// Validate projects.json + tableMode.json cross-file consistency
-if (projectsConfig && tableModeConfig) {
+// Validate dataset files in config/datasets/
+const datasetsDir = join(projectRoot, 'config', 'datasets');
+const datasetFiles = existsSync(datasetsDir)
+  ? readdirSync(datasetsDir).filter((f) => f.endsWith('.json'))
+  : [];
+
+/**
+ * Validate a projects+dimensions bundle (used for dataset files).
+ * @param {string} label - Display label for error messages
+ * @param {object} data - Object with projects, moralWeightKeys, discountFactorLabels, riskProfileOptions
+ */
+function validateProjectsBundle(label, data) {
   const errors = [];
 
-  const riskProfileCount = tableModeConfig.riskProfileOptions?.length;
-  const timePeriodCount = tableModeConfig.discountFactorLabels?.length;
-  const moralWeightKeySet = new Set((tableModeConfig.moralWeightKeys || []).map((k) => k.key));
+  const riskProfileCount = data.riskProfileOptions?.length;
+  const timePeriodCount = data.discountFactorLabels?.length;
+  const moralWeightKeySet = new Set((data.moralWeightKeys || []).map((k) => k.key));
 
   if (!riskProfileCount) {
-    errors.push('tableMode.json: missing or empty riskProfileOptions');
+    errors.push(`${label}: missing or empty riskProfileOptions`);
   }
   if (!timePeriodCount) {
-    errors.push('tableMode.json: missing or empty discountFactorLabels');
+    errors.push(`${label}: missing or empty discountFactorLabels`);
   }
 
   // Check riskProfileOptions values are sequential 0..N-1
   if (riskProfileCount) {
     for (let i = 0; i < riskProfileCount; i++) {
-      const opt = tableModeConfig.riskProfileOptions[i];
+      const opt = data.riskProfileOptions[i];
       if (opt.value !== i) {
-        errors.push(
-          `tableMode.json: riskProfileOptions[${i}].value is ${opt.value}, expected ${i}`
-        );
+        errors.push(`${label}: riskProfileOptions[${i}].value is ${opt.value}, expected ${i}`);
       }
       if (!opt.label || typeof opt.label !== 'string') {
-        errors.push(`tableMode.json: riskProfileOptions[${i}] missing or invalid label`);
+        errors.push(`${label}: riskProfileOptions[${i}] missing or invalid label`);
       }
     }
   }
 
-  // Validate each project's effects
-  const { projects, budget, incrementSize } = projectsConfig;
+  const { projects } = data;
   if (!projects || typeof projects !== 'object') {
-    errors.push('projects.json: missing or invalid "projects" object');
+    errors.push(`${label}: missing or invalid "projects" object`);
   } else {
     for (const [projectId, project] of Object.entries(projects)) {
       if (!project.effects || typeof project.effects !== 'object') {
-        errors.push(`projects.json: ${projectId} missing "effects" object`);
+        errors.push(`${label}: ${projectId} missing "effects" object`);
         continue;
       }
 
       for (const [effectId, effect] of Object.entries(project.effects)) {
-        const path = `${projectId}.${effectId}`;
+        const path = `${label}: ${projectId}.${effectId}`;
 
-        // Check recipient_type exists in moralWeightKeys
         if (!effect.recipient_type) {
           errors.push(`${path}: missing recipient_type`);
         } else if (moralWeightKeySet.size > 0 && !moralWeightKeySet.has(effect.recipient_type)) {
-          errors.push(
-            `${path}: recipient_type "${effect.recipient_type}" not in tableMode.json moralWeightKeys`
-          );
+          errors.push(`${path}: recipient_type "${effect.recipient_type}" not in moralWeightKeys`);
         }
 
-        // Check values matrix dimensions
         if (!Array.isArray(effect.values)) {
           errors.push(`${path}: missing or invalid "values" matrix`);
           continue;
@@ -231,16 +219,15 @@ if (projectsConfig && tableModeConfig) {
         }
       }
 
-      // Check diminishing_returns is a valid array of numbers
       if (project.diminishing_returns !== undefined) {
         if (!Array.isArray(project.diminishing_returns)) {
-          errors.push(`${projectId}: diminishing_returns is not an array`);
+          errors.push(`${label}: ${projectId}: diminishing_returns is not an array`);
         } else if (project.diminishing_returns.length === 0) {
-          errors.push(`${projectId}: diminishing_returns is empty`);
+          errors.push(`${label}: ${projectId}: diminishing_returns is empty`);
         } else {
           for (let i = 0; i < project.diminishing_returns.length; i++) {
             if (typeof project.diminishing_returns[i] !== 'number') {
-              errors.push(`${projectId}: diminishing_returns[${i}] is not a number`);
+              errors.push(`${label}: ${projectId}: diminishing_returns[${i}] is not a number`);
               break;
             }
           }
@@ -248,7 +235,6 @@ if (projectsConfig && tableModeConfig) {
       }
     }
 
-    // Check all projects have the same diminishing_returns length
     const drLengths = Object.entries(projects)
       .filter(([, p]) => Array.isArray(p.diminishing_returns))
       .map(([id, p]) => [id, p.diminishing_returns.length]);
@@ -257,14 +243,58 @@ if (projectsConfig && tableModeConfig) {
       for (const [id, len] of drLengths.slice(1)) {
         if (len !== firstLen) {
           errors.push(
-            `${id}: diminishing_returns has ${len} entries, but ${drLengths[0][0]} has ${firstLen}`
+            `${label}: ${id}: diminishing_returns has ${len} entries, but ${drLengths[0][0]} has ${firstLen}`
           );
         }
       }
     }
   }
 
-  // Validate presets reference valid moralWeightKeys and risk profiles
+  return errors;
+}
+
+// Validate each dataset file
+let defaultDataset = null;
+for (const file of datasetFiles) {
+  const filepath = join(datasetsDir, file);
+  let dataset;
+  try {
+    dataset = JSON.parse(readFileSync(filepath, 'utf-8'));
+  } catch (error) {
+    console.error(`✗ datasets/${file} is not valid JSON:`);
+    console.error(`  ${error.message}`);
+    hasErrors = true;
+    continue;
+  }
+
+  const errors = validateProjectsBundle(`datasets/${file}`, dataset);
+  if (errors.length > 0) {
+    console.error(`✗ datasets/${file} validation failed:`);
+    errors.forEach((e) => console.error(`  ${e}`));
+    hasErrors = true;
+  } else {
+    console.log(`✓ datasets/${file} validated successfully`);
+  }
+
+  // Track the default (latest dated) dataset for preset validation
+  if (/^\d{8}/.test(file)) {
+    if (!defaultDataset || file > defaultDataset.file) {
+      defaultDataset = { file, data: dataset };
+    }
+  }
+}
+
+if (datasetFiles.length === 0) {
+  console.log('  (no dataset files found in config/datasets/)');
+}
+
+// Validate tableMode.json presets against default dataset dimensions
+if (tableModeConfig && defaultDataset) {
+  const errors = [];
+  const moralWeightKeySet = new Set((defaultDataset.data.moralWeightKeys || []).map((k) => k.key));
+  const riskProfileCount = defaultDataset.data.riskProfileOptions?.length;
+  const timePeriodCount = defaultDataset.data.discountFactorLabels?.length;
+
   if (Array.isArray(tableModeConfig.presets)) {
     for (const preset of tableModeConfig.presets) {
       const name = preset.name || preset.id || '(unnamed)';
@@ -303,11 +333,11 @@ if (projectsConfig && tableModeConfig) {
   }
 
   if (errors.length > 0) {
-    console.error('✗ projects.json + tableMode.json cross-validation failed:');
+    console.error('✗ tableMode.json + dataset cross-validation failed:');
     errors.forEach((e) => console.error(`  ${e}`));
     hasErrors = true;
   } else {
-    console.log('✓ projects.json + tableMode.json cross-validated successfully');
+    console.log('✓ tableMode.json + dataset cross-validated successfully');
   }
 }
 

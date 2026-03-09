@@ -12,7 +12,6 @@
  * Precomputation is lazy (runs on first call, cached as singleton).
  */
 
-import projectsConfig from '../../config/projects.json';
 import questionsConfig from '../../config/questions.json';
 import { calculateAllProjects, adjustForExtinctionRisk } from './projectScoring.js';
 import {
@@ -25,12 +24,6 @@ import {
   Q_SAVING_VS_IMPROVING,
   Q_SAVING_VS_INCOME,
 } from './quizToWorldviews.js';
-
-const {
-  projects: PROJECT_DATA,
-  budget: TOTAL_BUDGET,
-  incrementSize: INCREMENT_SIZE,
-} = projectsConfig;
 
 // Hard ceiling: never run calculations with more than $1B regardless of input
 const MAX_BUDGET_M = 1000;
@@ -95,7 +88,7 @@ const HAS_ALL_QUESTIONS = hasAllMarketplaceQuestions();
  * The ordering is deterministic: iterates tf, rp, xr, aw, inv, svi, sic
  * in nested loops, matching quizToWorldviews internal order.
  */
-function precomputeAllWorldviews(data = PROJECT_DATA) {
+function precomputeAllWorldviews(data) {
   if (!HAS_ALL_QUESTIONS) return [];
 
   // Generate all 25,600 worldview dicts (no pruning, no credence needed)
@@ -127,11 +120,13 @@ function precomputeAllWorldviews(data = PROJECT_DATA) {
   return results;
 }
 
-// Lazy precomputation — runs on first call, cached as singleton
+// Precomputation cache keyed by dataset ID
+let _cachedDatasetId = null;
 let _precomputedResults = null;
-function getPrecomputedResults() {
-  if (!_precomputedResults) {
-    _precomputedResults = precomputeAllWorldviews();
+function getPrecomputedResults(data, datasetId) {
+  if (_cachedDatasetId !== datasetId || !_precomputedResults) {
+    _cachedDatasetId = datasetId;
+    _precomputedResults = precomputeAllWorldviews(data);
   }
   return _precomputedResults;
 }
@@ -182,7 +177,7 @@ function computeWorldviewCredences(credArrays) {
 // PACKED TYPED-ARRAY PARLIAMENT
 // =============================================================================
 
-function packForParliament(results, worldviews, data = PROJECT_DATA) {
+function packForParliament(results, worldviews, data) {
   const projectIds = Object.keys(data);
   const numProjects = projectIds.length;
   const N = worldviews.length;
@@ -325,7 +320,7 @@ function voteBordaFast(data, funding, increment, { packed }) {
 // =============================================================================
 
 function allocateBudget(data, votingMethod, totalBudget, opts = {}) {
-  const incrementSize = opts.incrementSize ?? INCREMENT_SIZE;
+  const incrementSize = opts.incrementSize ?? 10;
 
   const funding = {};
   for (const projectId of Object.keys(data)) funding[projectId] = 0;
@@ -410,9 +405,10 @@ function convertCredences(credences) {
  * Return a zero-allocation result for all projects.
  * Used as an early return when required questions are not configured.
  */
-function emptyResult() {
+function emptyResult(data) {
+  if (!data) return {};
   const result = {};
-  for (const projectId of Object.keys(PROJECT_DATA)) {
+  for (const projectId of Object.keys(data)) {
     result[projectId] = 0;
   }
   return result;
@@ -427,20 +423,28 @@ function emptyResult() {
  * @param {Function} votingMethod - One of voteParliamentFast, voteMecFast, voteBordaFast
  * @param {Object} credences - Quiz credences { questionId: { optionKey: value } }
  * @param {Object} options - Optional configuration
- * @param {number} [options.budget] - Budget in $M. Defaults to TOTAL_BUDGET from projects.json.
+ * @param {number} [options.budget] - Budget in $M.
+ * @param {Object} options.projectData - Project definitions from dataset.
+ * @param {string} options.datasetId - Dataset identifier for cache keying.
+ * @param {number} [options.incrementSize=10] - Budget allocation increment.
  * @returns {Object} Allocation percentages { project_id: percentage }
  */
 function runAllocation(votingMethod, credences, options = {}) {
-  if (!HAS_ALL_QUESTIONS) return emptyResult();
+  const { projectData, datasetId, incrementSize = 10 } = options;
+  if (!HAS_ALL_QUESTIONS || !projectData) return emptyResult(projectData);
 
-  const budget = Math.min(options.budget || TOTAL_BUDGET, MAX_BUDGET_M);
+  const budget = Math.min(options.budget || MAX_BUDGET_M, MAX_BUDGET_M);
   const credArrays = convertCredences(credences);
   const worldviews = computeWorldviewCredences(credArrays);
-  const packed = packForParliament(getPrecomputedResults(), worldviews, PROJECT_DATA);
+  const packed = packForParliament(
+    getPrecomputedResults(projectData, datasetId),
+    worldviews,
+    projectData
+  );
 
-  const { funding } = allocateBudget(PROJECT_DATA, votingMethod, budget, {
+  const { funding } = allocateBudget(projectData, votingMethod, budget, {
     packed,
-    incrementSize: INCREMENT_SIZE,
+    incrementSize,
   });
 
   const result = {};
@@ -459,8 +463,7 @@ function runAllocation(votingMethod, credences, options = {}) {
  * - Mammals = min(chickens * 1.1, 1.0), not equal to chickens
  *
  * @param {Object} credences - Quiz credences { questionId: { optionKey: value } }
- * @param {Object} [options] - Optional configuration
- * @param {number} [options.budget] - Budget in $M. Defaults to TOTAL_BUDGET from projects.json.
+ * @param {Object} [options] - Configuration including projectData, datasetId, budget, incrementSize.
  * @returns {Object} Allocation percentages { project_id: percentage }
  */
 export function calculateMoralMarketplace(credences, options = {}) {

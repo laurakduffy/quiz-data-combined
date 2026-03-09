@@ -1076,7 +1076,7 @@ const METHOD_MAP = {
 /**
  * Compute allocation for a given voting method.
  *
- * @param {Object} projectData - Project definitions (from projects.json, without name/color)
+ * @param {Object} projectData - Project definitions (without name/color)
  * @param {Array} worldviews - Array of worldview objects
  * @param {string} methodKey - Key from votingMethods config
  * @param {number} totalBudget - Total budget in $M
@@ -1125,7 +1125,7 @@ export function computeMarcusAllocation(
  * Compute allocation across multiple sequential stages.
  * Each stage picks up where the previous left off (diminishing returns compound).
  *
- * @param {Object} projectData - Project definitions (from projects.json)
+ * @param {Object} projectData - Project definitions
  * @param {Array} worldviews - Array of worldview objects with credences
  * @param {Array} stages - Array of { method, budget, options }
  * @param {number} incrementSize - Step size in $M

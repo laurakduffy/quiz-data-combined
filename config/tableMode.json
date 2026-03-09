@@ -1,26 +1,5 @@
 {
   "totalBudget": 800,
-  "moralWeightKeys": [
-    { "key": "human_life_years", "label": "Human Life-Years" },
-    { "key": "human_ylds", "label": "Human YLDs" },
-    { "key": "human_income_doublings", "label": "Human Income Doublings" },
-    { "key": "chickens_birds", "label": "Chickens/Birds" },
-    { "key": "fish", "label": "Fish" },
-    { "key": "shrimp", "label": "Shrimp" },
-    { "key": "non_shrimp_invertebrates", "label": "Non-Shrimp Invertebrates" },
-    { "key": "mammals", "label": "Mammals" }
-  ],
-  "discountFactorLabels": ["0-5 years", "5-10 years", "10-20 years", "20-100 years", "100-500 years", "500+ years"],
-  "riskProfileOptions": [
-    { "value": 0, "label": "Neutral" },
-    { "value": 1, "label": "WLU Low (0.01)" },
-    { "value": 2, "label": "WLU Moderate (0.05)" },
-    { "value": 3, "label": "WLU High (0.1)" },
-    { "value": 4, "label": "Upside Sceptical" },
-    { "value": 5, "label": "Downside Critical" },
-    { "value": 6, "label": "Combined" },
-    { "value": 7, "label": "Continuous Upside Sceptical" }
-  ],
   "votingMethods": [
     { "key": "credenceWeighted", "name": "Credence-Weighted" },
     { "key": "myFavoriteTheory", "name": "My Favorite Theory" },

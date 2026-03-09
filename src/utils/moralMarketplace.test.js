@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateMoralMarketplace } from './moralMarketplace.js';
-import projectsConfig from '../../config/projects.json';
+import datasetConfig from '../../config/datasets/20260306-data.json';
 
 /**
  * Reference implementation — mirrors the new moralMarketplace.js which uses
@@ -12,8 +12,14 @@ import projectsConfig from '../../config/projects.json';
  *
  * Iteration order: tf, rp, xr, aw, inv, svi, sic
  */
-const DATA = projectsConfig.projects;
-const BUDGET = projectsConfig.budget;
+const DATA = datasetConfig.projects;
+const BUDGET = datasetConfig.budget;
+const DATASET_OPTS = {
+  projectData: DATA,
+  datasetId: 'test',
+  budget: BUDGET,
+  incrementSize: datasetConfig.incrementSize,
+};
 
 // Option values matching quizToWorldviews.js exports
 const SVI = [0.0, 0.17, 1.0, 5.0]; // saving_vs_improving
@@ -219,7 +225,7 @@ describe('Moral Marketplace vs reference (new derivation)', () => {
       [0.25, 0.25, 0.25, 0.25], // svi
       [0.25, 0.25, 0.25, 0.25] // sic
     );
-    const result = calculateMoralMarketplace(credences);
+    const result = calculateMoralMarketplace(credences, DATASET_OPTS);
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);
@@ -246,7 +252,7 @@ describe('Moral Marketplace vs reference (new derivation)', () => {
       [1, 0, 0, 0],
       [1, 0, 0, 0]
     );
-    const result = calculateMoralMarketplace(credences);
+    const result = calculateMoralMarketplace(credences, DATASET_OPTS);
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);
@@ -273,7 +279,7 @@ describe('Moral Marketplace vs reference (new derivation)', () => {
       [0, 0, 1, 0],
       [0, 0, 0, 1]
     );
-    const result = calculateMoralMarketplace(credences);
+    const result = calculateMoralMarketplace(credences, DATASET_OPTS);
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);
@@ -300,7 +306,7 @@ describe('Moral Marketplace vs reference (new derivation)', () => {
       [0.1, 0.4, 0.4, 0.1], // svi
       [0.05, 0.3, 0.5, 0.15] // sic
     );
-    const result = calculateMoralMarketplace(credences);
+    const result = calculateMoralMarketplace(credences, DATASET_OPTS);
 
     for (const key of Object.keys(ref)) {
       expect(result[key]).toBeCloseTo(ref[key], 1);

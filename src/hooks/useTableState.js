@@ -1,8 +1,8 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { computeMultiStageAllocation } from '../utils/marcusCalculation';
 import { adjustCredences, roundCredences } from '../utils/calculations';
+import { useDataset } from '../context/DatasetContext';
 import tableConfig from '../../config/tableMode.json';
-import projectsConfig from '../../config/projects.json';
 import worldviewPresets from '../../config/worldviewPresets.json';
 
 const STORAGE_KEY = 'table_state';
@@ -107,6 +107,8 @@ const _savedState = loadSavedState();
 const MAX_TOTAL_BUDGET = 1000;
 
 export function useTableState() {
+  const { dataset } = useDataset();
+
   const [worldviews, setWorldviews] = useState(
     () => _savedState?.worldviews ?? tableConfig.presets.map((p) => createWorldview(p.id))
   );
@@ -115,6 +117,9 @@ export function useTableState() {
   );
   const [lockedKeys, setLockedKeys] = useState(() => _savedState?.lockedKeys ?? []);
   const [stages, setStages] = useState(() => _savedState?.stages ?? [createDefaultStage()]);
+
+  // Note: calculations recompute automatically when dataset changes
+  // via the dataset dependency in the results useMemo below.
 
   // Stage callbacks
   const addStage = useCallback(() => {
@@ -212,7 +217,7 @@ export function useTableState() {
     const { worldviews: wvs, credences: creds, stages: stgs } = debouncedState;
     if (!wvs.length) {
       const empty = {};
-      for (const id of Object.keys(projectsConfig.projects)) empty[id] = 0;
+      for (const id of Object.keys(dataset.projects)) empty[id] = 0;
       return { allocations: empty, funding: empty, stageResults: [] };
     }
 
@@ -224,10 +229,10 @@ export function useTableState() {
 
     try {
       const result = computeMultiStageAllocation(
-        projectsConfig.projects,
+        dataset.projects,
         worldviewsWithCredences,
         stgs,
-        projectsConfig.incrementSize
+        dataset.incrementSize
       );
       console.log(
         '[table] recalc stages',
@@ -240,7 +245,7 @@ export function useTableState() {
             Object.entries(result.allocations)
               .filter(([, v]) => v > 0)
               .sort((a, b) => b[1] - a[1])
-              .map(([id, v]) => [projectsConfig.projects[id].name, `${v.toFixed(1)}%`])
+              .map(([id, v]) => [dataset.projects[id].name, `${v.toFixed(1)}%`])
           ),
         }
       );
@@ -248,10 +253,10 @@ export function useTableState() {
     } catch (e) {
       console.error('[table] calc error', e);
       const empty = {};
-      for (const id of Object.keys(projectsConfig.projects)) empty[id] = 0;
+      for (const id of Object.keys(dataset.projects)) empty[id] = 0;
       return { allocations: empty, funding: empty, stageResults: [] };
     }
-  }, [debouncedState]);
+  }, [debouncedState, dataset]);
 
   const addWorldview = useCallback(() => {
     setWorldviews((prev) => {
