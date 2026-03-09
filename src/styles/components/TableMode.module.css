@@ -657,14 +657,40 @@
   line-height: 1.4;
 }
 
-/* === SHARE BUTTON (compact) === */
+/* === ACTION BUTTONS === */
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+}
 
 .shareButton {
-  margin-top: var(--spacing-4);
   font-size: var(--text-xs) !important;
   padding: var(--spacing-2) var(--spacing-4) !important;
   gap: var(--spacing-2) !important;
   letter-spacing: 0.02em !important;
+}
+
+.settingsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.settingsButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
 }
 
 /* === RESPONSIVE === */

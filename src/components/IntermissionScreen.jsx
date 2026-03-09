@@ -1,24 +1,29 @@
+import { useMemo } from 'react';
 import Header from './layout/Header';
 import ProgressBar from './layout/ProgressBar';
 import ResultCard from './ui/ResultCard';
 import { useQuiz } from '../context/useQuiz';
+import { useDataset } from '../context/DatasetContext';
 import { getEnabledMethods } from '../constants/calculationMethods';
 import styles from '../styles/components/Intermission.module.css';
 import resultStyles from '../styles/components/Results.module.css';
 import copy from '../../config/copy.json';
-import projectsConfig from '../../config/projects.json';
-
-// Build causeEntries from projects.json for ResultCard display
-const causeEntries = Object.entries(projectsConfig.projects).map(([key, project]) => [
-  key,
-  { name: project.name, color: project.color },
-]);
 
 /**
  * Intermission screen that displays partial results and contextual copy.
  * Does not count toward progress or store credences.
  */
 function IntermissionScreen() {
+  const { dataset } = useDataset();
+  const causeEntries = useMemo(
+    () =>
+      Object.entries(dataset.projects).map(([key, project]) => [
+        key,
+        { name: project.name, color: project.color },
+      ]),
+    [dataset]
+  );
+
   const {
     currentQuestion,
     questionNumber,

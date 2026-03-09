@@ -1,9 +1,6 @@
 {
   "_comment": "Feature flags for Moral Parliament Quiz prototypes",
   "_instructions": "Set flags to true to enable features, false to disable. If a feature flag doesn't exist, code should handle it gracefully with appropriate default behavior.",
-
-  "advanced": false,
-
   "ui": {
     "tableMode": false,
     "disclaimerPage": true,
@@ -16,7 +13,8 @@
     "calculationSelect": true,
     "feedbackCard": true,
     "methodsInfo": true,
-    "aiExplanation": false
+    "aiExplanation": false,
+    "settingsModal": true
 },
 
   "calculations": {

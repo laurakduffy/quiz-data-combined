@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { QuizProvider } from './QuizContext';
-import { useQuiz } from './useQuiz';
+
+// Mock DatasetContext so QuizProvider's useDataset() works without DatasetProvider
+vi.mock('./DatasetContext', () => ({
+  useDataset: () => ({
+    dataset: { id: 'test', projects: {}, budget: 800, incrementSize: 10 },
+  }),
+}));
 
 // Mock questions with an intermission
 const mockQuestionsWithIntermission = {

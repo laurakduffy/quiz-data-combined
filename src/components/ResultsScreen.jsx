@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { RotateCcw, Sparkles, HelpCircle } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { RotateCcw, Sparkles, HelpCircle, Settings } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import Header from './layout/Header';
 import ProgressBar from './layout/ProgressBar';
@@ -10,6 +10,7 @@ import InfoTooltip from './ui/InfoTooltip';
 import ShareButton from './ui/ShareButton';
 import MethodsInfoModal from './ui/MethodsInfoModal';
 import ExplanationModal from './ui/ExplanationModal';
+import SettingsModal from './ui/SettingsModal';
 import { useQuiz } from '../context/useQuiz';
 import { useShareUrl } from '../hooks/useShareUrl';
 import { useExplanation } from '../hooks/useExplanation';
@@ -20,24 +21,28 @@ import {
   processEmailPlaceholder,
   createEmailLinkComponent,
 } from '../hooks/useEmailCopy.jsx';
+import { useDataset } from '../context/DatasetContext';
 import styles from '../styles/components/Results.module.css';
 import features from '../../config/features.json';
 import copy from '../../config/copy.json';
-import projectsConfig from '../../config/projects.json';
 
 const isCalculationSelectEnabled = features.ui?.calculationSelect === true;
-
-// Build causeEntries from projects.json for ResultCard display
-const causeEntries = Object.entries(projectsConfig.projects).map(([key, project]) => [
-  key,
-  { name: project.name, color: project.color },
-]);
 
 /**
  * Results screen showing allocation methods.
  * Allows editing credences and seeing live recalculation.
  */
 function ResultsScreen() {
+  const { dataset } = useDataset();
+  const causeEntries = useMemo(
+    () =>
+      Object.entries(dataset.projects).map(([key, project]) => [
+        key,
+        { name: project.name, color: project.color },
+      ]),
+    [dataset]
+  );
+
   const {
     questionsConfig,
     stateMap,
@@ -58,7 +63,7 @@ function ResultsScreen() {
     setMarketplaceBudget,
   } = useQuiz();
 
-  const budget = marketplaceBudget ?? 897;
+  const budget = marketplaceBudget;
   const [budgetInput, setBudgetInput] = useState(String(budget));
 
   // Email copy functionality for feedback card
@@ -83,6 +88,7 @@ function ResultsScreen() {
 
   // Methods info modal state
   const [showMethodsInfo, setShowMethodsInfo] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // AI explanation modal state
   const [showExplanation, setShowExplanation] = useState(false);
@@ -124,7 +130,7 @@ function ResultsScreen() {
     if (activeResults) {
       for (const [key, value] of Object.entries(activeResults)) {
         if (key === 'evs') continue;
-        const projectName = projectsConfig.projects[key]?.name || key;
+        const projectName = dataset.projects[key]?.name || key;
         labeledResults[projectName] = value;
       }
     }
@@ -380,7 +386,7 @@ function ResultsScreen() {
           renderStandardResultsGrid()
         )}
 
-        {(features.ui?.methodsInfo || features.ui?.aiExplanation) && (
+        {(features.ui?.methodsInfo || features.ui?.aiExplanation || features.ui?.settingsModal) && (
           <div className={styles.infoButtonRow}>
             {features.ui?.methodsInfo && (
               <button className={styles.infoButton} onClick={() => setShowMethodsInfo(true)}>
@@ -392,6 +398,12 @@ function ResultsScreen() {
               <button className={styles.infoButton} onClick={handleExplainClick}>
                 <Sparkles size={16} />
                 {copy.results.aiExplanation.buttonLabel}
+              </button>
+            )}
+            {features.ui?.settingsModal && (
+              <button className={styles.infoButton} onClick={() => setShowSettings(true)}>
+                <Settings size={16} />
+                Settings
               </button>
             )}
           </div>
@@ -483,6 +495,7 @@ function ResultsScreen() {
             onClose={() => setShowExplanation(false)}
           />
         )}
+        {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       </div>
     </div>
   );

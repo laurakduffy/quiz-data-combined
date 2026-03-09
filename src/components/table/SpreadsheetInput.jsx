@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -9,30 +10,30 @@ import {
 import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import WorldviewColumn from './WorldviewColumn';
-import tableConfig from '../../../config/tableMode.json';
+import { useDataset } from '../../context/DatasetContext';
 import styles from '../../styles/components/TableMode.module.css';
 
 /**
  * Build the flat list of row descriptors. Both the label column and
  * each data column render this same list so heights stay in sync.
  */
-function buildRows() {
+function buildRows(moralWeightKeys, discountFactorLabels) {
   const rows = [];
 
   rows.push({ type: 'sectionTitle', label: 'Credence' });
   rows.push({ type: 'data', field: 'credence', label: 'Weight' });
 
   rows.push({ type: 'sectionTitle', label: 'Moral Weights' });
-  for (const mw of tableConfig.moralWeightKeys) {
+  for (const mw of moralWeightKeys) {
     rows.push({ type: 'data', field: `moral_weights.${mw.key}`, label: mw.label });
   }
 
   rows.push({ type: 'sectionTitle', label: 'Discount Factors' });
-  for (let i = 0; i < tableConfig.discountFactorLabels.length; i++) {
+  for (let i = 0; i < discountFactorLabels.length; i++) {
     rows.push({
       type: 'data',
       field: `discount_factor.${i}`,
-      label: tableConfig.discountFactorLabels[i],
+      label: discountFactorLabels[i],
     });
   }
 
@@ -42,10 +43,6 @@ function buildRows() {
 
   return rows;
 }
-
-const ROWS = buildRows();
-
-export { ROWS };
 
 function SpreadsheetInput({
   worldviews,
@@ -60,6 +57,12 @@ function SpreadsheetInput({
   onRemove,
   onReorder,
 }) {
+  const { dataset } = useDataset();
+  const rows = useMemo(
+    () => buildRows(dataset.moralWeightKeys, dataset.discountFactorLabels),
+    [dataset.moralWeightKeys, dataset.discountFactorLabels]
+  );
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor)
@@ -81,7 +84,7 @@ function SpreadsheetInput({
         {/* Row labels column */}
         <div className={styles.rowLabels}>
           <div className={styles.labelHeader} />
-          {ROWS.map((row, i) =>
+          {rows.map((row, i) =>
             row.type === 'sectionTitle' ? (
               <div key={i} className={styles.sectionTitle}>
                 {row.label}
@@ -111,7 +114,7 @@ function SpreadsheetInput({
                 id={wv.uid}
                 worldview={wv}
                 index={i}
-                rows={ROWS}
+                rows={rows}
                 columnIndex={i}
                 totalColumns={worldviews.length}
                 credences={credences}
