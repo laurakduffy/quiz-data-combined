@@ -13,9 +13,13 @@
   "discountFactorLabels": ["0-5 years", "5-10 years", "10-20 years", "20-100 years", "100-500 years", "500+ years"],
   "riskProfileOptions": [
     { "value": 0, "label": "Neutral" },
-    { "value": 1, "label": "Adjusted 1" },
-    { "value": 2, "label": "Adjusted 2" },
-    { "value": 3, "label": "Adjusted 3" }
+    { "value": 1, "label": "WLU Low (0.01)" },
+    { "value": 2, "label": "WLU Moderate (0.05)" },
+    { "value": 3, "label": "WLU High (0.1)" },
+    { "value": 4, "label": "Upside Sceptical" },
+    { "value": 5, "label": "Downside Critical" },
+    { "value": 6, "label": "Combined" },
+    { "value": 7, "label": "Continuous Upside Sceptical" }
   ],
   "votingMethods": [
     { "key": "credenceWeighted", "name": "Credence-Weighted" },

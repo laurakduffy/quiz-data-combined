@@ -46,6 +46,8 @@ const questionsConfig = loadJson('questions.json');
 const questionsAdvancedConfig = loadJson('questions-advanced.json');
 const featuresConfig = loadJson('features.json');
 const copyConfig = loadJson('copy.json');
+const projectsConfig = loadJson('projects.json');
+const tableModeConfig = loadJson('tableMode.json');
 
 // Validate questions.json structure
 if (questionsConfig) {
@@ -141,6 +143,171 @@ if (copyConfig) {
     hasErrors = true;
   } else {
     console.log('✓ copy.json validated successfully');
+  }
+}
+
+// Validate projects.json + tableMode.json cross-file consistency
+if (projectsConfig && tableModeConfig) {
+  const errors = [];
+
+  const riskProfileCount = tableModeConfig.riskProfileOptions?.length;
+  const timePeriodCount = tableModeConfig.discountFactorLabels?.length;
+  const moralWeightKeySet = new Set((tableModeConfig.moralWeightKeys || []).map((k) => k.key));
+
+  if (!riskProfileCount) {
+    errors.push('tableMode.json: missing or empty riskProfileOptions');
+  }
+  if (!timePeriodCount) {
+    errors.push('tableMode.json: missing or empty discountFactorLabels');
+  }
+
+  // Check riskProfileOptions values are sequential 0..N-1
+  if (riskProfileCount) {
+    for (let i = 0; i < riskProfileCount; i++) {
+      const opt = tableModeConfig.riskProfileOptions[i];
+      if (opt.value !== i) {
+        errors.push(
+          `tableMode.json: riskProfileOptions[${i}].value is ${opt.value}, expected ${i}`
+        );
+      }
+      if (!opt.label || typeof opt.label !== 'string') {
+        errors.push(`tableMode.json: riskProfileOptions[${i}] missing or invalid label`);
+      }
+    }
+  }
+
+  // Validate each project's effects
+  const { projects, budget, incrementSize } = projectsConfig;
+  if (!projects || typeof projects !== 'object') {
+    errors.push('projects.json: missing or invalid "projects" object');
+  } else {
+    for (const [projectId, project] of Object.entries(projects)) {
+      if (!project.effects || typeof project.effects !== 'object') {
+        errors.push(`projects.json: ${projectId} missing "effects" object`);
+        continue;
+      }
+
+      for (const [effectId, effect] of Object.entries(project.effects)) {
+        const path = `${projectId}.${effectId}`;
+
+        // Check recipient_type exists in moralWeightKeys
+        if (!effect.recipient_type) {
+          errors.push(`${path}: missing recipient_type`);
+        } else if (moralWeightKeySet.size > 0 && !moralWeightKeySet.has(effect.recipient_type)) {
+          errors.push(
+            `${path}: recipient_type "${effect.recipient_type}" not in tableMode.json moralWeightKeys`
+          );
+        }
+
+        // Check values matrix dimensions
+        if (!Array.isArray(effect.values)) {
+          errors.push(`${path}: missing or invalid "values" matrix`);
+          continue;
+        }
+
+        if (timePeriodCount && effect.values.length !== timePeriodCount) {
+          errors.push(
+            `${path}: values has ${effect.values.length} rows, expected ${timePeriodCount} (discountFactorLabels)`
+          );
+        }
+
+        for (let row = 0; row < effect.values.length; row++) {
+          if (!Array.isArray(effect.values[row])) {
+            errors.push(`${path}: values[${row}] is not an array`);
+            continue;
+          }
+          if (riskProfileCount && effect.values[row].length !== riskProfileCount) {
+            errors.push(
+              `${path}: values[${row}] has ${effect.values[row].length} columns, expected ${riskProfileCount} (riskProfileOptions)`
+            );
+          }
+          for (let col = 0; col < effect.values[row].length; col++) {
+            if (typeof effect.values[row][col] !== 'number') {
+              errors.push(
+                `${path}: values[${row}][${col}] is ${typeof effect.values[row][col]}, expected number`
+              );
+            }
+          }
+        }
+      }
+
+      // Check diminishing_returns is a valid array of numbers
+      if (project.diminishing_returns !== undefined) {
+        if (!Array.isArray(project.diminishing_returns)) {
+          errors.push(`${projectId}: diminishing_returns is not an array`);
+        } else if (project.diminishing_returns.length === 0) {
+          errors.push(`${projectId}: diminishing_returns is empty`);
+        } else {
+          for (let i = 0; i < project.diminishing_returns.length; i++) {
+            if (typeof project.diminishing_returns[i] !== 'number') {
+              errors.push(`${projectId}: diminishing_returns[${i}] is not a number`);
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // Check all projects have the same diminishing_returns length
+    const drLengths = Object.entries(projects)
+      .filter(([, p]) => Array.isArray(p.diminishing_returns))
+      .map(([id, p]) => [id, p.diminishing_returns.length]);
+    if (drLengths.length > 1) {
+      const firstLen = drLengths[0][1];
+      for (const [id, len] of drLengths.slice(1)) {
+        if (len !== firstLen) {
+          errors.push(
+            `${id}: diminishing_returns has ${len} entries, but ${drLengths[0][0]} has ${firstLen}`
+          );
+        }
+      }
+    }
+  }
+
+  // Validate presets reference valid moralWeightKeys and risk profiles
+  if (Array.isArray(tableModeConfig.presets)) {
+    for (const preset of tableModeConfig.presets) {
+      const name = preset.name || preset.id || '(unnamed)';
+
+      if (preset.moral_weights && moralWeightKeySet.size > 0) {
+        for (const key of Object.keys(preset.moral_weights)) {
+          if (!moralWeightKeySet.has(key)) {
+            errors.push(
+              `tableMode.json preset "${name}": moral_weights key "${key}" not in moralWeightKeys`
+            );
+          }
+        }
+        for (const key of moralWeightKeySet) {
+          if (!(key in preset.moral_weights)) {
+            errors.push(`tableMode.json preset "${name}": missing moral_weights key "${key}"`);
+          }
+        }
+      }
+
+      if (riskProfileCount && typeof preset.risk_profile === 'number') {
+        if (preset.risk_profile < 0 || preset.risk_profile >= riskProfileCount) {
+          errors.push(
+            `tableMode.json preset "${name}": risk_profile ${preset.risk_profile} out of range (0-${riskProfileCount - 1})`
+          );
+        }
+      }
+
+      if (timePeriodCount && Array.isArray(preset.discount_factors)) {
+        if (preset.discount_factors.length !== timePeriodCount) {
+          errors.push(
+            `tableMode.json preset "${name}": discount_factors has ${preset.discount_factors.length} entries, expected ${timePeriodCount}`
+          );
+        }
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    console.error('✗ projects.json + tableMode.json cross-validation failed:');
+    errors.forEach((e) => console.error(`  ${e}`));
+    hasErrors = true;
+  } else {
+    console.log('✓ projects.json + tableMode.json cross-validated successfully');
   }
 }
 
