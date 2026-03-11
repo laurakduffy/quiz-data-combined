@@ -29,17 +29,14 @@ async function getDbClient() {
   return createClient({ url, authToken });
 }
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+const RESPONSE_HEADERS = {
   'Content-Type': 'application/json',
 };
 
 function jsonResponse(statusCode, data) {
   return {
     statusCode,
-    headers: CORS_HEADERS,
+    headers: RESPONSE_HEADERS,
     body: JSON.stringify(data),
   };
 }
@@ -48,7 +45,7 @@ export async function handler(event) {
   const httpMethod = event.requestContext?.http?.method || event.httpMethod;
 
   if (httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers: CORS_HEADERS, body: '' };
+    return { statusCode: 204, headers: RESPONSE_HEADERS, body: '' };
   }
 
   try {

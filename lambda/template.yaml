@@ -38,7 +38,7 @@ Resources:
       TargetFunctionArn: !GetAtt ShareFunction.Arn
       Cors:
         AllowOrigins:
-          - '*'
+          - 'https://rethinkpriorities.github.io'
         AllowMethods:
           - GET
           - POST
