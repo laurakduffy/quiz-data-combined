@@ -239,4 +239,136 @@ describe('voteNashBargaining proportional fallback', () => {
     expect(funding.projectA).toBeCloseTo(100, 4);
     expect(funding.projectB).toBeCloseTo(0, 4);
   });
+
+  /**
+   * Test 5: Non-divisible budget — remaining != increment.
+   *
+   * Same divergent setup as Test 1, but budget=95, increment=30.
+   * First iteration: increment=30, remaining=95. All infeasible →
+   * fallback allocates remaining (95) proportionally, not increment (30).
+   *
+   * Expected: A=47.5, B=47.5 (total=95, full budget spent)
+   */
+  it('allocates full remaining budget (not just increment) on proportional fallback', () => {
+    const projectData = {
+      projectA: makeProject('type_a', 1),
+      projectB: makeProject('type_b', 1),
+    };
+    const worldviews = [
+      makeWorldview(0.5, { type_a: 1, type_b: 0 }),
+      makeWorldview(0.5, { type_a: 0, type_b: 1 }),
+    ];
+
+    const { funding } = computeMarcusAllocation(
+      projectData,
+      worldviews,
+      'nashBargaining',
+      95,
+      30,
+      BUDGET_BY_CREDENCE_OPTS
+    );
+
+    expect(funding.projectA).toBeCloseTo(47.5, 4);
+    expect(funding.projectB).toBeCloseTo(47.5, 4);
+    expect(funding.projectA + funding.projectB).toBeCloseTo(95, 4);
+  });
+
+  /**
+   * Test 6: Budget equals increment — single iteration edge case.
+   *
+   * budget=10, increment=10. Only one loop iteration.
+   * Infeasible → fallback allocates remaining=10 proportionally.
+   *
+   * Expected: A=5, B=5
+   */
+  it('handles single-iteration budget correctly', () => {
+    const projectData = {
+      projectA: makeProject('type_a', 1),
+      projectB: makeProject('type_b', 1),
+    };
+    const worldviews = [
+      makeWorldview(0.5, { type_a: 1, type_b: 0 }),
+      makeWorldview(0.5, { type_a: 0, type_b: 1 }),
+    ];
+
+    const { funding } = computeMarcusAllocation(
+      projectData,
+      worldviews,
+      'nashBargaining',
+      10,
+      10,
+      BUDGET_BY_CREDENCE_OPTS
+    );
+
+    expect(funding.projectA).toBeCloseTo(5, 4);
+    expect(funding.projectB).toBeCloseTo(5, 4);
+    expect(funding.projectA + funding.projectB).toBeCloseTo(10, 4);
+  });
+
+  /**
+   * Test 7 (regression): Single worldview — fallback never triggers.
+   *
+   * With one worldview (100% credence), budget_by_credence disagreement
+   * equals the score of that worldview's best project. Gains for the
+   * best project = max - max = 0, which is >= -1e-12 (feasible).
+   * All other projects have gains < 0 (infeasible).
+   * Result: entire budget to the best project, no proportional fallback.
+   */
+  it('allocates entirely to best project with a single worldview', () => {
+    const projectData = {
+      projectA: makeProject('type_a', 1),
+      projectB: makeProject('type_b', 1),
+    };
+    const worldviews = [makeWorldview(1.0, { type_a: 1, type_b: 0 })];
+
+    const { funding } = computeMarcusAllocation(
+      projectData,
+      worldviews,
+      'nashBargaining',
+      100,
+      10,
+      BUDGET_BY_CREDENCE_OPTS
+    );
+
+    expect(funding.projectA).toBeCloseTo(100, 4);
+    expect(funding.projectB).toBeCloseTo(0, 4);
+  });
+
+  /**
+   * Test 8 (regression): zero_spending with divergent preferences stays feasible.
+   *
+   * Same setup as Test 1 but with zero_spending. Disagreement = 0 for all.
+   * Gains for A: [1-0, 0-0] = [1, 0] → feasible (Nash product = 0)
+   * Gains for B: [0-0, 1-0] = [0, 1] → feasible (Nash product = 0)
+   * Tie → deterministic picks "projectA" (alphabetically first).
+   * Every iteration picks A → A gets entire budget.
+   *
+   * Contrasts with Test 1 (budget_by_credence → 50/50 proportional).
+   */
+  it('zero_spending keeps all projects feasible even with divergent preferences', () => {
+    const projectData = {
+      projectA: makeProject('type_a', 1),
+      projectB: makeProject('type_b', 1),
+    };
+    const worldviews = [
+      makeWorldview(0.5, { type_a: 1, type_b: 0 }),
+      makeWorldview(0.5, { type_a: 0, type_b: 1 }),
+    ];
+
+    const { funding } = computeMarcusAllocation(
+      projectData,
+      worldviews,
+      'nashBargaining',
+      100,
+      10,
+      {
+        disagreementPoint: 'zero_spending',
+        tieBreak: 'deterministic',
+      }
+    );
+
+    // With zero_spending, both are feasible (product=0), tie goes to alphabetically first
+    expect(funding.projectA).toBeCloseTo(100, 4);
+    expect(funding.projectB).toBeCloseTo(0, 4);
+  });
 });
