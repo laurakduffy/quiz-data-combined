@@ -187,11 +187,17 @@ function ResultsScreen() {
   };
 
   const handleBudgetChange = (e) => {
-    const val = Number(e.target.value);
-    if (!isNaN(val) && val >= 0) {
-      const clamped = Math.min(val, 1000);
-      setBudgetInput(String(clamped));
-      if (clamped > 0) setMarketplaceBudget(clamped);
+    const raw = e.target.value;
+    if (raw === '') {
+      setBudgetInput('');
+      return;
+    }
+    if (!/^\d*$/.test(raw)) return;
+    const cleaned = raw.replace(/^0+/, '') || '';
+    const val = Number(cleaned);
+    if (val >= 0 && val <= 1000) {
+      setBudgetInput(cleaned);
+      if (val > 0) setMarketplaceBudget(val);
     }
   };
 
@@ -324,10 +330,9 @@ function ResultsScreen() {
             <div className={styles.budgetInputWrapper}>
               <span className={styles.currencyPrefix}>$</span>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={budgetInput}
-                min="1"
-                max="1000"
                 onChange={handleBudgetChange}
                 onBlur={handleBudgetBlur}
                 onKeyDown={handleBudgetKeyDown}

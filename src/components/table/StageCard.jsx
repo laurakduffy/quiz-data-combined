@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import MethodOption from './MethodOption';
 import tableConfig from '../../../config/tableMode.json';
 import styles from '../../styles/components/TableMode.module.css';
@@ -11,6 +12,10 @@ function StageCard({
   onOptionChange,
   onRemove,
 }) {
+  const [editing, setEditing] = useState(false);
+  const [budgetInput, setBudgetInput] = useState(String(stage.budget));
+  const displayValue = editing ? budgetInput : String(stage.budget);
+
   const methodConfig = tableConfig.votingMethods.find((m) => m.key === stage.method);
 
   // Resolve current values for all options of the selected method
@@ -21,9 +26,31 @@ function StageCard({
     }
   }
 
+  const handleBudgetFocus = () => {
+    setBudgetInput(String(stage.budget));
+    setEditing(true);
+  };
+
   const handleBudgetChange = (e) => {
-    const val = e.target.value === '' ? 0 : Number(e.target.value);
-    if (!isNaN(val) && val >= 0) onBudgetChange(index, Math.min(val, 1000));
+    const raw = e.target.value;
+    if (raw === '') {
+      setBudgetInput('');
+      return;
+    }
+    if (!/^\d*$/.test(raw)) return;
+    const cleaned = raw.replace(/^0+/, '') || '';
+    const val = Number(cleaned);
+    if (val >= 0 && val <= 1000) {
+      setBudgetInput(cleaned);
+      if (val > 0) onBudgetChange(index, val);
+    }
+  };
+
+  const handleBudgetBlur = () => {
+    setEditing(false);
+    if (!budgetInput || Number(budgetInput) <= 0) {
+      setBudgetInput(String(stage.budget));
+    }
   };
 
   const handleOptionChange = (optKey, value) => {
@@ -47,13 +74,13 @@ function StageCard({
       <div className={styles.methodSelector}>
         <label className={styles.methodLabel}>Budget ($M)</label>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           className={styles.budgetInput}
-          value={stage.budget}
-          min="0"
-          max="1000"
-          step="10"
+          value={displayValue}
+          onFocus={handleBudgetFocus}
           onChange={handleBudgetChange}
+          onBlur={handleBudgetBlur}
         />
       </div>
       <div className={styles.methodSelector}>

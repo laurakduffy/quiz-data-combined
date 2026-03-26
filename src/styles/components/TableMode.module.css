@@ -549,16 +549,6 @@
   border-color: var(--border-bright);
 }
 
-/* Hide number spinners on budget input */
-.budgetInput::-webkit-inner-spin-button,
-.budgetInput::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.budgetInput[type='number'] {
-  -moz-appearance: textfield;
-}
-
 .allocationList {
   display: flex;
   flex-direction: column;
