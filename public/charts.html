@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donor Compass · Charts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #0f1117;
+  --surface: #161920;
+  --surface2: #1e2130;
+  --border: #252a3d;
+  --accent: #5b8dee;
+  --accent2: #e87d4a;
+  --accent3: #4bcfab;
+  --text: #d4daf0;
+  --muted: #6b7499;
+  --dim: #343860;
+  --danger: #e85b5b;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; min-height: 100vh; }
+
+header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 13px 22px; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+header h1 { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .08em; }
+#dsName { font-family: var(--mono); font-size: 10px; color: var(--accent3); margin-left: auto; }
+
+.layout { display: grid; grid-template-columns: 240px 1fr; height: calc(100vh - 47px); }
+
+/* ── Sidebar ── */
+.sidebar {
+  border-right: 1px solid var(--border);
+  padding: 14px 12px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.slabel {
+  font-family: var(--mono); font-size: 9px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--dim); margin-bottom: 5px;
+}
+
+.btn {
+  width: 100%; padding: 6px; border-radius: 4px;
+  border: 1px solid var(--border); background: var(--surface2);
+  color: var(--text); font-family: var(--sans); font-size: 12px;
+  cursor: pointer; transition: all .12s; margin-top: 5px;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.p { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.p:hover { filter: brightness(1.1); }
+
+.status { font-family: var(--mono); font-size: 10px; color: var(--muted); padding: 3px 0; min-height: 16px; }
+.status.ok { color: var(--accent3); }
+.status.err { color: var(--danger); }
+
+.pill-group { display: flex; flex-wrap: wrap; gap: 3px; }
+.pill {
+  padding: 3px 8px; border-radius: 3px; font-size: 9px; font-family: var(--mono);
+  cursor: pointer; border: 1px solid var(--border); background: transparent;
+  color: var(--muted); transition: all .12s; white-space: nowrap;
+}
+.pill.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.tog { display: flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.tog-btn {
+  flex: 1; padding: 5px 3px; text-align: center; cursor: pointer;
+  font-size: 10px; font-family: var(--mono); color: var(--muted);
+  background: transparent; border: none; transition: all .12s;
+}
+.tog-btn.on { background: var(--accent); color: #fff; }
+
+/* ── Main ── */
+.main { display: flex; flex-direction: column; overflow: hidden; }
+.tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 18px; }
+.tab {
+  padding: 10px 14px; cursor: pointer; font-size: 12px; color: var(--muted);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  background: none; border-left: none; border-right: none; border-top: none;
+  font-family: var(--sans); transition: all .12s;
+}
+.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+.content { flex: 1; overflow-y: auto; padding: 18px 20px; }
+
+/* ── Chart blocks ── */
+.block { margin-bottom: 26px; }
+.block-hdr {
+  display: flex; align-items: baseline; gap: 7px;
+  margin-bottom: 8px; padding-bottom: 5px;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.bname { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text); }
+.badge {
+  font-family: var(--mono); font-size: 9px; padding: 1px 5px;
+  border-radius: 3px; background: var(--surface2); color: var(--muted);
+  border: 1px solid var(--border);
+}
+.badge.warn { color: var(--accent2); border-color: var(--accent2); }
+
+.chart-outer { position: relative; height: 270px; margin-bottom: 4px; }
+
+/* ── Data tables (A vs B tab) ── */
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; font-family: var(--mono); font-size: 10px; width: 100%; }
+th {
+  padding: 4px 7px; background: var(--surface2); color: var(--muted);
+  font-weight: 500; border: 1px solid var(--border); white-space: nowrap; text-align: center;
+}
+th.L { text-align: left; min-width: 120px; }
+td { padding: 3px 7px; border: 1px solid var(--border); text-align: right; white-space: nowrap; }
+td.L { text-align: left; background: var(--surface2) !important; color: var(--muted); }
+td.num { color: var(--text); font-family: var(--mono); font-size: 10px; }
+tr:hover td { filter: brightness(1.08); }
+
+.ctrl-row {
+  display: flex; align-items: flex-start; gap: 20px;
+  margin-bottom: 14px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.ctrl-group { display: flex; flex-direction: column; gap: 5px; }
+
+.fund-legend {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 14px; font-family: var(--mono); font-size: 10px; color: var(--muted);
+}
+.fund-legend button {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: 1px solid var(--border); border-radius: 4px;
+  color: var(--muted); font-family: var(--mono); font-size: 10px;
+  padding: 3px 8px; cursor: pointer; transition: all .15s;
+}
+.fund-legend button:hover { border-color: var(--accent); color: var(--text); }
+.fund-legend button.hidden-series {
+  opacity: 0.35;
+  text-decoration: line-through;
+  border-style: dashed;
+}
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+
+select {
+  width: 100%;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); padding: 5px 7px; border-radius: 4px;
+  font-family: var(--sans); font-size: 12px; outline: none; cursor: pointer;
+}
+select:focus { border-color: var(--accent); }
+select:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Inner selects (inside ctrl-row) should not be full width */
+.ctrl-row select { width: auto; }
+
+.info { background: rgba(91,141,238,.08); border: 1px solid rgba(91,141,238,.2); border-radius: 4px; padding: 6px 10px; font-size: 10px; color: var(--accent); margin-bottom: 12px; font-family: var(--mono); }
+.empty { padding: 80px; text-align: center; color: var(--dim); font-family: var(--mono); font-size: 11px; line-height: 2.2; }
+
+.scroll-wrap { position: relative; }
+.scroll-track {
+  display: flex; align-items: center; gap: 0; margin-top: 4px;
+}
+.scroll-arrow {
+  flex-shrink: 0; width: 28px; height: 28px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  user-select: none; transition: all .12s; font-family: var(--mono);
+}
+.scroll-arrow:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.scroll-arrow:first-child { border-radius: 4px 0 0 4px; }
+.scroll-arrow:last-child  { border-radius: 0 4px 4px 0; }
+.scroll-bar-outer {
+  flex: 1; height: 28px; background: var(--surface2);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  position: relative; cursor: pointer; overflow: hidden;
+}
+.scroll-bar-thumb {
+  position: absolute; top: 4px; bottom: 4px;
+  background: var(--border); border-radius: 3px;
+  min-width: 40px; cursor: grab; transition: background .12s;
+}
+.scroll-bar-thumb:hover, .scroll-bar-thumb.dragging { background: var(--accent); }
+.scroll-tbl-outer {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DONOR COMPASS · CHARTS</h1>
+  <span id="dsName"></span>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+
+    <div>
+      <div class="slabel">Dataset A</div>
+      <select id="selectA" onchange="loadDatasetFromSelect('A')" disabled>
+        <option value="">Loading…</option>
+      </select>
+      <div class="status" id="statusA"></div>
+    </div>
+
+    <div>
+      <div class="slabel">Dataset B <span style="color:var(--dim)">(for A vs B tab)</span></div>
+      <select id="selectB" onchange="loadDatasetFromSelect('B')" disabled>
+        <option value="">— none —</option>
+      </select>
+      <div class="status" id="statusB"></div>
+    </div>
+
+    <div id="controls" style="display:none">
+
+      <div>
+        <div class="slabel">Funds</div>
+        <div class="pill-group" id="fundPills"></div>
+      </div>
+
+      <div>
+        <div class="slabel">Unit mode</div>
+        <div class="tog">
+          <button class="tog-btn on" id="btnRaw" onclick="setUnit('raw')">Total</button>
+          <button class="tog-btn"    id="btnYr"  onclick="setUnit('year')">Per year</button>
+        </div>
+        <div style="font-size:9px;color:var(--dim);font-family:var(--mono);margin-top:4px;line-height:1.6">
+          Per year ÷ period length<br>
+          5 / 5 / 10 / 80 / 400 / 2000 yrs<br>
+          ⚠ T5 = 2000 yr divisor — unbounded
+        </div>
+      </div>
+
+      <div>
+        <div class="slabel">Y-axis scale</div>
+        <div class="tog">
+          <button class="tog-btn on" id="btnLin" onclick="setScale('linear')">Linear</button>
+          <button class="tog-btn"    id="btnLog" onclick="setScale('log')">Log</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="tabs">
+      <button class="tab on" onclick="showTab('funds')">Compare Funds</button>
+      <button class="tab"    onclick="showTab('profiles')">Compare Risk Profiles</button>
+      <button class="tab"    onclick="showTab('dr')">Diminishing Returns</button>
+      <button class="tab"    onclick="showTab('ab')">A vs B</button>
+    </div>
+    <div class="content" id="content">
+      <div class="empty">
+        Loading datasets…
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────
+const PERIOD_YEARS  = [5, 5, 10, 80, 400, 2000];
+const PERIOD_LABELS = ['0–5 yr','5–10 yr','10–20 yr','20–100 yr','100–500 yr','500+ yr'];
+const T_COUNT = 6;
+
+const FUND_COLORS = [
+  '#5b8dee','#e87d4a','#4bcfab','#e8c74a','#9b5de5','#e85b5b','#00b4d8','#f4a261'
+];
+const PROFILE_COLORS = [
+  '#f4a261','#e76f51','#e9c46a','#2a9d8f','#a8dadc','#e63946','#c77dff','#90be6d'
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+let ds = null;
+let dsB = null;
+let availableDatasets = [];
+let selFunds = new Set();
+let selProfile = 0;
+let selFund = '';
+let unitMode = 'raw';
+let scaleMode = 'linear';
+let activeTab = 'funds';
+let selTimePeriods = new Set([0,1,2,3,4,5]);
+let chartInstances = [];
+let hiddenFundIndices = new Set();
+let hiddenProfileIndices = new Set();
+
+// ── Dataset loading via fetch ──────────────────────────────────────────────
+async function initDatasets() {
+  try {
+    const res = await fetch('./datasets/index.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    availableDatasets = await res.json();
+  } catch (e) {
+    document.getElementById('content').innerHTML =
+      `<div class="empty">Failed to load dataset index.<br><code style="color:var(--danger)">${e.message}</code></div>`;
+    return;
+  }
+
+  const selA = document.getElementById('selectA');
+  const selB = document.getElementById('selectB');
+
+  selA.innerHTML = availableDatasets.map((d, i) =>
+    `<option value="${i}">${d.name}</option>`
+  ).join('');
+  selA.disabled = false;
+
+  selB.innerHTML = `<option value="">— none —</option>` +
+    availableDatasets.map((d, i) =>
+      `<option value="${i}">${d.name}</option>`
+    ).join('');
+  selB.disabled = false;
+
+  // Auto-load the first (most recent) dataset
+  loadDatasetFromSelect('A');
+}
+
+function loadDatasetFromSelect(which) {
+  const sel = document.getElementById('select' + which);
+  const el  = document.getElementById('status' + which);
+  const idx = sel.value;
+
+  if (idx === '') {
+    if (which === 'B') {
+      dsB = null;
+      el.textContent = '';
+      el.className = 'status';
+      if (activeTab === 'ab') render();
+    }
+    return;
+  }
+
+  const entry = availableDatasets[Number(idx)];
+  const parsed = entry.data;
+
+  if (!parsed.projects) {
+    el.textContent = 'Error: Missing "projects" key';
+    el.className = 'status err';
+    return;
+  }
+
+  if (which === 'A') {
+    ds = parsed;
+    el.textContent = `✓ ${Object.keys(ds.projects).length} projects`;
+    el.className = 'status ok';
+    document.getElementById('dsName').textContent = ds.name || '';
+    initControls();
+  } else {
+    dsB = parsed;
+    el.textContent = `✓ ${Object.keys(dsB.projects).length} projects`;
+    el.className = 'status ok';
+    if (activeTab === 'ab') render();
+  }
+}
+
+// ── Data helpers ───────────────────────────────────────────────────────────
+function getProjects()    { return Object.keys(ds.projects); }
+function getProjectName(pk) { return ds.projects[pk].name || pk; }
+function fundColor(pk) {
+  const idx = getProjects().indexOf(pk);
+  return FUND_COLORS[idx % FUND_COLORS.length];
+}
+function getEffectsForFund(pk) { return Object.keys(ds.projects[pk].effects); }
+function getProfileLabel(idx) {
+  return (ds.riskProfileOptions[idx] || {}).label || `Profile ${idx}`;
+}
+function getProfileCount() { return ds.riskProfileOptions.length; }
+
+function getRaw(pk, ek, t, pi) {
+  try {
+    const v = parseFloat(ds.projects[pk].effects[ek].values[t][pi]);
+    return isNaN(v) ? null : v;
+  } catch { return null; }
+}
+
+function getVal(pk, ek, t, pi) {
+  const r = getRaw(pk, ek, t, pi);
+  if (r === null) return null;
+  return unitMode === 'year' ? r / PERIOD_YEARS[t] : r;
+}
+
+function getAllUnitTypes() {
+  const s = new Set();
+  getProjects().forEach(pk =>
+    getEffectsForFund(pk).forEach(ek =>
+      s.add(ds.projects[pk].effects[ek].recipient_type)
+    )
+  );
+  return [...s];
+}
+
+function getUnitLabel(rt) {
+  const e = (ds.moralWeightKeys||[]).find(m => m.key === rt);
+  return e ? e.label : rt;
+}
+
+function sumByUnit(pk, rt, t, pi) {
+  let total = 0, found = false;
+  for (const ek of getEffectsForFund(pk)) {
+    if (ds.projects[pk].effects[ek].recipient_type !== rt) continue;
+    const v = getVal(pk, ek, t, pi);
+    if (v !== null) { total += v; found = true; }
+  }
+  return found ? total : null;
+}
+
+// ── Scrollable table helpers ───────────────────────────────────────────────
+let _scrollDrag = null;
+
+function initScrollTable(id) {
+  const outer = document.getElementById('so_' + id);
+  const thumb = document.getElementById('st_' + id);
+  const bar   = document.getElementById('sb_' + id);
+  if (!outer || !thumb || !bar) return;
+
+  function updateThumb() {
+    const tbl = outer.querySelector('table');
+    if (!tbl) return;
+    const maxScroll = tbl.scrollWidth - outer.clientWidth;
+    if (maxScroll <= 0) { thumb.style.display = 'none'; return; }
+    thumb.style.display = '';
+    const ratio = outer.clientWidth / tbl.scrollWidth;
+    const thumbW = Math.max(40, bar.clientWidth * ratio);
+    const thumbX = (outer.scrollLeft / maxScroll) * (bar.clientWidth - thumbW);
+    thumb.style.width = thumbW + 'px';
+    thumb.style.left  = thumbX + 'px';
+  }
+
+  outer.addEventListener('scroll', updateThumb);
+  window.addEventListener('resize', updateThumb);
+  setTimeout(updateThumb, 50);
+
+  thumb.addEventListener('mousedown', e => {
+    e.preventDefault();
+    _scrollDrag = { id, startX: e.clientX, startScroll: outer.scrollLeft };
+    thumb.classList.add('dragging');
+  });
+
+  bar.addEventListener('click', e => {
+    if (e.target === thumb) return;
+    const tbl = outer.querySelector('table');
+    if (!tbl) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    outer.scrollLeft = ratio * (tbl.scrollWidth - outer.clientWidth);
+  });
+}
+
+document.addEventListener('mousemove', e => {
+  if (!_scrollDrag) return;
+  const { id, startX, startScroll } = _scrollDrag;
+  const outer = document.getElementById('so_' + id);
+  const bar   = document.getElementById('sb_' + id);
+  const thumb = document.getElementById('st_' + id);
+  if (!outer || !bar || !thumb) return;
+  const tbl = outer.querySelector('table');
+  if (!tbl) return;
+  const maxScroll = tbl.scrollWidth - outer.clientWidth;
+  const thumbW = parseFloat(thumb.style.width) || 40;
+  const dx = e.clientX - startX;
+  const ratio = dx / (bar.clientWidth - thumbW);
+  outer.scrollLeft = Math.max(0, Math.min(maxScroll, startScroll + ratio * maxScroll));
+});
+
+document.addEventListener('mouseup', () => {
+  if (_scrollDrag) {
+    const thumb = document.getElementById('st_' + _scrollDrag.id);
+    if (thumb) thumb.classList.remove('dragging');
+    _scrollDrag = null;
+  }
+});
+
+function scrollTableBy(id, dir) {
+  const outer = document.getElementById('so_' + id);
+  if (!outer) return;
+  outer.scrollBy({ left: dir * outer.clientWidth * 0.6, behavior: 'smooth' });
+}
+
+function makeScrollTable(id, tableHTML) {
+  return `<div class="scroll-wrap">
+    <div class="scroll-tbl-outer" id="so_${id}">${tableHTML}</div>
+    <div class="scroll-track">
+      <div class="scroll-arrow" onclick="scrollTableBy('${id}',-1)">←</div>
+      <div class="scroll-bar-outer" id="sb_${id}">
+        <div class="scroll-bar-thumb" id="st_${id}"></div>
+      </div>
+      <div class="scroll-arrow" onclick="scrollTableBy('${id}',1)">→</div>
+    </div>
+  </div>`;
+}
+
+// ── Controls ───────────────────────────────────────────────────────────────
+function initControls() {
+  document.getElementById('controls').style.display = 'block';
+
+  const funds = getProjects();
+  selFunds = new Set(funds);
+  selFund = funds[0] || '';
+
+  document.getElementById('fundPills').innerHTML = funds.map(f =>
+    `<button class="pill on" id="pill_${CSS.escape(f)}"
+      onclick="toggleFund(this,'${f}')">${getProjectName(f)}</button>`
+  ).join('');
+
+  render();
+}
+
+function toggleFund(el, f) {
+  if (selFunds.has(f)) { selFunds.delete(f); el.classList.remove('on'); }
+  else { selFunds.add(f); el.classList.add('on'); }
+  render();
+}
+
+function setUnit(u) {
+  unitMode = u;
+  document.getElementById('btnRaw').classList.toggle('on', u === 'raw');
+  document.getElementById('btnYr').classList.toggle('on',  u === 'year');
+  render();
+}
+
+function setScale(s) {
+  scaleMode = s;
+  document.getElementById('btnLin').classList.toggle('on', s === 'linear');
+  document.getElementById('btnLog').classList.toggle('on', s === 'log');
+  render();
+}
+
+function showTab(t) {
+  activeTab = t;
+  hiddenFundIndices = new Set();
+  hiddenProfileIndices = new Set();
+  document.querySelectorAll('.tab').forEach((el, i) =>
+    el.classList.toggle('on', ['funds','profiles','dr','ab'][i] === t)
+  );
+  destroyCharts();
+  render();
+}
+
+function toggleLegendFund(idx) {
+  if (hiddenFundIndices.has(idx)) hiddenFundIndices.delete(idx);
+  else hiddenFundIndices.add(idx);
+  chartInstances.forEach(ch => {
+    const meta = ch.getDatasetMeta(idx);
+    if (meta) {
+      meta.hidden = hiddenFundIndices.has(idx);
+      ch.update();
+    }
+  });
+  document.querySelectorAll('.fund-legend button[data-fi]').forEach(btn => {
+    const fi = +btn.dataset.fi;
+    btn.classList.toggle('hidden-series', hiddenFundIndices.has(fi));
+  });
+}
+
+function toggleLegendProfile(idx) {
+  if (hiddenProfileIndices.has(idx)) hiddenProfileIndices.delete(idx);
+  else hiddenProfileIndices.add(idx);
+  chartInstances.forEach(ch => {
+    ch.data.datasets.forEach((ds_, di) => {
+      if (ds_.label === getProfileLabel(idx)) {
+        ch.getDatasetMeta(di).hidden = hiddenProfileIndices.has(idx);
+      }
+    });
+    ch.update();
+  });
+  document.querySelectorAll('.fund-legend button[data-pi]').forEach(btn => {
+    const pi = +btn.dataset.pi;
+    btn.classList.toggle('hidden-series', hiddenProfileIndices.has(pi));
+  });
+}
+
+function applyHiddenSeries() {
+  if (activeTab === 'funds') {
+    chartInstances.forEach(ch => {
+      hiddenFundIndices.forEach(idx => {
+        const meta = ch.getDatasetMeta(idx);
+        if (meta) meta.hidden = true;
+      });
+      ch.update();
+    });
+  } else if (activeTab === 'profiles') {
+    chartInstances.forEach(ch => {
+      ch.data.datasets.forEach((ds_, di) => {
+        ds.riskProfileOptions.forEach((p, pi) => {
+          if (ds_.label === p.label && hiddenProfileIndices.has(pi)) {
+            ch.getDatasetMeta(di).hidden = true;
+          }
+        });
+      });
+      ch.update();
+    });
+  }
+}
+
+function toggleTimePeriod(i) {
+  if (selTimePeriods.has(i)) {
+    if (selTimePeriods.size > 1) selTimePeriods.delete(i);
+  } else {
+    selTimePeriods.add(i);
+  }
+  render();
+}
+
+// ── Chart utils ────────────────────────────────────────────────────────────
+function destroyCharts() {
+  chartInstances.forEach(c => c.destroy());
+  chartInstances = [];
+}
+
+function fmt(v, sign) {
+  if (v === null || v === undefined) return '—';
+  const s = sign && v > 0 ? '+' : '';
+  const a = Math.abs(v);
+  if (a === 0) return '0';
+  if (a >= 1e15 || (a < 0.001 && a > 0)) {
+    const exp = Math.floor(Math.log10(a));
+    const coeff = v / Math.pow(10, exp);
+    const supMap = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+    const supExp = String(exp).split('').map(c => supMap[c]||c).join('');
+    return `${s}${coeff.toFixed(2)}×10${supExp}`;
+  }
+  if (a >= 1e12) return s + (v/1e12).toPrecision(3) + 'T';
+  if (a >= 1e9)  return s + (v/1e9).toPrecision(3)  + 'B';
+  if (a >= 1e6)  return s + (v/1e6).toPrecision(3)  + 'M';
+  if (a >= 1e3)  return s + (v/1e3).toPrecision(3)  + 'k';
+  return s + v.toPrecision(3);
+}
+
+const tinyBarPlugin = {
+  id: 'tinyBar',
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const yAxis = chart.scales.y;
+    const yZero = yAxis.getPixelForValue(0);
+    const MIN_PX = 3;
+    const FONT = 9;
+    const HAIRLINE_ABOVE = 4;
+    const LABEL_GAP = 3;
+    const LABEL_STEP = FONT + 3;
+
+    const byCol = {};
+    chart.data.datasets.forEach((dataset, di) => {
+      const meta = chart.getDatasetMeta(di);
+      if (meta.hidden) return;
+      dataset.data.forEach((val, i) => {
+        if (val === 0) return;
+        const bar = meta.data[i];
+        if (!bar) return;
+        if (Math.abs(yZero - bar.y) >= MIN_PX) return;
+        if (!byCol[i]) byCol[i] = [];
+        byCol[i].push({ x: bar.x, w: bar.width || 8, val, color: dataset.borderColor, di });
+      });
+    });
+
+    ctx.save();
+    Object.values(byCol).forEach(group => {
+      group.sort((a, b) => a.di - b.di);
+      const hy = yZero - HAIRLINE_ABOVE;
+      group.forEach((m, si) => {
+        ctx.save();
+        ctx.globalAlpha = 0.55;
+        ctx.strokeStyle = m.color;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(m.x - m.w/2 + 2, hy);
+        ctx.lineTo(m.x + m.w/2 - 2, hy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+        const ly = hy - LABEL_GAP - si * LABEL_STEP;
+        ctx.save();
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = m.color;
+        ctx.font = `${FONT}px 'IBM Plex Mono', monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(fmt(m.val), m.x, ly);
+        ctx.restore();
+      });
+    });
+    ctx.restore();
+  }
+};
+
+function makeChart(canvasId, labels, datasets) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ch = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets },
+    plugins: [tinyBarPlugin],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 36 } },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#6b7499',
+            font: { family: "'IBM Plex Mono', monospace", size: 10 },
+            usePointStyle: true, pointStyle: 'rect',
+          }
+        },
+        tooltip: {
+          callbacks: { label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` },
+          titleFont: { family: "'IBM Plex Mono', monospace" },
+          bodyFont:  { family: "'IBM Plex Mono', monospace" },
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: '#252a3d' },
+          ticks: { color: '#6b7499', font: { family: "'IBM Plex Mono', monospace", size: 10 } }
+        },
+        y: {
+          type: scaleMode === 'log' ? 'logarithmic' : 'linear',
+          grid: { color: '#252a3d' },
+          ticks: {
+            color: '#6b7499',
+            font: { family: "'IBM Plex Mono', monospace", size: 10 },
+            callback: v => fmt(v)
+          },
+          border: { color: '#252a3d' }
+        }
+      }
+    }
+  });
+  chartInstances.push(ch);
+}
+
+function timePeriodPills() {
+  return `<div class="ctrl-group">
+    <div class="slabel">Time periods</div>
+    <div class="pill-group">
+      ${PERIOD_LABELS.map((l, i) =>
+        `<button class="pill ${selTimePeriods.has(i) ? 'on' : ''}"
+          onclick="toggleTimePeriod(${i})">${l}</button>`
+      ).join('')}
+    </div>
+  </div>`;
+}
+
+// ── Render dispatcher ──────────────────────────────────────────────────────
+function render() {
+  if (!ds) return;
+  destroyCharts();
+  const c = document.getElementById('content');
+  if      (activeTab === 'funds')    renderFunds(c);
+  else if (activeTab === 'profiles') renderProfiles(c);
+  else if (activeTab === 'dr')       renderDiminishing(c);
+  else                               renderAB(c);
+}
+
+// ── Tab 1: Compare Funds ───────────────────────────────────────────────────
+function renderFunds(c) {
+  const funds = getProjects().filter(f => selFunds.has(f));
+  const unitTypes = getAllUnitTypes();
+  const activeTimes = [...selTimePeriods].sort((a,b) => a-b);
+  const activeLabels = activeTimes.map(t => PERIOD_LABELS[t]);
+
+  const profOpts = ds.riskProfileOptions.map((p,i) =>
+    `<option value="${i}">${p.label}</option>`
+  ).join('');
+
+  let html = `<div class="ctrl-row">
+    <div class="ctrl-group">
+      <div class="slabel">Risk profile</div>
+      <select id="profSelFunds" onchange="selProfile=+this.value;render()">${profOpts}</select>
+    </div>
+    ${timePeriodPills()}
+  </div>
+  <div class="fund-legend">
+    ${funds.map((f,i) => `<button data-fi="${i}"
+      class="${hiddenFundIndices.has(i) ? 'hidden-series' : ''}"
+      onclick="toggleLegendFund(${i})">
+      <span class="swatch" style="background:${FUND_COLORS[i%FUND_COLORS.length]}"></span>
+      ${getProjectName(f)}
+    </button>`).join('')}
+  </div>`;
+
+  for (const rt of unitTypes) {
+    const unitLabel = getUnitLabel(rt);
+    const datasets = funds.map((f, i) => {
+      const data = activeTimes.map(t => {
+        const v = sumByUnit(f, rt, t, selProfile);
+        return v === null ? 0 : v;
+      });
+      const hasAny = data.some(v => v !== 0);
+      return {
+        label: getProjectName(f),
+        data,
+        backgroundColor: FUND_COLORS[i % FUND_COLORS.length] + 'cc',
+        borderColor:      FUND_COLORS[i % FUND_COLORS.length],
+        borderWidth: 1, borderRadius: 3, _hasAny: hasAny,
+      };
+    }).filter(d => d._hasAny);
+
+    if (!datasets.length) continue;
+
+    const hasExtreme = datasets.some(d => d.data.some(v => Math.abs(v) > 1e12));
+    const cid = 'fc_' + rt.replace(/[^a-z0-9]/gi, '_');
+
+    html += `<div class="block">
+      <div class="block-hdr">
+        <span class="bname">${unitLabel}</span>
+        ${unitMode==='year' ? '<span class="badge">per year</span>' : ''}
+        ${hasExtreme && unitMode!=='year' ? '<span class="badge warn">⚠ extreme values — try log or per-year</span>' : ''}
+      </div>
+      <div class="chart-outer"><canvas id="${cid}"></canvas></div>
+    </div>`;
+  }
+
+  c.innerHTML = html;
+  document.getElementById('profSelFunds').value = selProfile;
+
+  for (const rt of unitTypes) {
+    const cid = 'fc_' + rt.replace(/[^a-z0-9]/gi, '_');
+    if (!document.getElementById(cid)) continue;
+    const datasets = funds.map((f, i) => {
+      const data = activeTimes.map(t => {
+        const v = sumByUnit(f, rt, t, selProfile);
+        return v === null ? 0 : v;
+      });
+      return {
+        label: getProjectName(f),
+        data,
+        backgroundColor: FUND_COLORS[i % FUND_COLORS.length] + 'cc',
+        borderColor:      FUND_COLORS[i % FUND_COLORS.length],
+        borderWidth: 1, borderRadius: 3,
+      };
+    }).filter((_, i) => {
+      const data = activeTimes.map(t => sumByUnit(funds[i], rt, t, selProfile) || 0);
+      return data.some(v => v !== 0);
+    });
+    if (datasets.length) makeChart(cid, activeLabels, datasets);
+  }
+  applyHiddenSeries();
+}
+
+// ── Tab 2: Compare Risk Profiles ───────────────────────────────────────────
+function renderProfiles(c) {
+  const funds = getProjects().filter(f => selFunds.has(f));
+  const activeTimes = [...selTimePeriods].sort((a,b) => a-b);
+  const activeLabels = activeTimes.map(t => PERIOD_LABELS[t]);
+
+  let html = `<div class="ctrl-row">
+    ${timePeriodPills()}
+  </div>
+  <div class="fund-legend">
+    ${ds.riskProfileOptions.map((p, i) => `<button data-pi="${i}"
+      class="${hiddenProfileIndices.has(i) ? 'hidden-series' : ''}"
+      onclick="toggleLegendProfile(${i})">
+      <span class="swatch" style="background:${PROFILE_COLORS[i % PROFILE_COLORS.length]}"></span>
+      ${p.label}
+    </button>`).join('')}
+  </div>`;
+
+  for (const f of funds) {
+    const effectKeys = getEffectsForFund(f);
+    const byUnit = {};
+    effectKeys.forEach(ek => {
+      const rt = ds.projects[f].effects[ek].recipient_type;
+      if (!byUnit[rt]) byUnit[rt] = [];
+      byUnit[rt].push(ek);
+    });
+
+    for (const [rt, eks] of Object.entries(byUnit)) {
+      const unitLabel = getUnitLabel(rt);
+      const hasExtreme = ds.riskProfileOptions.some((_, pi) =>
+        activeTimes.some(t => eks.some(ek => {
+          const v = getVal(f, ek, t, pi);
+          return v !== null && Math.abs(v) > 1e12;
+        }))
+      );
+      const cid = 'pc_' + f.replace(/[^a-z0-9]/gi,'_') + '_' + rt.replace(/[^a-z0-9]/gi,'_');
+
+      html += `<div class="block">
+        <div class="block-hdr">
+          <span class="bname">${getProjectName(f)}</span>
+          <span class="badge">${unitLabel}</span>
+          ${unitMode==='year' ? '<span class="badge">per year</span>' : ''}
+          ${hasExtreme && unitMode!=='year' ? '<span class="badge warn">⚠ extreme values — try log or per-year</span>' : ''}
+        </div>
+        <div class="chart-outer"><canvas id="${cid}"></canvas></div>
+      </div>`;
+    }
+  }
+
+  c.innerHTML = html;
+
+  for (const f of funds) {
+    const effectKeys = getEffectsForFund(f);
+    const byUnit = {};
+    effectKeys.forEach(ek => {
+      const rt = ds.projects[f].effects[ek].recipient_type;
+      if (!byUnit[rt]) byUnit[rt] = [];
+      byUnit[rt].push(ek);
+    });
+
+    for (const [rt, eks] of Object.entries(byUnit)) {
+      const cid = 'pc_' + f.replace(/[^a-z0-9]/gi,'_') + '_' + rt.replace(/[^a-z0-9]/gi,'_');
+      if (!document.getElementById(cid)) continue;
+      const datasets = ds.riskProfileOptions.map((p, pi) => {
+        const data = activeTimes.map(t => {
+          let total = 0, found = false;
+          for (const ek of eks) {
+            const v = getVal(f, ek, t, pi);
+            if (v !== null) { total += v; found = true; }
+          }
+          return found ? total : 0;
+        });
+        return {
+          label: p.label,
+          data,
+          backgroundColor: PROFILE_COLORS[pi % PROFILE_COLORS.length] + 'cc',
+          borderColor:      PROFILE_COLORS[pi % PROFILE_COLORS.length],
+          borderWidth: 1, borderRadius: 3,
+        };
+      }).filter(d => d.data.some(v => v !== 0));
+      if (datasets.length) makeChart(cid, activeLabels, datasets);
+    }
+  }
+  applyHiddenSeries();
+}
+
+// ── Tab 3: Diminishing Returns ─────────────────────────────────────────────
+function renderDiminishing(c) {
+  const funds = getProjects().filter(f => selFunds.has(f));
+  const inc = ds.incrementSize || 10;
+
+  const fundData = funds.map((f, fi) => {
+    const dr = ds.projects[f].diminishing_returns || [];
+    return { f, name: getProjectName(f), dr, color: FUND_COLORS[fi % FUND_COLORS.length] };
+  });
+
+  const maxLen = Math.max(...fundData.map(d => d.dr.length));
+  const overlayXs = Array.from({ length: maxLen }, (_, i) => `${(i+1)*inc}M`);
+
+  const monoFont = { family: "'IBM Plex Mono', monospace", size: 10 };
+  const gridColor = '#252a3d';
+
+  let html = `
+  <div class="info" style="margin-bottom:16px">
+    Y-axis = cost-effectiveness multiplier relative to first dollar (1.0 = no diminishing returns).
+    A value of 0.5 means $1 at that level buys half what it would at the start.
+    X-axis = cumulative spend in ${inc}M increments.
+  </div>
+  <div class="block">
+    <div class="block-hdr"><span class="bname">All funds — overlay</span></div>
+    <div class="fund-legend">
+      ${fundData.map((fd, i) => `<button data-fi="${i}"
+        class="${hiddenFundIndices.has(i) ? 'hidden-series' : ''}"
+        onclick="toggleLegendFund(${i})">
+        <span class="swatch" style="background:${fd.color}"></span>${fd.name}
+      </button>`).join('')}
+    </div>
+    <div class="chart-outer" style="height:300px"><canvas id="dr_overlay"></canvas></div>
+  </div>
+  <div class="block">
+    <div class="block-hdr"><span class="bname">Per-fund detail</span></div>
+  </div>
+  ${fundData.map(fd => `
+  <div class="block">
+    <div class="block-hdr">
+      <span class="bname" style="border-left:3px solid ${fd.color};padding-left:6px">${fd.name}</span>
+      <span class="badge">${fd.dr.length} increments · ${fd.dr.length * inc}M total</span>
+      <span class="badge">floor: ${fd.dr.length ? Math.min(...fd.dr).toFixed(4) : '—'}</span>
+    </div>
+    <div class="chart-outer" style="height:220px"><canvas id="dr_${fd.f.replace(/[^a-z0-9]/gi,'_')}"></canvas></div>
+  </div>`).join('')}`;
+
+  c.innerHTML = html;
+
+  const overlayCanvas = document.getElementById('dr_overlay');
+  if (overlayCanvas) {
+    const ch = new Chart(overlayCanvas, {
+      type: 'line',
+      data: {
+        labels: overlayXs,
+        datasets: fundData.map(fd => {
+          const padded = [...fd.dr];
+          while (padded.length < maxLen) padded.push(null);
+          return {
+            label: fd.name,
+            data: padded,
+            borderColor: fd.color,
+            backgroundColor: fd.color + '11',
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            tension: 0.3,
+            spanGaps: false,
+          };
+        }),
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#6b7499', font: monoFont, usePointStyle: true, pointStyle: 'line' } },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y !== null ? ctx.parsed.y.toFixed(4) : '—'}`,
+              title: ctxs => `Cumulative spend: ${ctxs[0].label}`,
+            },
+            titleFont: monoFont, bodyFont: monoFont,
+          }
+        },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: '#6b7499', font: monoFont, maxTicksLimit: 15 } },
+          y: {
+            min: 0, max: 1,
+            grid: { color: gridColor },
+            ticks: { color: '#6b7499', font: monoFont },
+            border: { color: gridColor },
+            title: { display: true, text: 'multiplier (1.0 = full effectiveness)', color: '#6b7499', font: monoFont },
+          }
+        }
+      }
+    });
+    chartInstances.push(ch);
+  }
+
+  for (const fd of fundData) {
+    const cid = 'dr_' + fd.f.replace(/[^a-z0-9]/gi,'_');
+    const canvas = document.getElementById(cid);
+    if (!canvas) continue;
+    const xs = fd.dr.map((_, i) => `${(i+1)*inc}M`);
+    const ch = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: xs,
+        datasets: [{
+          label: fd.name,
+          data: fd.dr,
+          borderColor: fd.color,
+          backgroundColor: fd.color + '18',
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          tension: 0.3,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `multiplier: ${ctx.parsed.y.toFixed(4)}`,
+              title: ctxs => `Cumulative spend: ${ctxs[0].label}`,
+            },
+            titleFont: monoFont, bodyFont: monoFont,
+          }
+        },
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: '#6b7499', font: monoFont, maxTicksLimit: 12 } },
+          y: {
+            min: 0,
+            grid: { color: gridColor },
+            ticks: { color: '#6b7499', font: monoFont, callback: v => v.toFixed(2) },
+            border: { color: gridColor },
+            title: { display: true, text: 'multiplier', color: '#6b7499', font: monoFont },
+          }
+        }
+      }
+    });
+    chartInstances.push(ch);
+  }
+
+  const overlayChart = chartInstances[0];
+  if (overlayChart) {
+    hiddenFundIndices.forEach(idx => {
+      const meta = overlayChart.getDatasetMeta(idx);
+      if (meta) meta.hidden = true;
+    });
+    overlayChart.update();
+  }
+}
+
+// ── Tab 4: A vs B ──────────────────────────────────────────────────────────
+function renderAB(c) {
+  if (!dsB) {
+    c.innerHTML = `<div class="empty">Select Dataset B to use this tab.<br><br>
+      Shows A values, B values, and heatmap-coloured differences.</div>`;
+    return;
+  }
+
+  function diffColor(d, absMax) {
+    if (d === null || absMax === 0) return 'background:var(--surface);color:var(--dim)';
+    const r = Math.max(-1, Math.min(1, d / absMax));
+    const t = Math.abs(r);
+    if (r < 0) {
+      const bg = `rgb(${Math.round(80+t*150)},${Math.round(30+t*20)},${Math.round(30+t*20)})`;
+      return `background:${bg};color:${t>.45?'#fff':'var(--text)'}`;
+    }
+    const bg = `rgb(20,${Math.round(60+t*140)},${Math.round(80+t*80)})`;
+    return `background:${bg};color:${t>.3?'#fff':'var(--text)'}`;
+  }
+
+  function cell(v)  { return `<td class="num">${fmt(v)}</td>`; }
+  function dcell(d, absMax) {
+    const st = diffColor(d, absMax);
+    return `<td style="${st};text-align:right;font-family:var(--mono);font-size:10px;padding:3px 7px">${fmt(d, true)}</td>`;
+  }
+
+  const funds = getProjects().filter(f => selFunds.has(f));
+  const nP = ds.riskProfileOptions.length;
+  const inc = ds.incrementSize || 10;
+
+  function getRawB(pk, ek, t, pi) {
+    try {
+      const v = parseFloat(dsB.projects[pk].effects[ek].values[t][pi]);
+      return isNaN(v) ? null : v;
+    } catch { return null; }
+  }
+
+  let html = '';
+
+  // ── Diminishing Returns ──
+  html += `<div class="block">
+    <div class="block-hdr"><span class="bname">Diminishing Returns</span>
+      <span class="badge">multiplier per ${inc}M increment</span>
+    </div>`;
+
+  for (const f of funds) {
+    const drA = ds.projects[f].diminishing_returns || [];
+    const drB = (dsB.projects[f] || {}).diminishing_returns || [];
+    const len = Math.max(drA.length, drB.length);
+    if (!len) continue;
+
+    const diffs = Array.from({length: len}, (_, i) => {
+      const a = drA[i] ?? null, b = drB[i] ?? null;
+      return (a !== null && b !== null) ? b - a : null;
+    });
+    const absMax = Math.max(...diffs.filter(d => d !== null).map(d => Math.abs(d)), 1e-9);
+    const colLabels = Array.from({length: len}, (_, i) => `${(i+1)*inc}M`);
+
+    const drTableId = 'dr_' + f.replace(/[^a-z0-9]/gi,'_');
+    const drTableHTML = `<table style="width:max-content">
+        <thead><tr>
+          <th style="text-align:left;min-width:55px;position:sticky;left:0;z-index:1;background:var(--surface2)">Row</th>
+          ${colLabels.map(l=>`<th style="min-width:62px">${l}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          <tr><td style="text-align:left;position:sticky;left:0;background:var(--surface2);color:var(--muted);font-family:var(--mono);font-size:10px;padding:3px 7px;border:1px solid var(--border)">A</td>${drA.map((v,i) => i < len ? cell(v) : '<td>—</td>').join('')}${drA.length<len?Array.from({length:len-drA.length},()=>'<td style="color:var(--dim)">—</td>').join(''):''}</tr>
+          <tr><td style="text-align:left;position:sticky;left:0;background:var(--surface2);color:var(--muted);font-family:var(--mono);font-size:10px;padding:3px 7px;border:1px solid var(--border)">B</td>${Array.from({length:len},(_,i) => cell(drB[i]??null)).join('')}</tr>
+          <tr><td style="text-align:left;position:sticky;left:0;background:var(--surface2);color:var(--accent3);font-family:var(--mono);font-size:10px;padding:3px 7px;border:1px solid var(--border)">B−A</td>${diffs.map(d => dcell(d, absMax)).join('')}</tr>
+        </tbody>
+      </table>`;
+
+    html += `<div style="margin-bottom:16px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:5px">${getProjectName(f)}</div>
+      ${makeScrollTable(drTableId, drTableHTML)}
+    </div>`;
+  }
+  html += `</div>`;
+
+  // ── Effects ──
+  html += `<div class="block">
+    <div class="block-hdr"><span class="bname">Effects</span>
+      <span class="badge">all profiles × all time periods</span>
+    </div>
+  </div>`;
+
+  for (const f of funds) {
+    if (!ds.projects[f]) continue;
+    const effectKeys = Object.keys(ds.projects[f].effects || {});
+
+    for (const ek of effectKeys) {
+      const recipType = ds.projects[f].effects[ek].recipient_type;
+      const unitLabel = getUnitLabel(recipType);
+
+      const allDiffs = [];
+      for (let pi = 0; pi < nP; pi++) {
+        for (let t = 0; t < T_COUNT; t++) {
+          const a = getRaw(f, ek, t, pi);
+          const b = getRawB(f, ek, t, pi);
+          if (a !== null && b !== null) allDiffs.push(b - a);
+        }
+      }
+      const absMax = allDiffs.length ? Math.max(...allDiffs.map(d => Math.abs(d)), 1e-9) : 1;
+
+      const effTableId = 'ef_' + f.replace(/[^a-z0-9]/gi,'_') + '_' + ek.replace(/[^a-z0-9]/gi,'_');
+      let effTableHTML = `<table style="width:max-content">
+          <thead>
+            <tr>
+              <th style="text-align:left;min-width:130px;position:sticky;left:0;z-index:1;background:var(--surface2)">Profile</th>
+              <th colspan="${T_COUNT}" style="color:var(--accent);border-bottom:none">A — ${ds.name||'Dataset A'}</th>
+              <th colspan="${T_COUNT}" style="color:var(--accent2);border-bottom:none">B — ${dsB.name||'Dataset B'}</th>
+              <th colspan="${T_COUNT}" style="color:var(--accent3);border-bottom:none">B − A</th>
+            </tr>
+            <tr>
+              <th style="position:sticky;left:0;z-index:1;background:var(--surface2)"></th>
+              ${PERIOD_LABELS.map(l=>`<th style="color:var(--accent)">${l}</th>`).join('')}
+              ${PERIOD_LABELS.map(l=>`<th style="color:var(--accent2)">${l}</th>`).join('')}
+              ${PERIOD_LABELS.map(l=>`<th style="color:var(--accent3)">${l}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>`;
+
+      for (let pi = 0; pi < nP; pi++) {
+        const pLabel = ds.riskProfileOptions[pi].label;
+        const pColor = PROFILE_COLORS[pi % PROFILE_COLORS.length];
+        effTableHTML += `<tr>
+          <td style="text-align:left;position:sticky;left:0;background:var(--surface2);border-left:3px solid ${pColor};font-family:var(--mono);font-size:10px;padding:3px 7px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap">${pLabel}</td>
+          ${Array.from({length:T_COUNT},(_,t)=>cell(getRaw(f,ek,t,pi))).join('')}
+          ${Array.from({length:T_COUNT},(_,t)=>cell(getRawB(f,ek,t,pi))).join('')}
+          ${Array.from({length:T_COUNT},(_,t)=>{
+            const a=getRaw(f,ek,t,pi), b=getRawB(f,ek,t,pi);
+            return dcell((a!==null&&b!==null)?b-a:null, absMax);
+          }).join('')}
+        </tr>`;
+      }
+      effTableHTML += `</tbody></table>`;
+
+      html += `<div style="margin-bottom:20px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:5px">
+          ${getProjectName(f)} · ${ek} <span style="color:var(--dim);margin-left:4px">(${unitLabel})</span>
+        </div>
+        ${makeScrollTable(effTableId, effTableHTML)}
+      </div>`;
+    }
+  }
+
+  c.innerHTML = html;
+
+  document.querySelectorAll('.scroll-tbl-outer').forEach(el => {
+    initScrollTable(el.id.replace('so_', ''));
+  });
+}
+
+// ── Bootstrap ──────────────────────────────────────────────────────────────
+initDatasets();
+</script>
+</body>
+</html>
