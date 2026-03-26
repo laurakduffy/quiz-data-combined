@@ -100,6 +100,38 @@ The vite server (`npm run dev`) is faster but can't reach the serverless functio
 - `npm run test:run` - single run
 - Pre-commit hook runs linting + tests
 
+### Legacy Parity Tests
+
+The `tests/legacy-parity.test.js` suite verifies that all 9 JS voting methods
+(`marcusCalculation.js`) produce identical results to the original Python
+implementations. Tests consume JSON fixtures generated from the Python code.
+
+**To regenerate fixtures** (only needed if Python reference code changes):
+
+```bash
+# One-time setup
+python3 -m venv legacy/.venv
+legacy/.venv/bin/pip install -r legacy/requirements.txt
+
+# Regenerate
+legacy/.venv/bin/python legacy/generate_fixtures.py
+```
+
+The venv is gitignored. CI does not need Python — it runs against the committed
+JSON fixture files in `tests/fixtures/`.
+
+**Legacy file structure:**
+
+| File | Purpose |
+|------|---------|
+| `legacy/generate_fixtures.py` | Generates JSON test fixtures from Python |
+| `legacy/refactored/donor_compass.py` | Core scoring functions + credenceWeighted, myFavoriteTheory, mec |
+| `legacy/expanded/calculation.py` | borda, splitCycle, lexicographicMaximin, nashBargaining, met, msa |
+| `legacy/expanded/multi_stage_aggregation.py` | MSA theory types (used by vote_msa) |
+| `legacy/requirements.txt` | Python dependencies (numpy) |
+
+See `docs/legacy-calculation-differences.md` for detailed algorithmic comparison.
+
 ### Design Decisions
 All visual/UX design decisions are handled by the UX team, not implementation. Manu and Claude implement features with placeholder styles that will be updated when design specs arrive.
 
@@ -469,4 +501,6 @@ Show an "Explain Results" button that generates a personalized explanation of wh
 | `scripts/snapshot.sh` | Prototype builder |
 | `scripts/init-dev-db.py` | Initialize local dev database |
 | `docs/CLAUDE-ARCHIVE.md` | Detailed implementation notes for completed features |
+| `docs/legacy-calculation-differences.md` | Python↔JS algorithmic comparison for all 9 voting methods |
+| `legacy/` | Python reference implementations + fixture generator (see Legacy Parity Tests) |
 | `example/` | Standalone calculation code for Moral Marketplace feature |

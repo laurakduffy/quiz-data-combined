@@ -1,0 +1,6751 @@
+{
+  "metadata": {
+    "generated_by": "legacy/generate_fixtures.py",
+    "source": [
+      "legacy/refactored/donor_compass.py",
+      "legacy/expanded/calculation.py",
+      "legacy/expanded/multi_stage_aggregation.py"
+    ],
+    "description": "End-to-end reference outputs for voting methods with budget allocation loop.",
+    "tie_breaking": "Python uses max() which returns first element in insertion order on ties. JS uses alphabetical sort on ties. This can cause differences when project scores are exactly equal.",
+    "mec_note": "MEC fixtures use an expected-value algorithm matching the JS implementation: E[score] = sum(credence * marginal_value), pick argmax. The original Python MEC averages continuous parameters before evaluation and splits on discrete risk_profile, allowing multiple projects per iteration.",
+    "nash_note": "Nash bargaining tested with default zero_spending disagreement. Python random_dictator == JS budget_by_credence (naming only). No-feasible fallback differs: Python uses sum-of-gains argmax, JS uses proportional allocation + stops loop. Test inputs are chosen so all projects are feasible (no fallback triggered).",
+    "met_note": "MET fixtures use a bridge function with classical MDS (eigendecomposition) matching the JS implementation. The original Python MET uses sklearn SMACOF MDS which produces different 2D embeddings. The correlation functions (Pearson, Spearman) are reimplemented to match JS exactly.",
+    "msa_note": "MSA uses expanded/calculation.py's vote_msa which imports from multi_stage_aggregation.py. Algorithm is identical to JS. MSA can return __stop__ if no project exceeds 50%% permissibility; test inputs are chosen so this does not occur."
+  },
+  "project_data": {
+    "malaria_nets": {
+      "tags": {
+        "near_term_xrisk": false
+      },
+      "diminishing_returns": [
+        1.0,
+        0.833,
+        0.714,
+        0.625,
+        0.556,
+        0.5,
+        0.455,
+        0.417,
+        0.385,
+        0.357,
+        0.333,
+        0.313,
+        0.294,
+        0.278,
+        0.263,
+        0.25,
+        0.238,
+        0.227,
+        0.217,
+        0.208,
+        0.2,
+        0.192,
+        0.185,
+        0.179,
+        0.173,
+        0.167,
+        0.161,
+        0.156,
+        0.152,
+        0.147,
+        0.143,
+        0.139,
+        0.135,
+        0.132,
+        0.128,
+        0.125,
+        0.122,
+        0.119,
+        0.116,
+        0.114,
+        0.111,
+        0.109,
+        0.106,
+        0.104,
+        0.102,
+        0.1,
+        0.098,
+        0.096,
+        0.094,
+        0.093,
+        0.091,
+        0.089,
+        0.088,
+        0.087,
+        0.085,
+        0.084,
+        0.082,
+        0.081,
+        0.08,
+        0.079,
+        0.077,
+        0.076,
+        0.075,
+        0.074,
+        0.073,
+        0.072,
+        0.071,
+        0.07,
+        0.069,
+        0.068,
+        0.068,
+        0.067,
+        0.066,
+        0.065,
+        0.065,
+        0.064,
+        0.063,
+        0.063,
+        0.062,
+        0.061,
+        0.061,
+        0.06,
+        0.06,
+        0.059,
+        0.059,
+        0.058,
+        0.058,
+        0.057,
+        0.057,
+        0.056
+      ],
+      "effects": {
+        "effect_lives_saved": {
+          "recipient_type": "human_life_years",
+          "values": [
+            [
+              1000,
+              950,
+              900,
+              850
+            ],
+            [
+              800,
+              760,
+              720,
+              680
+            ],
+            [
+              400,
+              380,
+              360,
+              340
+            ],
+            [
+              100,
+              95,
+              90,
+              85
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "effect_disability_reduction": {
+          "recipient_type": "human_ylds",
+          "values": [
+            [
+              500,
+              475,
+              450,
+              425
+            ],
+            [
+              600,
+              570,
+              540,
+              510
+            ],
+            [
+              400,
+              380,
+              360,
+              340
+            ],
+            [
+              200,
+              190,
+              180,
+              170
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "effect_income": {
+          "recipient_type": "human_income_doublings",
+          "values": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              50,
+              47,
+              45,
+              42
+            ],
+            [
+              100,
+              95,
+              90,
+              85
+            ],
+            [
+              80,
+              76,
+              72,
+              68
+            ],
+            [
+              20,
+              19,
+              18,
+              17
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "cage_free_campaigns": {
+      "tags": {
+        "near_term_xrisk": false
+      },
+      "diminishing_returns": [
+        1.0,
+        0.667,
+        0.5,
+        0.4,
+        0.333,
+        0.286,
+        0.25,
+        0.222,
+        0.2,
+        0.182,
+        0.167,
+        0.154,
+        0.143,
+        0.133,
+        0.125,
+        0.118,
+        0.111,
+        0.105,
+        0.1,
+        0.095,
+        0.091,
+        0.087,
+        0.083,
+        0.08,
+        0.077,
+        0.074,
+        0.071,
+        0.069,
+        0.067,
+        0.065,
+        0.063,
+        0.061,
+        0.059,
+        0.057,
+        0.056,
+        0.054,
+        0.053,
+        0.051,
+        0.05,
+        0.049,
+        0.048,
+        0.047,
+        0.046,
+        0.045,
+        0.044,
+        0.043,
+        0.042,
+        0.041,
+        0.04,
+        0.039,
+        0.038,
+        0.038,
+        0.037,
+        0.036,
+        0.036,
+        0.035,
+        0.035,
+        0.034,
+        0.034,
+        0.033,
+        0.033,
+        0.032,
+        0.032,
+        0.031,
+        0.031,
+        0.031,
+        0.03,
+        0.03,
+        0.03,
+        0.029,
+        0.029,
+        0.029,
+        0.028,
+        0.028,
+        0.028,
+        0.028,
+        0.027,
+        0.027,
+        0.027,
+        0.027,
+        0.026,
+        0.026,
+        0.026,
+        0.026,
+        0.026,
+        0.025,
+        0.025,
+        0.025,
+        0.025,
+        0.025
+      ],
+      "effects": {
+        "effect_chickens": {
+          "recipient_type": "chickens_birds",
+          "values": [
+            [
+              50000,
+              45000,
+              40000,
+              35000
+            ],
+            [
+              80000,
+              72000,
+              64000,
+              56000
+            ],
+            [
+              60000,
+              54000,
+              48000,
+              42000
+            ],
+            [
+              20000,
+              18000,
+              16000,
+              14000
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "shrimp_welfare": {
+      "tags": {
+        "near_term_xrisk": false
+      },
+      "diminishing_returns": [
+        1.0,
+        0.667,
+        0.5,
+        0.4,
+        0.333,
+        0.286,
+        0.25,
+        0.222,
+        0.2,
+        0.182,
+        0.167,
+        0.154,
+        0.143,
+        0.133,
+        0.125,
+        0.118,
+        0.111,
+        0.105,
+        0.1,
+        0.095,
+        0.091,
+        0.087,
+        0.083,
+        0.08,
+        0.077,
+        0.074,
+        0.071,
+        0.069,
+        0.067,
+        0.065,
+        0.063,
+        0.061,
+        0.059,
+        0.057,
+        0.056,
+        0.054,
+        0.053,
+        0.051,
+        0.05,
+        0.049,
+        0.048,
+        0.047,
+        0.046,
+        0.045,
+        0.044,
+        0.043,
+        0.042,
+        0.041,
+        0.04,
+        0.039,
+        0.038,
+        0.038,
+        0.037,
+        0.036,
+        0.036,
+        0.035,
+        0.035,
+        0.034,
+        0.034,
+        0.033,
+        0.033,
+        0.032,
+        0.032,
+        0.031,
+        0.031,
+        0.031,
+        0.03,
+        0.03,
+        0.03,
+        0.029,
+        0.029,
+        0.029,
+        0.028,
+        0.028,
+        0.028,
+        0.028,
+        0.027,
+        0.027,
+        0.027,
+        0.027,
+        0.026,
+        0.026,
+        0.026,
+        0.026,
+        0.026,
+        0.025,
+        0.025,
+        0.025,
+        0.025,
+        0.025
+      ],
+      "effects": {
+        "effect_shrimp": {
+          "recipient_type": "shrimp",
+          "values": [
+            [
+              1000000,
+              800000,
+              600000,
+              400000
+            ],
+            [
+              2000000,
+              1600000,
+              1200000,
+              800000
+            ],
+            [
+              1500000,
+              1200000,
+              900000,
+              600000
+            ],
+            [
+              500000,
+              400000,
+              300000,
+              200000
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "wild_animal_welfare": {
+      "tags": {
+        "near_term_xrisk": false
+      },
+      "diminishing_returns": [
+        1.0,
+        0.769,
+        0.625,
+        0.526,
+        0.455,
+        0.4,
+        0.357,
+        0.323,
+        0.294,
+        0.27,
+        0.25,
+        0.233,
+        0.217,
+        0.204,
+        0.192,
+        0.182,
+        0.172,
+        0.164,
+        0.156,
+        0.149,
+        0.143,
+        0.137,
+        0.132,
+        0.127,
+        0.122,
+        0.118,
+        0.114,
+        0.11,
+        0.107,
+        0.104,
+        0.101,
+        0.098,
+        0.096,
+        0.093,
+        0.091,
+        0.089,
+        0.087,
+        0.085,
+        0.083,
+        0.081,
+        0.079,
+        0.078,
+        0.076,
+        0.075,
+        0.073,
+        0.072,
+        0.071,
+        0.069,
+        0.068,
+        0.067,
+        0.066,
+        0.065,
+        0.064,
+        0.063,
+        0.063,
+        0.062,
+        0.061,
+        0.06,
+        0.06,
+        0.059,
+        0.058,
+        0.058,
+        0.057,
+        0.057,
+        0.056,
+        0.056,
+        0.055,
+        0.055,
+        0.054,
+        0.054,
+        0.053,
+        0.053,
+        0.053,
+        0.052,
+        0.052,
+        0.052,
+        0.051,
+        0.051,
+        0.051,
+        0.05,
+        0.05,
+        0.05,
+        0.05,
+        0.049,
+        0.049,
+        0.049,
+        0.049,
+        0.048,
+        0.048,
+        0.048
+      ],
+      "effects": {
+        "effect_mammals": {
+          "recipient_type": "mammals",
+          "values": [
+            [
+              100,
+              80,
+              50,
+              30
+            ],
+            [
+              500,
+              400,
+              250,
+              150
+            ],
+            [
+              1000,
+              800,
+              500,
+              300
+            ],
+            [
+              800,
+              640,
+              400,
+              240
+            ],
+            [
+              200,
+              160,
+              100,
+              60
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "effect_invertebrates": {
+          "recipient_type": "non_shrimp_invertebrates",
+          "values": [
+            [
+              10000,
+              8000,
+              5000,
+              3000
+            ],
+            [
+              50000,
+              40000,
+              25000,
+              15000
+            ],
+            [
+              100000,
+              80000,
+              50000,
+              30000
+            ],
+            [
+              80000,
+              64000,
+              40000,
+              24000
+            ],
+            [
+              20000,
+              16000,
+              10000,
+              6000
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "fish_welfare": {
+      "tags": {
+        "near_term_xrisk": false
+      },
+      "diminishing_returns": [
+        1.0,
+        0.667,
+        0.5,
+        0.4,
+        0.333,
+        0.286,
+        0.25,
+        0.222,
+        0.2,
+        0.182,
+        0.167,
+        0.154,
+        0.143,
+        0.133,
+        0.125,
+        0.118,
+        0.111,
+        0.105,
+        0.1,
+        0.095,
+        0.091,
+        0.087,
+        0.083,
+        0.08,
+        0.077,
+        0.074,
+        0.071,
+        0.069,
+        0.067,
+        0.065,
+        0.063,
+        0.061,
+        0.059,
+        0.057,
+        0.056,
+        0.054,
+        0.053,
+        0.051,
+        0.05,
+        0.049,
+        0.048,
+        0.047,
+        0.046,
+        0.045,
+        0.044,
+        0.043,
+        0.042,
+        0.041,
+        0.04,
+        0.039,
+        0.038,
+        0.038,
+        0.037,
+        0.036,
+        0.036,
+        0.035,
+        0.035,
+        0.034,
+        0.034,
+        0.033,
+        0.033,
+        0.032,
+        0.032,
+        0.031,
+        0.031,
+        0.031,
+        0.03,
+        0.03,
+        0.03,
+        0.029,
+        0.029,
+        0.029,
+        0.028,
+        0.028,
+        0.028,
+        0.028,
+        0.027,
+        0.027,
+        0.027,
+        0.027,
+        0.026,
+        0.026,
+        0.026,
+        0.026,
+        0.026,
+        0.025,
+        0.025,
+        0.025,
+        0.025,
+        0.025
+      ],
+      "effects": {
+        "effect_fish": {
+          "recipient_type": "fish",
+          "values": [
+            [
+              100000,
+              90000,
+              80000,
+              70000
+            ],
+            [
+              200000,
+              180000,
+              160000,
+              140000
+            ],
+            [
+              150000,
+              135000,
+              120000,
+              105000
+            ],
+            [
+              50000,
+              45000,
+              40000,
+              35000
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "ai_safety_policy": {
+      "tags": {
+        "near_term_xrisk": true
+      },
+      "diminishing_returns": [
+        1.0,
+        0.909,
+        0.833,
+        0.769,
+        0.714,
+        0.667,
+        0.625,
+        0.588,
+        0.556,
+        0.526,
+        0.5,
+        0.476,
+        0.455,
+        0.435,
+        0.417,
+        0.4,
+        0.385,
+        0.37,
+        0.357,
+        0.345,
+        0.333,
+        0.323,
+        0.313,
+        0.303,
+        0.294,
+        0.286,
+        0.278,
+        0.27,
+        0.263,
+        0.256,
+        0.25,
+        0.244,
+        0.238,
+        0.233,
+        0.227,
+        0.222,
+        0.217,
+        0.213,
+        0.208,
+        0.204,
+        0.2,
+        0.196,
+        0.192,
+        0.189,
+        0.185,
+        0.182,
+        0.179,
+        0.176,
+        0.173,
+        0.17,
+        0.167,
+        0.164,
+        0.161,
+        0.159,
+        0.156,
+        0.154,
+        0.152,
+        0.149,
+        0.147,
+        0.145,
+        0.143,
+        0.141,
+        0.139,
+        0.137,
+        0.135,
+        0.134,
+        0.132,
+        0.13,
+        0.129,
+        0.127,
+        0.126,
+        0.124,
+        0.123,
+        0.121,
+        0.12,
+        0.119,
+        0.117,
+        0.116,
+        0.115,
+        0.114,
+        0.112,
+        0.111,
+        0.11,
+        0.109,
+        0.108,
+        0.107,
+        0.106,
+        0.105,
+        0.104,
+        0.103
+      ],
+      "effects": {
+        "effect_human_lives_far_future": {
+          "recipient_type": "human_life_years",
+          "values": [
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              100,
+              50,
+              -50,
+              -100
+            ],
+            [
+              10000,
+              8000,
+              5000,
+              3000
+            ],
+            [
+              50000,
+              40000,
+              25000,
+              15000
+            ],
+            [
+              100000,
+              80000,
+              50000,
+              30000
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "tests": [
+    {
+      "method": "credenceWeighted",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100.0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "mec",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "met",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "msa",
+      "description": "single_human, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "credenceWeighted",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130.0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670.0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "mec",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "met",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "msa",
+      "description": "single_human, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-only",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.0,
+              "fish": 0.0,
+              "shrimp": 0.0,
+              "non_shrimp_invertebrates": 0.0,
+              "mammals": 0.0
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 130,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 670
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 16.25,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 83.75
+      }
+    },
+    {
+      "method": "credenceWeighted",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "mec",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "met",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "msa",
+      "description": "single_animal, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "credenceWeighted",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100.0,
+        "shrimp_welfare": 550.0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150.0,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "mec",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "met",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "msa",
+      "description": "single_animal, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Animal-focused",
+            "credence": 1.0,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.1,
+              "non_shrimp_invertebrates": 0.05,
+              "mammals": 0.5
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 100,
+        "shrimp_welfare": 550,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 150,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 12.5,
+        "shrimp_welfare": 68.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 18.75,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "credenceWeighted",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 28.0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 12.0,
+        "ai_safety_policy": 60.0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 28.000000000000004,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 12.0,
+        "ai_safety_policy": 60.0
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 50,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 30,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 20.0,
+        "shrimp_welfare": 50.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 30.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "mec",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 50,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 30,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 20.0,
+        "shrimp_welfare": 50.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 30.0,
+        "ai_safety_policy": 0.0
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "met",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 100.0
+      }
+    },
+    {
+      "method": "msa",
+      "description": "three_mixed, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 50,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 30,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 20.0,
+        "shrimp_welfare": 50.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 30.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "credenceWeighted",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 63.0,
+        "cage_free_campaigns": 68.0,
+        "shrimp_welfare": 152.0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 100.0,
+        "ai_safety_policy": 417.0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 7.875,
+        "cage_free_campaigns": 8.5,
+        "shrimp_welfare": 19.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 12.5,
+        "ai_safety_policy": 52.125
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 170,
+        "shrimp_welfare": 380,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 250,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 21.25,
+        "shrimp_welfare": 47.5,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 31.25,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "mec",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 130,
+        "shrimp_welfare": 270,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 180,
+        "ai_safety_policy": 220
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 16.25,
+        "shrimp_welfare": 33.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 22.5,
+        "ai_safety_policy": 27.500000000000004
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 110,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 30,
+        "ai_safety_policy": 640
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 13.750000000000002,
+        "cage_free_campaigns": 2.5,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 3.75,
+        "ai_safety_policy": 80.0
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 110,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 30,
+        "ai_safety_policy": 640
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 13.750000000000002,
+        "cage_free_campaigns": 2.5,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 3.75,
+        "ai_safety_policy": 80.0
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 70,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 730
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 8.75,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 91.25
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 50,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 30,
+        "ai_safety_policy": 700
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 6.25,
+        "cage_free_campaigns": 2.5,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 3.75,
+        "ai_safety_policy": 87.5
+      }
+    },
+    {
+      "method": "met",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 110,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 30,
+        "ai_safety_policy": 640
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 13.750000000000002,
+        "cage_free_campaigns": 2.5,
+        "shrimp_welfare": 0.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 3.75,
+        "ai_safety_policy": 80.0
+      }
+    },
+    {
+      "method": "msa",
+      "description": "three_mixed, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Human-focused, near-term optimist",
+            "credence": 0.35,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.2,
+              "chickens_birds": 0.01,
+              "fish": 0.005,
+              "shrimp": 0.0001,
+              "non_shrimp_invertebrates": 5e-05,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1.0,
+              0.9,
+              0.5,
+              0.2,
+              0.05,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0.1
+          },
+          {
+            "name": "Animal welfare prioritizer",
+            "credence": 0.4,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.8,
+              "human_income_doublings": 0.1,
+              "chickens_birds": 0.5,
+              "fish": 0.3,
+              "shrimp": 0.05,
+              "non_shrimp_invertebrates": 0.01,
+              "mammals": 0.8
+            },
+            "discount_factors": [
+              1.0,
+              0.8,
+              0.4,
+              0.15,
+              0.03,
+              0.005
+            ],
+            "risk_profile": 1,
+            "p_extinction": 0.05
+          },
+          {
+            "name": "Longtermist with high extinction concern",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1.0,
+              "human_ylds": 0.3,
+              "human_income_doublings": 0.05,
+              "chickens_birds": 0.001,
+              "fish": 0.0005,
+              "shrimp": 1e-05,
+              "non_shrimp_invertebrates": 5e-06,
+              "mammals": 0.01
+            },
+            "discount_factors": [
+              1.0,
+              1.0,
+              0.9,
+              0.7,
+              0.5,
+              0.3
+            ],
+            "risk_profile": 2,
+            "p_extinction": 0.5
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 130,
+        "shrimp_welfare": 270,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 180,
+        "ai_safety_policy": 220
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 16.25,
+        "shrimp_welfare": 33.75,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 22.5,
+        "ai_safety_policy": 27.500000000000004
+      }
+    },
+    {
+      "method": "credenceWeighted",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 20.0,
+        "cage_free_campaigns": 25.0,
+        "shrimp_welfare": 50.0,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 2.5,
+        "ai_safety_policy": 2.5
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 20.0,
+        "cage_free_campaigns": 25.0,
+        "shrimp_welfare": 50.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 2.5,
+        "ai_safety_policy": 2.5
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "mec",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 70,
+        "cage_free_campaigns": 0,
+        "shrimp_welfare": 30,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 0,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 70.0,
+        "cage_free_campaigns": 0.0,
+        "shrimp_welfare": 30.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 0.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 20,
+        "shrimp_welfare": 60,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 20,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 20.0,
+        "shrimp_welfare": 60.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 20.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "met",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "msa",
+      "description": "four_presets, budget=100",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 100,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 10,
+        "shrimp_welfare": 80,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 10,
+        "ai_safety_policy": 0
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 80.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 10.0,
+        "ai_safety_policy": 0.0
+      }
+    },
+    {
+      "method": "credenceWeighted",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 195.0,
+        "cage_free_campaigns": 150.0,
+        "shrimp_welfare": 217.5,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 60.0,
+        "ai_safety_policy": 177.5
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 24.375,
+        "cage_free_campaigns": 18.75,
+        "shrimp_welfare": 27.187499999999996,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 7.5,
+        "ai_safety_policy": 22.1875
+      }
+    },
+    {
+      "method": "myFavoriteTheory",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 90,
+        "shrimp_welfare": 470,
+        "wild_animal_welfare": 10,
+        "fish_welfare": 130,
+        "ai_safety_policy": 100
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 11.25,
+        "shrimp_welfare": 58.75,
+        "wild_animal_welfare": 1.25,
+        "fish_welfare": 16.25,
+        "ai_safety_policy": 12.5
+      }
+    },
+    {
+      "method": "mec",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 80,
+        "shrimp_welfare": 420,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 120,
+        "ai_safety_policy": 180
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 52.5,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 15.0,
+        "ai_safety_policy": 22.5
+      },
+      "note": "Uses expected-value MEC matching JS. Original Python MEC uses parameter-averaging."
+    },
+    {
+      "method": "borda",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 80,
+        "shrimp_welfare": 450,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 120,
+        "ai_safety_policy": 150
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 56.25,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 15.0,
+        "ai_safety_policy": 18.75
+      }
+    },
+    {
+      "method": "splitCycle",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 50,
+        "cage_free_campaigns": 70,
+        "shrimp_welfare": 400,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 110,
+        "ai_safety_policy": 170
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 6.25,
+        "cage_free_campaigns": 8.75,
+        "shrimp_welfare": 50.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 13.750000000000002,
+        "ai_safety_policy": 21.25
+      }
+    },
+    {
+      "method": "lexicographicMaximin",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 470,
+        "cage_free_campaigns": 40,
+        "shrimp_welfare": 170,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 50,
+        "ai_safety_policy": 70
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 58.75,
+        "cage_free_campaigns": 5.0,
+        "shrimp_welfare": 21.25,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 6.25,
+        "ai_safety_policy": 8.75
+      }
+    },
+    {
+      "method": "nashBargaining",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 80,
+        "cage_free_campaigns": 120,
+        "shrimp_welfare": 320,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 130,
+        "ai_safety_policy": 150
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 10.0,
+        "cage_free_campaigns": 15.0,
+        "shrimp_welfare": 40.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 16.25,
+        "ai_safety_policy": 18.75
+      }
+    },
+    {
+      "method": "met",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 140,
+        "cage_free_campaigns": 90,
+        "shrimp_welfare": 320,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 90,
+        "ai_safety_policy": 160
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 17.5,
+        "cage_free_campaigns": 11.25,
+        "shrimp_welfare": 40.0,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 11.25,
+        "ai_safety_policy": 20.0
+      }
+    },
+    {
+      "method": "msa",
+      "description": "four_presets, budget=800",
+      "inputs": {
+        "worldviews": [
+          {
+            "name": "Total Utilitarian",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 0.3,
+              "chickens_birds": 0.4,
+              "fish": 0.24,
+              "shrimp": 0.08,
+              "non_shrimp_invertebrates": 0.07,
+              "mammals": 0.44
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Kantianism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.5,
+              "human_income_doublings": 0.5,
+              "chickens_birds": 0.05,
+              "fish": 0.01,
+              "shrimp": 0.001,
+              "non_shrimp_invertebrates": 0.001,
+              "mammals": 0.05
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          },
+          {
+            "name": "Consequentialism (Non-Utilitarian)",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 1,
+              "human_income_doublings": 1,
+              "chickens_birds": 0.1,
+              "fish": 0.06,
+              "shrimp": 0.02,
+              "non_shrimp_invertebrates": 0.02,
+              "mammals": 0.11
+            },
+            "discount_factors": [
+              1,
+              0.9,
+              0.8,
+              0.6,
+              0.4,
+              0.01
+            ],
+            "risk_profile": 0,
+            "p_extinction": 0
+          },
+          {
+            "name": "Contractualism",
+            "credence": 0.25,
+            "moral_weights": {
+              "human_life_years": 1,
+              "human_ylds": 0.01,
+              "human_income_doublings": 0.001,
+              "chickens_birds": 0.004,
+              "fish": 0.002,
+              "shrimp": 0.0016,
+              "non_shrimp_invertebrates": 0.0014,
+              "mammals": 0.0044
+            },
+            "discount_factors": [
+              1,
+              1,
+              0.5,
+              0.1,
+              0.001,
+              1e-05
+            ],
+            "risk_profile": 3,
+            "p_extinction": 0
+          }
+        ],
+        "budget": 800,
+        "increment_size": 10
+      },
+      "expected_funding": {
+        "malaria_nets": 0,
+        "cage_free_campaigns": 80,
+        "shrimp_welfare": 420,
+        "wild_animal_welfare": 0,
+        "fish_welfare": 120,
+        "ai_safety_policy": 180
+      },
+      "expected_allocations_pct": {
+        "malaria_nets": 0.0,
+        "cage_free_campaigns": 10.0,
+        "shrimp_welfare": 52.5,
+        "wild_animal_welfare": 0.0,
+        "fish_welfare": 15.0,
+        "ai_safety_policy": 22.5
+      }
+    }
+  ]
+}

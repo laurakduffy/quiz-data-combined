@@ -269,10 +269,20 @@ quiz-demo/
 │
 ├── prototypes/                     # Committed prototype builds
 │   └── index.html                  # Prototype listing page
+├── legacy/                         # Python reference implementations for parity testing
+│   ├── generate_fixtures.py        # Generates JSON test fixtures from Python code
+│   ├── requirements.txt            # Python dependencies (numpy)
+│   ├── refactored/
+│   │   └── donor_compass.py        # credenceWeighted, myFavoriteTheory, mec + sub-calculations
+│   └── expanded/
+│       ├── calculation.py          # borda, splitCycle, lexicographicMaximin, nashBargaining, met, msa
+│       └── multi_stage_aggregation.py  # MSA theory types and MEC aggregation
+│
 ├── docs/                           # Documentation
 │   ├── CLAUDE-ARCHIVE.md           # Detailed implementation notes for completed features
 │   ├── REFACTORING_NOTES.md        # Bug fixes and architectural decisions
-│   └── COMPONENT_BOUNDARIES.md     # Component responsibility documentation
+│   ├── COMPONENT_BOUNDARIES.md     # Component responsibility documentation
+│   └── legacy-calculation-differences.md  # Python vs JS algorithmic differences
 └── CLAUDE.md                       # Development guide and feature tracking
 ```
 
@@ -408,13 +418,34 @@ npm test
 npm run test:run
 ```
 
-**Test coverage (72 tests across 7 files):**
+**Test coverage (~176 tests across 10 files):**
 - `calculations.test.js` - Calculations, Monte Carlo sampling, appliesTo pattern (35 tests)
 - `ResultsScreen.test.jsx` - Reset button functionality (5 tests)
 - `CredenceSlider.test.jsx` - Slider lock feature (8 tests)
 - `QuestionScreen.test.jsx` - Question types mode toggle (6 tests)
 - `EditPanel.test.jsx` - Selection vs slider rendering (8 tests)
 - `QuizContext.intermission.test.jsx` - Intermission progress/feature flag (8 tests)
+- `moralMarketplace.test.js` - Moral marketplace worldview expansion and voting (14 tests)
+- `legacy-parity.test.js` - Legacy Python parity: sub-calculations + 9 voting methods (92 tests)
+
+### Legacy Parity Tests
+
+The `legacy-parity.test.js` suite verifies that all 9 voting methods in `marcusCalculation.js` produce identical results to the original Python implementations. Tests consume pre-generated JSON fixtures — no Python needed at CI time.
+
+**Covered methods:** credenceWeighted, myFavoriteTheory, mec, borda, splitCycle, lexicographicMaximin, nashBargaining, met, msa
+
+**Regenerating fixtures** (only needed if Python reference code changes):
+
+```bash
+# Set up Python venv (first time only)
+python3 -m venv legacy/.venv
+legacy/.venv/bin/pip install -r legacy/requirements.txt
+
+# Generate fixtures
+legacy/.venv/bin/python legacy/generate_fixtures.py
+```
+
+See `docs/legacy-calculation-differences.md` for documented algorithmic differences between Python and JS implementations.
 
 ### Manual Testing Areas
 The dev server runs at `http://localhost:5173/` with hot module replacement (or `http://localhost:8888/` with `netlify dev` for full stack).
@@ -528,7 +559,7 @@ Questions are defined in `config/questions.json`. To add a new question:
 ### Planned Improvements
 
 - [x] Refine slider recalculation UX during drag operations (completed with ratio preservation and smooth animations)
-- [x] Add component tests with React Testing Library (72 tests across 7 test files)
+- [x] Add component tests with React Testing Library (~176 tests across 10 test files)
 - [ ] Add TypeScript for type safety
 - [x] Add unit tests for calculation functions (diminishing returns)
 - [ ] Improve accessibility (ARIA labels, keyboard navigation)

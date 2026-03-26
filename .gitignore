@@ -40,8 +40,9 @@ dist-ssr
 # Local dev database
 dev.db
 
-# Python cache
+# Python
 __pycache__/
+.venv/
 
 # Netlify dev artifacts
 deno.lock

@@ -23,7 +23,7 @@ Resources:
       FunctionName: quiz-demo-share
       CodeUri: share/
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Timeout: 30
       MemorySize: 256
       Environment:
@@ -69,7 +69,7 @@ Resources:
       FunctionName: quiz-demo-explain
       CodeUri: explain/
       Handler: index.handler
-      Runtime: nodejs20.x
+      Runtime: nodejs22.x
       Timeout: 60
       MemorySize: 256
       Environment:

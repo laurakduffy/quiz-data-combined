@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
+    "test:legacy": "vitest run --config vitest.legacy.config.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "validate": "node scripts/validate-config.js",
