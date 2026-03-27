@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import AllocationBar from './AllocationBar';
 import StageCard from './StageCard';
+import ResultsModal from './ResultsModal';
 import { useDataset } from '../../context/DatasetContext';
 import tableConfig from '../../../config/tableMode.json';
 import styles from '../../styles/components/TableMode.module.css';
@@ -15,6 +17,7 @@ function ResultsPanel({
   onRemoveStage,
   results,
 }) {
+  const [showModal, setShowModal] = useState(false);
   const { dataset } = useDataset();
   const projectEntries = Object.entries(dataset.projects);
   const totalBudget = stages.reduce((sum, s) => sum + s.budget, 0);
@@ -75,7 +78,7 @@ function ResultsPanel({
         <div className={styles.stageArrow} />
       </div>
 
-      <div className={styles.resultsCard}>
+      <div className={styles.resultsCard} onClick={() => setShowModal(true)}>
         <div className={styles.allocationList}>
           {projectEntries.map(([id, project]) => (
             <AllocationBar
@@ -94,6 +97,14 @@ function ResultsPanel({
           </p>
         )}
       </div>
+
+      {showModal && (
+        <ResultsModal
+          results={results}
+          projectEntries={projectEntries}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }
