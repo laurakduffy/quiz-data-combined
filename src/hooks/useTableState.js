@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { computeMultiStageAllocation } from '../utils/marcusCalculation';
 import { adjustCredences, roundCredences } from '../utils/calculations';
 import { useDataset } from '../context/DatasetContext';
+import { useQuiz } from '../context/useQuiz';
 import tableConfig from '../../config/tableMode.json';
 import worldviewPresets from '../../config/worldviewPresets.json';
 
@@ -108,6 +109,7 @@ const MAX_TOTAL_BUDGET = 1000;
 
 export function useTableState() {
   const { dataset } = useDataset();
+  const { fundingCaps, isHydrating } = useQuiz();
 
   const [worldviews, setWorldviews] = useState(
     () => _savedState?.worldviews ?? tableConfig.presets.map((p) => createWorldview(p.id))
@@ -215,7 +217,7 @@ export function useTableState() {
 
   const results = useMemo(() => {
     const { worldviews: wvs, credences: creds, stages: stgs } = debouncedState;
-    if (!wvs.length) {
+    if (!wvs.length || isHydrating) {
       const empty = {};
       for (const id of Object.keys(dataset.projects)) empty[id] = 0;
       return { allocations: empty, funding: empty, stageResults: [] };
@@ -228,10 +230,17 @@ export function useTableState() {
     }));
 
     try {
+      // Inject fundingCaps into each stage's options so allocateBudget sees them
+      // Use live fundingCaps (not debounced) to avoid flash of uncapped results on reload
+      const stagesWithCaps =
+        fundingCaps && Object.keys(fundingCaps).length > 0
+          ? stgs.map((s) => ({ ...s, options: { ...s.options, fundingCaps } }))
+          : stgs;
+
       const result = computeMultiStageAllocation(
         dataset.projects,
         worldviewsWithCredences,
-        stgs,
+        stagesWithCaps,
         dataset.incrementSize
       );
       console.log(
@@ -256,7 +265,7 @@ export function useTableState() {
       for (const id of Object.keys(dataset.projects)) empty[id] = 0;
       return { allocations: empty, funding: empty, stageResults: [] };
     }
-  }, [debouncedState, dataset]);
+  }, [debouncedState, dataset, isHydrating, fundingCaps]);
 
   const addWorldview = useCallback(() => {
     setWorldviews((prev) => {

@@ -208,21 +208,27 @@ function packForParliament(results, worldviews, data) {
  * Compute diminishing returns factors for each project based on current funding.
  * Shared across all voting methods.
  */
-function computeDrFactors(funding, projectIds, drArrays) {
+function computeDrFactors(funding, projectIds, drArrays, fundingCaps) {
   const numProjects = projectIds.length;
   const drFactors = new Float64Array(numProjects);
   for (let p = 0; p < numProjects; p++) {
-    const idx = Math.floor(funding[projectIds[p]] / 10);
-    const arr = drArrays[p];
-    drFactors[p] = idx >= arr.length ? arr[arr.length - 1] : arr[idx];
+    const pid = projectIds[p];
+    const cap = fundingCaps?.[pid];
+    if (cap != null && funding[pid] >= cap) {
+      drFactors[p] = 0;
+    } else {
+      const idx = Math.floor(funding[pid] / 10);
+      const arr = drArrays[p];
+      drFactors[p] = idx >= arr.length ? arr[arr.length - 1] : arr[idx];
+    }
   }
   return drFactors;
 }
 
-function voteParliamentFast(data, funding, increment, { packed }) {
+function voteParliamentFast(data, funding, increment, { packed, fundingCaps }) {
   const { scoreMatrix, credences, numActive, projectIds, drArrays } = packed;
   const numProjects = projectIds.length;
-  const drFactors = computeDrFactors(funding, projectIds, drArrays);
+  const drFactors = computeDrFactors(funding, projectIds, drArrays, fundingCaps);
 
   const alloc = new Float64Array(numProjects);
 
@@ -249,10 +255,10 @@ function voteParliamentFast(data, funding, increment, { packed }) {
   return allocations;
 }
 
-function voteMecFast(data, funding, increment, { packed }) {
+function voteMecFast(data, funding, increment, { packed, fundingCaps }) {
   const { scoreMatrix, credences, numActive, projectIds, drArrays } = packed;
   const numProjects = projectIds.length;
-  const drFactors = computeDrFactors(funding, projectIds, drArrays);
+  const drFactors = computeDrFactors(funding, projectIds, drArrays, fundingCaps);
 
   const expectedScores = new Float64Array(numProjects);
   for (let w = 0; w < numActive; w++) {
@@ -275,10 +281,10 @@ function voteMecFast(data, funding, increment, { packed }) {
   return allocations;
 }
 
-function voteBordaFast(data, funding, increment, { packed }) {
+function voteBordaFast(data, funding, increment, { packed, fundingCaps }) {
   const { scoreMatrix, credences, numActive, projectIds, drArrays } = packed;
   const numProjects = projectIds.length;
-  const drFactors = computeDrFactors(funding, projectIds, drArrays);
+  const drFactors = computeDrFactors(funding, projectIds, drArrays, fundingCaps);
 
   const bordaScores = new Float64Array(numProjects);
   // Rank by counting how many projects score higher per worldview
@@ -321,6 +327,7 @@ function voteBordaFast(data, funding, increment, { packed }) {
 
 function allocateBudget(data, votingMethod, totalBudget, opts = {}) {
   const incrementSize = opts.incrementSize ?? 10;
+  const fundingCaps = opts.fundingCaps;
 
   const funding = {};
   for (const projectId of Object.keys(data)) funding[projectId] = 0;
@@ -333,6 +340,10 @@ function allocateBudget(data, votingMethod, totalBudget, opts = {}) {
 
     for (const projectId of Object.keys(data)) {
       funding[projectId] += allocations[projectId];
+      const cap = fundingCaps?.[projectId];
+      if (cap != null && funding[projectId] > cap) {
+        funding[projectId] = cap;
+      }
     }
 
     remaining -= increment;
@@ -430,7 +441,7 @@ function emptyResult(data) {
  * @returns {Object} Allocation percentages { project_id: percentage }
  */
 function runAllocation(votingMethod, credences, options = {}) {
-  const { projectData, datasetId, incrementSize = 10 } = options;
+  const { projectData, datasetId, incrementSize = 10, fundingCaps } = options;
   if (!HAS_ALL_QUESTIONS || !projectData) return emptyResult(projectData);
 
   const budget = Math.min(options.budget || MAX_BUDGET_M, MAX_BUDGET_M);
@@ -445,6 +456,7 @@ function runAllocation(votingMethod, credences, options = {}) {
   const { funding } = allocateBudget(projectData, votingMethod, budget, {
     packed,
     incrementSize,
+    fundingCaps,
   });
 
   const result = {};

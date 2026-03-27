@@ -435,7 +435,7 @@ function _normalizeCredences(customWorldviews) {
   return credences.map((c) => c / total);
 }
 
-function _computeWorldviewMarginalValues(data, funding, worldview) {
+function _computeWorldviewMarginalValues(data, funding, worldview, fundingCaps) {
   const baseValues = calculateAllProjects(
     data,
     worldview.moral_weights,
@@ -445,14 +445,22 @@ function _computeWorldviewMarginalValues(data, funding, worldview) {
   const adjustedValues = adjustForExtinctionRisk(baseValues, data, worldview.p_extinction);
   const result = {};
   for (const projectId of Object.keys(data)) {
-    result[projectId] =
-      adjustedValues[projectId] * getDiminishingReturnsFactor(data, projectId, funding[projectId]);
+    const cap = fundingCaps?.[projectId];
+    if (cap != null && funding[projectId] >= cap) {
+      result[projectId] = 0;
+    } else {
+      result[projectId] =
+        adjustedValues[projectId] *
+        getDiminishingReturnsFactor(data, projectId, funding[projectId]);
+    }
   }
   return result;
 }
 
-function _computeAllWorldviewMarginalValues(data, funding, customWorldviews) {
-  return customWorldviews.map((wv) => _computeWorldviewMarginalValues(data, funding, wv));
+function _computeAllWorldviewMarginalValues(data, funding, customWorldviews, fundingCaps) {
+  return customWorldviews.map((wv) =>
+    _computeWorldviewMarginalValues(data, funding, wv, fundingCaps)
+  );
 }
 
 function _buildProjectRanking(projectScores) {
@@ -479,7 +487,13 @@ function _resolveMsaWorldviewType(worldview, worldviewTypes = null) {
 
 // ---- Voting functions ----
 
-function voteCredenceWeightedCustom(data, funding, increment, customWorldviews) {
+function voteCredenceWeightedCustom(
+  data,
+  funding,
+  increment,
+  customWorldviews,
+  { fundingCaps } = {}
+) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
 
@@ -492,7 +506,12 @@ function voteCredenceWeightedCustom(data, funding, increment, customWorldviews) 
 
   for (let i = 0; i < customWorldviews.length; i++) {
     const share = credences[i] * increment;
-    const marginalValues = _computeWorldviewMarginalValues(data, funding, customWorldviews[i]);
+    const marginalValues = _computeWorldviewMarginalValues(
+      data,
+      funding,
+      customWorldviews[i],
+      fundingCaps
+    );
     const split = _splitAmongTied(marginalValues, share);
     for (const p of Object.keys(split)) allocations[p] += split[p];
   }
@@ -504,7 +523,7 @@ function voteMyFavoriteTheory(
   data,
   funding,
   increment,
-  { customWorldviews = null, tieBreak = null, randomSeed = null } = {}
+  { customWorldviews = null, tieBreak = null, randomSeed = null, fundingCaps } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -518,7 +537,12 @@ function voteMyFavoriteTheory(
 
   const bestIdx = argmax(credences);
   const selectedWorldview = customWorldviews[bestIdx];
-  const marginalValues = _computeWorldviewMarginalValues(data, funding, selectedWorldview);
+  const marginalValues = _computeWorldviewMarginalValues(
+    data,
+    funding,
+    selectedWorldview,
+    fundingCaps
+  );
   const bestProject = _argmaxProject(marginalValues, tieBreak, rng);
   allocations[bestProject] = increment;
   return allocations;
@@ -528,7 +552,7 @@ function voteMec(
   data,
   funding,
   increment,
-  { customWorldviews = null, tieBreak = null, randomSeed = null } = {}
+  { customWorldviews = null, tieBreak = null, randomSeed = null, fundingCaps } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -540,7 +564,12 @@ function voteMec(
   const credences = _normalizeCredences(customWorldviews);
   if (isClose(arraySum(credences), 0.0)) return allocations;
 
-  const worldviewScores = _computeAllWorldviewMarginalValues(data, funding, customWorldviews);
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
   const expectedScores = {};
   for (const projectId of Object.keys(data)) {
     let s = 0;
@@ -559,7 +588,7 @@ function voteMet(
   funding,
   increment,
   customWorldviews,
-  { metThreshold = null, tieBreak = null, randomSeed = null } = {}
+  { metThreshold = null, tieBreak = null, randomSeed = null, fundingCaps } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -569,7 +598,12 @@ function voteMet(
   tieBreak = tieBreak ?? AGGREGATION_DEFAULTS.tie_break;
   const rng = _buildRng(tieBreak, randomSeed);
 
-  const worldviewScores = _computeAllWorldviewMarginalValues(data, funding, customWorldviews);
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
   const credences = _normalizeCredences(customWorldviews);
   const maxIdx = argmax(credences);
   const maxCredence = credences[maxIdx];
@@ -699,7 +733,13 @@ function voteNashBargaining(
   funding,
   increment,
   customWorldviews,
-  { disagreementPoint = null, tieBreak = null, randomSeed = null, remaining = null } = {}
+  {
+    disagreementPoint = null,
+    tieBreak = null,
+    randomSeed = null,
+    remaining = null,
+    fundingCaps,
+  } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -709,7 +749,12 @@ function voteNashBargaining(
   tieBreak = tieBreak ?? AGGREGATION_DEFAULTS.tie_break;
   const rng = _buildRng(tieBreak, randomSeed);
 
-  const worldviewScores = _computeAllWorldviewMarginalValues(data, funding, customWorldviews);
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
 
@@ -775,6 +820,7 @@ function voteMsa(
     noPermissibleAction = 'stop',
     tieBreak = null,
     randomSeed = null,
+    fundingCaps,
   } = {}
 ) {
   const allocations = {};
@@ -790,7 +836,12 @@ function voteMsa(
   binaryPermissibilityThreshold =
     binaryPermissibilityThreshold ?? AGGREGATION_DEFAULTS.msa_binary_threshold;
 
-  const worldviewScores = _computeAllWorldviewMarginalValues(data, funding, customWorldviews);
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
 
@@ -912,7 +963,7 @@ function voteBorda(
   funding,
   increment,
   customWorldviews,
-  { tieBreak = null, randomSeed = null } = {}
+  { tieBreak = null, randomSeed = null, fundingCaps } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -920,7 +971,12 @@ function voteBorda(
 
   tieBreak = tieBreak ?? AGGREGATION_DEFAULTS.tie_break;
   const rng = _buildRng(tieBreak, randomSeed);
-  const worldviewScores = _computeAllWorldviewMarginalValues(data, funding, customWorldviews);
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
   const nProjects = projects.length;
@@ -964,7 +1020,7 @@ function voteSplitCycle(
   funding,
   increment,
   customWorldviews,
-  { tieBreak = null, randomSeed = null } = {}
+  { tieBreak = null, randomSeed = null, fundingCaps } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -972,7 +1028,12 @@ function voteSplitCycle(
 
   tieBreak = tieBreak ?? AGGREGATION_DEFAULTS.tie_break;
   const rng = _buildRng(tieBreak, randomSeed);
-  const worldviewScores = _computeAllWorldviewMarginalValues(data, funding, customWorldviews);
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
 
@@ -1066,7 +1127,7 @@ function voteLexicographicMaximin(
   funding,
   increment,
   customWorldviews,
-  { tieBreak = null, randomSeed = null } = {}
+  { tieBreak = null, randomSeed = null, fundingCaps } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -1074,7 +1135,12 @@ function voteLexicographicMaximin(
 
   tieBreak = tieBreak ?? AGGREGATION_DEFAULTS.tie_break;
   const rng = _buildRng(tieBreak, randomSeed);
-  const worldviewScores = _computeAllWorldviewMarginalValues(data, funding, customWorldviews);
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
 
@@ -1118,6 +1184,7 @@ function allocateBudget(
   totalBudget,
   { incrementSize = 10, initialFunding = null, ...kwargs } = {}
 ) {
+  const fundingCaps = kwargs.fundingCaps;
   const funding = {};
   for (const projectId of Object.keys(data)) {
     funding[projectId] = initialFunding?.[projectId] ?? 0;
@@ -1136,6 +1203,10 @@ function allocateBudget(
 
     for (const projectId of Object.keys(data)) {
       funding[projectId] += allocationsResult[projectId] || 0;
+      const cap = fundingCaps?.[projectId];
+      if (cap != null && funding[projectId] > cap) {
+        funding[projectId] = cap;
+      }
     }
 
     remaining -= increment;
@@ -1152,7 +1223,7 @@ function allocateBudget(
 
 const METHOD_MAP = {
   credenceWeighted: (d, f, inc, opts) =>
-    voteCredenceWeightedCustom(d, f, inc, opts.customWorldviews),
+    voteCredenceWeightedCustom(d, f, inc, opts.customWorldviews, opts),
   myFavoriteTheory: (d, f, inc, opts) => voteMyFavoriteTheory(d, f, inc, opts),
   mec: (d, f, inc, opts) => voteMec(d, f, inc, opts),
   met: (d, f, inc, opts) => voteMet(d, f, inc, opts.customWorldviews, opts),

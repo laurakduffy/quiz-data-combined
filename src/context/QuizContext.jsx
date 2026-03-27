@@ -226,6 +226,7 @@ const initialState = {
   debugConfig: null,
   selectedCalculations: { left: null, right: null },
   marketplaceBudget: null,
+  fundingCaps: {}, // { projectId: number ($M) } — empty = no caps
   justCompletedWorldview: null, // ID of worldview just completed (for hub alert)
 };
 
@@ -243,6 +244,7 @@ const ACTIONS = {
   SET_SELECTED_CALCULATIONS: 'SET_SELECTED_CALCULATIONS',
   SET_WORLDVIEW_NAME: 'SET_WORLDVIEW_NAME',
   SET_MARKETPLACE_BUDGET: 'SET_MARKETPLACE_BUDGET',
+  SET_FUNDING_CAPS: 'SET_FUNDING_CAPS',
   SET_SELECTED_PRESET: 'SET_SELECTED_PRESET',
   SET_JUST_COMPLETED_WORLDVIEW: 'SET_JUST_COMPLETED_WORLDVIEW',
   CLEAR_JUST_COMPLETED_WORLDVIEW: 'CLEAR_JUST_COMPLETED_WORLDVIEW',
@@ -417,6 +419,7 @@ function quizReducer(state, action) {
         credences: legacyCredences,
         currentStep: sessionStep,
         selectedCalculations: sourceSelectedCalculations,
+        fundingCaps: sourceFundingCaps,
       } = action.payload;
 
       // Helper to restore a single question's state
@@ -476,6 +479,7 @@ function quizReducer(state, action) {
           worldviewNames: restoreWorldviewNames(sourceWorldviewNames, sourceWorldviews),
           activeWorldviewId: sourceActiveId,
           selectedCalculations: sourceSelectedCalculations || state.selectedCalculations,
+          fundingCaps: sourceFundingCaps || state.fundingCaps,
         };
       }
 
@@ -519,6 +523,9 @@ function quizReducer(state, action) {
 
     case ACTIONS.SET_MARKETPLACE_BUDGET:
       return { ...state, marketplaceBudget: action.payload };
+
+    case ACTIONS.SET_FUNDING_CAPS:
+      return { ...state, fundingCaps: action.payload };
 
     case ACTIONS.SET_SELECTED_CALCULATIONS:
       return {
@@ -743,6 +750,7 @@ export function QuizProvider({ children }) {
         worldviewNames: state.worldviewNames,
         activeWorldviewId: state.activeWorldviewId,
         selectedCalculations: state.selectedCalculations,
+        fundingCaps: state.fundingCaps,
       });
     }, 300);
 
@@ -757,6 +765,7 @@ export function QuizProvider({ children }) {
     state.worldviewNames,
     state.activeWorldviewId,
     state.selectedCalculations,
+    state.fundingCaps,
     isHydrating,
   ]);
 
@@ -821,6 +830,10 @@ export function QuizProvider({ children }) {
 
   const setMarketplaceBudget = useCallback((budget) => {
     dispatch({ type: ACTIONS.SET_MARKETPLACE_BUDGET, payload: budget });
+  }, []);
+
+  const setFundingCaps = useCallback((caps) => {
+    dispatch({ type: ACTIONS.SET_FUNDING_CAPS, payload: caps });
   }, []);
 
   const setWorldviewName = useCallback((worldviewId, name) => {
@@ -918,12 +931,13 @@ export function QuizProvider({ children }) {
 
   // Calculate a single method by key
   const computeMethod = useCallback(
-    (key, credences, debugConfig, budget) => {
+    (key, credences, debugConfig, budget, fundingCaps) => {
       const opts = {
         budget: budget || dataset.budget,
         projectData: dataset.projects,
         datasetId: dataset.id,
         incrementSize: dataset.incrementSize,
+        fundingCaps,
       };
       switch (key) {
         case 'credenceWeighted':
@@ -982,11 +996,19 @@ export function QuizProvider({ children }) {
         key,
         currentCredences,
         state.debugConfig,
-        state.marketplaceBudget
+        state.marketplaceBudget,
+        state.fundingCaps
       );
     }
     return results;
-  }, [currentCredences, neededMethods, computeMethod, state.debugConfig, state.marketplaceBudget]);
+  }, [
+    currentCredences,
+    neededMethods,
+    computeMethod,
+    state.debugConfig,
+    state.marketplaceBudget,
+    state.fundingCaps,
+  ]);
 
   const originalCalculationResults = useMemo(() => {
     if (!originalCredences) return null;
@@ -996,11 +1018,19 @@ export function QuizProvider({ children }) {
         key,
         originalCredences,
         state.debugConfig,
-        state.marketplaceBudget
+        state.marketplaceBudget,
+        state.fundingCaps
       );
     }
     return results;
-  }, [originalCredences, neededMethods, computeMethod, state.debugConfig, state.marketplaceBudget]);
+  }, [
+    originalCredences,
+    neededMethods,
+    computeMethod,
+    state.debugConfig,
+    state.marketplaceBudget,
+    state.fundingCaps,
+  ]);
 
   // Check if any credences have changed from originals
   const hasChanged = useMemo(() => {
@@ -1108,6 +1138,7 @@ export function QuizProvider({ children }) {
       debugConfig: state.debugConfig,
       selectedCalculations: state.selectedCalculations,
       marketplaceBudget: state.marketplaceBudget ?? dataset.budget,
+      fundingCaps: state.fundingCaps,
       justCompletedWorldview: state.justCompletedWorldview,
       shareUrlError,
       isHydrating,
@@ -1133,6 +1164,7 @@ export function QuizProvider({ children }) {
       setDebugConfig,
       switchWorldview,
       setMarketplaceBudget,
+      setFundingCaps,
       setSelectedCalculations,
       setWorldviewName,
       clearJustCompletedWorldview,
@@ -1174,6 +1206,7 @@ export function QuizProvider({ children }) {
       state.debugConfig,
       state.selectedCalculations,
       state.marketplaceBudget,
+      state.fundingCaps,
       state.justCompletedWorldview,
       shareUrlError,
       isHydrating,
@@ -1190,6 +1223,7 @@ export function QuizProvider({ children }) {
       setDebugConfig,
       switchWorldview,
       setMarketplaceBudget,
+      setFundingCaps,
       setSelectedCalculations,
       setWorldviewName,
       clearJustCompletedWorldview,
