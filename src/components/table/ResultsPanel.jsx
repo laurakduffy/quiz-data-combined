@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { Expand } from 'lucide-react';
 import AllocationBar from './AllocationBar';
 import StageCard from './StageCard';
 import ResultsModal from './ResultsModal';
 import { useDataset } from '../../context/DatasetContext';
+import { useQuiz } from '../../context/useQuiz';
 import tableConfig from '../../../config/tableMode.json';
 import styles from '../../styles/components/TableMode.module.css';
 
@@ -19,6 +21,7 @@ function ResultsPanel({
 }) {
   const [showModal, setShowModal] = useState(false);
   const { dataset } = useDataset();
+  const { fundingCaps } = useQuiz();
   const projectEntries = Object.entries(dataset.projects);
   const totalBudget = stages.reduce((sum, s) => sum + s.budget, 0);
   const canAddStage = totalBudget < MAX_TOTAL_BUDGET;
@@ -87,8 +90,14 @@ function ResultsPanel({
               percentage={results.allocations[id] || 0}
               funding={results.funding[id] || 0}
               color={project.color}
+              cap={fundingCaps[id]}
+              totalBudget={totalBudget}
             />
           ))}
+        </div>
+        <div className={styles.resultsCardHint}>
+          <Expand size={12} />
+          <span>Click to expand</span>
         </div>
         {ignoresCredences && (
           <p className={styles.methodDisclaimer}>
@@ -102,6 +111,8 @@ function ResultsPanel({
         <ResultsModal
           results={results}
           projectEntries={projectEntries}
+          fundingCaps={fundingCaps}
+          totalBudget={totalBudget}
           onClose={() => setShowModal(false)}
         />
       )}

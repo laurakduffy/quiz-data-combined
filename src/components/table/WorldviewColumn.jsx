@@ -209,21 +209,23 @@ function WorldviewColumn({
 
     if (field.startsWith('discount_factor.')) {
       const factorIndex = Number(field.split('.')[1]);
+      const rawVal = worldview.discount_factors[factorIndex] ?? 0;
       return (
         <div className={styles.cell}>
           <input
             type="number"
             className={styles.cellInput}
-            value={worldview.discount_factors[factorIndex] ?? 0}
+            value={rawVal * 100}
             min="0"
-            max="1"
-            step="0.05"
+            max="100"
+            step="5"
             onChange={(e) => {
-              const val = e.target.value === '' ? 0 : Number(e.target.value);
-              if (!isNaN(val)) onUpdateDiscount(index, factorIndex, val);
+              const pct = e.target.value === '' ? 0 : Number(e.target.value);
+              if (!isNaN(pct)) onUpdateDiscount(index, factorIndex, pct / 100);
             }}
             {...cellProps}
           />
+          <span className={styles.cellSuffix}>%</span>
         </div>
       );
     }
@@ -248,18 +250,23 @@ function WorldviewColumn({
     }
 
     if (field === 'p_extinction') {
+      const rawVal = worldview.p_extinction ?? 0;
       return (
         <div className={styles.cell}>
           <input
             type="number"
             className={styles.cellInput}
-            value={worldview.p_extinction}
+            value={rawVal * 100}
             min="0"
-            max="1"
-            step="0.05"
-            onChange={(e) => handleNumericChange('p_extinction', e.target.value)}
+            max="100"
+            step="5"
+            onChange={(e) => {
+              const pct = e.target.value === '' ? 0 : Number(e.target.value);
+              if (!isNaN(pct)) onUpdate(index, 'p_extinction', pct / 100);
+            }}
             {...cellProps}
           />
+          <span className={styles.cellSuffix}>%</span>
         </div>
       );
     }

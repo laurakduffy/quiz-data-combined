@@ -5,7 +5,7 @@ import { copyToClipboard } from '../../utils/clipboard';
 import styles from '../../styles/components/ResultsModal.module.css';
 import tableStyles from '../../styles/components/TableMode.module.css';
 
-function ResultsModal({ results, projectEntries, onClose }) {
+function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, onClose }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -38,6 +38,8 @@ function ResultsModal({ results, projectEntries, onClose }) {
                 percentage={results.allocations[id] || 0}
                 funding={results.funding[id] || 0}
                 color={project.color}
+                cap={fundingCaps[id]}
+                totalBudget={totalBudget}
               />
             ))}
           </div>
