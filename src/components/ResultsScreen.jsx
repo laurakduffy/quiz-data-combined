@@ -61,6 +61,7 @@ function ResultsScreen() {
     setSelectedCalculations,
     marketplaceBudget,
     setMarketplaceBudget,
+    fundingCaps,
   } = useQuiz();
 
   const budget = marketplaceBudget;
@@ -84,6 +85,7 @@ function ResultsScreen() {
     selectedCalculations: isCalculationSelectEnabled ? selectedCalculations : null,
     worldviewNames,
     marketplaceBudget,
+    fundingCaps,
   });
 
   // Methods info modal state

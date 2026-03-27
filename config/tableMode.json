@@ -25,7 +25,8 @@
         "disagreementPoint": {
           "label": "Disagreement Point",
           "type": "select",
-          "default": "zero_spending",
+          "default": "budget_by_credence",
+          "hidden": true,
           "choices": [
             { "value": "zero_spending", "label": "Zero Spending", "ignoresCredences": true },
             { "value": "anti_utopia", "label": "Anti-Utopia", "ignoresCredences": true },

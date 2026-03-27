@@ -98,16 +98,18 @@ function StageCard({
         </select>
       </div>
       {methodConfig?.options &&
-        Object.entries(methodConfig.options).map(([optKey, optDef]) => (
-          <MethodOption
-            key={optKey}
-            optKey={optKey}
-            optDef={optDef}
-            currentValue={currentValues[optKey]}
-            allCurrentValues={currentValues}
-            onChange={handleOptionChange}
-          />
-        ))}
+        Object.entries(methodConfig.options)
+          .filter(([, optDef]) => !optDef.hidden)
+          .map(([optKey, optDef]) => (
+            <MethodOption
+              key={optKey}
+              optKey={optKey}
+              optDef={optDef}
+              currentValue={currentValues[optKey]}
+              allCurrentValues={currentValues}
+              onChange={handleOptionChange}
+            />
+          ))}
     </div>
   );
 }

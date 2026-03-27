@@ -53,7 +53,7 @@ function validateQuestionsConfig(questionsToValidate) {
  */
 export async function generateShareUrl(worldviews, activeWorldviewId, options = {}) {
   const sessionId = getOrCreateSessionId();
-  const { selectedCalculations, worldviewNames, marketplaceBudget } = options;
+  const { selectedCalculations, worldviewNames, marketplaceBudget, fundingCaps } = options;
 
   const payload = {
     sessionId,
@@ -63,6 +63,7 @@ export async function generateShareUrl(worldviews, activeWorldviewId, options = 
     ...(selectedCalculations && { selectedCalculations }),
     ...(worldviewNames && { worldviewNames }),
     ...(marketplaceBudget && { marketplaceBudget }),
+    ...(fundingCaps && Object.keys(fundingCaps).length > 0 && { fundingCaps }),
   };
 
   const response = await fetch(endpoints.share, {
@@ -171,6 +172,7 @@ export async function parseShareUrl() {
       selectedCalculations: shareData.selectedCalculations || null,
       worldviewNames: shareData.worldviewNames || null,
       marketplaceBudget: shareData.marketplaceBudget || null,
+      fundingCaps: shareData.fundingCaps || null,
     };
   }
 

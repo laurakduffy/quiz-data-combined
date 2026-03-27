@@ -20,6 +20,7 @@ export function useShareUrl({
   selectedCalculations,
   worldviewNames,
   marketplaceBudget,
+  fundingCaps,
 }) {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,7 @@ export function useShareUrl({
       selectedCalculations,
       worldviewNames,
       marketplaceBudget,
+      fundingCaps,
     };
 
     try {
@@ -66,7 +68,14 @@ export function useShareUrl({
     } finally {
       setLoading(false);
     }
-  }, [worldviews, activeWorldviewId, selectedCalculations, worldviewNames, marketplaceBudget]);
+  }, [
+    worldviews,
+    activeWorldviewId,
+    selectedCalculations,
+    worldviewNames,
+    marketplaceBudget,
+    fundingCaps,
+  ]);
 
   return { copied, loading, error, handleShare };
 }

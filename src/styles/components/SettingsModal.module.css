@@ -115,3 +115,85 @@
   font-size: 0.85rem;
   line-height: 1.4;
 }
+
+.capsSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.capsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.capRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.capLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  min-width: 0;
+  flex: 1;
+}
+
+.projectColor {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.capInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.capPrefix,
+.capSuffix {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+}
+
+.capInput {
+  width: 5.5rem;
+  padding: 0.35rem 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  text-align: right;
+  outline: none;
+  transition: border-color 0.15s ease;
+  -moz-appearance: textfield;
+}
+
+.capInput::-webkit-outer-spin-button,
+.capInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.capInput:focus {
+  border-color: var(--accent-teal, #3ecfcf);
+}
+
+.capInput::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  text-align: right;
+}
