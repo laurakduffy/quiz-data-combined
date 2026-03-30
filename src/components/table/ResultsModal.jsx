@@ -7,6 +7,7 @@ import tableStyles from '../../styles/components/TableMode.module.css';
 
 function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, onClose }) {
   const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState('results');
 
   const handleCopy = async () => {
     const header = 'Project\tAllocation %\tFunding ($M)';
@@ -24,35 +25,54 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Results</h2>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${activeTab === 'results' ? styles.tabActive : ''}`}
+              onClick={() => setActiveTab('results')}
+            >
+              Results
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'debug' ? styles.tabActive : ''}`}
+              onClick={() => setActiveTab('debug')}
+            >
+              Debug
+            </button>
+          </div>
           <button className={styles.closeButton} onClick={onClose}>
             <X size={16} />
           </button>
         </div>
         <div className={styles.content}>
-          <div className={tableStyles.allocationList}>
-            {projectEntries.map(([id, project]) => (
-              <AllocationBar
-                key={id}
-                name={project.name}
-                percentage={results.allocations[id] || 0}
-                funding={results.funding[id] || 0}
-                color={project.color}
-                cap={fundingCaps[id]}
-                totalBudget={totalBudget}
-              />
-            ))}
+          {activeTab === 'results' ? (
+            <div className={tableStyles.allocationList}>
+              {projectEntries.map(([id, project]) => (
+                <AllocationBar
+                  key={id}
+                  name={project.name}
+                  percentage={results.allocations[id] || 0}
+                  funding={results.funding[id] || 0}
+                  color={project.color}
+                  cap={fundingCaps[id]}
+                  totalBudget={totalBudget}
+                />
+              ))}
+            </div>
+          ) : (
+            <pre className={styles.debugContent}>{JSON.stringify(results.debugTrace, null, 2)}</pre>
+          )}
+        </div>
+        {activeTab === 'results' && (
+          <div className={styles.footer}>
+            <button
+              className={`btn btn-secondary ${styles.copyButton} ${copied ? styles.copied : ''}`}
+              onClick={handleCopy}
+            >
+              {copied ? <Check size={16} /> : <Copy size={16} />}
+              {copied ? 'Copied!' : 'Copy to Clipboard'}
+            </button>
           </div>
-        </div>
-        <div className={styles.footer}>
-          <button
-            className={`btn btn-secondary ${styles.copyButton} ${copied ? styles.copied : ''}`}
-            onClick={handleCopy}
-          >
-            {copied ? <Check size={16} /> : <Copy size={16} />}
-            {copied ? 'Copied!' : 'Copy to Clipboard'}
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

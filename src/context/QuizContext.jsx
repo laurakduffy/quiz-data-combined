@@ -736,8 +736,10 @@ export function QuizProvider({ children }) {
   // Persistence effect: save state to sessionStorage on changes (debounced)
   useEffect(() => {
     // Don't save during hydration or if on disclaimer/welcome screens
-    // (Table Mode bypasses navigation, so always save when it's enabled)
-    const isTableMode = features.ui?.tableMode === true;
+    // (Table Mode bypasses navigation, so always save when it's enabled —
+    //  check both the feature flag and the #table hash route)
+    const isTableMode =
+      features.ui?.tableMode === true || window.location.hash.startsWith('#table');
     if (
       isHydrating ||
       (!isTableMode && (state.currentStep === 'welcome' || state.currentStep === 'disclaimer'))

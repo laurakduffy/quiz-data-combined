@@ -37,6 +37,33 @@
   margin: 0;
 }
 
+.tabs {
+  display: flex;
+  gap: 0;
+}
+
+.tab {
+  padding: 0.25rem 1rem 0.5rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  color: var(--text-primary);
+  border-bottom-color: var(--text-primary);
+}
+
 .closeButton {
   display: flex;
   align-items: center;
@@ -80,4 +107,15 @@
 .copyButton.copied {
   border-color: #4ade80;
   color: #4ade80;
+}
+
+.debugContent {
+  margin: 0;
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre;
+  overflow-x: auto;
+  tab-size: 2;
 }

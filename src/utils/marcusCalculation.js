@@ -505,6 +505,7 @@ function voteCredenceWeightedCustom(
   }
   if (isClose(totalCredence, 0.0, 1e-12)) return allocations;
 
+  const perWorldviewScores = {};
   for (let i = 0; i < customWorldviews.length; i++) {
     const share = credences[i] * increment;
     const marginalValues = _computeWorldviewMarginalValues(
@@ -513,10 +514,12 @@ function voteCredenceWeightedCustom(
       customWorldviews[i],
       fundingCaps
     );
+    perWorldviewScores[customWorldviews[i].name || `wv_${i}`] = marginalValues;
     const split = _splitAmongTied(marginalValues, share);
     for (const p of Object.keys(split)) allocations[p] += split[p];
   }
 
+  allocations.__scores__ = perWorldviewScores;
   return allocations;
 }
 
@@ -546,6 +549,7 @@ function voteMyFavoriteTheory(
   );
   const bestProject = _argmaxProject(marginalValues, tieBreak, rng);
   allocations[bestProject] = increment;
+  allocations.__scores__ = { marginalValues, selectedWorldview: bestIdx };
   return allocations;
 }
 
@@ -581,6 +585,7 @@ function voteMec(
   }
   const split = _splitAmongTied(expectedScores, increment);
   for (const p of Object.keys(split)) allocations[p] += split[p];
+  allocations.__scores__ = { expectedScores };
   return allocations;
 }
 
@@ -636,6 +641,7 @@ function voteMet(
     const split = _splitAmongTied(worldviewScores[idx], sharePerWorldview);
     for (const p of Object.keys(split)) allocations[p] += split[p];
   }
+  allocations.__scores__ = { selectedIndices, worldviewScores };
   return allocations;
 }
 
@@ -795,6 +801,7 @@ function voteNashBargaining(
         rng
       ),
       __stopAfterApplying__: true,
+      __scores__: { feasibleScores, fallbackScores, disagreementUtilities, fallback: true },
     };
   }
 
@@ -804,6 +811,7 @@ function voteNashBargaining(
   );
   const selectedProject = _chooseFromCandidates(candidates, tieBreak, rng);
   allocations[selectedProject] = increment;
+  allocations.__scores__ = { feasibleScores, fallbackScores, disagreementUtilities };
   return allocations;
 }
 
@@ -925,10 +933,15 @@ function voteMsa(
     }
   }
 
+  const msaScores = { mecScores, voteTallies, cardinalPermissible: [...cardinalPermissible] };
   const maxTally = Math.max(...Object.values(voteTallies), 0.0);
   if (maxTally <= 0.5) {
     if (noPermissibleAction === 'stop') {
-      return { __stop__: true, __reason__: 'No intervention exceeded 50% permissibility.' };
+      return {
+        __stop__: true,
+        __reason__: 'No intervention exceeded 50% permissibility.',
+        __scores__: msaScores,
+      };
     }
 
     if (noPermissibleAction === 'fallback_mec') {
@@ -947,6 +960,7 @@ function voteMsa(
         selectedProject = _argmaxProject(weightedScores, tieBreak, rng);
       }
       allocations[selectedProject] = increment;
+      allocations.__scores__ = { ...msaScores, fallback: 'mec' };
       return allocations;
     }
 
@@ -956,6 +970,7 @@ function voteMsa(
   const winners = projects.filter((p) => isClose(voteTallies[p], maxTally));
   const selectedProject = _chooseFromCandidates(winners, tieBreak, rng);
   allocations[selectedProject] = increment;
+  allocations.__scores__ = msaScores;
   return allocations;
 }
 
@@ -1013,6 +1028,7 @@ function voteBorda(
 
   const split = _splitAmongTied(bordaScores, increment);
   for (const p of Object.keys(split)) allocations[p] += split[p];
+  allocations.__scores__ = { bordaScores };
   return allocations;
 }
 
@@ -1120,6 +1136,7 @@ function voteSplitCycle(
 
   const share = increment / winners.length;
   for (const p of winners) allocations[p] = share;
+  allocations.__scores__ = { margins, unbeaten };
   return allocations;
 }
 
@@ -1172,6 +1189,7 @@ function voteLexicographicMaximin(
   const winners = projects.filter((p) => compareVectors(vectors[p], bestVector) === 0);
   const selectedProject = _chooseFromCandidates(winners, tieBreak, rng);
   allocations[selectedProject] = increment;
+  allocations.__scores__ = { vectors };
   return allocations;
 }
 
@@ -1179,11 +1197,32 @@ function voteLexicographicMaximin(
 // ITERATION LOOP
 // =============================================================================
 
+function _addDebugExtras(entry, data, fundingBefore, fundingCaps) {
+  const drFactors = {};
+  for (const projectId of Object.keys(data)) {
+    drFactors[projectId] = getDiminishingReturnsFactor(data, projectId, fundingBefore[projectId]);
+  }
+  entry.drFactors = drFactors;
+
+  if (fundingCaps) {
+    const capped = Object.keys(fundingCaps).filter(
+      (id) => fundingCaps[id] != null && fundingBefore[id] >= fundingCaps[id]
+    );
+    if (capped.length) entry.cappedProjects = capped;
+  }
+}
+
 function allocateBudget(
   data,
   votingMethod,
   totalBudget,
-  { incrementSize = 10, initialFunding = null, ...kwargs } = {}
+  {
+    incrementSize = 10,
+    initialFunding = null,
+    debugTrace = null,
+    debugMethod = null,
+    ...kwargs
+  } = {}
 ) {
   const fundingCaps = kwargs.fundingCaps;
   const funding = {};
@@ -1194,25 +1233,53 @@ function allocateBudget(
 
   while (remaining > 0) {
     const increment = Math.min(incrementSize, remaining);
+    const fundingBefore = debugTrace ? { ...funding } : null;
     const allocationsResult = votingMethod(data, funding, increment, { ...kwargs, remaining });
 
     if (typeof allocationsResult !== 'object') {
       throw new TypeError('Voting methods must return an object of allocations.');
     }
 
-    if (allocationsResult.__stop__) break;
+    if (allocationsResult.__stop__) {
+      if (debugTrace) {
+        const { __stop__, __reason__, __scores__, ...allocs } = allocationsResult;
+        const entry = {
+          method: debugMethod,
+          fundingBefore,
+          methodResult: { ...allocs, ...__scores__ },
+          stopped: __reason__ || true,
+          fundingAfter: { ...funding },
+        };
+        _addDebugExtras(entry, data, fundingBefore, fundingCaps);
+        debugTrace.push(entry);
+      }
+      break;
+    }
+
+    const { __scores__, __stopAfterApplying__, ...cleanResult } = allocationsResult;
 
     for (const projectId of Object.keys(data)) {
-      funding[projectId] += allocationsResult[projectId] || 0;
+      funding[projectId] += cleanResult[projectId] || 0;
       const cap = fundingCaps?.[projectId];
       if (cap != null && funding[projectId] > cap) {
         funding[projectId] = cap;
       }
     }
 
+    if (debugTrace) {
+      const entry = {
+        method: debugMethod,
+        fundingBefore,
+        methodResult: { ...cleanResult, ...__scores__ },
+        fundingAfter: { ...funding },
+      };
+      _addDebugExtras(entry, data, fundingBefore, fundingCaps);
+      debugTrace.push(entry);
+    }
+
     remaining -= increment;
 
-    if (allocationsResult.__stopAfterApplying__) break;
+    if (__stopAfterApplying__) break;
   }
 
   return { funding };
@@ -1315,6 +1382,7 @@ export function computeMultiStageAllocation(
   }
 
   const stageResults = [];
+  const debugTrace = [];
 
   for (const stage of stages) {
     const votingMethod = METHOD_MAP[stage.method];
@@ -1328,6 +1396,8 @@ export function computeMultiStageAllocation(
       incrementSize,
       initialFunding: cumulativeFunding,
       customWorldviews: worldviews,
+      debugTrace,
+      debugMethod: stage.method,
       ...(stage.options || {}),
     });
 
@@ -1348,5 +1418,5 @@ export function computeMultiStageAllocation(
     allocations[projectId] = totalFunded > 0 ? (amount / totalFunded) * 100 : 0;
   }
 
-  return { allocations, funding: cumulativeFunding, stageResults };
+  return { allocations, funding: cumulativeFunding, stageResults, debugTrace };
 }
