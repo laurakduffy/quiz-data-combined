@@ -125,7 +125,7 @@ const SETUP_D = {
  *
  * MEC: expected[A]=expected[B]=0.75, expected[C]=0 → A/B tie
  * Borda: bordaScores[A]=bordaScores[B]=1.5, C=0 → A/B tie
- * Split-Cycle: margin[A][B]=0 → both unbeaten
+ * Split Cycle: margin[A][B]=0 → both unbeaten
  */
 const SETUP_E = {
   projects: {
@@ -149,7 +149,7 @@ const SETUP_E = {
  *
  * MEC:   expected[A]=expected[B]=expected[C]=0.5 → three-way tie
  * Borda: bordaScores[A]=bordaScores[B]=bordaScores[C]=1.0 → three-way tie
- * Split-Cycle: margins form a cycle of equal strength 1/3; no defeats survive → three-way tie
+ * Split Cycle: margins form a cycle of equal strength 1/3; no defeats survive → three-way tie
  * MET: symmetric MDS embedding → three-way tie among worldviews
  *
  * Note: 1/3 + 1/3 + 1/3 ≈ 0.9999999999999999 in IEEE 754, which passes
@@ -480,7 +480,7 @@ describe('voteBorda', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 5. Split-Cycle
+// 5. Split Cycle
 // ---------------------------------------------------------------------------
 
 describe('voteSplitCycle', () => {
@@ -543,7 +543,7 @@ describe('voteSplitCycle', () => {
    * Each project beats one other by margin 1/3. The strongest path from the
    * loser back to the winner is also 1/3 (via the third project), so no margin
    * strictly exceeds its counter-path → no defeats survive → unbeaten=[A,B,C].
-   * Split-Cycle resolves the cycle by splitting the increment three ways.
+   * Split Cycle resolves the cycle by splitting the increment three ways.
    */
   it('splits equally among all 3 projects when a Condorcet cycle leaves none defeated (Setup F)', () => {
     const f = run('splitCycle', SETUP_F);

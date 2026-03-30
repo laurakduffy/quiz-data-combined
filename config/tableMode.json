@@ -80,7 +80,7 @@
       }
     },
     { "key": "borda", "name": "Borda Count" },
-    { "key": "splitCycle", "name": "Split-Cycle" },
+    { "key": "splitCycle", "name": "Split Cycle" },
     { "key": "lexicographicMaximin", "name": "Lexicographic Maximin" }
   ],
   "presets": [

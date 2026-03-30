@@ -81,7 +81,7 @@
   ],
   "projects": {
     "givewell": {
-      "name": "Givewell",
+      "name": "GiveWell",
       "color": "#85E4FF",
       "tags": {
         "near_term_xrisk": false
