@@ -215,13 +215,13 @@ function WorldviewColumn({
           <input
             type="number"
             className={styles.cellInput}
-            value={rawVal * 100}
+            value={Math.round(rawVal * 100)}
             min="0"
             max="100"
             step="5"
             onChange={(e) => {
               const pct = e.target.value === '' ? 0 : Number(e.target.value);
-              if (!isNaN(pct)) onUpdateDiscount(index, factorIndex, pct / 100);
+              if (!isNaN(pct)) onUpdateDiscount(index, factorIndex, Math.round(pct) / 100);
             }}
             {...cellProps}
           />
@@ -256,13 +256,13 @@ function WorldviewColumn({
           <input
             type="number"
             className={styles.cellInput}
-            value={rawVal * 100}
+            value={Math.round(rawVal * 100)}
             min="0"
             max="100"
             step="5"
             onChange={(e) => {
               const pct = e.target.value === '' ? 0 : Number(e.target.value);
-              if (!isNaN(pct)) onUpdate(index, 'p_extinction', pct / 100);
+              if (!isNaN(pct)) onUpdate(index, 'p_extinction', Math.round(pct) / 100);
             }}
             {...cellProps}
           />
@@ -319,7 +319,11 @@ function WorldviewColumn({
               {p.name}
             </option>
           ))}
-          <option value="custom">Custom</option>
+          <option value="custom">
+            {!worldview.presetId && worldview.name && worldview.name !== 'Custom'
+              ? worldview.name
+              : 'Custom'}
+          </option>
         </select>
       </div>
 

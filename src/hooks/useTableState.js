@@ -102,8 +102,39 @@ function saveState(state) {
   }
 }
 
-// Load once at module level so useState initializers don't re-parse
-const _savedState = loadSavedState();
+/**
+ * Check for simple quiz handoff data (set by "Go to advanced mode" button).
+ * If present, use it as the initial state and clear the handoff key.
+ */
+function loadHandoff() {
+  try {
+    const stored = sessionStorage.getItem('simple_quiz_handoff');
+    if (!stored) return null;
+    sessionStorage.removeItem('simple_quiz_handoff');
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed.worldviews) || !parsed.worldviews.length) return null;
+    return {
+      worldviews: parsed.worldviews,
+      credences: parsed.credences || { 0: 100 },
+      lockedKeys: [],
+      stages: null, // use default stage
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Lazy-load initial state on first useTableState() call (not at import time).
+// This ensures handoff data set by "Go to Advanced Mode" is available,
+// since the module is imported at startup before the button is ever clicked.
+let _initialState = null;
+function getInitialState() {
+  if (!_initialState) {
+    const handoff = loadHandoff();
+    _initialState = handoff || loadSavedState();
+  }
+  return _initialState;
+}
 
 const MAX_TOTAL_BUDGET = 1000;
 
@@ -111,14 +142,22 @@ export function useTableState() {
   const { dataset } = useDataset();
   const { fundingCaps, drOverrides, isHydrating } = useQuiz();
 
-  const [worldviews, setWorldviews] = useState(
-    () => _savedState?.worldviews ?? tableConfig.presets.map((p) => createWorldview(p.id))
-  );
-  const [credences, setCredences] = useState(
-    () => _savedState?.credences ?? buildEqualCredences(tableConfig.presets.length)
-  );
-  const [lockedKeys, setLockedKeys] = useState(() => _savedState?.lockedKeys ?? []);
-  const [stages, setStages] = useState(() => _savedState?.stages ?? [createDefaultStage()]);
+  const [worldviews, setWorldviews] = useState(() => {
+    const saved = getInitialState();
+    return saved?.worldviews ?? tableConfig.presets.map((p) => createWorldview(p.id));
+  });
+  const [credences, setCredences] = useState(() => {
+    const saved = getInitialState();
+    return saved?.credences ?? buildEqualCredences(tableConfig.presets.length);
+  });
+  const [lockedKeys, setLockedKeys] = useState(() => {
+    const saved = getInitialState();
+    return saved?.lockedKeys ?? [];
+  });
+  const [stages, setStages] = useState(() => {
+    const saved = getInitialState();
+    return saved?.stages ?? [createDefaultStage()];
+  });
 
   // Note: calculations recompute automatically when dataset changes
   // via the dataset dependency in the results useMemo below.

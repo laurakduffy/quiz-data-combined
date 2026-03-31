@@ -263,6 +263,61 @@ Summary of implemented features. See `docs/CLAUDE-ARCHIVE.md` for detailed imple
 | Disclaimer Page | `ui.disclaimerPage` | Initial disclaimer screen before welcome page. |
 | Info Tooltips | `ui.questionInfo`, `ui.answerInfo` | Markdown-enabled info tooltips on questions and answer options. |
 | Feedback Card | `ui.feedbackCard` | Feedback request card on results screen. |
+| Simple Quiz | `ui.simpleQuiz` | Simplified 4-question quiz with direct worldview mapping and bar chart results. **Defaults to ON.** See below. |
+| Support RP Footer | `ui.supportFooter` | Fixed footer on all screens with RP donation link. |
+
+### Simple Quiz
+
+**Flag:** `ui.simpleQuiz` (default: `true`)
+
+A simplified entry point: 4 preset-based questions that map directly to a single worldview object, producing fund scores with no multi-worldview aggregation. The existing legacy quiz and table mode stay intact behind feature flags.
+
+**Flow:** Disclaimer (if `ui.disclaimerPage`) → Welcome → 4 Questions → Results bar chart
+
+**Architecture:**
+```
+User picks 4 presets → assembleWorldview() → single worldview object
+  → calculateAllProjects() + adjustForExtinctionRisk()  (from projectScoring.js)
+  → raw scores per fund → Recharts BarChart
+```
+
+Uses its own lightweight context (`SimpleQuizContext`) rather than the existing `QuizContext`. Both are always mounted; the router in `MoralParliamentQuiz.jsx` chooses which flow to render based on the feature flag.
+
+**Questions:**
+
+| # | ID | Topic | Worldview Field | Manual Input |
+|---|-----|-------|-----------------|--------------|
+| 1 | `animal_weights` | Animal welfare vs human welfare | `moral_weights` | 8 number inputs |
+| 2 | `discount_factors` | Time horizon discounting | `discount_factors` | 6 percentage inputs |
+| 3 | `p_extinction` | Extinction risk discount | `p_extinction` | Slider (0-100%) |
+| 4 | `risk_profile` | Risk attitude | `risk_profile` | Dropdown (8 options) |
+
+Each question has 3-4 main preset options, expandable "More options" with additional presets, and a custom input section. All manual inputs apply immediately on change (no apply button).
+
+**Results screen:** Horizontal bar chart (Recharts) with one bar per fund in dataset order. Scores normalized to percentage of max. Negative scores clamped to zero. No animation.
+
+**Table mode handoff:** "Go to Advanced Mode" writes the assembled worldview to `sessionStorage` (`simple_quiz_handoff` key). `useTableState.js` checks for this on init, loads the single worldview at 100% credence, and clears the key.
+
+**Session persistence:** State saved to `sessionStorage` under `simple_quiz_state` (debounced 300ms). Disclaimer and welcome steps are not persisted — reload always starts from the beginning until the user enters a question.
+
+**Config:** `config/simpleQuizConfig.json` defines questions with preset options and their worldview values. Preset values are drawn from `worldviewPresets.json`.
+
+**Disabling:** Set `"simpleQuiz": false` in `config/features.json` to revert to the legacy quiz flow.
+
+**Files:**
+
+| File | Purpose |
+|------|---------|
+| `config/simpleQuizConfig.json` | 4 question definitions with preset options |
+| `src/utils/simpleQuizScoring.js` | `assembleWorldview()`, `computeSimpleScores()`, `worldviewToTableHandoff()` |
+| `src/utils/simpleQuizScoring.test.js` | Unit tests for scoring functions |
+| `src/context/SimpleQuizContext.jsx` | Lightweight `useReducer` context + session persistence |
+| `src/context/useSimpleQuiz.js` | Hook wrapper |
+| `src/components/simple/SimpleWelcomeScreen.jsx` | Welcome screen |
+| `src/components/simple/SimpleQuizScreen.jsx` | Question screen with preset buttons |
+| `src/components/simple/SimpleMoreOptions.jsx` | Expanded options + manual inputs |
+| `src/components/simple/SimpleResultsScreen.jsx` | Bar chart results |
+| `src/styles/components/SimpleQuiz.module.css` | All styling |
 
 ### Key Architecture Notes
 - **State management**: React Context in `src/context/QuizContext.jsx`
@@ -300,185 +355,60 @@ Colors defined in `src/constants/config.js` as `QUESTION_TYPE_COLORS` (placehold
 
 ---
 
-## Planned Features
+## Planned Features (Simple Quiz Spec Gaps)
 
-### 1. Stale URL Recovery (Share Results Layer 2)
-**Flag:** `ui.shareResults` (extends existing feature)
+Source: Carmen's "Donor Compass: Simplified Quiz — Programmer Spec"
 
-Graceful handling when a shared URL references a quiz configuration that has changed.
+### 1. Info Popups on Preset Options
+Each preset option should have an info button opening a popup that shows the exact underlying input values (all moral weights by species/effect type, discount factors, etc.) and links to external documents explaining RP's reasoning. The explanation of why RP chose those values should live in a separate linked document, not in the popup itself.
 
-**Current behavior (Layer 1):**
-- If URL is valid and all questions/options match: restore and show results
-- If URL is invalid or config changed: show error toast, start fresh quiz
+**Status:** Question-level info tooltips exist (`ui.questionInfo`), but per-option info popups are not implemented. `simpleQuizConfig.json` options have no `info` fields.
 
-**Layer 2 behavior:**
-- If some questions missing or options changed: show dialog explaining quiz has changed
-- User clicks through quiz to answer only the missing/changed questions
-- Pre-populate matching questions from URL data
-- Answers to removed questions are ignored
+### 2. Save Results
+"Save results — same as current implementation." The existing `ui.shareResults` feature is enabled but not wired into the simple results screen.
 
-**Implementation notes:**
-- Detect which questions exist in URL but not in config (removed)
-- Detect which questions exist in config but not in URL (new)
-- Detect which options changed for existing questions
-- Dialog component explaining the situation
-- Modified quiz flow: skip pre-populated questions, show only new/changed
-- Navigation logic to handle partial completion
+### 3. Donation Advice Flow
+Entry point: "Get advice on how to split donations" from post-results actions. Displays text explaining diversification for amounts above $1M with link to source.
 
-**Dependencies:**
-- Requires `ui.shareResults` Layer 1 (completed)
+**Options:**
+- **A. RP all-things-considered recommendation** — Links to RP recommendation doc. Displays RP recommended allocation as a static bar chart (not derived from user inputs).
+- **B. Donate to the RP Cross-Cause Fund** — Explanation + link to fund donation page.
+- **C. Combine your views with RP's advice** — Opens multi-worldview allocation screen (see #7).
+- **D. Make a donation through the RP DAF** — Generates pre-filled PDF or email specifying the requested split.
 
----
+### 4. Diminishing Returns Line Chart
+"See how scores change as I donate more money" — opens a line chart. X-axis: total donation amount. Y-axis: fund score. One line per fund, adjusted using existing diminishing returns factors per fund.
 
-### 2. Export Results as PDF
-**Flag:** `ui.exportPDF`
+### 5. Sensitivity Analysis (Change One Input)
+User picks one of the four questions and selects a different option. Displays a grouped bar chart: for each fund, one bar for original inputs and one bar for new inputs, in fixed fund order.
 
-Download quiz results as a PDF document. Hybrid approach: visual screenshot of results + text footer with data summary and shareable link.
+**Two actions:**
+- "Update to new inputs" — replaces original inputs, removes before bars
+- "Save as separate comparison" — keeps both sets for later reference
 
-**Behavior:**
-- Results screen shows "Download PDF" button
-- Click generates and downloads PDF
-- PDF contains:
-  1. Screenshot of results screen (preserves exact visual appearance)
-  2. Text footer with plain text summary of results
-  3. Clickable shareable URL (same as Share Results feature)
+### 6. Compare Quiz Runs
+If the user has saved prior runs, they can select up to 3 and view them as a grouped bar chart (one bar per run per fund, fixed fund order). If no second run exists, user is prompted to retake the quiz first. Runs identified by label (auto-generated timestamp or user-defined name).
 
-**Technical Approach:**
-- Dynamic import of libraries (only loaded when user clicks download)
-- Use html2canvas to capture results screen as image
-- Use jsPDF to create PDF, add image, then add text footer
-- Footer text is native PDF text (selectable, accessible)
-- URL is clickable link via jsPDF `.link()` method
+### 7. Multi-Worldview Allocation Screen
+Computes recommended donation allocation by aggregating across multiple worldviews using budget-by-credence as the sole aggregation method.
 
-```js
-const handleDownload = async () => {
-  const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-    import('html2canvas'),
-    import('jspdf')
-  ]);
-  // capture, generate, download
-};
-```
+**Worldviews included:**
+- All worldviews the user has saved by taking the quiz (one or more runs)
+- Marcus's predefined worldviews (loaded from an advanced mode export file)
 
-**Footer Content:**
-- Quiz title and completion date
-- Summary of calculation results (text form)
-- Shareable URL that repopulates quiz with these answers
+**Credence assignment:**
+- One credence per saved user worldview
+- One combined credence for the totality of Marcus's worldviews (his individual worldviews weighted proportionally within that)
+- Default: equal credence across all user worldviews, 50/50 split between user worldviews total and Marcus's worldviews total
 
-**Dependencies:**
-- `html2canvas` (~40kb gzipped)
-- `jspdf` (~90kb gzipped)
-- `lz-string` (shared with Share Results feature)
+**Requires:** Budget input from user (required to run allocation calculation).
 
-**Relationship to Share Results:**
-- Reuses URL generation logic from Share Results feature
-- If Share Results is also enabled, same URL appears in both places
-- Can be implemented independently, but shares `lz-string` encoding utilities
+**Output:** Recommended allocation in dollars and percentage across funds, shown as bar chart in fixed fund order.
 
----
+**Post-allocation actions:** Save results, add a new worldview (retake quiz), compare to a single worldview (grouped bar chart), reset all inputs, go to advanced mode.
 
-### 3. Results-Only Share Mode
-**Flag:** `ui.shareResultsOnly` (extends `ui.shareResults`)
-
-Share quiz results without exposing the underlying quiz answers. Recipients see only the final results, not the credences that produced them.
-
-**Behavior:**
-- Results screen shows additional "Share Results Only" button (alongside full share)
-- Generated URL contains calculation results but blocks answer repopulation
-- Recipients landing on this URL go directly to results view
-- No access to edit panels or individual question answers
-
-**Data Format:**
-- Builds on existing lz-string compression from `ui.shareResults`
-- Adds `resultsOnly: true` flag in the encoded data
-- Stores calculation results directly instead of (or in addition to) credences
-- When `resultsOnly` flag is detected, app renders results in read-only mode
-
-**URL Structure:**
-```
-https://.../#results=compressed_data
-```
-Same hash format as feature #5, but data payload includes the `resultsOnly` marker.
-
-**Loading from URL:**
-- On page load, decompress data and check for `resultsOnly` flag
-- If `resultsOnly: true`: render results screen in read-only mode
-- Skip any "edit your answers" functionality
-- Hide navigation back to quiz questions
-
-**Graceful Failure:**
-- If quiz config has changed significantly (calculation methods, cause definitions), results may be invalid
-- Detect mismatches by comparing stored calculation IDs against current config
-- On mismatch: show friendly message ("These results were generated with an older version of the quiz")
-- Optionally display partial results if some calculations still match
-- Never crash or show broken UI
-
-**Dependencies:**
-- `lz-string` (shared with features #5 and #6)
-- Requires `ui.shareResults` infrastructure
-
-**Relationship to Share Results (#5):**
-- Shares URL encoding/decoding utilities
-- Both features can coexist (two share buttons on results screen)
-- Results-only mode is a subset: less data exposed, simpler recipient experience
-
----
-
-### 4. AI Results Explanation
-**Flag:** `ui.aiExplanation`
-
-Show an "Explain Results" button that generates a personalized explanation of why the user got their results, powered by Claude API.
-
-**Behavior:**
-- Results screen shows "Explain Results" button
-- Click sends quiz data to Vercel serverless function
-- Backend calls Claude API with quiz context + user's answers/results
-- Returns short paragraph explanations for each voting method
-- Displays explanations inline on results screen
-
-**Example Output:**
-> "You value animals highly, and scale matters. There are many times more animals than humans, therefore animal welfare wins a lot of these voting methods."
-
-**Architecture:**
-```
-[Frontend] → [Vercel Serverless Function] → [Claude API]
-     ↑                                            ↓
-     └──────────── Response ──────────────────────┘
-```
-
-**Request Payload:**
-- User's credences per question
-- Calculation results (winners, scores)
-- Question metadata (worldview dimensions)
-- Cause definitions
-
-**Backend Prompt:**
-- System prompt explaining quiz mechanics and calculation methods
-- How worldview dimensions map to cause scoring
-- Instructions to generate concise, personalized explanations
-- One paragraph per voting method explaining the "why"
-
-**Serverless Function:**
-- Located in `/api/explain.js` (Vercel convention)
-- Validates request payload
-- Constructs prompt with quiz context + user data
-- Calls Claude API (claude-3-haiku or claude-3-5-sonnet)
-- Returns structured response with per-method explanations
-
-**Frontend State:**
-- Loading state while waiting for API response
-- Error handling with user-friendly message
-- Cache response in session (don't re-fetch on re-render)
-
-**Dependencies:**
-- `@anthropic-ai/sdk` (backend only)
-- Vercel deployment for serverless functions
-- `ANTHROPIC_API_KEY` environment variable
-
-**Security Considerations:**
-- API key stored in Vercel environment variables (never exposed to frontend)
-- Rate limiting on serverless function
-- Input validation to prevent prompt injection
+### 8. AI Results Explanation (Future)
+"Explain these results" button below charts opens LLM interface. Marked as "Future version" in spec. Backend Lambda exists (`lambda/explain/`) but is not deployed or connected to the simple quiz frontend.
 
 ---
 
@@ -504,3 +434,8 @@ Show an "Explain Results" button that generates a personalized explanation of wh
 | `docs/legacy-calculation-differences.md` | Python↔JS algorithmic comparison for all 9 voting methods |
 | `legacy/` | Python reference implementations + fixture generator (see Legacy Parity Tests) |
 | `example/` | Standalone calculation code for Moral Marketplace feature |
+| `config/simpleQuizConfig.json` | Simple quiz question definitions + preset options |
+| `src/context/SimpleQuizContext.jsx` | Simple quiz state management (useReducer + session persistence) |
+| `src/context/useSimpleQuiz.js` | Hook wrapper for simple quiz context |
+| `src/utils/simpleQuizScoring.js` | Scoring functions: assembleWorldview, computeSimpleScores, worldviewToTableHandoff |
+| `src/components/simple/` | Simple quiz UI components (welcome, questions, more options, results) |
