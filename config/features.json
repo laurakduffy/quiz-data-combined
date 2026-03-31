@@ -14,8 +14,10 @@
     "feedbackCard": true,
     "methodsInfo": true,
     "aiExplanation": false,
-    "settingsModal": true
-},
+    "settingsModal": true,
+    "simpleQuiz": true,
+    "supportFooter": true
+  },
 
   "calculations": {
     "order": ["credenceWeighted", "mec", "borda"],

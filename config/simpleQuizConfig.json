@@ -1,0 +1,218 @@
+{
+  "questions": [
+    {
+      "id": "animal_weights",
+      "title": "Animal Moral Weights",
+      "heading": "How much do you value animal welfare relative to human welfare?",
+      "info": "Moral weights determine how much you value improvements to different types of beings. A weight of 1.0 for human life-years is the baseline. Lower weights for animals mean you think improving an animal's life is worth less than improving a human's life by the same amount.",
+      "icon": "paw",
+      "previewText": "Animal welfare weights",
+      "worldviewField": "moral_weights",
+      "options": [
+        {
+          "id": "human_focused",
+          "label": "Humans first",
+          "description": "Heavily prioritize human welfare. Animal weights are very low.",
+          "value": {
+            "human_life_years": 1.0,
+            "human_ylds": 0.5,
+            "human_income_doublings": 0.2,
+            "chickens_birds": 0.01,
+            "fish": 0.005,
+            "shrimp": 0.0001,
+            "non_shrimp_invertebrates": 0.00005,
+            "mammals": 0.05
+          }
+        },
+        {
+          "id": "balanced",
+          "label": "Balanced",
+          "description": "Give moderate weight to animal welfare alongside human welfare.",
+          "value": {
+            "human_life_years": 1.0,
+            "human_ylds": 0.5,
+            "human_income_doublings": 0.15,
+            "chickens_birds": 0.1,
+            "fish": 0.05,
+            "shrimp": 0.005,
+            "non_shrimp_invertebrates": 0.001,
+            "mammals": 0.2
+          }
+        },
+        {
+          "id": "animals_matter",
+          "label": "Animals matter a lot",
+          "description": "Give significant weight to animal welfare. Animals can matter nearly as much as humans.",
+          "value": {
+            "human_life_years": 1.0,
+            "human_ylds": 0.8,
+            "human_income_doublings": 0.1,
+            "chickens_birds": 0.5,
+            "fish": 0.3,
+            "shrimp": 0.05,
+            "non_shrimp_invertebrates": 0.01,
+            "mammals": 0.8
+          }
+        }
+      ],
+      "moreOptions": [
+        {
+          "id": "only_humans",
+          "label": "Only humans matter",
+          "description": "Zero weight on all non-human animals.",
+          "value": {
+            "human_life_years": 1.0,
+            "human_ylds": 0.5,
+            "human_income_doublings": 0.2,
+            "chickens_birds": 0,
+            "fish": 0,
+            "shrimp": 0,
+            "non_shrimp_invertebrates": 0,
+            "mammals": 0
+          }
+        },
+        {
+          "id": "invertebrates_count",
+          "label": "Invertebrates count",
+          "description": "Meaningful weight on shrimp and invertebrates alongside other animals.",
+          "value": {
+            "human_life_years": 1.0,
+            "human_ylds": 0.5,
+            "human_income_doublings": 0.1,
+            "chickens_birds": 0.3,
+            "fish": 0.2,
+            "shrimp": 0.1,
+            "non_shrimp_invertebrates": 0.05,
+            "mammals": 0.5
+          }
+        }
+      ],
+      "manualInputType": "moral_weights"
+    },
+    {
+      "id": "discount_factors",
+      "title": "Time Discounting",
+      "heading": "How much do you discount effects that happen further in the future?",
+      "info": "Discount factors determine how much you value effects at different time horizons. A value of 100% means full weight; 0% means you ignore effects in that time period entirely. Near-term focused views discount the far future heavily; longtermist views keep high values across all periods.",
+      "icon": "hourglass",
+      "previewText": "Time horizon preferences",
+      "worldviewField": "discount_factors",
+      "options": [
+        {
+          "id": "no_discount",
+          "label": "No discounting",
+          "description": "Value all time periods equally. The far future matters just as much as today.",
+          "value": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        },
+        {
+          "id": "moderate",
+          "label": "Moderate discounting",
+          "description": "Gradually reduce weight for more distant effects.",
+          "value": [1.0, 0.9, 0.5, 0.2, 0.05, 0.01]
+        },
+        {
+          "id": "near_term",
+          "label": "Near-term focus",
+          "description": "Strongly prioritize effects in the next 10 years.",
+          "value": [1.0, 0.5, 0.1, 0.01, 0.001, 0.0001]
+        }
+      ],
+      "moreOptions": [
+        {
+          "id": "longtermist",
+          "label": "Longtermist",
+          "description": "High value on all periods, especially the long run.",
+          "value": [1.0, 1.0, 0.9, 0.7, 0.5, 0.3]
+        },
+        {
+          "id": "medium_term",
+          "label": "Medium-term focus",
+          "description": "Prioritize the next 20 years, then drop off.",
+          "value": [1.0, 0.8, 0.4, 0.05, 0.005, 0.001]
+        }
+      ],
+      "manualInputType": "discount_factors"
+    },
+    {
+      "id": "p_extinction",
+      "title": "Extinction Risk",
+      "heading": "How much should potential extinction risk discount non-x-risk projects?",
+      "info": "If you believe there's a significant chance humanity goes extinct, that reduces the expected long-term value of projects that don't address existential risks. A higher value here means you think extinction is more likely, which favors x-risk-reduction projects.",
+      "icon": "alert-triangle",
+      "previewText": "Extinction risk discount",
+      "worldviewField": "p_extinction",
+      "options": [
+        {
+          "id": "none",
+          "label": "No extinction discount",
+          "description": "Don't discount projects for extinction risk (0%).",
+          "value": 0
+        },
+        {
+          "id": "low",
+          "label": "Low risk",
+          "description": "Small discount for extinction risk (10%).",
+          "value": 0.1
+        },
+        {
+          "id": "high",
+          "label": "High risk",
+          "description": "Large discount for extinction risk (50%).",
+          "value": 0.5
+        }
+      ],
+      "moreOptions": [
+        {
+          "id": "very_low",
+          "label": "Very low risk",
+          "description": "Minimal discount (5%).",
+          "value": 0.05
+        },
+        {
+          "id": "moderate",
+          "label": "Moderate risk",
+          "description": "Moderate discount (25%).",
+          "value": 0.25
+        }
+      ],
+      "manualInputType": "p_extinction"
+    },
+    {
+      "id": "risk_profile",
+      "title": "Risk Attitude",
+      "heading": "What is your attitude toward risk and uncertainty in cost-effectiveness estimates?",
+      "info": "Cost-effectiveness estimates come with significant uncertainty. 'Neutral' takes estimates at face value. Other options adjust for how you feel about upside or downside risk in these estimates.",
+      "icon": "dice",
+      "previewText": "Risk profile",
+      "worldviewField": "risk_profile",
+      "options": [
+        {
+          "id": "neutral",
+          "label": "Risk neutral",
+          "description": "Take estimates at face value, no adjustment.",
+          "value": 0
+        },
+        {
+          "id": "upside_skeptical",
+          "label": "Upside skeptical",
+          "description": "Discount projects with very high estimates \u2014 they might be too good to be true.",
+          "value": 4
+        },
+        {
+          "id": "downside_critical",
+          "label": "Downside focused",
+          "description": "Weight negative outcomes more heavily \u2014 avoid projects that could cause harm.",
+          "value": 5
+        },
+        {
+          "id": "combined",
+          "label": "Combined caution",
+          "description": "Both skeptical of high upside and sensitive to downside risk.",
+          "value": 6
+        }
+      ],
+      "moreOptions": [],
+      "manualInputType": "risk_profile"
+    }
+  ]
+}

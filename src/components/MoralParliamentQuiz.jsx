@@ -5,9 +5,13 @@ import RatioQuestion from './RatioQuestion';
 import IntermissionScreen from './IntermissionScreen';
 import ResultsScreen from './ResultsScreen';
 import TableModeScreen from './table/TableModeScreen';
+import SimpleWelcomeScreen from './simple/SimpleWelcomeScreen';
+import SimpleQuizScreen from './simple/SimpleQuizScreen';
+import SimpleResultsScreen from './simple/SimpleResultsScreen';
 import CalculationDebugger from './CalculationDebugger';
 import { useState, useEffect } from 'react';
 import { useQuiz } from '../context/useQuiz';
+import { useSimpleQuiz } from '../context/useSimpleQuiz';
 import { QUESTION_TYPES } from '../constants/config';
 import features from '../../config/features.json';
 
@@ -28,9 +32,11 @@ const toastStyle = {
 /**
  * Main quiz router component.
  * Renders the appropriate screen based on current step from context.
+ * When features.ui.simpleQuiz is true (default), renders the simplified quiz flow.
  */
 function MoralParliamentQuiz() {
   const { currentStep, currentQuestion, setDebugConfig, shareUrlError, isHydrating } = useQuiz();
+  const simpleQuiz = useSimpleQuiz();
 
   // Hash-based route: #table or #table&s=<id> renders Table Mode
   const [isTableRoute, setIsTableRoute] = useState(() => window.location.hash.startsWith('#table'));
@@ -56,7 +62,12 @@ function MoralParliamentQuiz() {
     return <TableModeScreen />;
   }
 
-  // Determine which screen to render
+  // Simple quiz mode (default: true)
+  if (features.ui?.simpleQuiz !== false) {
+    return getSimpleQuizContent();
+  }
+
+  // Legacy quiz flow
   function getScreenContent() {
     if (currentStep === 'disclaimer') return <DisclaimerScreen />;
     if (currentStep === 'welcome') return <WelcomeScreen />;
@@ -73,6 +84,16 @@ function MoralParliamentQuiz() {
       return <IntermissionScreen />;
     }
     return <QuestionScreen />;
+  }
+
+  function getSimpleQuizContent() {
+    const step = simpleQuiz.currentStep;
+    if (step === 'disclaimer')
+      return <DisclaimerScreen onContinue={() => simpleQuiz.goToStep('welcome')} />;
+    if (step === 'welcome') return <SimpleWelcomeScreen />;
+    if (step === 'results') return <SimpleResultsScreen />;
+    if (typeof step === 'number') return <SimpleQuizScreen />;
+    return <SimpleWelcomeScreen />;
   }
 
   return (

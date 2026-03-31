@@ -13,13 +13,11 @@ import copy from '../../config/copy.json';
  * Disclaimer screen shown before the welcome page.
  * Displays markdown content with a clickable email that copies to clipboard.
  */
-function DisclaimerScreen() {
+function DisclaimerScreen({ onContinue: onContinueProp }) {
   const { goToStep } = useQuiz();
   const { email, copied, handleEmailClick } = useEmailCopy(copy.disclaimer?.email);
 
-  const handleContinue = () => {
-    goToStep('welcome');
-  };
+  const handleContinue = onContinueProp || (() => goToStep('welcome'));
 
   const processedContent = processEmailPlaceholder(copy.disclaimer.content, email, copied);
 

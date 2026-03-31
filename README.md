@@ -10,31 +10,28 @@ An interactive tool to help you allocate resources across different causes based
 
 **Donor Compass** is a Rethink Priorities tool that helps you navigate moral uncertainty by:
 
-- Asking about your credences (confidence levels) on key ethical questions
-- Calculating optimal resource allocation using four methods:
-  - **Max Expected Value**: Allocate based on expected values (with diminishing returns, spreads across causes)
-  - **Variance Voting**: Weighted votes from different worldviews (moral parliament approach)
-  - **Merged Favorites**: Each worldview allocates its budget share (with diminishing returns, spreads within each)
-  - **Maximin**: Maximizes the minimum utility any worldview receives (egalitarian approach)
-- Allowing real-time adjustment and exploration of how different credences affect allocations
+- Asking about your values and preferences on key ethical dimensions
+- Calculating which charitable funds best match those preferences
+- Allowing real-time adjustment and exploration of how different inputs affect recommendations
 
-### Questions Asked
+The tool has two modes:
 
-1. **Disability vs. Lives**: How do you value relieving disability vs. saving lives?
-2. **Income vs. Lives**: How do you value increasing income vs. saving lives?
-3. **Chicken Welfare**: How do you value chicken welfare relative to human welfare?
-4. **Shrimp Welfare**: How do you value shrimp/invertebrate welfare relative to human welfare?
-5. **Timeframes**: How do you prioritize short-term vs. medium-term vs. long-term effects?
-6. **Existential Risk**: How do you prioritize x-risk mitigation vs. other projects?
+### Simple Quiz (Default)
 
-### Causes Evaluated
+A streamlined 4-question quiz (~2 minutes) where you pick presets that map directly to a single worldview, producing a bar chart of fund scores. Questions cover:
 
-- **Blindness Prevention**: Short-term disability intervention
-- **Basic Income**: Short-term income intervention
-- **Chicken Welfare**: Animal welfare (vertebrates)
-- **Shrimp Welfare**: Animal welfare (invertebrates)
-- **AI Safety Research**: Long-term x-risk mitigation
-- **Pandemic Prevention**: Short-term x-risk mitigation
+1. **Animal Moral Weights**: How much do you value animal welfare relative to human welfare?
+2. **Time Discounting**: How much do you discount effects further in the future?
+3. **Extinction Risk**: How much should extinction risk discount non-x-risk projects?
+4. **Risk Attitude**: What is your attitude toward uncertainty in cost-effectiveness estimates?
+
+Each question offers preset options plus expandable custom inputs. From the results screen, you can jump to Advanced Mode with your answers pre-populated.
+
+### Advanced Mode (Table Mode)
+
+A power-user interface for configuring multiple worldviews with full control over moral weights, discount factors, risk profiles, and extinction risk. Supports multiple voting methods (credence-weighted parliament, MEC, Borda count, and more) with configurable multi-stage budget allocation.
+
+Access via the "Go to Advanced Mode" button on the simple quiz results screen, or directly at `#table`.
 
 ---
 
@@ -184,7 +181,9 @@ quiz-demo/
 │   ├── causes.json                 # Cause definitions (points, colors, flags)
 │   ├── copy.json                   # UI copy/text content
 │   ├── features.json               # Feature flags for toggling functionality
-│   └── questions.json              # Question definitions and worldview dimensions
+│   ├── questions.json              # Question definitions and worldview dimensions (legacy quiz)
+│   ├── simpleQuizConfig.json       # Simple quiz question definitions + preset options
+│   └── worldviewPresets.json       # Worldview presets + default worldview template
 │
 ├── src/
 │   ├── main.jsx                    # React entry point + config validation
@@ -202,6 +201,12 @@ quiz-demo/
 │   │   ├── ResultsScreen.jsx           # Results display
 │   │   ├── MoralMarketplaceScreen.jsx  # Combined worldview analysis (advanced)
 │   │   ├── CalculationDebugger.jsx     # Developer tool for testing calculations
+│   │   │
+│   │   ├── simple/                       # Simple quiz components
+│   │   │   ├── SimpleWelcomeScreen.jsx   # Welcome screen for simple quiz
+│   │   │   ├── SimpleQuizScreen.jsx      # Question screen with preset buttons
+│   │   │   ├── SimpleMoreOptions.jsx     # Expanded options + manual inputs
+│   │   │   └── SimpleResultsScreen.jsx   # Bar chart results
 │   │   │
 │   │   ├── ui/                         # Reusable UI components
 │   │   │   ├── OptionButton.jsx        # Quick selection button
@@ -223,11 +228,15 @@ quiz-demo/
 │   │       └── ProgressBar.jsx         # Progress indicator
 │   │
 │   ├── context/                    # React Context for state management
-│   │   ├── QuizContext.jsx         # Quiz state provider and hooks
-│   │   └── useQuiz.js              # Custom hook for consuming quiz context
+│   │   ├── QuizContext.jsx         # Legacy quiz state provider and hooks
+│   │   ├── useQuiz.js              # Custom hook for consuming quiz context
+│   │   ├── SimpleQuizContext.jsx   # Simple quiz state (useReducer + session persistence)
+│   │   └── useSimpleQuiz.js        # Custom hook for simple quiz context
 │   │
 │   ├── utils/                      # Pure utility functions
 │   │   ├── calculations.js         # All calculation logic
+│   │   ├── projectScoring.js       # Shared scoring engine (calculateProject, adjustForExtinctionRisk)
+│   │   ├── simpleQuizScoring.js    # Simple quiz: assembleWorldview, computeSimpleScores
 │   │   ├── shareUrl.js             # URL encoding/decoding for sharing results
 │   │   ├── validateCauses.js       # Validates causes.json on startup
 │   │   └── validateQuestions.js    # Validates questions.json on startup
@@ -451,11 +460,24 @@ See `docs/legacy-calculation-differences.md` for documented algorithmic differen
 The dev server runs at `http://localhost:5173/` with hot module replacement (or `http://localhost:8888/` with `netlify dev` for full stack).
 
 Test the following flows:
+
+**Simple Quiz (default):**
+- Welcome → 4 questions → results bar chart
+- "More options" expands additional presets + custom inputs per question
+- Custom inputs apply immediately (slider, number fields, dropdown)
+- "Go to Advanced Mode" → table mode loads with quiz worldview pre-populated
+- "Start Over" → returns to welcome (with confirmation)
+- Session persistence: reload mid-quiz restores state
+- `#table` URL → table mode works directly (no regression)
+
+**Legacy Quiz** (set `ui.simpleQuiz: false`):
 - All user flows (welcome → questions → results)
 - Option selection and slider modes
 - Auto-balancing behavior (sliders always sum to 100%)
 - Real-time recalculation in results screen
 - Reset functionality (individual and "Reset All")
+
+**General:**
 - Visual polish and responsive design
 - Browser console should show zero errors
 
@@ -465,7 +487,17 @@ Test the following flows:
 
 ### State Management
 
-State is managed via React Context in `src/context/QuizContext.jsx`:
+**Simple Quiz** state is managed via `src/context/SimpleQuizContext.jsx` — a lightweight `useReducer` with session persistence. State shape:
+
+```js
+{
+  currentStep: 'disclaimer' | 'welcome' | 0..3 | 'results',
+  selections: { questionId: optionId },     // preset selections
+  manualOverrides: { questionId: value },    // custom input overrides (take priority)
+}
+```
+
+**Legacy Quiz** state is managed via React Context in `src/context/QuizContext.jsx`:
 
 ```js
 {

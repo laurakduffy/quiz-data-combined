@@ -183,6 +183,35 @@ input[type='range']::-moz-range-thumb {
   color: var(--text-primary);
   display: flex;
   flex-direction: column;
+  padding-bottom: 40px;
+}
+
+/* ===== SUPPORT FOOTER ===== */
+
+.support-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-align: center;
+  padding: var(--spacing-4) var(--spacing-8);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.support-footer a {
+  color: var(--color-teal-light);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.support-footer a:hover {
+  color: #5fbcd3;
 }
 
 .screen-main {
