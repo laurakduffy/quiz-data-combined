@@ -45,8 +45,8 @@ export function assembleWorldview(selections, manualOverrides, questions) {
  *
  * @param {Array<Object>} worldviews - Array of { ...worldviewFields, credence: 0-1 }
  * @param {Object} projectData - Dataset projects object (keyed by project ID)
- * @param {number} budget - Total budget in $K (default 100 = $100K)
- * @param {number} incrementSize - Step size in $K (default 1)
+ * @param {number} budget - Total budget in $M (default 100 = $100M)
+ * @param {number} incrementSize - Step size in $M (default 1)
  * @returns {Object} { projectId: percentage, ... }
  */
 export function computeSimpleAllocations(worldviews, projectData, budget = 100, incrementSize = 1) {

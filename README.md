@@ -20,12 +20,12 @@ The tool has two modes:
 
 A streamlined 4-question quiz (~2 minutes) where you pick presets that map directly to a single worldview, producing a bar chart of fund scores. Questions cover:
 
-1. **Animal Moral Weights**: How much do you value animal welfare relative to human welfare?
-2. **Time Discounting**: How much do you discount effects further in the future?
-3. **Extinction Risk**: How much should extinction risk discount non-x-risk projects?
-4. **Risk Attitude**: What is your attitude toward uncertainty in cost-effectiveness estimates?
+1. **Animal Moral Weights**: How much moral weight do you give to the welfare of animals compared to humans?
+2. **Time Discounting**: How much do you care about effects that happen in the future, compared to effects happening now?
+3. **Non-AI X-Risk Discount**: How much do you discount non-AI existential risk interventions?
+4. **Risk Attitude**: How do you want to handle uncertainty and risk when comparing funds?
 
-Each question offers preset options plus expandable custom inputs. From the results screen, you can jump to Advanced Mode with your answers pre-populated.
+Each question offers preset options plus custom inputs via "More options". From the results screen, you can jump to Advanced Mode with your answers pre-populated.
 
 ### Advanced Mode (Table Mode)
 
@@ -463,7 +463,7 @@ Test the following flows:
 
 **Simple Quiz (default):**
 - Welcome → 4 questions → results bar chart
-- "More options" expands additional presets + custom inputs per question
+- "More options" expands custom inputs per question
 - Custom inputs apply immediately (slider, number fields, dropdown)
 - "Go to Advanced Mode" → table mode loads with quiz worldview pre-populated
 - "Start Over" → returns to welcome (with confirmation)

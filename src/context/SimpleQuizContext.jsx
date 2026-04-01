@@ -102,7 +102,7 @@ function loadState() {
     const stored = sessionStorage.getItem(STORAGE_KEY);
     if (!stored) return null;
     const parsed = JSON.parse(stored);
-    if (parsed.version !== 2) return null;
+    if (parsed.version !== 3) return null;
     return parsed.state;
   } catch {
     return null;
@@ -111,7 +111,7 @@ function loadState() {
 
 function saveState(state) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, state }));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 3, state }));
   } catch {
     // sessionStorage full or unavailable
   }

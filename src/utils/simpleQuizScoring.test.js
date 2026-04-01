@@ -62,15 +62,15 @@ describe('assembleWorldview', () => {
 
   it('applies preset selections correctly', () => {
     const selections = {
-      animal_weights: 'animals_matter',
-      discount_factors: 'no_discount',
-      p_extinction: 'high',
+      animal_weights: 'rp_default',
+      discount_factors: 'all_equal',
+      p_extinction: 'rp_default',
       risk_profile: 'upside_skeptical',
     };
     const wv = assembleWorldview(selections, {}, questions);
-    expect(wv.moral_weights.chickens_birds).toBe(0.5);
+    expect(wv.moral_weights.chickens_birds).toBe(0.4);
     expect(wv.discount_factors).toEqual([1, 1, 1, 1, 1, 1]);
-    expect(wv.p_extinction).toBe(0.5);
+    expect(wv.p_extinction).toBe(0.4);
     expect(wv.risk_profile).toBe(4);
   });
 
@@ -84,7 +84,7 @@ describe('assembleWorldview', () => {
   });
 
   it('manual overrides take priority over selections', () => {
-    const selections = { p_extinction: 'high' };
+    const selections = { p_extinction: 'rp_default' };
     const manualOverrides = { p_extinction: 0.33 };
     const wv = assembleWorldview(selections, manualOverrides, questions);
     expect(wv.p_extinction).toBe(0.33);
