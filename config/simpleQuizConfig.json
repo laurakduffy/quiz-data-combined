@@ -3,185 +3,158 @@
     {
       "id": "animal_weights",
       "title": "Animal Moral Weights",
-      "heading": "How much do you value animal welfare relative to human welfare?",
-      "info": "Moral weights determine how much you value improvements to different types of beings. A weight of 1.0 for human life-years is the baseline. Lower weights for animals mean you think improving an animal's life is worth less than improving a human's life by the same amount.",
+      "heading": "How much moral weight do you give to the welfare of animals compared to humans?",
+      "info": "Moral weights determine how much you value improvements to different types of beings. Human life-years are the baseline (1.0). Your answer here affects how the model scores funds that focus on animal welfare. Each option sets weights across species and effect types (life-years, disability, income doublings).",
       "icon": "paw",
       "previewText": "Animal welfare weights",
       "worldviewField": "moral_weights",
       "options": [
         {
-          "id": "human_focused",
-          "label": "Humans first",
-          "description": "Heavily prioritize human welfare. Animal weights are very low.",
+          "id": "only_humans",
+          "label": "Only humans matter",
+          "description": "Animal welfare is not counted. Only effects on humans are included in fund scores.",
           "value": {
             "human_life_years": 1.0,
-            "human_ylds": 0.5,
-            "human_income_doublings": 0.2,
+            "human_ylds": 1.0,
+            "human_income_doublings": 0.3,
+            "chickens_birds": 0.0,
+            "fish": 0.0,
+            "shrimp": 0.0,
+            "non_shrimp_invertebrates": 0.0,
+            "mammals": 0.0
+          }
+        },
+        {
+          "id": "low_animals",
+          "label": "Animals matter, but much less than humans",
+          "description": "Gives animals meaningful but low moral weight. Reflects substantial scepticism about the depth of animal experience relative to human experience.",
+          "value": {
+            "human_life_years": 1.0,
+            "human_ylds": 1.0,
+            "human_income_doublings": 0.3,
             "chickens_birds": 0.01,
-            "fish": 0.005,
-            "shrimp": 0.0001,
-            "non_shrimp_invertebrates": 0.00005,
+            "fish": 0.01,
+            "shrimp": 0.001,
+            "non_shrimp_invertebrates": 0.001,
             "mammals": 0.05
           }
         },
         {
-          "id": "balanced",
-          "label": "Balanced",
-          "description": "Give moderate weight to animal welfare alongside human welfare.",
+          "id": "rp_default",
+          "label": "RP weighted average",
+          "description": "A weighted average across the moral weight estimates that Rethink Priorities researchers find most plausible, giving animals meaningful but not equal weight to humans.",
+          "isDefault": true,
           "value": {
             "human_life_years": 1.0,
-            "human_ylds": 0.5,
-            "human_income_doublings": 0.15,
-            "chickens_birds": 0.1,
-            "fish": 0.05,
-            "shrimp": 0.005,
-            "non_shrimp_invertebrates": 0.001,
-            "mammals": 0.2
+            "human_ylds": 1.0,
+            "human_income_doublings": 0.3,
+            "chickens_birds": 0.4,
+            "fish": 0.24,
+            "shrimp": 0.08,
+            "non_shrimp_invertebrates": 0.07,
+            "mammals": 0.44
           }
         },
         {
-          "id": "animals_matter",
-          "label": "Animals matter a lot",
-          "description": "Give significant weight to animal welfare. Animals can matter nearly as much as humans.",
+          "id": "all_equal",
+          "label": "All sentient beings count equally",
+          "description": "A year of suffering counts the same regardless of species. Strong moral egalitarianism across all sentient life.",
           "value": {
             "human_life_years": 1.0,
-            "human_ylds": 0.8,
-            "human_income_doublings": 0.1,
-            "chickens_birds": 0.5,
-            "fish": 0.3,
-            "shrimp": 0.05,
-            "non_shrimp_invertebrates": 0.01,
-            "mammals": 0.8
+            "human_ylds": 1.0,
+            "human_income_doublings": 1.0,
+            "chickens_birds": 1.0,
+            "fish": 1.0,
+            "shrimp": 1.0,
+            "non_shrimp_invertebrates": 1.0,
+            "mammals": 1.0
           }
         }
       ],
-      "moreOptions": [
-        {
-          "id": "only_humans",
-          "label": "Only humans matter",
-          "description": "Zero weight on all non-human animals.",
-          "value": {
-            "human_life_years": 1.0,
-            "human_ylds": 0.5,
-            "human_income_doublings": 0.2,
-            "chickens_birds": 0,
-            "fish": 0,
-            "shrimp": 0,
-            "non_shrimp_invertebrates": 0,
-            "mammals": 0
-          }
-        },
-        {
-          "id": "invertebrates_count",
-          "label": "Invertebrates count",
-          "description": "Meaningful weight on shrimp and invertebrates alongside other animals.",
-          "value": {
-            "human_life_years": 1.0,
-            "human_ylds": 0.5,
-            "human_income_doublings": 0.1,
-            "chickens_birds": 0.3,
-            "fish": 0.2,
-            "shrimp": 0.1,
-            "non_shrimp_invertebrates": 0.05,
-            "mammals": 0.5
-          }
-        }
-      ],
+      "moreOptions": [],
       "manualInputType": "moral_weights"
     },
     {
       "id": "discount_factors",
       "title": "Time Discounting",
-      "heading": "How much do you discount effects that happen further in the future?",
-      "info": "Discount factors determine how much you value effects at different time horizons. A value of 100% means full weight; 0% means you ignore effects in that time period entirely. Near-term focused views discount the far future heavily; longtermist views keep high values across all periods.",
+      "heading": "How much do you care about effects that happen in the future, compared to effects happening now?",
+      "info": "The model divides effects into six time periods: 0–5 years, 5–10 years, 10–20 years, 20–100 years, 100–500 years, and 500+ years. Your answer sets a multiplier for each period. A multiplier of 0 means effects in that period are ignored entirely; 1 means they count fully.",
       "icon": "hourglass",
       "previewText": "Time horizon preferences",
       "worldviewField": "discount_factors",
       "options": [
         {
-          "id": "no_discount",
-          "label": "No discounting",
-          "description": "Value all time periods equally. The far future matters just as much as today.",
+          "id": "near_term_only",
+          "label": "Near-term only (next 10 years)",
+          "description": "Only effects occurring before 2035 count. Medium and long-term effects are ignored entirely.",
+          "value": [1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+        },
+        {
+          "id": "next_100_years",
+          "label": "Next 100 years",
+          "description": "Near and medium-term effects count; effects after 2100 are ignored. Emphasises people alive today and those born in the next few generations.",
+          "value": [1.0, 1.0, 0.8, 0.6, 0.0, 0.0]
+        },
+        {
+          "id": "rp_default",
+          "label": "More weight on near-term, some weight on long-term",
+          "description": "Near-term effects count fully. Medium-term effects count somewhat. Long-term effects count a little but are substantially discounted. RP's recommended starting point.",
+          "isDefault": true,
+          "value": [1.0, 0.9, 0.8, 0.1, 0.001, 0.00001]
+        },
+        {
+          "id": "all_equal",
+          "label": "All timeframes count equally",
+          "description": "A good outcome in 500 years counts just as much as one today. Pure longtermist view with no time discounting.",
           "value": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-        },
-        {
-          "id": "moderate",
-          "label": "Moderate discounting",
-          "description": "Gradually reduce weight for more distant effects.",
-          "value": [1.0, 0.9, 0.5, 0.2, 0.05, 0.01]
-        },
-        {
-          "id": "near_term",
-          "label": "Near-term focus",
-          "description": "Strongly prioritize effects in the next 10 years.",
-          "value": [1.0, 0.5, 0.1, 0.01, 0.001, 0.0001]
         }
       ],
-      "moreOptions": [
-        {
-          "id": "longtermist",
-          "label": "Longtermist",
-          "description": "High value on all periods, especially the long run.",
-          "value": [1.0, 1.0, 0.9, 0.7, 0.5, 0.3]
-        },
-        {
-          "id": "medium_term",
-          "label": "Medium-term focus",
-          "description": "Prioritize the next 20 years, then drop off.",
-          "value": [1.0, 0.8, 0.4, 0.05, 0.005, 0.001]
-        }
-      ],
+      "moreOptions": [],
       "manualInputType": "discount_factors"
     },
     {
       "id": "p_extinction",
-      "title": "Extinction Risk",
-      "heading": "How much should potential extinction risk discount non-x-risk projects?",
-      "info": "If you believe there's a significant chance humanity goes extinct, that reduces the expected long-term value of projects that don't address existential risks. A higher value here means you think extinction is more likely, which favors x-risk-reduction projects.",
+      "title": "Non-AI X-Risk Discount",
+      "heading": "How much do you discount non-AI existential risk interventions, given the possibility that AI poses an overriding near-term threat?",
+      "info": "This adjustment applies only to non-AI x-risk interventions (e.g. biosecurity, pandemic prevention, nuclear risk reduction). The value is a discount fraction — 0.0 means no discount, 0.4 means a 40% discount, 1.0 means they score zero. AI safety and global health interventions are unaffected.",
       "icon": "alert-triangle",
-      "previewText": "Extinction risk discount",
+      "previewText": "Non-AI x-risk discount",
       "worldviewField": "p_extinction",
       "options": [
         {
-          "id": "none",
-          "label": "No extinction discount",
-          "description": "Don't discount projects for extinction risk (0%).",
-          "value": 0
+          "id": "no_discount",
+          "label": "No discount",
+          "description": "Non-AI existential risk interventions are evaluated the same way as all other interventions.",
+          "value": 0.0
         },
         {
-          "id": "low",
-          "label": "Low risk",
-          "description": "Small discount for extinction risk (10%).",
+          "id": "small_discount",
+          "label": "Small discount (10%)",
+          "description": "Non-AI x-risk interventions are scored at 90% of their otherwise calculated value.",
           "value": 0.1
         },
         {
-          "id": "high",
-          "label": "High risk",
-          "description": "Large discount for extinction risk (50%).",
-          "value": 0.5
-        }
-      ],
-      "moreOptions": [
-        {
-          "id": "very_low",
-          "label": "Very low risk",
-          "description": "Minimal discount (5%).",
-          "value": 0.05
+          "id": "rp_default",
+          "label": "Large discount (40%)",
+          "description": "Non-AI x-risk interventions are scored at 60% of their otherwise calculated value. RP's view that AI risk is a substantial near-term priority that partially crowds out other existential risk work.",
+          "isDefault": true,
+          "value": 0.4
         },
         {
-          "id": "moderate",
-          "label": "Moderate risk",
-          "description": "Moderate discount (25%).",
-          "value": 0.25
+          "id": "ai_only",
+          "label": "Only AI risk matters (100% discount)",
+          "description": "Non-AI existential risk interventions are scored at zero.",
+          "value": 1.0
         }
       ],
+      "moreOptions": [],
       "manualInputType": "p_extinction"
     },
     {
       "id": "risk_profile",
       "title": "Risk Attitude",
-      "heading": "What is your attitude toward risk and uncertainty in cost-effectiveness estimates?",
-      "info": "Cost-effectiveness estimates come with significant uncertainty. 'Neutral' takes estimates at face value. Other options adjust for how you feel about upside or downside risk in these estimates.",
+      "heading": "How do you want to handle uncertainty and risk when comparing funds?",
+      "info": "Each fund's impact is estimated across a range of scenarios with different probabilities. The risk profile determines how those scenarios are weighted. A risk-neutral approach takes a straight expected value. WLU (Weighted Linear Utility) applies a formal variance-aversion method that penalises high-variance outcomes.",
       "icon": "dice",
       "previewText": "Risk profile",
       "worldviewField": "risk_profile",
@@ -189,26 +162,27 @@
         {
           "id": "neutral",
           "label": "Risk neutral",
-          "description": "Take estimates at face value, no adjustment.",
+          "description": "Funds are scored using standard expected value. A 1% chance of 100x impact counts the same as a certain 1x impact.",
           "value": 0
         },
         {
           "id": "upside_skeptical",
-          "label": "Upside skeptical",
-          "description": "Discount projects with very high estimates \u2014 they might be too good to be true.",
+          "label": "Sceptical of very large upside scenarios",
+          "description": "Discounts the most optimistic impact scenarios. Funds whose scores depend heavily on low-probability, very large outcomes will score lower.",
           "value": 4
         },
         {
           "id": "downside_critical",
-          "label": "Downside focused",
-          "description": "Weight negative outcomes more heavily \u2014 avoid projects that could cause harm.",
+          "label": "Penalise risk of doing harm",
+          "description": "Applies extra weight to scenarios where an intervention backfires or causes harm. Funds with significant downside risk will score lower even if their expected value is high.",
           "value": 5
         },
         {
-          "id": "combined",
-          "label": "Combined caution",
-          "description": "Both skeptical of high upside and sensitive to downside risk.",
-          "value": 6
+          "id": "wlu_moderate",
+          "label": "Variance-averse (WLU)",
+          "description": "Uses a formal variance-aversion method (Weighted Linear Utility) that penalises high-variance outcomes. RP's recommended approach for donors who care about robustness across scenarios.",
+          "isDefault": true,
+          "value": 2
         }
       ],
       "moreOptions": [],
