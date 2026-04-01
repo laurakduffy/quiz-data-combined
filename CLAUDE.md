@@ -287,12 +287,12 @@ Uses its own lightweight context (`SimpleQuizContext`) rather than the existing 
 
 | # | ID | Topic | Worldview Field | Manual Input |
 |---|-----|-------|-----------------|--------------|
-| 1 | `animal_weights` | Animal welfare vs human welfare | `moral_weights` | 8 number inputs |
-| 2 | `discount_factors` | Time horizon discounting | `discount_factors` | 6 percentage inputs |
-| 3 | `p_extinction` | Extinction risk discount | `p_extinction` | Slider (0-100%) |
+| 1 | `animal_weights` | Animal moral weights vs humans | `moral_weights` | 8 number inputs |
+| 2 | `discount_factors` | Time discounting | `discount_factors` | 6 percentage inputs |
+| 3 | `p_extinction` | Non-AI x-risk discount | `p_extinction` | Slider (0-100%) |
 | 4 | `risk_profile` | Risk attitude | `risk_profile` | Dropdown (8 options) |
 
-Each question has 3-4 main preset options, expandable "More options" with additional presets, and a custom input section. All manual inputs apply immediately on change (no apply button).
+Each question has 4 main preset options (one marked `isDefault`) and a custom input section via "More options". All manual inputs apply immediately on change (no apply button).
 
 **Results screen:** Horizontal bar chart (Recharts) with one bar per fund in dataset order. Scores normalized to percentage of max. Negative scores clamped to zero. No animation.
 
@@ -300,7 +300,7 @@ Each question has 3-4 main preset options, expandable "More options" with additi
 
 **Session persistence:** State saved to `sessionStorage` under `simple_quiz_state` (debounced 300ms). Disclaimer and welcome steps are not persisted — reload always starts from the beginning until the user enters a question.
 
-**Config:** `config/simpleQuizConfig.json` defines questions with preset options and their worldview values. Preset values are drawn from `worldviewPresets.json`.
+**Config:** `config/simpleQuizConfig.json` defines questions with preset options and their worldview values. Default worldview template is in `worldviewPresets.json`.
 
 **Disabling:** Set `"simpleQuiz": false` in `config/features.json` to revert to the legacy quiz flow.
 

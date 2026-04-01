@@ -197,7 +197,7 @@ function SimpleResultsScreen() {
                   onKeyDown={handleBudgetKeyDown}
                   className={resultStyles.budgetInput}
                 />
-                <span className={resultStyles.budgetUnit}>K</span>
+                <span className={resultStyles.budgetUnit}>M</span>
               </div>
             </label>
           </div>

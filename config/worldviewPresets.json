@@ -4,17 +4,17 @@
     "credence": 1.0,
     "moral_weights": {
       "human_life_years": 1.0,
-      "human_ylds": 0.5,
-      "human_income_doublings": 0.2,
-      "chickens_birds": 0.01,
-      "fish": 0.005,
-      "shrimp": 0.0001,
-      "non_shrimp_invertebrates": 0.00005,
-      "mammals": 0.05
+      "human_ylds": 1.0,
+      "human_income_doublings": 0.3,
+      "chickens_birds": 0.4,
+      "fish": 0.24,
+      "shrimp": 0.08,
+      "non_shrimp_invertebrates": 0.07,
+      "mammals": 0.44
     },
-    "discount_factors": [1.0, 0.9, 0.5, 0.2, 0.05, 0.01],
-    "risk_profile": 0,
-    "p_extinction": 0
+    "discount_factors": [1.0, 0.9, 0.8, 0.1, 0.001, 0.00001],
+    "risk_profile": 2,
+    "p_extinction": 0.4
   },
   "presets": [
     {
