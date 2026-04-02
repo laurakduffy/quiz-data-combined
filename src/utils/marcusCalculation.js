@@ -551,7 +551,13 @@ function voteMyFavoriteTheory(
   );
   const bestProject = _argmaxProject(marginalValues, tieBreak, rng);
   allocations[bestProject] = increment;
-  allocations.__scores__ = { marginalValues, selectedWorldview: bestIdx };
+  const worldviewScores = _computeAllWorldviewMarginalValues(
+    data,
+    funding,
+    customWorldviews,
+    fundingCaps
+  );
+  allocations.__scores__ = { marginalValues, selectedWorldview: bestIdx, worldviewScores };
   return allocations;
 }
 
@@ -587,7 +593,7 @@ function voteMec(
   }
   const split = _splitAmongTied(expectedScores, increment);
   for (const p of Object.keys(split)) allocations[p] += split[p];
-  allocations.__scores__ = { expectedScores };
+  allocations.__scores__ = { expectedScores, worldviewScores };
   return allocations;
 }
 
@@ -803,7 +809,13 @@ function voteNashBargaining(
         rng
       ),
       __stopAfterApplying__: true,
-      __scores__: { feasibleScores, fallbackScores, disagreementUtilities, fallback: true },
+      __scores__: {
+        feasibleScores,
+        fallbackScores,
+        disagreementUtilities,
+        worldviewScores,
+        fallback: true,
+      },
     };
   }
 
@@ -813,7 +825,12 @@ function voteNashBargaining(
   );
   const selectedProject = _chooseFromCandidates(candidates, tieBreak, rng);
   allocations[selectedProject] = increment;
-  allocations.__scores__ = { feasibleScores, fallbackScores, disagreementUtilities };
+  allocations.__scores__ = {
+    feasibleScores,
+    fallbackScores,
+    disagreementUtilities,
+    worldviewScores,
+  };
   return allocations;
 }
 
@@ -935,7 +952,12 @@ function voteMsa(
     }
   }
 
-  const msaScores = { mecScores, voteTallies, cardinalPermissible: [...cardinalPermissible] };
+  const msaScores = {
+    mecScores,
+    voteTallies,
+    cardinalPermissible: [...cardinalPermissible],
+    worldviewScores,
+  };
   const maxTally = Math.max(...Object.values(voteTallies), 0.0);
   if (maxTally <= 0.5) {
     if (noPermissibleAction === 'stop') {
@@ -1030,7 +1052,7 @@ function voteBorda(
 
   const split = _splitAmongTied(bordaScores, increment);
   for (const p of Object.keys(split)) allocations[p] += split[p];
-  allocations.__scores__ = { bordaScores };
+  allocations.__scores__ = { bordaScores, worldviewScores };
   return allocations;
 }
 
@@ -1138,7 +1160,7 @@ function voteSplitCycle(
 
   const share = increment / winners.length;
   for (const p of winners) allocations[p] = share;
-  allocations.__scores__ = { margins, unbeaten };
+  allocations.__scores__ = { margins, unbeaten, worldviewScores };
   return allocations;
 }
 
@@ -1191,7 +1213,7 @@ function voteLexicographicMaximin(
   const winners = projects.filter((p) => compareVectors(vectors[p], bestVector) === 0);
   const selectedProject = _chooseFromCandidates(winners, tieBreak, rng);
   allocations[selectedProject] = increment;
-  allocations.__scores__ = { vectors };
+  allocations.__scores__ = { vectors, worldviewScores };
   return allocations;
 }
 
@@ -1251,6 +1273,7 @@ function allocateBudget(
           methodResult: { ...allocs, ...__scores__ },
           stopped: __reason__ || true,
           fundingAfter: { ...funding },
+          worldviewNames: kwargs.customWorldviews?.map((w, i) => w.name || `wv${i}`),
         };
         _addDebugExtras(entry, data, fundingBefore, fundingCaps);
         debugTrace.push(entry);
@@ -1274,6 +1297,7 @@ function allocateBudget(
         fundingBefore,
         methodResult: { ...cleanResult, ...__scores__ },
         fundingAfter: { ...funding },
+        worldviewNames: kwargs.customWorldviews?.map((w, i) => w.name || `wv${i}`),
       };
       _addDebugExtras(entry, data, fundingBefore, fundingCaps);
       debugTrace.push(entry);

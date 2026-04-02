@@ -22,6 +22,10 @@ function formatScore(v) {
   return v.toFixed(2);
 }
 
+function truncLabel(s, max = 16) {
+  return s.length > max ? s.slice(0, max - 1) + '\u2026' : s;
+}
+
 function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, onClose }) {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('results');
@@ -78,6 +82,7 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
       );
     };
     const selectedIndices = selectedEntry.methodResult.selectedIndices;
+    const wvNames = selectedEntry.worldviewNames;
     for (const [key, value] of Object.entries(selectedEntry.methodResult)) {
       if (projectIds.includes(key)) continue;
       if (key === 'selectedIndices' || key === 'unbeaten') continue;
@@ -104,19 +109,21 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
         cols.push({ label: 'netMargin', values: netMargins });
         continue;
       }
-      // Array of project→number maps (MET worldviewScores)
+      // Array of project→number maps (worldviewScores)
       if (Array.isArray(value)) {
         for (let i = 0; i < value.length; i++) {
           if (typeof value[i] === 'object' && value[i] !== null && isProjectMap(value[i])) {
             const selected = selectedIndices?.includes(i);
-            cols.push({ label: `wv${i}${selected ? ' *' : ''}`, values: value[i] });
+            const name = wvNames?.[i] || `wv${i}`;
+            const full = `${name}${selected ? ' *' : ''}`;
+            cols.push({ label: truncLabel(full), title: full, values: value[i] });
           }
         }
         continue;
       }
       if (typeof value !== 'object' || value === null) continue;
       if (isProjectMap(value)) {
-        cols.push({ label: key, values: value });
+        cols.push({ label: truncLabel(key), title: key, values: value });
       }
     }
     return cols;
@@ -311,7 +318,9 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
                           <tr>
                             <th>Project</th>
                             {scoreColumns.map((col) => (
-                              <th key={col.label}>{col.label}</th>
+                              <th key={col.label} title={col.title}>
+                                {col.label}
+                              </th>
                             ))}
                           </tr>
                         </thead>
