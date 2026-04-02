@@ -85,16 +85,26 @@ export function adjustForExtinctionRisk(projectValues, data, pExtinction) {
 /**
  * Get diminishing returns factor for a project at a given funding level.
  *
+ * Uses linear interpolation between array entries so that DR kicks in
+ * from the first dollar rather than stepping at $10M boundaries.
+ *
  * @param {Object} data - Project definitions (need diminishing_returns arrays)
  * @param {string} projectId - Project ID
- * @param {number} currentFunding - Current funding level (in $M increments of 10)
+ * @param {number} currentFunding - Current funding level ($M)
  * @returns {number} Diminishing returns multiplier
  */
 export function getDiminishingReturnsFactor(data, projectId, currentFunding) {
-  const idx = Math.floor(currentFunding / 10);
   const drArray = data[projectId].diminishing_returns;
-  if (idx >= drArray.length) {
+  const i = currentFunding / 10;
+
+  if (i >= drArray.length - 1) {
     return drArray[drArray.length - 1];
   }
-  return drArray[idx];
+
+  const lower = Math.floor(i);
+  const t = i - lower;
+
+  if (t === 0) return drArray[lower];
+
+  return drArray[lower] * (1 - t) + drArray[lower + 1] * t;
 }

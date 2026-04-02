@@ -25,7 +25,8 @@ function SettingsModal({ onClose }) {
   const [localDr, setLocalDr] = useState(() => {
     const dr = {};
     for (const { id } of projectEntries) {
-      dr[id] = drOverrides[id] != null ? String(drOverrides[id]) : '';
+      // Convert stored power (0-1) to decay percent (0-100) for display
+      dr[id] = drOverrides[id] != null ? String(Math.round((1 - drOverrides[id]) * 100)) : '';
     }
     return dr;
   });
@@ -61,7 +62,9 @@ function SettingsModal({ onClose }) {
       if (value === '' || isNaN(num)) {
         delete newOverrides[projectId];
       } else {
-        newOverrides[projectId] = Math.max(0, Math.min(1, num));
+        // Convert decay percent (0-100) to power (0-1): power = 1 - percent/100
+        const clamped = Math.max(0, Math.min(100, num));
+        newOverrides[projectId] = 1 - clamped / 100;
       }
       setDrOverrides(newOverrides);
     },
@@ -99,7 +102,7 @@ function SettingsModal({ onClose }) {
             <div className={styles.overridesHeader}>
               <span className={styles.overridesHeaderLabel}>Project</span>
               <span className={styles.overridesHeaderCol}>Cap ($M)</span>
-              <span className={styles.overridesHeaderCol}>DR power</span>
+              <span className={styles.overridesHeaderCol}>DR decay (%)</span>
             </div>
             <div className={styles.capsList}>
               {projectEntries.map(({ id, name, color }) => (
@@ -128,13 +131,15 @@ function SettingsModal({ onClose }) {
                     onChange={(e) => handleDrChange(id, e.target.value)}
                     placeholder="Default"
                     min="0"
-                    max="1"
-                    step="0.01"
+                    max="100"
+                    step="1"
                   />
                 </div>
               ))}
             </div>
-            <p className={styles.sectionHint}>DR power: exponent 0–1. Empty = dataset default.</p>
+            <p className={styles.sectionHint}>
+              DR decay: % effectiveness lost per $10M increment. Empty = dataset default.
+            </p>
           </div>
         </div>
       </div>

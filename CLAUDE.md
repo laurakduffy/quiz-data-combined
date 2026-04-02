@@ -102,9 +102,15 @@ The vite server (`npm run dev`) is faster but can't reach the serverless functio
 
 ### Legacy Parity Tests
 
-The `tests/legacy-parity.test.js` suite verifies that all 9 JS voting methods
-(`marcusCalculation.js`) produce identical results to the original Python
-implementations. Tests consume JSON fixtures generated from the Python code.
+The `tests/legacy-parity.test.js` suite compares the 9 JS voting methods
+(`marcusCalculation.js`) against the original Python implementations. Tests
+consume JSON fixtures generated from the Python code.
+
+**These tests are excluded from the default test run** (`vitest.config.js`) and
+are expected to fail due to intentional divergences (e.g. continuous DR
+interpolation). They exist only as a reference to measure how far the JS
+implementation has drifted from the original Python. Do not use them to gate
+changes.
 
 **To regenerate fixtures** (only needed if Python reference code changes):
 
