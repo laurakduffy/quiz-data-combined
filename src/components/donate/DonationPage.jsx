@@ -25,7 +25,6 @@ export default function DonationPage() {
     splits: { ...DEFAULT_SPLIT },
     amount: '',
   });
-  const [copyConfirm, setCopyConfirm] = useState(false);
   const [submitState, setSubmitState] = useState(null); // null | 'submitting' | 'success' | 'error'
   const [warning, setWarning] = useState('');
   const refId = useRef(genRefId());
@@ -86,20 +85,6 @@ Split preference: ${splitText}`;
   }, [form]);
 
   // --- Actions ---
-  function handleCopy() {
-    const missing = getMissingFields();
-    if (missing.length) {
-      setWarning(config.validation.copyWarningPrefix + missing.join(', ') + '.');
-      setCopyConfirm(false);
-      return;
-    }
-    setWarning('');
-    navigator.clipboard.writeText(memo).then(() => {
-      setCopyConfirm(true);
-      setTimeout(() => setCopyConfirm(false), 2500);
-    });
-  }
-
   async function handleSubmit() {
     const missing = getMissingFields();
     if (missing.length) {
@@ -300,32 +285,24 @@ Split preference: ${splitText}`;
             <div className={styles.fieldHint}>{config.fields.amount.hint}</div>
           </div>
 
-          {/* Output — always shown */}
-          <div className={styles.outputSection}>
+          {/* Submit */}
+          <div className={styles.formSection}>
             <div className={styles.divider} />
-            <div className={styles.outputLabel}>{config.memo.label}</div>
-            <div className={styles.outputDesc}>{config.memo.description}</div>
-
-            <div className={`${styles.memoBox} ${!isComplete ? styles.memoBoxIncomplete : ''}`}>
-              {isComplete ? memo : config.memo.placeholder}
-            </div>
 
             {warning && <div className={styles.missingWarning}>{warning}</div>}
 
-            <div className={styles.actionRow}>
-              <button className="btn btn-primary btn-sm" onClick={handleCopy}>
-                {config.actions.copy}
-              </button>
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={handleSubmit}
-                disabled={submitState === 'submitting' || submitState === 'success'}
-              >
-                {submitState === 'success' ? config.actions.submitted : config.actions.submit}
-              </button>
-            </div>
-
-            {copyConfirm && <div className={styles.copyConfirm}>{config.actions.copyConfirm}</div>}
+            <button
+              className="btn btn-primary"
+              onClick={handleSubmit}
+              disabled={submitState === 'submitting' || submitState === 'success'}
+              style={{ marginTop: 8 }}
+            >
+              {submitState === 'submitting'
+                ? 'Submitting\u2026'
+                : submitState === 'success'
+                  ? config.actions.submitted
+                  : config.actions.submit}
+            </button>
 
             {submitState === 'success' && (
               <div className={styles.notifyConfirm}>
@@ -338,10 +315,6 @@ Split preference: ${splitText}`;
             {submitState === 'error' && (
               <div className={styles.missingWarning}>{config.actions.errorMessage}</div>
             )}
-
-            <div className={styles.refId}>
-              Reference ID: <strong>{refId.current}</strong>
-            </div>
           </div>
 
           <div className={styles.legalNote}>{config.legal}</div>
