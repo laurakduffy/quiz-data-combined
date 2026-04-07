@@ -142,9 +142,9 @@
         },
         {
           "id": "ai_only",
-          "label": "Only AI risk matters (100% discount)",
-          "description": "All interventions except those focused on reducing the risk from AI are scored at zero.",
-          "value": 1.0
+          "label": "Very large discount (80% discount)",
+          "description": "Non-AI interventions are scored at 20% of their otherwise calculated value.",
+          "value": 0.8
         }
       ],
       "moreOptions": [],
