@@ -176,6 +176,7 @@ netlify dev                       # Run frontend + functions at localhost:8888
 Two copies of each function (kept in sync):
 - `netlify/functions/share.js` / `lambda/share/index.mjs` — Share URL API
 - `netlify/functions/explain.js` / `lambda/explain/index.mjs` — AI Explanation API
+- `netlify/functions/donate.js` / `lambda/donate/index.mjs` — Donation Intent API
 
 ### Deploying the Lambdas
 
@@ -271,6 +272,7 @@ Summary of implemented features. See `docs/CLAUDE-ARCHIVE.md` for detailed imple
 | Feedback Card | `ui.feedbackCard` | Feedback request card on results screen. |
 | Simple Quiz | `ui.simpleQuiz` | Simplified 4-question quiz with direct worldview mapping and bar chart results. **Defaults to ON.** See below. |
 | Support RP Footer | `ui.supportFooter` | Fixed footer on all screens with RP donation link. |
+| Donation Page | N/A (hash route) | Donation intent form at `#donate`. Config-driven copy, Lambda backend. See below. |
 
 ### Simple Quiz
 
@@ -324,6 +326,43 @@ Each question has 4 main preset options (one marked `isDefault`) and a custom in
 | `src/components/simple/SimpleMoreOptions.jsx` | Expanded options + manual inputs |
 | `src/components/simple/SimpleResultsScreen.jsx` | Bar chart results |
 | `src/styles/components/SimpleQuiz.module.css` | All styling |
+
+### Donation Page
+
+**Route:** `#donate` (hash-based, like `#table`)
+
+A donation intent form where donors provide their details, choose a fund split preference, and generate a transfer memo to paste into their DAF or bank transfer. Ported from a standalone HTML file (`donation_intent_form.html`) and restyled to match the quiz's dark teal theme.
+
+**Flow:** Header → Intro → Form (name, email, visibility, split, amount) → Live memo → Copy / Submit
+
+**Config:** All copy is in `config/donationPage.json` — labels, placeholders, radio options, fund list, validation messages, legal text. Non-developers can edit any text without touching React code.
+
+**Funds:** Each fund entry has an `id` matching a project slug from the dataset (`givewell`, `leaf`, `ea_awf`, `longview_ai`, `longview_nuclear`, `sentinel_bio`), a display `name`, a `sub` label, and a `defaultPct` (currently all `null`/TBD).
+
+**Backend:** POST to `/api/donate` Lambda. Currently validates required fields and echoes success — no database writes or email side effects yet.
+
+**Support footer:** Hidden on `#donate` (checked in `App.jsx`).
+
+**Not yet implemented:**
+- Lambda side effects (email notification to RP, database persistence)
+- Lambda not deployed to production yet (SAM template is ready)
+- `VITE_DONATE_API_URL` not set in GitHub repo secrets
+- `defaultPct` values on funds are all `null` (awaiting RP's recommended split)
+- No link from quiz results screen to `#donate` yet
+- No session persistence (form resets on reload)
+
+**Files:**
+
+| File | Purpose |
+|------|---------|
+| `config/donationPage.json` | All copy, fund list with project slugs, validation messages |
+| `src/components/donate/DonationPage.jsx` | Main form component (controlled state, memo generation, submit) |
+| `src/components/donate/SplitEditor.jsx` | Fund split percentage editor with validation |
+| `src/styles/components/DonationPage.module.css` | Styling (dark teal theme, CSS variables) |
+| `lambda/donate/index.mjs` | AWS Lambda handler (validate + echo) |
+| `lambda/donate/package.json` | Lambda package manifest |
+| `netlify/functions/donate.js` | Local dev mirror (CommonJS) |
+| `donation_intent_form.html` | Original standalone HTML reference |
 
 ### Key Architecture Notes
 - **State management**: React Context in `src/context/QuizContext.jsx`
@@ -442,3 +481,5 @@ Computes recommended donation allocation by aggregating across multiple worldvie
 | `src/context/useSimpleQuiz.js` | Hook wrapper for simple quiz context |
 | `src/utils/simpleQuizScoring.js` | Scoring functions: assembleWorldview, computeSimpleScores, worldviewToTableHandoff |
 | `src/components/simple/` | Simple quiz UI components (welcome, questions, more options, results) |
+| `config/donationPage.json` | Donation page copy, fund list with project slugs, validation messages |
+| `src/components/donate/` | Donation page UI components (form, split editor) |
