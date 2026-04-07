@@ -8,6 +8,7 @@ import TableModeScreen from './table/TableModeScreen';
 import SimpleWelcomeScreen from './simple/SimpleWelcomeScreen';
 import SimpleQuizScreen from './simple/SimpleQuizScreen';
 import SimpleResultsScreen from './simple/SimpleResultsScreen';
+import DonationPage from './donate/DonationPage';
 import CalculationDebugger from './CalculationDebugger';
 import { useState, useEffect } from 'react';
 import { useQuiz } from '../context/useQuiz';
@@ -38,14 +39,25 @@ function MoralParliamentQuiz() {
   const { currentStep, currentQuestion, setDebugConfig, shareUrlError, isHydrating } = useQuiz();
   const simpleQuiz = useSimpleQuiz();
 
-  // Hash-based route: #table or #table&s=<id> renders Table Mode
+  // Hash-based routes: #table, #donate
   const [isTableRoute, setIsTableRoute] = useState(() => window.location.hash.startsWith('#table'));
+  const [isDonateRoute, setIsDonateRoute] = useState(() =>
+    window.location.hash.startsWith('#donate')
+  );
 
   useEffect(() => {
-    const onHashChange = () => setIsTableRoute(window.location.hash.startsWith('#table'));
+    const onHashChange = () => {
+      setIsTableRoute(window.location.hash.startsWith('#table'));
+      setIsDonateRoute(window.location.hash.startsWith('#donate'));
+    };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
+
+  // Hash route: #donate renders Donation Page directly
+  if (isDonateRoute) {
+    return <DonationPage />;
+  }
 
   // Hash route: #table renders Table Mode directly
   if (isTableRoute) {

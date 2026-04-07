@@ -1,0 +1,11 @@
+{
+  "name": "quiz-donate-lambda",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Donation intent API for Donor Compass",
+  "main": "index.mjs",
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "@aws-sdk/client-ses": "^3.0.0"
+  }
+}

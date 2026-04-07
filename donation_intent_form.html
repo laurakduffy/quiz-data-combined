@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donation Intent — Rethink Priorities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #1a6b6b;
+    --teal-light: #2a8a8a;
+    --teal-pale: #e8f4f4;
+    --cream: #faf8f4;
+    --coral: #d4614a;
+    --coral-pale: #fdf0ee;
+    --text: #1c1c1c;
+    --text-mid: #555;
+    --text-light: #888;
+    --border: #d8d4cc;
+    --border-focus: #1a6b6b;
+    --success-bg: #edf7f7;
+    --radius: 4px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  .site-header {
+    background: var(--teal);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    border: 2px solid rgba(255,255,255,0.7);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark span { color: white; font-size: 13px; font-weight: 500; letter-spacing: -0.5px; }
+  .org-name {
+    color: rgba(255,255,255,0.9);
+    font-size: 13px; font-weight: 400;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  .page-wrap { max-width: 680px; margin: 0 auto; padding: 56px 24px 80px; }
+
+  .intro { margin-bottom: 48px; animation: fadeUp 0.5s ease both; }
+  .eyebrow {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 14px;
+  }
+  .intro h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 5vw, 38px);
+    line-height: 1.15; color: var(--text); margin-bottom: 18px;
+  }
+  .intro p { font-size: 15px; line-height: 1.7; color: var(--text-mid); max-width: 560px; }
+
+  .divider { height: 1px; background: var(--border); margin: 36px 0; }
+
+  .form-section { margin-bottom: 36px; animation: fadeUp 0.5s ease both; }
+  .form-section:nth-child(2) { animation-delay: 0.05s; }
+  .form-section:nth-child(3) { animation-delay: 0.10s; }
+  .form-section:nth-child(4) { animation-delay: 0.15s; }
+  .form-section:nth-child(5) { animation-delay: 0.20s; }
+
+  .field-label {
+    display: block; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .field-hint { font-size: 13px; color: var(--text-light); margin-top: 6px; line-height: 1.5; }
+  .field-hint a { color: var(--teal); text-decoration: underline; }
+
+  input[type="text"], input[type="email"], input[type="number"] {
+    width: 100%; padding: 11px 14px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: white; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 300; color: var(--text);
+    transition: border-color 0.15s; outline: none; -webkit-appearance: none;
+  }
+  input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(26,107,107,0.08); }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 500px) { .field-row { grid-template-columns: 1fr; } }
+
+  .radio-group { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .radio-option {
+    display: flex; align-items: flex-start; gap: 11px; cursor: pointer;
+    padding: 12px 14px; border: 1px solid var(--border);
+    border-radius: var(--radius); background: white;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .radio-option:hover { border-color: var(--teal-light); }
+  .radio-option.selected { border-color: var(--teal); background: var(--teal-pale); }
+  .radio-option input[type="radio"] {
+    width: auto; margin-top: 2px; flex-shrink: 0;
+    accent-color: var(--teal); cursor: pointer;
+  }
+  .radio-label { font-size: 14px; line-height: 1.45; color: var(--text); }
+  .radio-sub { font-size: 12.5px; color: var(--text-light); margin-top: 3px; line-height: 1.4; }
+  .radio-sub a { color: var(--teal); text-decoration: underline; }
+
+  /* Split editor */
+  .split-editor {
+    margin-top: 14px; border: 1px solid var(--border);
+    border-radius: var(--radius); background: white; overflow: hidden; display: none;
+  }
+  .split-editor.visible { display: block; }
+
+  .split-row {
+    display: flex; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 16px;
+  }
+  .split-fund-name { flex: 1; font-size: 13.5px; color: var(--text); line-height: 1.35; }
+  .fund-sub { font-size: 11.5px; color: var(--text-light); margin-top: 2px; }
+  .split-percent-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .split-percent-wrap input { width: 62px; text-align: right; padding: 6px 8px; font-size: 14px; }
+  .split-percent-wrap span { font-size: 13px; color: var(--text-mid); }
+
+  .split-total-row {
+    padding: 10px 16px; display: flex; justify-content: flex-end;
+    align-items: center; gap: 8px; background: #f7f5f1;
+    border-top: 1px solid var(--border); font-size: 13px; color: var(--text-mid);
+  }
+  .total-val { font-weight: 500; font-size: 14px; color: var(--text); }
+  .split-total-row.error .total-val { color: var(--coral); }
+  .split-total-err { font-size: 12px; color: var(--coral); margin-left: 4px; display: none; }
+
+  .split-reset {
+    margin-top: 10px; font-size: 12.5px; color: var(--teal);
+    cursor: pointer; text-decoration: underline;
+    background: none; border: none; padding: 0; font-family: inherit; display: none;
+  }
+  .split-reset:hover { color: var(--teal-light); }
+
+  .amount-wrap { position: relative; }
+  .currency {
+    position: absolute; left: 13px; top: 50%;
+    transform: translateY(-50%); font-size: 15px;
+    color: var(--text-light); pointer-events: none;
+  }
+  .amount-wrap input { padding-left: 26px; }
+
+  /* Output — always visible */
+  .output-section { margin-top: 44px; animation: fadeUp 0.5s ease both; animation-delay: 0.25s; }
+
+  .output-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 10px;
+  }
+  .output-desc { font-size: 13.5px; color: var(--text-mid); line-height: 1.6; margin-bottom: 14px; }
+
+  .memo-box {
+    background: white; border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    font-size: 12.5px; line-height: 1.75; color: var(--text);
+    white-space: pre-wrap; word-break: break-word; min-height: 120px;
+  }
+  .memo-box.incomplete {
+    font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+    font-style: italic; color: var(--text-light);
+    display: flex; align-items: center;
+  }
+  .memo-box:not(.incomplete) { font-family: 'Courier New', monospace; }
+
+  .missing-warning {
+    display: none; margin-top: 10px; padding: 11px 14px;
+    background: var(--coral-pale); border: 1px solid #e8c0b8;
+    border-radius: var(--radius); font-size: 13px; color: var(--coral); line-height: 1.5;
+  }
+  .missing-warning.visible { display: block; }
+
+  .action-row { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 11px 20px; border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+    font-weight: 500; cursor: pointer; border: none;
+    transition: all 0.15s; letter-spacing: 0.01em;
+  }
+  .btn-primary { background: var(--teal); color: white; }
+  .btn-primary:hover { background: var(--teal-light); }
+  .btn-secondary { background: white; color: var(--teal); border: 1px solid var(--teal); }
+  .btn-secondary:hover { background: var(--teal-pale); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .copy-confirm { font-size: 12.5px; color: var(--teal); margin-top: 6px; display: none; }
+  .copy-confirm.visible { display: block; }
+
+  .notify-confirm {
+    margin-top: 16px; padding: 14px 16px;
+    background: var(--success-bg); border: 1px solid #b8dede;
+    border-radius: var(--radius); font-size: 13.5px;
+    color: var(--teal); line-height: 1.55; display: none;
+  }
+  .notify-confirm.visible { display: block; }
+
+  .ref-id { margin-top: 10px; font-size: 12px; color: var(--text-light); }
+  .ref-id strong { color: var(--text-mid); }
+
+  .legal-note {
+    margin-top: 48px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-light); line-height: 1.6;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-mark"><span>RP</span></div>
+  <div class="org-name">Rethink Priorities</div>
+</header>
+
+<div class="page-wrap">
+
+  <div class="intro">
+    <div class="eyebrow">Cross-Cause Fund</div>
+    <h1>Tell us you're planning to donate</h1>
+    <p>Fill in your details below to generate transfer instructions you can paste directly into your DAF or bank transfer, and to notify us of your intent. If we don't receive your donation within a week, we'll follow up.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Name + Email -->
+  <div class="form-section">
+    <div class="field-row">
+      <div>
+        <label class="field-label" for="donor-name">Your name</label>
+        <input type="text" id="donor-name" placeholder="Jane Smith" autocomplete="name">
+      </div>
+      <div>
+        <label class="field-label" for="donor-email">Email address</label>
+        <input type="email" id="donor-email" placeholder="jane@example.com" autocomplete="email">
+        <div class="field-hint">We'll use this to follow up if needed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anonymity -->
+  <div class="form-section">
+    <label class="field-label">Donor visibility</label>
+    <div class="radio-group" id="anon-group">
+      <label class="radio-option">
+        <input type="radio" name="anonymity" value="anonymous">
+        <div>
+          <div class="radio-label">Keep my name and donation anonymous to the public</div>
+        </div>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="anonymity" value="consent">
+        <div>
+          <div class="radio-label">I am happy for my name and donation amount to be published in future</div>
+        </div>
+      </label>
+    </div>
+    <div class="field-hint">We do not currently publish donor names publicly. If we do so in future, we will only include your name if you have consented here.</div>
+  </div>
+
+  <!-- Split preference -->
+  <div class="form-section">
+    <label class="field-label">How would you like to split your donation across funds?</label>
+    <div class="field-hint" style="margin-top:0; margin-bottom:10px;">
+      Not sure? <a href="#" onclick="return false;">Take our Donor Compass quiz</a> to get a personalised allocation based on your values and risk preferences.
+    </div>
+    <div class="radio-group" id="split-group">
+
+      <label class="radio-option selected">
+        <input type="radio" name="split" value="defer" checked>
+        <div>
+          <div class="radio-label">I defer to Rethink Priorities — allocate however you judge is best</div>
+          <div class="radio-sub">We will apply our best current judgment, which may differ from our publicly published split as our research develops.</div>
+        </div>
+      </label>
+
+      <label class="radio-option">
+        <input type="radio" name="split" value="recommended">
+        <div>
+          <div class="radio-label">Use the current recommended split</div>
+          <div class="radio-sub">Based on our <a href="#" onclick="return false;">All Things Considered allocation</a>. Selecting this will show you the exact percentages below.</div>
+        </div>
+      </label>
+
+      <label class="radio-option">
+        <input type="radio" name="split" value="custom">
+        <div>
+          <div class="radio-label">I want to adjust the split myself</div>
+          <div class="radio-sub">Start from the recommended percentages and edit as you like.</div>
+        </div>
+      </label>
+
+    </div>
+
+    <div class="split-editor" id="split-editor">
+      <div class="split-row">
+        <div class="split-fund-name">
+          GiveWell All Grants Fund
+          <div class="fund-sub">Global health &amp; development</div>
+        </div>
+        <div class="split-percent-wrap">
+          <input type="number" class="split-input" data-fund="GiveWell All Grants Fund" min="0" max="100" value="">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="split-row">
+        <div class="split-fund-name">
+          Lead Elimination Action Fund
+          <div class="fund-sub">Global health &amp; development</div>
+        </div>
+        <div class="split-percent-wrap">
+          <input type="number" class="split-input" data-fund="Lead Elimination Action Fund" min="0" max="100" value="">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="split-row">
+        <div class="split-fund-name">
+          Animal Welfare Fund
+          <div class="fund-sub">Animal welfare</div>
+        </div>
+        <div class="split-percent-wrap">
+          <input type="number" class="split-input" data-fund="Animal Welfare Fund" min="0" max="100" value="">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="split-row">
+        <div class="split-fund-name">
+          Longview Philanthropy's Frontier AI Fund
+          <div class="fund-sub">AI risk</div>
+        </div>
+        <div class="split-percent-wrap">
+          <input type="number" class="split-input" data-fund="Longview Philanthropy's Frontier AI Fund" min="0" max="100" value="">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="split-row">
+        <div class="split-fund-name">
+          Longview Philanthropy's Nuclear Weapons Policy Fund
+          <div class="fund-sub">Nuclear risk</div>
+        </div>
+        <div class="split-percent-wrap">
+          <input type="number" class="split-input" data-fund="Longview Philanthropy's Nuclear Weapons Policy Fund" min="0" max="100" value="">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="split-row">
+        <div class="split-fund-name">
+          Sentinel Bio
+          <div class="fund-sub">Biosecurity</div>
+        </div>
+        <div class="split-percent-wrap">
+          <input type="number" class="split-input" data-fund="Sentinel Bio" min="0" max="100" value="">
+          <span>%</span>
+        </div>
+      </div>
+      <div class="split-total-row" id="split-total-row">
+        <span>Total:</span>
+        <span class="total-val" id="split-total">100%</span>
+        <span class="split-total-err" id="split-total-err">— must equal 100%</span>
+      </div>
+    </div>
+    <button class="split-reset" id="split-reset" onclick="resetSplit()">Reset to recommended split</button>
+  </div>
+
+  <!-- Amount -->
+  <div class="form-section">
+    <label class="field-label" for="donor-amount">Approximate donation amount <span style="font-weight:300;text-transform:none;letter-spacing:0;color:var(--text-light)">(optional)</span></label>
+    <div class="amount-wrap">
+      <span class="currency">$</span>
+      <input type="number" id="donor-amount" placeholder="e.g. 10000" min="0" style="max-width:200px">
+    </div>
+    <div class="field-hint">This helps us follow up accurately. You are not committing to this amount.</div>
+  </div>
+
+  <!-- Output — always shown -->
+  <div class="output-section">
+    <div class="divider"></div>
+    <div class="output-label">Your transfer memo</div>
+    <div class="output-desc">Paste this into the memo or note field when making your transfer from Daffy or another DAF. This allows us to match your donation to your preferences.</div>
+    <div class="memo-box incomplete" id="memo-box">Your memo will appear here once you have filled in your name, email, and visibility preference above.</div>
+    <div class="missing-warning" id="missing-warning"></div>
+    <div class="action-row">
+      <button class="btn btn-primary" onclick="copyMemo()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.5"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5" stroke="white" stroke-width="1.5"/></svg>
+        Copy to clipboard
+      </button>
+      <button class="btn btn-secondary" id="notify-btn" onclick="notifyRP()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4l6 5 6-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+        Notify Rethink Priorities
+      </button>
+    </div>
+    <div class="copy-confirm" id="copy-confirm">✓ Copied to clipboard</div>
+    <div class="notify-confirm" id="notify-confirm">
+      We've been notified. If we don't receive your donation within a week, someone from the Rethink Priorities team will be in touch at <strong id="confirm-email"></strong>.
+    </div>
+    <div class="ref-id">Reference ID: <strong id="ref-id-val"></strong></div>
+  </div>
+
+  <div class="legal-note">
+    Contributions to the Rethink Priorities Cross-Cause Fund are irrevocable charitable donations administered by CharityVest, a 501(c)(3) public charity. CharityVest retains ultimate discretion over all disbursements. Contributions are tax-deductible to the extent permitted by law. Rethink Priorities does not provide legal or tax advice.
+  </div>
+
+</div>
+
+<script>
+  // Update these values to change the recommended split without touching anything else
+  const DEFAULT_SPLIT = {
+    "GiveWell All Grants Fund": null,
+    "Lead Elimination Action Fund": null,
+    "Animal Welfare Fund": null,
+    "Longview Philanthropy's Frontier AI Fund": null,
+    "Longview Philanthropy's Nuclear Weapons Policy Fund": null,
+    "Sentinel Bio": null
+  };
+
+  // Generate reference ID once on load
+  function genRefId() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let id = '';
+    for (let i = 0; i < 4; i++) id += chars[Math.floor(Math.random() * chars.length)];
+    return 'ATC-' + new Date().getFullYear() + '-' + id;
+  }
+  const REF_ID = genRefId();
+  document.getElementById('ref-id-val').textContent = REF_ID;
+
+  // Radio highlighting
+  function setupRadioHighlight(groupId) {
+    document.getElementById(groupId).querySelectorAll('.radio-option').forEach(opt => {
+      opt.querySelector('input[type="radio"]').addEventListener('change', function() {
+        document.getElementById(groupId).querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+        if (this.checked) opt.classList.add('selected');
+      });
+    });
+  }
+  setupRadioHighlight('anon-group');
+  setupRadioHighlight('split-group');
+
+  // Split editor visibility and readonly state
+  function updateSplitEditor() {
+    const splitVal = document.querySelector('input[name="split"]:checked');
+    const editor = document.getElementById('split-editor');
+    const resetBtn = document.getElementById('split-reset');
+    const inputs = editor.querySelectorAll('.split-input');
+
+    if (!splitVal || splitVal.value === 'defer') {
+      editor.classList.remove('visible');
+      resetBtn.style.display = 'none';
+    } else if (splitVal.value === 'recommended') {
+      editor.classList.add('visible');
+      resetBtn.style.display = 'none';
+      inputs.forEach(i => {
+        i.value = DEFAULT_SPLIT[i.dataset.fund] || 0;
+        i.readOnly = true;
+        i.style.background = '#f7f5f1';
+        i.style.color = 'var(--text-mid)';
+      });
+      updateSplitTotal();
+    } else {
+      editor.classList.add('visible');
+      resetBtn.style.display = 'inline';
+      inputs.forEach(i => {
+        i.readOnly = false;
+        i.style.background = '';
+        i.style.color = '';
+      });
+      updateSplitTotal();
+    }
+  }
+
+  document.querySelectorAll('input[name="split"]').forEach(r => {
+    r.addEventListener('change', () => { updateSplitEditor(); updateOutput(); });
+  });
+
+  function getSplitTotal() {
+    let t = 0;
+    document.querySelectorAll('.split-input').forEach(i => { t += parseFloat(i.value) || 0; });
+    return Math.round(t * 10) / 10;
+  }
+
+  function updateSplitTotal() {
+    const total = getSplitTotal();
+    const row = document.getElementById('split-total-row');
+    const val = document.getElementById('split-total');
+    const err = document.getElementById('split-total-err');
+    val.textContent = total + '%';
+    if (total !== 100) { row.classList.add('error'); err.style.display = 'inline'; }
+    else { row.classList.remove('error'); err.style.display = 'none'; }
+  }
+
+  document.querySelectorAll('.split-input').forEach(i => {
+    i.addEventListener('input', () => { updateSplitTotal(); updateOutput(); });
+  });
+
+  function resetSplit() {
+    document.querySelectorAll('.split-input').forEach(i => { i.value = DEFAULT_SPLIT[i.dataset.fund] || 0; });
+    updateSplitTotal(); updateOutput();
+  }
+
+  // Validation
+  function getMissingFields() {
+    const missing = [];
+    if (!document.getElementById('donor-name').value.trim()) missing.push('your name');
+    const email = document.getElementById('donor-email').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) missing.push('a valid email address');
+    if (!document.querySelector('input[name="anonymity"]:checked')) missing.push('a donor visibility preference');
+    const sv = document.querySelector('input[name="split"]:checked');
+    if (sv && sv.value === 'custom' && getSplitTotal() !== 100) missing.push('a fund split that adds up to 100%');
+    return missing;
+  }
+  function isComplete() { return getMissingFields().length === 0; }
+
+  // Build memo
+  function buildMemo() {
+    const name = document.getElementById('donor-name').value.trim();
+    const email = document.getElementById('donor-email').value.trim();
+    const anonVal = document.querySelector('input[name="anonymity"]:checked');
+    const splitVal = document.querySelector('input[name="split"]:checked');
+    const amount = document.getElementById('donor-amount').value.trim();
+
+    const anonText = anonVal ? (anonVal.value === 'anonymous' ? 'Anonymous' : 'Consent to publish') : '—';
+
+    let splitText = 'Defer to Rethink Priorities';
+    if (splitVal && splitVal.value === 'recommended') {
+      splitText = 'RP recommended split:';
+      Object.entries(DEFAULT_SPLIT).forEach(([f, p]) => { splitText += `\n  ${f}: ${p}%`; });
+    } else if (splitVal && splitVal.value === 'custom') {
+      splitText = 'Custom split:';
+      document.querySelectorAll('.split-input').forEach(i => { splitText += `\n  ${i.dataset.fund}: ${i.value}%`; });
+    }
+
+    let memo = `Fund: Rethink Priorities Cross-Cause Fund
+Donor name: ${name}
+Donor email: ${email}
+Anonymity: ${anonText}
+Split preference: ${splitText}`;
+    if (amount) memo += `\nApproximate amount: $${parseFloat(amount).toLocaleString()}`;
+    memo += `\nReference: ${REF_ID}`;
+    return memo;
+  }
+
+  function updateOutput() {
+    const box = document.getElementById('memo-box');
+    if (isComplete()) {
+      box.classList.remove('incomplete');
+      box.textContent = buildMemo();
+    } else {
+      box.classList.add('incomplete');
+      box.textContent = 'Your memo will appear here once you have filled in your name, email, and visibility preference above.';
+    }
+  }
+
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('input', updateOutput);
+    el.addEventListener('change', updateOutput);
+  });
+
+  function showWarning(msg) {
+    const w = document.getElementById('missing-warning');
+    w.textContent = msg;
+    w.classList.add('visible');
+  }
+
+  function copyMemo() {
+    if (!isComplete()) {
+      showWarning('Please complete the following before copying: ' + getMissingFields().join(', ') + '.');
+      document.getElementById('copy-confirm').classList.remove('visible');
+      return;
+    }
+    document.getElementById('missing-warning').classList.remove('visible');
+    navigator.clipboard.writeText(buildMemo()).then(() => {
+      const c = document.getElementById('copy-confirm');
+      c.classList.add('visible');
+      setTimeout(() => c.classList.remove('visible'), 2500);
+    });
+  }
+
+  function notifyRP() {
+    if (!isComplete()) {
+      showWarning('Please complete the following before notifying us: ' + getMissingFields().join(', ') + '.');
+      return;
+    }
+    document.getElementById('missing-warning').classList.remove('visible');
+    const name = document.getElementById('donor-name').value.trim();
+    const email = document.getElementById('donor-email').value.trim();
+    const subject = encodeURIComponent(`Donation intent: ${name} — ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})}`);
+    const body = encodeURIComponent(buildMemo() + '\n\nPlease follow up if the donation has not been received within one week.');
+    window.location.href = `mailto:giving@rethinkpriorities.org?subject=${subject}&body=${body}`;
+    document.getElementById('confirm-email').textContent = email;
+    document.getElementById('notify-confirm').classList.add('visible');
+    const btn = document.getElementById('notify-btn');
+    btn.disabled = true;
+    btn.innerHTML = '✓ Notified';
+  }
+
+  // Initialise
+  updateSplitEditor();
+  updateOutput();
+</script>
+</body>
+</html>

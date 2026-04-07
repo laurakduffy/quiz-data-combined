@@ -176,6 +176,7 @@ netlify dev                       # Run frontend + functions at localhost:8888
 Two copies of each function (kept in sync):
 - `netlify/functions/share.js` / `lambda/share/index.mjs` — Share URL API
 - `netlify/functions/explain.js` / `lambda/explain/index.mjs` — AI Explanation API
+- `netlify/functions/donate.js` / `lambda/donate/index.mjs` — Donation Intent API
 
 ### Deploying the Lambdas
 
@@ -271,6 +272,7 @@ Summary of implemented features. See `docs/CLAUDE-ARCHIVE.md` for detailed imple
 | Feedback Card | `ui.feedbackCard` | Feedback request card on results screen. |
 | Simple Quiz | `ui.simpleQuiz` | Simplified 4-question quiz with direct worldview mapping and bar chart results. **Defaults to ON.** See below. |
 | Support RP Footer | `ui.supportFooter` | Fixed footer on all screens with RP donation link. |
+| Donation Page | N/A (hash route) | Donation intent form at `#donate`. Config-driven copy, Lambda backend. See below. |
 
 ### Simple Quiz
 
@@ -324,6 +326,75 @@ Each question has 4 main preset options (one marked `isDefault`) and a custom in
 | `src/components/simple/SimpleMoreOptions.jsx` | Expanded options + manual inputs |
 | `src/components/simple/SimpleResultsScreen.jsx` | Bar chart results |
 | `src/styles/components/SimpleQuiz.module.css` | All styling |
+
+### Donation Page
+
+**Route:** `#donate` (hash-based, like `#table`)
+
+A donation intent form where donors provide their details, choose a fund split preference, and generate a transfer memo to paste into their DAF or bank transfer. Ported from a standalone HTML file (`donation_intent_form.html`) and restyled to match the quiz's dark teal theme.
+
+**Flow:** Header → Intro → Form (name, email, visibility, split, amount) → Live memo → Copy / Submit
+
+**Config:** All copy is in `config/donationPage.json` — labels, placeholders, radio options, fund list, validation messages, legal text. Non-developers can edit any text without touching React code.
+
+**Funds:** Each fund entry has an `id` matching a project slug from the dataset (`givewell`, `leaf`, `ea_awf`, `longview_ai`, `longview_nuclear`, `sentinel_bio`), a display `name`, a `sub` label, and a `defaultPct` (currently all `null`/TBD).
+
+**Backend:** POST to `/api/donate` Lambda. Validates required fields, saves to Turso DB (`donations` table), and sends email notification via AWS SES to a configurable recipient. The full POST body is stored as a JSON blob in `form_data` for flexibility.
+
+**Support footer:** Hidden on `#donate` (checked in `App.jsx`).
+
+**Deploying to production (steps in order):**
+
+1. **Fix frontend URL routing** — `api.js` currently sends donate requests to `${VITE_API_URL}/donate`, which hits the share Lambda. Add a separate `VITE_DONATE_API_URL` env var since each Lambda gets its own Function URL.
+
+2. **Run migration on prod Turso:**
+   ```bash
+   turso db shell donor-compass < migrations/002_donations.sql
+   ```
+
+3. **Deploy the donate Lambda** (direct deploy — SAM deploy fails, see Lambda Deployment notes above):
+   ```bash
+   cd lambda/donate && npm ci && cd ..
+   sam build
+   cd .aws-sam/build/DonateFunction
+   zip -r /tmp/lambda-donate.zip .
+   aws lambda update-function-code \
+     --function-name quiz-demo-donate \
+     --zip-file fileb:///tmp/lambda-donate.zip
+   ```
+
+4. **Set Lambda env vars** — The direct deploy skips CloudFormation parameter overrides, so set these manually in the Lambda console (or via `aws lambda update-function-configuration`):
+   - `TURSO_DATABASE_URL` — same Turso URL as the share Lambda
+   - `TURSO_AUTH_TOKEN` — same Turso token as the share Lambda
+   - `NOTIFY_EMAIL` — recipient for donation notifications (e.g. `giving@rethinkpriorities.org`)
+   - `SENDER_EMAIL` — verified SES sender (e.g. `noreply@rethinkpriorities.org`)
+
+5. **Verify SES email addresses** — If the AWS account is in the SES sandbox (likely), both sender and recipient addresses must be verified (each gets a confirmation email to click). For production volume, request SES production access via the AWS console.
+
+6. **Set `VITE_DONATE_API_URL` in GitHub repo secrets** — Get the Function URL:
+   ```bash
+   aws lambda get-function-url-config --function-name quiz-demo-donate
+   ```
+   Add it to the repo secrets and redeploy the frontend to GitHub Pages.
+
+**Not yet implemented:**
+- `defaultPct` values on funds are all `null` (awaiting RP's recommended split)
+- No link from quiz results screen to `#donate` yet
+- No session persistence (form resets on reload)
+
+**Files:**
+
+| File | Purpose |
+|------|---------|
+| `config/donationPage.json` | All copy, fund list with project slugs, validation messages |
+| `src/components/donate/DonationPage.jsx` | Main form component (controlled state, memo generation, submit) |
+| `src/components/donate/SplitEditor.jsx` | Fund split percentage editor with validation |
+| `src/styles/components/DonationPage.module.css` | Styling (dark teal theme, CSS variables) |
+| `lambda/donate/index.mjs` | AWS Lambda handler (validate, DB write, SES email) |
+| `lambda/donate/package.json` | Lambda package manifest (`@libsql/client`, `@aws-sdk/client-ses`) |
+| `netlify/functions/donate.js` | Local dev mirror (DB write, email logged to console) |
+| `migrations/002_donations.sql` | Creates `donations` table + indexes |
+| `donation_intent_form.html` | Original standalone HTML reference |
 
 ### Key Architecture Notes
 - **State management**: React Context in `src/context/QuizContext.jsx`
@@ -382,20 +453,17 @@ Entry point: "Get advice on how to split donations" from post-results actions. D
 - **C. Combine your views with RP's advice** — Opens multi-worldview allocation screen (see #7).
 - **D. Make a donation through the RP DAF** — Generates pre-filled PDF or email specifying the requested split.
 
-### 4. Diminishing Returns Line Chart
-"See how scores change as I donate more money" — opens a line chart. X-axis: total donation amount. Y-axis: fund score. One line per fund, adjusted using existing diminishing returns factors per fund.
-
-### 5. Sensitivity Analysis (Change One Input)
+### 4. Sensitivity Analysis (Change One Input)
 User picks one of the four questions and selects a different option. Displays a grouped bar chart: for each fund, one bar for original inputs and one bar for new inputs, in fixed fund order.
 
 **Two actions:**
 - "Update to new inputs" — replaces original inputs, removes before bars
 - "Save as separate comparison" — keeps both sets for later reference
 
-### 6. Compare Quiz Runs
+### 5. Compare Quiz Runs
 If the user has saved prior runs, they can select up to 3 and view them as a grouped bar chart (one bar per run per fund, fixed fund order). If no second run exists, user is prompted to retake the quiz first. Runs identified by label (auto-generated timestamp or user-defined name).
 
-### 7. Multi-Worldview Allocation Screen
+### 6. Multi-Worldview Allocation Screen
 Computes recommended donation allocation by aggregating across multiple worldviews using budget-by-credence as the sole aggregation method.
 
 **Worldviews included:**
@@ -413,7 +481,7 @@ Computes recommended donation allocation by aggregating across multiple worldvie
 
 **Post-allocation actions:** Save results, add a new worldview (retake quiz), compare to a single worldview (grouped bar chart), reset all inputs, go to advanced mode.
 
-### 8. AI Results Explanation (Future)
+### 7. AI Results Explanation (Future)
 "Explain these results" button below charts opens LLM interface. Marked as "Future version" in spec. Backend Lambda exists (`lambda/explain/`) but is not deployed or connected to the simple quiz frontend.
 
 ---
@@ -445,3 +513,5 @@ Computes recommended donation allocation by aggregating across multiple worldvie
 | `src/context/useSimpleQuiz.js` | Hook wrapper for simple quiz context |
 | `src/utils/simpleQuizScoring.js` | Scoring functions: assembleWorldview, computeSimpleScores, worldviewToTableHandoff |
 | `src/components/simple/` | Simple quiz UI components (welcome, questions, more options, results) |
+| `config/donationPage.json` | Donation page copy, fund list with project slugs, validation messages |
+| `src/components/donate/` | Donation page UI components (form, split editor) |

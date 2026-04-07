@@ -15,6 +15,14 @@ Parameters:
     Type: String
     Description: Anthropic API key for AI explanation
     NoEcho: true
+  NotifyEmail:
+    Type: String
+    Description: Email address to receive donation notifications
+    Default: giving@rethinkpriorities.org
+  SenderEmail:
+    Type: String
+    Description: Verified SES sender email address
+    Default: noreply@rethinkpriorities.org
 
 Resources:
   ShareFunction:
@@ -105,6 +113,57 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: '*'
 
+  DonateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: quiz-demo-donate
+      CodeUri: donate/
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          TURSO_DATABASE_URL: !Ref TursoDatabaseUrl
+          TURSO_AUTH_TOKEN: !Ref TursoAuthToken
+          NOTIFY_EMAIL: !Ref NotifyEmail
+          SENDER_EMAIL: !Ref SenderEmail
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+              Resource: '*'
+
+  DonateFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      TargetFunctionArn: !GetAtt DonateFunction.Arn
+      Cors:
+        AllowOrigins:
+          - 'https://rethinkpriorities.github.io'
+        AllowMethods:
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+
+  DonateFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DonateFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+
+  DonateFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DonateFunction
+      Action: lambda:InvokeFunction
+      Principal: '*'
+
 Outputs:
   ShareFunctionUrl:
     Description: Function URL for the Share API
@@ -118,3 +177,9 @@ Outputs:
   ExplainFunctionArn:
     Description: ARN of the Explain function
     Value: !GetAtt ExplainFunction.Arn
+  DonateFunctionUrl:
+    Description: Function URL for the Donate API
+    Value: !GetAtt DonateFunctionUrl.FunctionUrl
+  DonateFunctionArn:
+    Description: ARN of the Donate function
+    Value: !GetAtt DonateFunction.Arn

@@ -10,6 +10,8 @@ import './styles/global.css';
  * Provides dataset + quiz + simple quiz context and renders the Moral Parliament Quiz
  */
 function App() {
+  const isDonate = window.location.hash.startsWith('#donate');
+
   return (
     <>
       <DatasetProvider>
@@ -19,7 +21,7 @@ function App() {
           </SimpleQuizProvider>
         </QuizProvider>
       </DatasetProvider>
-      {features.ui?.supportFooter && <SupportFooter />}
+      {features.ui?.supportFooter && !isDonate && <SupportFooter />}
     </>
   );
 }

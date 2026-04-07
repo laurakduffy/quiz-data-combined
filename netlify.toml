@@ -20,6 +20,12 @@
   to = "/.netlify/functions/explain"
   status = 200
 
+# API route for donate function
+[[redirects]]
+  from = "/api/donate"
+  to = "/.netlify/functions/donate"
+  status = 200
+
 [[redirects]]
   from = "/api/share/:id"
   to = "/.netlify/functions/share?id=:id"
