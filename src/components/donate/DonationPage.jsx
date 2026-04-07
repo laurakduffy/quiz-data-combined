@@ -1,12 +1,16 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import Header from '../layout/Header';
 import styles from '../../styles/components/DonationPage.module.css';
 import SplitEditor from './SplitEditor';
 import { endpoints } from '../../config/api';
 import config from '../../../config/donationPage.json';
 
+const HANDOFF_KEY = 'donate_handoff';
+
+const fundNameById = Object.fromEntries(config.funds.map(({ id, name }) => [id, name]));
+
 const DEFAULT_SPLIT = Object.fromEntries(
-  config.funds.map(({ name, defaultPct }) => [name, defaultPct])
+  config.funds.map(({ id, defaultPct }) => [id, defaultPct])
 );
 
 function genRefId() {
@@ -27,7 +31,47 @@ export default function DonationPage() {
   });
   const [submitState, setSubmitState] = useState(null); // null | 'submitting' | 'success' | 'error'
   const [warning, setWarning] = useState('');
+  const [handoffBanner, setHandoffBanner] = useState(false);
   const refId = useRef(genRefId());
+
+  // Read donate handoff from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(HANDOFF_KEY);
+      if (!raw) return;
+      sessionStorage.removeItem(HANDOFF_KEY);
+      const { allocations } = JSON.parse(raw);
+      if (!allocations || typeof allocations !== 'object') return;
+
+      // Build splits keyed by fund id, rounding to 1 decimal
+      const splits = {};
+      let total = 0;
+      const ids = config.funds.map((f) => f.id);
+      for (const id of ids) {
+        const raw = allocations[id];
+        const val = Math.round((raw != null ? Number(raw) : 0) * 10) / 10;
+        splits[id] = val;
+        total += val;
+      }
+      // Adjust rounding error on the largest entry
+      const diff = Math.round((100 - total) * 10) / 10;
+      if (diff !== 0) {
+        const largestId = ids.reduce((best, id) =>
+          (splits[id] || 0) > (splits[best] || 0) ? id : best
+        );
+        splits[largestId] = Math.round((splits[largestId] + diff) * 10) / 10;
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        splitPreference: 'custom',
+        splits,
+      }));
+      setHandoffBanner(true);
+    } catch {
+      // ignore corrupt handoff
+    }
+  }, []);
 
   const set = useCallback((field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -54,8 +98,6 @@ export default function DonationPage() {
     return missing;
   }, [form]);
 
-  const isComplete = getMissingFields().length === 0;
-
   // --- Memo ---
   const memo = useMemo(() => {
     const anonOpt = config.fields.anonymity.options.find((o) => o.value === form.anonymity);
@@ -64,13 +106,13 @@ export default function DonationPage() {
     let splitText = config.fields.split.options[0].label; // "defer" label
     if (form.splitPreference === 'recommended') {
       splitText = 'RP recommended split:';
-      for (const [fund, pct] of Object.entries(DEFAULT_SPLIT)) {
-        splitText += `\n  ${fund}: ${pct ?? 0}%`;
+      for (const [id, pct] of Object.entries(DEFAULT_SPLIT)) {
+        splitText += `\n  ${fundNameById[id] || id}: ${pct ?? 0}%`;
       }
     } else if (form.splitPreference === 'custom') {
       splitText = 'Custom split:';
-      for (const [fund, pct] of Object.entries(form.splits)) {
-        splitText += `\n  ${fund}: ${pct}%`;
+      for (const [id, pct] of Object.entries(form.splits)) {
+        splitText += `\n  ${fundNameById[id] || id}: ${pct}%`;
       }
     }
 
@@ -148,6 +190,12 @@ Split preference: ${splitText}`;
           </div>
 
           <div className={styles.divider} />
+
+          {handoffBanner && (
+            <div className={styles.handoffBanner}>
+              Your quiz allocations have been pre-filled below. Adjust as needed.
+            </div>
+          )}
 
           {/* Name + Email */}
           <div className={styles.formSection}>

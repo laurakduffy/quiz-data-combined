@@ -65,7 +65,9 @@
     { "id": "ea_awf", "name": "Animal Welfare Fund", "sub": "Animal welfare", "defaultPct": null },
     { "id": "longview_ai", "name": "Longview Philanthropy's Frontier AI Fund", "sub": "AI risk", "defaultPct": null },
     { "id": "longview_nuclear", "name": "Longview Philanthropy's Nuclear Weapons Policy Fund", "sub": "Nuclear risk", "defaultPct": null },
-    { "id": "sentinel_bio", "name": "Sentinel Bio", "sub": "Biosecurity", "defaultPct": null }
+    { "id": "sentinel_bio", "name": "Sentinel Bio", "sub": "Biosecurity", "defaultPct": null },
+    { "id": "navigation_fund_general", "name": "Navigation Fund — General", "sub": "Cross-cause", "defaultPct": null },
+    { "id": "navigation_fund_cagefree", "name": "Navigation Fund — Cage-Free", "sub": "Animal welfare", "defaultPct": null }
   ],
 
   "memo": {

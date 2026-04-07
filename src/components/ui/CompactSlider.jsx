@@ -17,6 +17,7 @@ function CompactSlider({
   sliderKey,
   lockedKeys = [],
   setLockedKeys,
+  hideLock = false,
 }) {
   const { isLocked, hasLockedSibling, thumbOffset, canLockMore, featureEnabled } = useLockedSlider({
     sliderKey,
@@ -50,9 +51,7 @@ function CompactSlider({
     <div className={styles.compactSlider}>
       <div className={styles.header}>
         <span className={styles.label}>{label}</span>
-        <span className={styles.value} style={{ color }}>
-          {Math.round(value)}%
-        </span>
+        <span className={styles.value}>{Math.round(value)}%</span>
       </div>
       <div className={styles.sliderRow}>
         <div className={styles.sliderContainer}>
@@ -72,7 +71,7 @@ function CompactSlider({
           />
           {hasLockedSibling && <div className={styles.lockLimit} style={{ left: thumbOffset }} />}
         </div>
-        {featureEnabled && (
+        {featureEnabled && !hideLock && (
           <button
             className={`${styles.lockButton} ${isLocked ? styles.locked : ''} ${!isLocked && !canLockMore ? styles.lockDisabled : ''}`}
             onClick={handleLockClick}

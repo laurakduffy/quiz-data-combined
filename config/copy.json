@@ -88,6 +88,13 @@
         "subtitle": "Ranked-choice voting",
         "footerLabel": null,
         "footerText": "Worldviews rank projects, scores aggregated"
+      },
+      "nashBargaining": {
+        "icon": "handshake",
+        "title": "Nash Bargaining",
+        "subtitle": "Fair compromise allocation",
+        "footerLabel": null,
+        "footerText": "Finds the fairest compromise across all worldviews"
       }
     }
   },

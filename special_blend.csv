@@ -1,0 +1,30 @@
+,,Rethink Priorities Cross-Cause Model Inputs,,,,,,,,,,,,,
+Worldview Types,Total,Total Utilitarianism,Total Utilitarianism,Total Utilitarianism,Total Utilitarianism,Total Utilitarianism,Non-Utilitarian Consequentialism,Non-Utilitarian Consequentialism,Non-Utilitarian Consequentialism,Non-Utilitarian Consequentialism,Contractualism,Contractualism,Contractualism,Kantianism,Kantianism
+Description,,Default,"Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",Weighted Linear Utility,"High life value, risk averse, and skeptical of upside cases","Suffering forward, clueless, and only sentience discount",Default,High Life Value / Cluelessness / Low animals,Person-Affecting/Cluelessness,Weighted Linear Utility,Person-Affecting/Cluelessness and Animals Baseline,Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,Default + cluelessness,Low animals,Low animals / downside critical
+,,,,,,,,,,,,,,,
+Worldview Credences,,,,,,,,,,,,,,,
+Credence Weight,100.00%,10.00%,10.00%,10.00%,5.00%,5.00%,5.00%,5.00%,5.00%,5.00%,10.00%,10.00%,5.00%,5.00%,10.00%
+Share of Worldview Types,,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!,#DIV/0!
+,,,,,,,,,,,,,,,
+Moral Weights,,,,,,,,,,,,,,,
+Human Life-Years,,1,1,1,1,0.1,1,1,1,1,1,1,1,1,1
+Human YLDs,,1,1,1,0.1,1,1,0.1,1,1,0.01,0.01,0.01,0.5,0.5
+Human Income Doublings,,0.3,0.3,0.3,0.1,0.3,1,0.1,1,1,0.001,0.001,0.001,0.5,0.5
+Chickens/Birds,,0.4,0.75,0.4,0.4,0.75,0.1,0.01,0.1,0.1,0.4,0.4,0.004,0.01,0.01
+Fish,,0.24,0.6,0.24,0.24,0.6,0.06,0.01,0.06,0.06,0.24,0.24,0.002,0.01,0.01
+Shrimp,,0.08,0.25,0.08,0.08,0.25,0.02,0.001,0.02,0.02,0.08,0.08,0.0016,0.001,0.001
+Non-Shrimp Invertebrates,,0.07,0.2,0.07,0.07,0.2,0.02,0.001,0.02,0.02,0.07,0.07,0.0014,0.001,0.001
+Mammals,,0.44,0.9,0.44,0.44,0.9,0.11,0.05,0.11,0.11,0.44,0.44,0.0044,0.05,0.05
+,,,,,,,,,,,,,,,
+Discount Factors,,,,,,,,,,,,,,,
+0-5 years,,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+5-10 years,,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,0.9,1,1,1,1,1
+10-20 years,,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.5,0.5,0.5,0.5,0.5
+20-100 years,,0.6,0.1,0.6,0.1,0.6,0.6,0.6,0.6,0.6,0.1,0.1,0.1,0.1,0.1
+100-500 years,,0.4,0,0.4,0.001,0,0.4,0,0,0.4,0,0,0,0.001,0.001
+500+ years,,0.01,0,0.01,0.00001,0,0.01,0,0,0.01,0,0,0,0.00001,0.00001
+,,,,,,,,,,,,,,,
+Risk,,,,,,,,,,,,,,,
+Risk Profile,,Neutral,Continuous Upside Skeptical,WLU (c=0.05),Combined,Neutral,Neutral,Neutral,Neutral,WLU (c=0.05),Downside Critical,Neutral,WLU (c=0.05),WLU (c=0.10),Combined
+,,,,,,,,,,,,,,,
+Non-xrisk discount,,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%,40.00%

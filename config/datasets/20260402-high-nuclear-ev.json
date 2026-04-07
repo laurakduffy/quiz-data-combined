@@ -2378,7 +2378,7 @@
     },
     "longview_ai": {
       "name": "AI fund (Longview)",
-      "color": "#e74c3c",
+      "color": "#85E4FF",
       "tags": {
         "near_term_xrisk": true
       },

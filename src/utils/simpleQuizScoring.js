@@ -61,6 +61,70 @@ export function computeSimpleAllocations(worldviews, projectData, budget = 100, 
 }
 
 /**
+ * Blend RP special-blend worldviews with user worldviews.
+ *
+ * @param {Array<Object>} blendWvs - Worldviews from specialBlend.json (each has .credence summing to 1.0)
+ * @param {Array<Object>} userWvs - User worldview(s), each gets equal share of user credence
+ * @param {number} blendCredence - 0–100, how much credence goes to the blend worldviews
+ * @param {Array<number>} [userCredences] - Per-worldview credences (0–100, summing to 100). Falls back to equal split.
+ * @returns {Array<Object>} Combined worldviews with .credence fields summing to 1.0
+ */
+export function blendWorldviews(blendWvs, userWvs, blendCredence, userCredences) {
+  const blendShare = blendCredence / 100;
+  const userShare = 1 - blendShare;
+
+  const combined = [];
+
+  // Blend worldviews: distribute blendShare proportionally by their internal credences
+  for (const wv of blendWvs) {
+    combined.push({
+      ...wv,
+      credence: wv.credence * blendShare,
+    });
+  }
+
+  // User worldviews: distribute userShare by userCredences (or equally if not provided)
+  for (let i = 0; i < userWvs.length; i++) {
+    const share = userCredences
+      ? userShare * (userCredences[i] / 100)
+      : userWvs.length > 0
+        ? userShare / userWvs.length
+        : 0;
+    combined.push({
+      ...userWvs[i],
+      credence: share,
+    });
+  }
+
+  return combined;
+}
+
+/**
+ * Compute allocation percentages using credenceWeighted for blended worldviews.
+ *
+ * @param {Array<Object>} worldviews - Combined worldviews with .credence fields
+ * @param {Object} projectData - Dataset projects object (keyed by project ID)
+ * @param {number} budget - Total budget in $M (default 100 = $100M)
+ * @param {number} incrementSize - Step size in $M (default 1)
+ * @returns {Object} { projectId: percentage, ... }
+ */
+export function computeBlendedAllocations(
+  worldviews,
+  projectData,
+  budget = 100,
+  incrementSize = 1
+) {
+  const { allocations } = computeMarcusAllocation(
+    projectData,
+    worldviews,
+    'credenceWeighted',
+    budget,
+    incrementSize
+  );
+  return allocations;
+}
+
+/**
  * Convert worldviews into the shape expected by useTableState for handoff.
  * Accepts an array of { worldview, name } objects and distributes credences equally.
  *

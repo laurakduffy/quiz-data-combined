@@ -16,7 +16,7 @@
     "aiExplanation": false,
     "settingsModal": true,
     "simpleQuiz": true,
-    "supportFooter": true
+    "supportFooter": false
   },
 
   "calculations": {

@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   assembleWorldview,
   computeSimpleAllocations,
+  blendWorldviews,
+  computeBlendedAllocations,
   worldviewToTableHandoff,
 } from './simpleQuizScoring';
 import quizConfig from '../../config/simpleQuizConfig.json';
@@ -161,6 +163,175 @@ describe('computeSimpleAllocations', () => {
       },
     ];
     const result = computeSimpleAllocations(worldviews, mockProjects, 50);
+    const total = Object.values(result).reduce((s, v) => s + v, 0);
+    expect(total).toBeCloseTo(100, 0);
+  });
+});
+
+describe('blendWorldviews', () => {
+  const blendWvs = [
+    {
+      name: 'Blend A',
+      credence: 0.6,
+      moral_weights: { human_life_years: 1 },
+      discount_factors: [1, 1, 1, 1, 1, 1],
+      risk_profile: 0,
+      p_extinction: 0.4,
+    },
+    {
+      name: 'Blend B',
+      credence: 0.4,
+      moral_weights: { human_life_years: 0.5 },
+      discount_factors: [1, 0.5, 0, 0, 0, 0],
+      risk_profile: 2,
+      p_extinction: 0.4,
+    },
+  ];
+
+  it('distributes credences correctly at 50% blend', () => {
+    const userWvs = [
+      {
+        moral_weights: { human_life_years: 1 },
+        discount_factors: [1, 1, 1, 1, 1, 1],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+    ];
+    const result = blendWorldviews(blendWvs, userWvs, 50);
+    expect(result).toHaveLength(3);
+    // Blend A: 0.6 * 0.5 = 0.3
+    expect(result[0].credence).toBeCloseTo(0.3);
+    // Blend B: 0.4 * 0.5 = 0.2
+    expect(result[1].credence).toBeCloseTo(0.2);
+    // User: 0.5 / 1 = 0.5
+    expect(result[2].credence).toBeCloseTo(0.5);
+    // Total should be 1.0
+    const total = result.reduce((s, w) => s + w.credence, 0);
+    expect(total).toBeCloseTo(1.0);
+  });
+
+  it('gives all credence to blend at 100%', () => {
+    const userWvs = [
+      {
+        moral_weights: { human_life_years: 1 },
+        discount_factors: [1, 1, 1, 1, 1, 1],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+    ];
+    const result = blendWorldviews(blendWvs, userWvs, 100);
+    expect(result[0].credence).toBeCloseTo(0.6);
+    expect(result[1].credence).toBeCloseTo(0.4);
+    expect(result[2].credence).toBeCloseTo(0);
+  });
+
+  it('gives all credence to user at 0%', () => {
+    const userWvs = [
+      {
+        moral_weights: { human_life_years: 1 },
+        discount_factors: [1, 1, 1, 1, 1, 1],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+    ];
+    const result = blendWorldviews(blendWvs, userWvs, 0);
+    expect(result[0].credence).toBeCloseTo(0);
+    expect(result[1].credence).toBeCloseTo(0);
+    expect(result[2].credence).toBeCloseTo(1.0);
+  });
+
+  it('splits user share equally among multiple user worldviews', () => {
+    const userWvs = [
+      {
+        moral_weights: { human_life_years: 1 },
+        discount_factors: [1, 1, 1, 1, 1, 1],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+      {
+        moral_weights: { human_life_years: 0.5 },
+        discount_factors: [1, 0, 0, 0, 0, 0],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+    ];
+    const result = blendWorldviews(blendWvs, userWvs, 50);
+    expect(result).toHaveLength(4);
+    // User each: 0.5 / 2 = 0.25
+    expect(result[2].credence).toBeCloseTo(0.25);
+    expect(result[3].credence).toBeCloseTo(0.25);
+  });
+
+  it('uses custom userCredences when provided', () => {
+    const userWvs = [
+      {
+        moral_weights: { human_life_years: 1 },
+        discount_factors: [1, 1, 1, 1, 1, 1],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+      {
+        moral_weights: { human_life_years: 0.5 },
+        discount_factors: [1, 0, 0, 0, 0, 0],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+    ];
+    // 75/25 split among user worldviews, 50% blend credence
+    const result = blendWorldviews(blendWvs, userWvs, 50, [75, 25]);
+    expect(result).toHaveLength(4);
+    // User share = 0.5; user[0] = 0.5 * 75/100 = 0.375
+    expect(result[2].credence).toBeCloseTo(0.375);
+    // user[1] = 0.5 * 25/100 = 0.125
+    expect(result[3].credence).toBeCloseTo(0.125);
+    // Total should still be 1.0
+    const total = result.reduce((s, w) => s + w.credence, 0);
+    expect(total).toBeCloseTo(1.0);
+  });
+
+  it('handles userCredences at 0% blend', () => {
+    const userWvs = [
+      {
+        moral_weights: { human_life_years: 1 },
+        discount_factors: [1, 1, 1, 1, 1, 1],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+      {
+        moral_weights: { human_life_years: 0.5 },
+        discount_factors: [1, 0, 0, 0, 0, 0],
+        risk_profile: 0,
+        p_extinction: 0,
+      },
+    ];
+    const result = blendWorldviews(blendWvs, userWvs, 0, [80, 20]);
+    // All credence to user: user[0] = 1.0 * 0.8 = 0.8
+    expect(result[2].credence).toBeCloseTo(0.8);
+    expect(result[3].credence).toBeCloseTo(0.2);
+  });
+});
+
+describe('computeBlendedAllocations', () => {
+  it('returns allocations using Nash bargaining', () => {
+    const worldviews = [
+      {
+        moral_weights: { human_life_years: 1, chickens_birds: 0.01 },
+        discount_factors: [1, 1, 0, 0, 0, 0],
+        risk_profile: 0,
+        p_extinction: 0,
+        credence: 0.5,
+      },
+      {
+        moral_weights: { human_life_years: 0.01, chickens_birds: 1 },
+        discount_factors: [1, 0, 0, 0, 0, 0],
+        risk_profile: 0,
+        p_extinction: 0,
+        credence: 0.5,
+      },
+    ];
+    const result = computeBlendedAllocations(worldviews, mockProjects);
+    expect(result).toHaveProperty('proj_a');
+    expect(result).toHaveProperty('proj_b');
     const total = Object.values(result).reduce((s, v) => s + v, 0);
     expect(total).toBeCloseTo(100, 0);
   });

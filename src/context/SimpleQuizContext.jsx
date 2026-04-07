@@ -79,6 +79,13 @@ function reducer(state, action) {
         ...state,
         savedWorldviews: state.savedWorldviews.filter((wv) => wv.uid !== action.uid),
       };
+    case 'REMOVE_CURRENT':
+      return {
+        ...state,
+        selections: {},
+        manualOverrides: {},
+        currentRunName: null,
+      };
     case 'RENAME_WORLDVIEW':
       return {
         ...state,
@@ -246,6 +253,10 @@ export function SimpleQuizProvider({ children }) {
     dispatch({ type: 'REMOVE_WORLDVIEW', uid });
   }, []);
 
+  const removeCurrent = useCallback(() => {
+    dispatch({ type: 'REMOVE_CURRENT' });
+  }, []);
+
   const renameWorldview = useCallback((uid, name) => {
     dispatch({ type: 'RENAME_WORLDVIEW', uid, name });
   }, []);
@@ -297,6 +308,7 @@ export function SimpleQuizProvider({ children }) {
       clearManualOverride,
       saveAndRetake,
       removeWorldview,
+      removeCurrent,
       renameWorldview,
     }),
     [
@@ -321,6 +333,7 @@ export function SimpleQuizProvider({ children }) {
       clearManualOverride,
       setCurrentRunName,
       saveAndRetake,
+      removeCurrent,
       removeWorldview,
       renameWorldview,
     ]

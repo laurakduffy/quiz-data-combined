@@ -1,13 +1,22 @@
-import { useMemo, useState, useRef, useEffect } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import Header from '../layout/Header';
 import ResultCard from '../ui/ResultCard';
+import CompactSlider from '../ui/CompactSlider';
 import InfoTooltip from '../ui/InfoTooltip';
 import { useSimpleQuiz } from '../../context/useSimpleQuiz';
 import { useDataset } from '../../context/DatasetContext';
-import { computeSimpleAllocations } from '../../utils/simpleQuizScoring';
+import { adjustCredences } from '../../utils/calculations';
+import {
+  computeSimpleAllocations,
+  blendWorldviews,
+  computeBlendedAllocations,
+} from '../../utils/simpleQuizScoring';
+import specialBlendConfig from '../../../config/specialBlend.json';
 import styles from '../../styles/components/SimpleQuiz.module.css';
 import resultStyles from '../../styles/components/Results.module.css';
 import copy from '../../../config/copy.json';
+
+const DONATE_HANDOFF_KEY = 'donate_handoff';
 
 /**
  * Results screen showing allocation percentages via ResultCard.
@@ -23,6 +32,7 @@ function SimpleResultsScreen() {
     setCurrentRunName,
     saveAndRetake,
     removeWorldview,
+    removeCurrent,
     renameWorldview,
     goToAdvancedMode,
     resetQuiz,
@@ -37,6 +47,32 @@ function SimpleResultsScreen() {
   const editInputRef = useRef(null);
 
   const [budgetInput, setBudgetInput] = useState(String(budget));
+
+  // Blend state
+  const [blendEnabled, setBlendEnabled] = useState(specialBlendConfig.defaultEnabled);
+  const [blendCredence, setBlendCredence] = useState(specialBlendConfig.defaultCredence);
+
+  // Per-run credence sliders (keyed by 'current' + saved uids).
+  // Raw state holds user adjustments; derived credences reconcile against current keys.
+  const [userCredencesRaw, setUserCredencesRaw] = useState({});
+  const [lockedKeys, setLockedKeys] = useState([]);
+
+  // Derive credences: if keys match raw state, use it; otherwise equal split.
+  const userCredences = useMemo(() => {
+    const keys = ['current', ...savedWorldviews.map((sw) => sw.uid)];
+    const rawKeys = Object.keys(userCredencesRaw).sort();
+    const currentKeys = [...keys].sort();
+    if (rawKeys.length === currentKeys.length && rawKeys.every((k, i) => k === currentKeys[i])) {
+      return userCredencesRaw;
+    }
+    // Keys changed — reset to equal split
+    const each = Math.floor(100 / keys.length);
+    const creds = {};
+    keys.forEach((k, i) => {
+      creds[k] = i === 0 ? each + (100 - each * keys.length) : each;
+    });
+    return creds;
+  }, [savedWorldviews, userCredencesRaw]);
 
   // Fall back to 'current' if the selected worldview was removed
   const activeView =
@@ -61,20 +97,69 @@ function SimpleResultsScreen() {
     [dataset]
   );
 
+  // Active worldview (for non-blend single-view display)
+  const activeWorldview = useMemo(() => {
+    if (activeView === 'current') return worldview;
+    const saved = savedWorldviews.find((sw) => sw.uid === activeView);
+    return saved?.worldview || worldview;
+  }, [activeView, worldview, savedWorldviews]);
+
+  // All user worldviews (current + saved) for blend mode — keys match userCredences
+  const allUserWorldviewKeys = useMemo(() => {
+    return ['current', ...savedWorldviews.map((sw) => sw.uid)];
+  }, [savedWorldviews]);
+
+  const allUserWorldviews = useMemo(() => {
+    const wvs = [worldview];
+    for (const sw of savedWorldviews) {
+      wvs.push(sw.worldview);
+    }
+    return wvs;
+  }, [worldview, savedWorldviews]);
+
+  const handleUserCredenceChange = useCallback(
+    (key, newValue) => {
+      const adjusted = adjustCredences(key, newValue, userCredences, null, lockedKeys);
+      setUserCredencesRaw(adjusted);
+    },
+    [userCredences, lockedKeys]
+  );
+
+  // Build userCredences array in worldview order for blendWorldviews
+  const userCredencesArray = useMemo(() => {
+    return allUserWorldviewKeys.map((k) => userCredences[k] || 0);
+  }, [allUserWorldviewKeys, userCredences]);
+
   // Compute allocations for the active view
   const displayAllocations = useMemo(() => {
     if (!dataset?.projects) return {};
-    if (activeView === 'current') {
-      return computeSimpleAllocations([{ ...worldview, credence: 1.0 }], dataset.projects, budget);
+
+    if (blendEnabled) {
+      const combined = blendWorldviews(
+        specialBlendConfig.worldviews,
+        allUserWorldviews,
+        blendCredence,
+        userCredencesArray
+      );
+      return computeBlendedAllocations(combined, dataset.projects, budget);
     }
-    const saved = savedWorldviews.find((sw) => sw.uid === activeView);
-    if (!saved) return {};
+
     return computeSimpleAllocations(
-      [{ ...saved.worldview, credence: 1.0 }],
+      [{ ...activeWorldview, credence: 1.0 }],
       dataset.projects,
       budget
     );
-  }, [activeView, worldview, savedWorldviews, dataset, budget]);
+  }, [
+    activeWorldview,
+    allUserWorldviews,
+    dataset,
+    budget,
+    blendEnabled,
+    blendCredence,
+    userCredencesArray,
+  ]);
+
+  const methodKey = 'credenceWeighted';
 
   const handleBudgetChange = (e) => {
     const raw = e.target.value;
@@ -105,6 +190,12 @@ function SimpleResultsScreen() {
     if (window.confirm('Are you sure? This will clear all your answers and start over.')) {
       resetQuiz();
     }
+  };
+
+  const handleDonate = () => {
+    if (!displayAllocations) return;
+    sessionStorage.setItem(DONATE_HANDOFF_KEY, JSON.stringify({ allocations: displayAllocations }));
+    window.location.hash = 'donate';
   };
 
   const startEditing = (id, name) => {
@@ -177,9 +268,11 @@ function SimpleResultsScreen() {
         <div className={styles.resultsContainer}>
           <h1 className={styles.resultsHeading}>Recommended Allocations</h1>
           <p className={styles.resultsSubtext}>
-            {hasSaved && activeLabel
-              ? `Showing results for: ${activeLabel}`
-              : 'Based on your preferences, here\u2019s how your budget would be allocated across funds.'}
+            {blendEnabled
+              ? 'Your worldviews are blended with RP\u2019s expert views to produce a combined allocation.'
+              : hasSaved && activeLabel
+                ? `Showing results for: ${activeLabel}`
+                : 'Based on your preferences, here\u2019s how your budget would be allocated across funds.'}
           </p>
 
           <div className={resultStyles.budgetRow}>
@@ -205,7 +298,7 @@ function SimpleResultsScreen() {
           {displayAllocations && (
             <div className={resultStyles.singleResultCard}>
               <ResultCard
-                methodKey="credenceWeighted"
+                methodKey={methodKey}
                 results={displayAllocations}
                 causeEntries={causeEntries}
                 simpleMode={true}
@@ -213,46 +306,153 @@ function SimpleResultsScreen() {
             </div>
           )}
 
+          {/* Worldview list (always shown when there are saved runs) */}
           {hasSaved && (
             <div className={styles.savedWorldviewsList}>
-              <h3 className={styles.savedWorldviewsHeading}>Worldviews</h3>
+              <h3 className={styles.savedWorldviewsHeading}>Your Worldviews</h3>
 
-              {savedWorldviews.map((sw) => (
+              {savedWorldviews.map((sw) =>
+                blendEnabled ? (
+                  <div
+                    key={sw.uid}
+                    className={`${styles.savedWorldviewItem} ${styles.savedWorldviewWithSlider}`}
+                  >
+                    <span className={styles.savedWorldviewNameGroup}>
+                      {renderNameCell(sw.uid, sw.name)}
+                    </span>
+                    <div className={styles.savedWorldviewSliderCell}>
+                      <CompactSlider
+                        label=""
+                        value={userCredences[sw.uid] || 0}
+                        onChange={(val) => handleUserCredenceChange(sw.uid, val)}
+                        color="#2a9ab5"
+                        credences={userCredences}
+                        sliderKey={sw.uid}
+                        lockedKeys={lockedKeys}
+                        setLockedKeys={setLockedKeys}
+                      />
+                    </div>
+                    <button
+                      className={styles.savedWorldviewRemove}
+                      onClick={() => removeWorldview(sw.uid)}
+                      title="Remove worldview"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    key={sw.uid}
+                    className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === sw.uid ? styles.savedWorldviewActive : ''}`}
+                    onClick={() => setActiveView(sw.uid)}
+                  >
+                    <span className={styles.savedWorldviewNameGroup}>
+                      {renderNameCell(sw.uid, sw.name)}
+                    </span>
+                    <button
+                      className={styles.savedWorldviewRemove}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeWorldview(sw.uid);
+                      }}
+                      title="Remove worldview"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )
+              )}
+
+              {blendEnabled ? (
+                <div className={`${styles.savedWorldviewItem} ${styles.savedWorldviewWithSlider}`}>
+                  <span className={styles.savedWorldviewNameGroup}>
+                    {renderNameCell('current', currentRunName)}
+                  </span>
+                  <div className={styles.savedWorldviewSliderCell}>
+                    <CompactSlider
+                      label=""
+                      value={userCredences['current'] || 0}
+                      onChange={(val) => handleUserCredenceChange('current', val)}
+                      color="#2a9ab5"
+                      credences={userCredences}
+                      sliderKey="current"
+                      lockedKeys={lockedKeys}
+                      setLockedKeys={setLockedKeys}
+                    />
+                  </div>
+                  <button
+                    className={styles.savedWorldviewRemove}
+                    onClick={removeCurrent}
+                    title="Remove worldview"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ) : (
                 <div
-                  key={sw.uid}
-                  className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === sw.uid ? styles.savedWorldviewActive : ''}`}
-                  onClick={() => setActiveView(sw.uid)}
+                  className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === 'current' ? styles.savedWorldviewActive : ''}`}
+                  onClick={() => setActiveView('current')}
                 >
                   <span className={styles.savedWorldviewNameGroup}>
-                    {renderNameCell(sw.uid, sw.name)}
+                    {renderNameCell('current', currentRunName)}
                   </span>
                   <button
                     className={styles.savedWorldviewRemove}
                     onClick={(e) => {
                       e.stopPropagation();
-                      removeWorldview(sw.uid);
+                      removeCurrent();
                     }}
                     title="Remove worldview"
                   >
                     &times;
                   </button>
                 </div>
-              ))}
-
-              <div
-                className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === 'current' ? styles.savedWorldviewActive : ''}`}
-                onClick={() => setActiveView('current')}
-              >
-                <span className={styles.savedWorldviewNameGroup}>
-                  {renderNameCell('current', currentRunName)}
-                </span>
-              </div>
+              )}
             </div>
           )}
+
+          {/* Blend controls */}
+          <div className={styles.blendControls}>
+            <label className={styles.blendToggle}>
+              <input
+                type="checkbox"
+                checked={blendEnabled}
+                onChange={(e) => setBlendEnabled(e.target.checked)}
+              />
+              <span className={styles.blendToggleLabel}>Mix with {specialBlendConfig.label}</span>
+              <InfoTooltip content="When enabled, your preferences are combined with Rethink Priorities' expert worldviews using credence-weighted allocation." />
+            </label>
+
+            {blendEnabled && (
+              <div className={styles.blendSliders}>
+                <CompactSlider
+                  label="Your views"
+                  value={100 - blendCredence}
+                  onChange={(val) => setBlendCredence(100 - val)}
+                  color="#2a9ab5"
+                  credences={{ user: 100 - blendCredence, blend: blendCredence }}
+                  sliderKey="user"
+                  hideLock
+                />
+                <CompactSlider
+                  label={specialBlendConfig.label}
+                  value={blendCredence}
+                  onChange={(val) => setBlendCredence(val)}
+                  color="#2a9ab5"
+                  credences={{ user: 100 - blendCredence, blend: blendCredence }}
+                  sliderKey="blend"
+                  hideLock
+                />
+              </div>
+            )}
+          </div>
 
           <div className={styles.resultsActions}>
             <button className="btn btn-secondary btn-sm" onClick={goBack}>
               &larr; Back
+            </button>
+            <button className="btn btn-primary btn-sm" onClick={handleDonate}>
+              Donate &rarr;
             </button>
             <button className="btn btn-primary btn-sm" onClick={saveAndRetake}>
               Save &amp; Retake Quiz

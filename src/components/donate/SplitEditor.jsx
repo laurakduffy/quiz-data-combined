@@ -8,8 +8,8 @@ export default function SplitEditor({ splits, onChange, readOnly }) {
 
   return (
     <div className={styles.splitEditor}>
-      {config.funds.map(({ name, sub }) => (
-        <div key={name} className={styles.splitRow}>
+      {config.funds.map(({ id, name, sub }) => (
+        <div key={id} className={styles.splitRow}>
           <div className={styles.splitFundName}>
             {name}
             <div className={styles.fundSub}>{sub}</div>
@@ -19,9 +19,9 @@ export default function SplitEditor({ splits, onChange, readOnly }) {
               type="number"
               min="0"
               max="100"
-              value={splits[name] ?? ''}
+              value={splits[id] ?? ''}
               readOnly={readOnly}
-              onChange={(e) => onChange(name, e.target.value)}
+              onChange={(e) => onChange(id, e.target.value)}
             />
             <span>%</span>
           </div>

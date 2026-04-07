@@ -343,39 +343,18 @@ A donation intent form where donors provide their details, choose a fund split p
 
 **Support footer:** Hidden on `#donate` (checked in `App.jsx`).
 
-**Deploying to production (steps in order):**
+**Production deployment:** Complete. Lambda function `quiz-demo-donate` is live at `https://kcsjk7jyxottgqyk752o4pgnrq0srxhf.lambda-url.us-east-1.on.aws/`. Turso DB, SES emails, and `VITE_DONATE_API_URL` GitHub secret are all configured. SES is in sandbox mode (sender/recipient must be verified addresses); request production access when ready for real recipients.
 
-1. **Fix frontend URL routing** — `api.js` currently sends donate requests to `${VITE_API_URL}/donate`, which hits the share Lambda. Add a separate `VITE_DONATE_API_URL` env var since each Lambda gets its own Function URL.
-
-2. **Run migration on prod Turso:**
-   ```bash
-   turso db shell donor-compass < migrations/002_donations.sql
-   ```
-
-3. **Deploy the donate Lambda** (direct deploy — SAM deploy fails, see Lambda Deployment notes above):
-   ```bash
-   cd lambda/donate && npm ci && cd ..
-   sam build
-   cd .aws-sam/build/DonateFunction
-   zip -r /tmp/lambda-donate.zip .
-   aws lambda update-function-code \
-     --function-name quiz-demo-donate \
-     --zip-file fileb:///tmp/lambda-donate.zip
-   ```
-
-4. **Set Lambda env vars** — The direct deploy skips CloudFormation parameter overrides, so set these manually in the Lambda console (or via `aws lambda update-function-configuration`):
-   - `TURSO_DATABASE_URL` — same Turso URL as the share Lambda
-   - `TURSO_AUTH_TOKEN` — same Turso token as the share Lambda
-   - `NOTIFY_EMAIL` — recipient for donation notifications (e.g. `giving@rethinkpriorities.org`)
-   - `SENDER_EMAIL` — verified SES sender (e.g. `noreply@rethinkpriorities.org`)
-
-5. **Verify SES email addresses** — If the AWS account is in the SES sandbox (likely), both sender and recipient addresses must be verified (each gets a confirmation email to click). For production volume, request SES production access via the AWS console.
-
-6. **Set `VITE_DONATE_API_URL` in GitHub repo secrets** — Get the Function URL:
-   ```bash
-   aws lambda get-function-url-config --function-name quiz-demo-donate
-   ```
-   Add it to the repo secrets and redeploy the frontend to GitHub Pages.
+**Redeploying the Lambda** (same as share Lambda — SAM deploy fails, deploy directly):
+```bash
+cd lambda/donate && npm ci && cd ..
+sam build
+cd .aws-sam/build/DonateFunction
+zip -r /tmp/lambda-donate.zip .
+aws lambda update-function-code \
+  --function-name quiz-demo-donate \
+  --zip-file fileb:///tmp/lambda-donate.zip
+```
 
 **Not yet implemented:**
 - `defaultPct` values on funds are all `null` (awaiting RP's recommended split)
