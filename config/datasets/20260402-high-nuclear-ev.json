@@ -1,8 +1,8 @@
 {
-  "name": "April 2, 2026 at 8:20 AM",
+  "name": "April 2, 2026 at 8:21 AM",
   "description": "higher risk fraction from nuclear (4% vs 3%) and lower for bio (1% vs 3%)",
   "budget": 897,
-  "incrementSize": 1,
+  "incrementSize": 10,
   "moralWeightKeys": [
     {
       "key": "human_life_years",
