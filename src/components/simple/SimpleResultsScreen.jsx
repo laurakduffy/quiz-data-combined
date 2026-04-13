@@ -153,13 +153,19 @@ function SimpleResultsScreen() {
         blendCredence,
         userCredencesArray
       );
-      return computeBlendedAllocations(combined, dataset.projects, budget);
+      return computeBlendedAllocations(
+        combined,
+        dataset.projects,
+        budget,
+        dataset.incrementSize || 10
+      );
     }
 
     return computeSimpleAllocations(
       [{ ...activeWorldview, credence: 1.0 }],
       dataset.projects,
-      budget
+      budget,
+      dataset.incrementSize || 10
     );
   }, [
     activeWorldview,

@@ -401,7 +401,12 @@ export function SimpleQuizProvider({ children }) {
 
   const allocations = useMemo(() => {
     if (!dataset?.projects) return {};
-    return computeSimpleAllocations(allWorldviews, dataset.projects, budget);
+    return computeSimpleAllocations(
+      allWorldviews,
+      dataset.projects,
+      budget,
+      dataset.incrementSize || 10
+    );
   }, [allWorldviews, dataset, budget]);
 
   // --- Save & Retake ---
