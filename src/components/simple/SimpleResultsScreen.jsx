@@ -13,6 +13,7 @@ import {
   blendWorldviews,
   computeBlendedAllocations,
 } from '../../utils/simpleQuizScoring';
+import { clusterAllocations, getClusterEntries } from '../../utils/fundClusters';
 import ShareButton from '../ui/ShareButton';
 import NetworkBlockedModal from '../ui/NetworkBlockedModal';
 import { useSimpleShareUrl } from '../../hooks/useSimpleShareUrl';
@@ -101,13 +102,17 @@ function SimpleResultsScreen() {
     }
   }, [editingId]);
 
+  const useClusters = features.ui?.fundClusters && dataset.clusters?.length > 0;
+
   const causeEntries = useMemo(
     () =>
-      Object.entries(dataset.projects).map(([key, project]) => [
-        key,
-        { name: project.name, color: project.color },
-      ]),
-    [dataset]
+      useClusters
+        ? getClusterEntries(dataset.clusters, dataset.projects)
+        : Object.entries(dataset.projects).map(([key, project]) => [
+            key,
+            { name: project.name, color: project.color },
+          ]),
+    [dataset, useClusters]
   );
 
   // Active worldview (for non-blend single-view display)
@@ -143,8 +148,8 @@ function SimpleResultsScreen() {
     return allUserWorldviewKeys.map((k) => userCredences[k] || 0);
   }, [allUserWorldviewKeys, userCredences]);
 
-  // Compute allocations for the active view
-  const displayAllocations = useMemo(() => {
+  // Compute allocations for the active view (per-fund)
+  const rawAllocations = useMemo(() => {
     if (!dataset?.projects) return {};
 
     if (blendEnabled) {
@@ -177,6 +182,12 @@ function SimpleResultsScreen() {
     blendCredence,
     userCredencesArray,
   ]);
+
+  // Cluster allocations for display when fund clustering is enabled
+  const displayAllocations = useMemo(
+    () => (useClusters ? clusterAllocations(rawAllocations, dataset.clusters) : rawAllocations),
+    [rawAllocations, useClusters, dataset.clusters]
+  );
 
   const methodKey = 'credenceWeighted';
 
@@ -212,8 +223,16 @@ function SimpleResultsScreen() {
   };
 
   const handleDonate = () => {
-    if (!displayAllocations) return;
-    sessionStorage.setItem(DONATE_HANDOFF_KEY, JSON.stringify({ allocations: displayAllocations }));
+    if (!rawAllocations) return;
+    const handoff = { allocations: rawAllocations };
+    if (useClusters) {
+      handoff.clusteredAllocations = displayAllocations;
+      handoff.clusters = dataset.clusters.map((c) => ({
+        ...c,
+        memberNames: c.members.map((m) => dataset.projects[m]?.name || m),
+      }));
+    }
+    sessionStorage.setItem(DONATE_HANDOFF_KEY, JSON.stringify(handoff));
     window.location.hash = 'donate';
   };
 

@@ -1,4 +1,4 @@
-import { Target, Building2, Handshake, Scale, HelpCircle } from 'lucide-react';
+import { Target, Building2, Handshake, Scale, BarChart3, HelpCircle } from 'lucide-react';
 
 /**
  * Maps calculation method icon names to Lucide React components.
@@ -9,6 +9,7 @@ const ICON_MAP = {
   parliament: Building2,
   handshake: Handshake,
   scale: Scale,
+  'bar-chart': BarChart3,
 };
 
 function MethodIcon({ name, size = 18, className = '' }) {

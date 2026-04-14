@@ -1,18 +1,20 @@
+import InfoTooltip from '../ui/InfoTooltip';
 import styles from '../../styles/components/DonationPage.module.css';
 import config from '../../../config/donationPage.json';
 
-export default function SplitEditor({ splits, onChange, readOnly }) {
+export default function SplitEditor({ splits, onChange, readOnly, funds = config.funds }) {
   const total = Object.values(splits).reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
   const roundedTotal = Math.round(total * 10) / 10;
   const hasError = roundedTotal !== 100;
 
   return (
     <div className={styles.splitEditor}>
-      {config.funds.map(({ id, name, sub }) => (
+      {funds.map(({ id, name, sub, info }) => (
         <div key={id} className={styles.splitRow}>
           <div className={styles.splitFundName}>
             {name}
-            <div className={styles.fundSub}>{sub}</div>
+            {info && <InfoTooltip content={info} size={13} />}
+            {sub && <div className={styles.fundSub}>{sub}</div>}
           </div>
           <div className={styles.splitPercentWrap}>
             <input

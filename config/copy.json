@@ -71,7 +71,7 @@
     },
     "methods": {
       "credenceWeighted": {
-        "icon": "shopping-cart",
+        "icon": "bar-chart",
         "title": "Credence-Weighted",
         "subtitle": "25,600 worldview parliament",
         "footerLabel": null,
