@@ -207,6 +207,75 @@
   border-color: var(--color-teal-light);
 }
 
+/* Compact variant for edit panel */
+.manualCompact {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-6);
+  border-radius: var(--radius-md);
+}
+
+.manualCompact .manualTitle {
+  font-size: var(--text-xs);
+  margin-bottom: 0;
+}
+
+.manualCompact .manualHeader {
+  margin-bottom: var(--spacing-3);
+}
+
+.manualCompact .manualGrid {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-2);
+}
+
+.manualCompact .manualFieldLabel {
+  font-size: 0.65rem;
+}
+
+.manualCompact .manualFieldInput {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--text-sm);
+}
+
+.manualCompact .manualFieldSelect {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-sm);
+}
+
+.manualCompact .manualSliderValue {
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-1);
+}
+
+.manualCompact .manualSlider {
+  height: 4px;
+}
+
+.manualSliderRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.manualSliderRowLabel {
+  font-size: var(--text-xs);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.manualSliderRowValue {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+  min-width: 2.5em;
+  text-align: right;
+}
+
+.manualSliderRow .manualSlider {
+  flex: 1;
+  height: 4px;
+}
+
 /* === Navigation === */
 
 .navRow {
@@ -254,12 +323,22 @@
   font-family: var(--font-body);
 }
 
+/* === Controls Row (worldviews + blend side by side) === */
+
+.controlsRow {
+  display: flex;
+  gap: var(--spacing-6);
+  align-items: flex-start;
+  margin-top: var(--spacing-8);
+  margin-bottom: var(--spacing-4);
+}
+
 /* === Blend Controls === */
 
 .blendControls {
-  margin-top: var(--spacing-12);
-  margin-bottom: var(--spacing-12);
-  padding: var(--spacing-8) var(--spacing-10);
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-4) var(--spacing-6);
   background: var(--overlay-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
@@ -287,7 +366,7 @@
 }
 
 .blendSliders {
-  margin-top: var(--spacing-6);
+  margin-top: var(--spacing-4);
 }
 
 .chartContainer {
@@ -299,28 +378,28 @@
 }
 
 .savedWorldviewsList {
-  margin-top: var(--spacing-8);
-  margin-bottom: var(--spacing-12);
-  padding: var(--spacing-8) var(--spacing-10);
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-4) var(--spacing-6);
   background: var(--overlay-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
 }
 
 .savedWorldviewsHeading {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
   opacity: 0.7;
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--spacing-2);
 }
 
 .savedWorldviewItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-3) var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-3);
   border-bottom: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
 }
@@ -354,7 +433,7 @@
 }
 
 .savedWorldviewName {
-  font-size: var(--text-xl);
+  font-size: var(--text-base);
   font-family: var(--font-body);
 }
 
@@ -418,10 +497,232 @@
 
 .resultsActions {
   display: flex;
-  justify-content: center;
-  gap: var(--spacing-8);
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-12);
   margin-top: var(--spacing-16);
+}
+
+.actionBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+  text-align: center;
+}
+
+.actionBlockText {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  max-width: 28rem;
+  line-height: var(--leading-relaxed);
+}
+
+.advancedToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: var(--spacing-4) 0;
+  transition: var(--transition-fast);
+}
+
+.advancedToggle:hover {
+  color: var(--text-primary);
+}
+
+.advancedToggleIcon {
+  transition: transform 0.2s ease;
+}
+
+.advancedToggleIconOpen {
+  transform: rotate(90deg);
+}
+
+.advancedPanel {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-6);
+  flex-wrap: wrap;
+  animation: fadeIn 0.2s ease;
+}
+
+/* === Edit Answers Panel === */
+
+.editAnswersSection {
+  margin-top: var(--spacing-12);
+  margin-bottom: var(--spacing-4);
+}
+
+.editAnswersToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: var(--spacing-4) 0;
+  transition: var(--transition-fast);
+}
+
+.editAnswersToggle:hover {
+  color: var(--text-primary);
+}
+
+.editAnswersToggleIcon {
+  transition: transform 0.2s ease;
+}
+
+.editAnswersToggleIconOpen {
+  transform: rotate(90deg);
+}
+
+.editAnswersPanel {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-8) var(--spacing-10);
+  background: var(--overlay-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  animation: fadeIn 0.2s ease;
+}
+
+.editViewSelector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding-bottom: var(--spacing-6);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--spacing-2);
+}
+
+.editViewSelectorLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+.editViewSelectorSelect {
+  background: var(--overlay-medium);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.editViewSelectorSelect:focus {
+  outline: none;
+  border-color: var(--color-teal-light);
+}
+
+.editAnswerItem {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.editAnswerItem:last-child {
+  border-bottom: none;
+}
+
+.editAnswerHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+  padding: var(--spacing-3) 0;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: left;
+}
+
+.editAnswerHeader:hover {
+  opacity: 0.85;
+}
+
+.editAnswerChevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: var(--text-secondary);
+}
+
+.editAnswerChevronOpen {
+  transform: rotate(90deg);
+}
+
+.editAnswerTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  flex: 1;
+  min-width: 0;
+}
+
+.editAnswerCurrent {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.editAnswerBody {
+  padding: var(--spacing-2) 0 var(--spacing-4) var(--spacing-6);
+  animation: fadeIn 0.15s ease;
+}
+
+.editAnswerBody .moreOptionsToggle {
+  font-size: var(--text-sm);
+  padding: var(--spacing-2) 0;
+  margin-bottom: var(--spacing-2);
+}
+
+.editAnswerOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.editOptionButton {
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  background: var(--overlay-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.editOptionButton:hover {
+  background: var(--overlay-light);
+  border-color: var(--border-medium);
+}
+
+.editOptionSelected {
+  background: rgba(42, 154, 181, 0.2);
+  border-color: var(--color-teal-light);
+}
+
+.editOptionSelected:hover {
+  background: rgba(42, 154, 181, 0.25);
+  border-color: var(--color-teal-light);
 }
 
 /* === Welcome Screen === */
@@ -489,8 +790,20 @@
     grid-template-columns: 1fr;
   }
 
-  .resultsActions {
+  .advancedPanel {
     flex-direction: column;
     align-items: center;
+  }
+
+  .controlsRow {
+    flex-direction: column;
+  }
+
+  .editAnswerOptions {
+    flex-direction: column;
+  }
+
+  .editOptionButton {
+    white-space: normal;
   }
 }

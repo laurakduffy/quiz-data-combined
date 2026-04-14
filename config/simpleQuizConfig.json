@@ -12,6 +12,7 @@
         {
           "id": "only_humans",
           "label": "Only humans matter",
+          "shortLabel": "Humans only",
           "description": "Animal welfare is not counted. Only effects on humans are included in fund scores.",
           "value": {
             "human_life_years": 1.0,
@@ -27,6 +28,7 @@
         {
           "id": "low_animals",
           "label": "Animals matter, but much less than humans",
+          "shortLabel": "Low animal weight",
           "description": "Gives animals meaningful but low moral weight. Reflects substantial scepticism about the depth of animal experience relative to human experience.",
           "value": {
             "human_life_years": 1.0,
@@ -42,6 +44,7 @@
         {
           "id": "rp_default",
           "label": "Animals matter, but less than humans (RP starting point)",
+          "shortLabel": "RP default",
           "description": "Moral weights based on research done in the moral weights project, giving animals meaningful but not equal weight to humans.",
           "isDefault": true,
           "value": {
@@ -58,6 +61,7 @@
         {
           "id": "all_equal",
           "label": "All sentient beings count equally",
+          "shortLabel": "All equal",
           "description": "A year of suffering counts the same regardless of species. Strong moral egalitarianism across all sentient life.",
           "value": {
             "human_life_years": 1.0,
@@ -86,12 +90,14 @@
         {
           "id": "all_equal",
           "label": "All time periods count equally",
+          "shortLabel": "All equal",
           "description": "Effects are valued the same regardless of when they occur. No discounting applied.",
           "value": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         },
         {
           "id": "rp_default",
           "label": "All time periods matter, but the near term gets more weight (RP starting point)",
+          "shortLabel": "RP default",
           "description": "Near-term effects count fully. Effects further out are progressively discounted, with distant effects counting very little.",
           "isDefault": true,
           "value": [1.0, 0.9, 0.8, 0.1, 0.001, 0.00001]
@@ -99,12 +105,14 @@
         {
           "id": "next_100_years",
           "label": "Only the next century matters, with more weight on the near term",
+          "shortLabel": "Next 100 years",
           "description": "Effects within the next century count, with more weight on the near term. Effects beyond that are ignored.",
           "value": [1.0, 0.9, 0.8, 0.6, 0.0, 0.0]
         },
         {
           "id": "near_term_only",
           "label": "Near term only",
+          "shortLabel": "Near term only",
           "description": "Only effects in the next decade matter. Everything beyond that is ignored.",
           "value": [1.0, 0.9, 0.0, 0.0, 0.0, 0.0]
         }
@@ -124,18 +132,21 @@
         {
           "id": "no_discount",
           "label": "No discount",
+          "shortLabel": "None",
           "description": "Non-AI existential risk interventions are evaluated the same way as all other interventions.",
           "value": 0.0
         },
         {
           "id": "small_discount",
           "label": "Small discount (10%)",
+          "shortLabel": "Small (10%)",
           "description": "Non-AI x-risk interventions are scored at 90% of their otherwise calculated value.",
           "value": 0.1
         },
         {
           "id": "rp_default",
           "label": "Large discount (40%) (RP starting point)",
+          "shortLabel": "RP default (40%)",
           "description": "Non-AI interventions are scored at 60% of their otherwise calculated value.",
           "isDefault": true,
           "value": 0.4
@@ -143,6 +154,7 @@
         {
           "id": "ai_only",
           "label": "Very large discount (80% discount)",
+          "shortLabel": "Very large (80%)",
           "description": "Non-AI interventions are scored at 20% of their otherwise calculated value.",
           "value": 0.8
         }
@@ -162,24 +174,28 @@
         {
           "id": "neutral",
           "label": "Risk neutral",
+          "shortLabel": "Neutral",
           "description": "Take expected value estimates at face value. If something has a 10% chance of saving 1,000 lives, count it as 100 expected lives saved. No adjustment for uncertainty or risk.",
           "value": 0
         },
         {
           "id": "upside_skeptical",
           "label": "Skeptical of large upsides",
+          "shortLabel": "Upside skeptical",
           "description": "Puts lower weight on the most optimistic scenarios. If a model says there's a small chance of enormous impact, this heavily discounts that claim.",
           "value": 4
         },
         {
           "id": "downside_critical",
           "label": "Extra weight on potential harms",
+          "shortLabel": "Downside averse",
           "description": "Put extra weight on avoiding harms. Scenarios where an intervention backfires are weighted 5x more heavily than equivalent positive outcomes.",
           "value": 5
         },
         {
           "id": "wlu_moderate",
           "label": "Cautious across the board (RP starting point)",
+          "shortLabel": "RP default",
           "description": "Penalizes high-variance outcomes: less impressed by very large claimed benefits and more concerned about very large potential harms. RP's recommended approach.",
           "isDefault": true,
           "value": 2

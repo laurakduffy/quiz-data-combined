@@ -38,6 +38,8 @@ jobs:
             echo "Prototypes included:"
             ls -la dist/prototypes/ || true
           fi
+      - name: Add CNAME for custom domain
+        run: echo 'donorcompass.rethinkpriorities.org' > dist/CNAME
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

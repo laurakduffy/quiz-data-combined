@@ -65,7 +65,7 @@ function MoralParliamentQuiz() {
   }
 
   // Show nothing while hydrating to avoid flash of welcome screen
-  if (isHydrating) {
+  if (isHydrating || simpleQuiz.isHydrating) {
     return null;
   }
 

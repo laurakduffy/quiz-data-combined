@@ -77,39 +77,19 @@ async function createShare(event, db) {
   const { type, sessionId, quizVersion, datasetId } = body;
 
   let dataToStore;
-  if (type === 'table' || type === 'marcus') {
-    const {
-      worldviews,
-      credences,
-      stages,
-      selectedMethod,
-      totalBudget,
-      methodOptions,
-      fundingCaps,
-      drOverrides,
-    } = body;
-    if (!worldviews) {
-      return jsonResponse(400, { error: 'Missing worldviews' });
-    }
-    dataToStore = { type, worldviews, credences };
-    if (stages) {
-      dataToStore.stages = stages;
-    } else {
-      dataToStore.selectedMethod = selectedMethod;
-      dataToStore.totalBudget = totalBudget;
-      dataToStore.methodOptions = methodOptions;
-    }
-    if (fundingCaps) dataToStore.fundingCaps = fundingCaps;
-    if (drOverrides) dataToStore.drOverrides = drOverrides;
+  if (type) {
+    // Typed payload (simple, table, marcus, etc.) — store body minus metadata
+    const { sessionId: _s, quizVersion: _q, ...data } = body;
+    dataToStore = data;
   } else {
+    // Legacy untyped format
     const { worldviews, activeWorldviewId } = body;
     if (!worldviews || !activeWorldviewId) {
       return jsonResponse(400, { error: 'Missing worldviews or activeWorldviewId' });
     }
     dataToStore = { worldviews, activeWorldviewId };
+    if (datasetId) dataToStore.datasetId = datasetId;
   }
-
-  if (datasetId) dataToStore.datasetId = datasetId;
 
   for (let attempt = 0; attempt < 5; attempt++) {
     const shortId = generateShortId();
@@ -173,7 +153,7 @@ async function getShare(event, db) {
     createdAt: row.created_at,
   };
 
-  if (storedData.type === 'table' || storedData.type === 'marcus') {
+  if (storedData.type) {
     return jsonResponse(200, { ...baseResponse, ...storedData });
   }
 

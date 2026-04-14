@@ -39,6 +39,8 @@
     "adjustCredencesHeading": "Adjust Your Credences",
     "resetAllButton": "Reset All",
     "resetConfirmation": "Are you sure? This will clear all your answers and return to the beginning.",
+    "saveAndRetakeDescription": "Save your current worldview and retake the quiz to compare different perspectives.",
+    "donateDescription": "Your recommended allocation will carry over to the donation form.",
     "shareButton": "Share Results",
     "shareCopied": "Link copied!",
     "calculationSelectTooltip": "There are different ways to advise allocations based on your inputs. The next version of the tool will let you compare different methods and explain clearly what is happening behind the scenes for each of these options. The current calculations are placeholders.",
@@ -97,6 +99,9 @@
         "footerText": "Finds the fairest compromise across all worldviews"
       }
     }
+  },
+  "simpleQuiz": {
+    "moreOptionsToggle": "More options (show underlying values)"
   },
   "editPanel": {
     "modifiedBadge": "modified",

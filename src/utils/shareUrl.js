@@ -39,6 +39,67 @@ function validateQuestionsConfig(questionsToValidate) {
 }
 
 /**
+ * Generate a shareable URL for the simple quiz.
+ * Stores selections, manual overrides, saved worldviews, run name, and budget.
+ *
+ * @param {Object} payload
+ * @param {Object} payload.selections - { questionId: optionId }
+ * @param {Object} payload.manualOverrides - { questionId: value|null }
+ * @param {Array} payload.savedWorldviews - [{ worldview, name, uid }]
+ * @param {string|null} payload.currentRunName
+ * @param {number} payload.budget
+ * @returns {Promise<{ url: string, id: string }>}
+ * @throws {Error} If API call fails
+ */
+export async function generateSimpleShareUrl({
+  selections,
+  manualOverrides,
+  savedWorldviews,
+  currentRunName,
+  budget,
+  activeView,
+  blendEnabled,
+  blendCredence,
+  userCredencesRaw,
+  lockedKeys,
+}) {
+  const sessionId = getOrCreateSessionId();
+
+  const payload = {
+    type: 'simple',
+    sessionId,
+    selections,
+    manualOverrides,
+    savedWorldviews,
+    currentRunName,
+    budget,
+    activeView,
+    blendEnabled,
+    blendCredence,
+    userCredencesRaw,
+    lockedKeys,
+  };
+
+  const response = await fetch(endpoints.share, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'Failed to create share link');
+  }
+
+  const { id } = await response.json();
+  const baseUrl = window.location.origin + window.location.pathname;
+  return {
+    url: `${baseUrl}#s=${id}`,
+    id,
+  };
+}
+
+/**
  * Generate a shareable URL via backend API.
  * Includes full worldviews state (all worldviews with question states).
  *
@@ -156,6 +217,23 @@ export async function parseShareUrl() {
 
   if (!shareData) {
     return { error: 'This share link has expired or no longer exists' };
+  }
+
+  // Simple quiz format
+  if (shareData.type === 'simple') {
+    return {
+      type: 'simple',
+      selections: shareData.selections || {},
+      manualOverrides: shareData.manualOverrides || {},
+      savedWorldviews: shareData.savedWorldviews || [],
+      currentRunName: shareData.currentRunName || null,
+      budget: shareData.budget || 100,
+      activeView: shareData.activeView || 'current',
+      blendEnabled: shareData.blendEnabled,
+      blendCredence: shareData.blendCredence,
+      userCredencesRaw: shareData.userCredencesRaw || {},
+      lockedKeys: shareData.lockedKeys || [],
+    };
   }
 
   // Worldviews format (current)
