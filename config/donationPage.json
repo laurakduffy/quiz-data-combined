@@ -84,7 +84,7 @@
     "submit": "Notify Rethink Priorities",
     "submitted": "Submitted",
     "successMessage": "We've been notified. If we don't receive your donation within a week, someone from the Rethink Priorities team will be in touch at {email}.",
-    "errorMessage": "Something went wrong submitting your intent. Please try again or copy the memo and email it to giving@rethinkpriorities.org directly."
+    "errorMessage": "Something went wrong submitting your intent. Please try again or email your donation details to fund@rethinkpriorities.org directly."
   },
 
   "validation": {

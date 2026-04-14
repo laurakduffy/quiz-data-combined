@@ -3,11 +3,15 @@ import { generateSimpleShareUrl } from '../utils/shareUrl';
 import { copyToClipboard } from '../utils/clipboard';
 import { useSimpleQuiz } from '../context/useSimpleQuiz';
 
+function isNetworkBlocked(err) {
+  return err instanceof TypeError && /failed to fetch|networkerror|load failed/i.test(err.message);
+}
+
 /**
  * Hook for simple quiz share URL generation and clipboard copy.
  * Mirrors useShareUrl pattern (loading/copied/error state).
  *
- * @returns {Object} { copied, loading, error, handleShare }
+ * @returns {Object} { copied, loading, error, networkBlocked, dismissNetworkBlocked, handleShare }
  */
 export function useSimpleShareUrl() {
   const {
@@ -26,9 +30,13 @@ export function useSimpleShareUrl() {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [networkBlocked, setNetworkBlocked] = useState(false);
+
+  const dismissNetworkBlocked = useCallback(() => setNetworkBlocked(false), []);
 
   const handleShare = useCallback(async () => {
     setError(null);
+    setNetworkBlocked(false);
     setLoading(true);
 
     try {
@@ -49,8 +57,12 @@ export function useSimpleShareUrl() {
       window.setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('[Share] Failed to generate simple share URL:', err);
-      setError(err.message || 'Failed to create share link');
-      window.setTimeout(() => setError(null), 5000);
+      if (isNetworkBlocked(err)) {
+        setNetworkBlocked(true);
+      } else {
+        setError(err.message || 'Failed to create share link');
+        window.setTimeout(() => setError(null), 5000);
+      }
     } finally {
       setLoading(false);
     }
@@ -67,5 +79,5 @@ export function useSimpleShareUrl() {
     lockedKeys,
   ]);
 
-  return { copied, loading, error, handleShare };
+  return { copied, loading, error, networkBlocked, dismissNetworkBlocked, handleShare };
 }

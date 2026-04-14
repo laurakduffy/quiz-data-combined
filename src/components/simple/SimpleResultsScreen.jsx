@@ -14,6 +14,7 @@ import {
   computeBlendedAllocations,
 } from '../../utils/simpleQuizScoring';
 import ShareButton from '../ui/ShareButton';
+import NetworkBlockedModal from '../ui/NetworkBlockedModal';
 import { useSimpleShareUrl } from '../../hooks/useSimpleShareUrl';
 import specialBlendConfig from '../../../config/specialBlend.json';
 import features from '../../../config/features.json';
@@ -238,7 +239,14 @@ function SimpleResultsScreen() {
     if (e.key === 'Escape') setEditingId(null);
   };
 
-  const { copied, loading: shareLoading, error: shareError, handleShare } = useSimpleShareUrl();
+  const {
+    copied,
+    loading: shareLoading,
+    error: shareError,
+    networkBlocked,
+    dismissNetworkBlocked,
+    handleShare,
+  } = useSimpleShareUrl();
 
   const hasSaved = savedWorldviews.length > 0;
 
@@ -584,6 +592,8 @@ function SimpleResultsScreen() {
           </div>
         </div>
       </main>
+
+      {networkBlocked && <NetworkBlockedModal onDismiss={dismissNetworkBlocked} context="share" />}
     </div>
   );
 }
