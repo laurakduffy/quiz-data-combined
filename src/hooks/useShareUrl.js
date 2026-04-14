@@ -2,6 +2,10 @@ import { useState, useCallback } from 'react';
 import { generateShareUrl } from '../utils/shareUrl';
 import { copyToClipboard } from '../utils/clipboard';
 
+function isNetworkBlocked(err) {
+  return err instanceof TypeError && /failed to fetch|networkerror|load failed/i.test(err.message);
+}
+
 /**
  * Hook for share URL generation and clipboard copy functionality.
  * Handles loading state, error state, and clipboard API fallbacks.
@@ -12,7 +16,7 @@ import { copyToClipboard } from '../utils/clipboard';
  * @param {Object} options.selectedCalculations - Selected calculation methods
  * @param {Object} options.worldviewNames - Names for each worldview
  * @param {number} options.marketplaceBudget - Budget amount for marketplace
- * @returns {Object} { copied, loading, error, handleShare }
+ * @returns {Object} { copied, loading, error, networkBlocked, dismissNetworkBlocked, handleShare }
  */
 export function useShareUrl({
   worldviews,
@@ -26,9 +30,13 @@ export function useShareUrl({
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [networkBlocked, setNetworkBlocked] = useState(false);
+
+  const dismissNetworkBlocked = useCallback(() => setNetworkBlocked(false), []);
 
   const handleShare = useCallback(async () => {
     setError(null);
+    setNetworkBlocked(false);
 
     // Build worldviews state for backend
     const worldviewsForShare = {};
@@ -65,8 +73,12 @@ export function useShareUrl({
       window.setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('[Share] Failed to generate share URL:', err);
-      setError(err.message || 'Failed to create share link');
-      window.setTimeout(() => setError(null), 5000);
+      if (isNetworkBlocked(err)) {
+        setNetworkBlocked(true);
+      } else {
+        setError(err.message || 'Failed to create share link');
+        window.setTimeout(() => setError(null), 5000);
+      }
     } finally {
       setLoading(false);
     }
@@ -80,5 +92,5 @@ export function useShareUrl({
     datasetId,
   ]);
 
-  return { copied, loading, error, handleShare };
+  return { copied, loading, error, networkBlocked, dismissNetworkBlocked, handleShare };
 }

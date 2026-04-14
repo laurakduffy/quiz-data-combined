@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import Header from '../layout/Header';
+import NetworkBlockedModal from '../ui/NetworkBlockedModal';
 import styles from '../../styles/components/DonationPage.module.css';
 import SplitEditor from './SplitEditor';
 import { endpoints } from '../../config/api';
@@ -32,6 +33,7 @@ export default function DonationPage() {
   const [submitState, setSubmitState] = useState(null); // null | 'submitting' | 'success' | 'error'
   const [warning, setWarning] = useState('');
   const [handoffBanner, setHandoffBanner] = useState(false);
+  const [networkBlocked, setNetworkBlocked] = useState(false);
   const refId = useRef(genRefId());
 
   // Read donate handoff from sessionStorage on mount
@@ -153,7 +155,13 @@ Split preference: ${splitText}`;
       });
       if (!res.ok) throw new Error('Request failed');
       setSubmitState('success');
-    } catch {
+    } catch (err) {
+      if (
+        err instanceof TypeError &&
+        /failed to fetch|networkerror|load failed/i.test(err.message)
+      ) {
+        setNetworkBlocked(true);
+      }
       setSubmitState('error');
     }
   }
@@ -368,6 +376,10 @@ Split preference: ${splitText}`;
           <div className={styles.legalNote}>{config.legal}</div>
         </div>
       </main>
+
+      {networkBlocked && (
+        <NetworkBlockedModal onDismiss={() => setNetworkBlocked(false)} context="donate" />
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import ResultCard from './ui/ResultCard';
 import QuestionIcon from './ui/QuestionIcon';
 import InfoTooltip from './ui/InfoTooltip';
 import ShareButton from './ui/ShareButton';
+import NetworkBlockedModal from './ui/NetworkBlockedModal';
 import MethodsInfoModal from './ui/MethodsInfoModal';
 import ExplanationModal from './ui/ExplanationModal';
 import SettingsModal from './ui/SettingsModal';
@@ -78,6 +79,8 @@ function ResultsScreen() {
     copied: shareCopied,
     loading: shareLoading,
     error: shareError,
+    networkBlocked: shareNetworkBlocked,
+    dismissNetworkBlocked: dismissShareNetworkBlocked,
     handleShare: handleShareClick,
   } = useShareUrl({
     worldviews,
@@ -504,6 +507,9 @@ function ResultsScreen() {
           />
         )}
         {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+        {shareNetworkBlocked && (
+          <NetworkBlockedModal onDismiss={dismissShareNetworkBlocked} context="share" />
+        )}
       </div>
     </div>
   );
