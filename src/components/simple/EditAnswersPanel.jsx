@@ -173,6 +173,7 @@ function EditAnswerItem({
                       override={manualOverride}
                       onSet={onSetManualOverride}
                       dataset={dataset}
+                      compact
                     />
                   )}
                 </div>

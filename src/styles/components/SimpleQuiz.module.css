@@ -207,6 +207,75 @@
   border-color: var(--color-teal-light);
 }
 
+/* Compact variant for edit panel */
+.manualCompact {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-6);
+  border-radius: var(--radius-md);
+}
+
+.manualCompact .manualTitle {
+  font-size: var(--text-xs);
+  margin-bottom: 0;
+}
+
+.manualCompact .manualHeader {
+  margin-bottom: var(--spacing-3);
+}
+
+.manualCompact .manualGrid {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-2);
+}
+
+.manualCompact .manualFieldLabel {
+  font-size: 0.65rem;
+}
+
+.manualCompact .manualFieldInput {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--text-sm);
+}
+
+.manualCompact .manualFieldSelect {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-sm);
+}
+
+.manualCompact .manualSliderValue {
+  font-size: var(--text-sm);
+  margin-bottom: var(--spacing-1);
+}
+
+.manualCompact .manualSlider {
+  height: 4px;
+}
+
+.manualSliderRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.manualSliderRowLabel {
+  font-size: var(--text-xs);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.manualSliderRowValue {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+  min-width: 2.5em;
+  text-align: right;
+}
+
+.manualSliderRow .manualSlider {
+  flex: 1;
+  height: 4px;
+}
+
 /* === Navigation === */
 
 .navRow {
@@ -614,6 +683,12 @@
 .editAnswerBody {
   padding: var(--spacing-2) 0 var(--spacing-4) var(--spacing-6);
   animation: fadeIn 0.15s ease;
+}
+
+.editAnswerBody .moreOptionsToggle {
+  font-size: var(--text-sm);
+  padding: var(--spacing-2) 0;
+  margin-bottom: var(--spacing-2);
 }
 
 .editAnswerOptions {

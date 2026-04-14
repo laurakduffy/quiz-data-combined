@@ -29,13 +29,14 @@ export function getManualValue(type, override, selectedValue, question, dataset)
   }
 }
 
-function ManualInput({ type, question, selectedValue, override, onSet, dataset }) {
+function ManualInput({ type, question, selectedValue, override, onSet, dataset, compact }) {
   const isActive = override != null;
   const value = getManualValue(type, override, selectedValue, question, dataset);
+  const c = compact ? styles.manualCompact : '';
 
   if (type === 'moral_weights') {
     return (
-      <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''}`}>
+      <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''} ${c}`}>
         <div className={styles.manualHeader}>
           <span className={styles.manualTitle}>Custom Values</span>
         </div>
@@ -63,7 +64,7 @@ function ManualInput({ type, question, selectedValue, override, onSet, dataset }
 
   if (type === 'discount_factors') {
     return (
-      <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''}`}>
+      <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''} ${c}`}>
         <div className={styles.manualHeader}>
           <span className={styles.manualTitle}>Custom Values</span>
         </div>
@@ -96,6 +97,28 @@ function ManualInput({ type, question, selectedValue, override, onSet, dataset }
 
   if (type === 'p_extinction') {
     const pct = Math.round(value * 100);
+    if (compact) {
+      return (
+        <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''} ${c}`}>
+          <div className={styles.manualSliderRow}>
+            <span className={styles.manualSliderRowLabel}>Custom</span>
+            <span className={styles.manualSliderRowValue}>{pct}%</span>
+            <input
+              type="range"
+              className={styles.manualSlider}
+              min="0"
+              max="100"
+              step="1"
+              value={pct}
+              style={{
+                background: `linear-gradient(to right, #2a9ab5 0%, #2a9ab5 ${pct}%, rgba(255,255,255,0.15) ${pct}%, rgba(255,255,255,0.15) 100%)`,
+              }}
+              onChange={(e) => onSet(Math.round(Number(e.target.value)) / 100)}
+            />
+          </div>
+        </div>
+      );
+    }
     return (
       <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''}`}>
         <div className={styles.manualHeader}>
@@ -120,7 +143,7 @@ function ManualInput({ type, question, selectedValue, override, onSet, dataset }
 
   if (type === 'risk_profile') {
     return (
-      <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''}`}>
+      <div className={`${styles.manualSection} ${isActive ? styles.manualActive : ''} ${c}`}>
         <div className={styles.manualHeader}>
           <span className={styles.manualTitle}>Custom Value</span>
         </div>
