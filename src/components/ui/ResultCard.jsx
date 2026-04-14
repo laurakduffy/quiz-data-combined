@@ -38,6 +38,7 @@ function ResultCard({
         <CauseBar
           key={causeKey}
           name={cause.name}
+          info={cause.info}
           percentage={results[causeKey]}
           originalPercentage={originalResults?.[causeKey]}
           color={cause.color}

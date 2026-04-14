@@ -16,7 +16,8 @@
     "aiExplanation": false,
     "settingsModal": true,
     "simpleQuiz": true,
-    "supportFooter": false
+    "supportFooter": false,
+    "fundClusters": true
   },
 
   "calculations": {

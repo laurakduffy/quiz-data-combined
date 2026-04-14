@@ -5,6 +5,8 @@ import styles from '../../styles/components/DonationPage.module.css';
 import SplitEditor from './SplitEditor';
 import { endpoints } from '../../config/api';
 import config from '../../../config/donationPage.json';
+import features from '../../../config/features.json';
+import { useDataset } from '../../context/DatasetContext';
 
 const HANDOFF_KEY = 'donate_handoff';
 
@@ -22,6 +24,21 @@ function genRefId() {
 }
 
 export default function DonationPage() {
+  const { dataset } = useDataset();
+
+  // Derive cluster fund list from the dataset when feature is on
+  const useClusters = features.ui?.fundClusters && dataset.clusters?.length > 0;
+  const activeFunds = useMemo(() => {
+    if (!useClusters) return config.funds;
+    return dataset.clusters.map((c) => ({
+      id: c.id,
+      name: c.name,
+      sub: null,
+      defaultPct: null,
+      info: c.members.map((m) => dataset.projects[m]?.name || m).join('  \n'),
+    }));
+  }, [useClusters, dataset]);
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -36,22 +53,34 @@ export default function DonationPage() {
   const [networkBlocked, setNetworkBlocked] = useState(false);
   const refId = useRef(genRefId());
 
+  const activeFundNameById = useMemo(
+    () => Object.fromEntries(activeFunds.map(({ id, name }) => [id, name])),
+    [activeFunds]
+  );
+
   // Read donate handoff from sessionStorage on mount
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(HANDOFF_KEY);
       if (!raw) return;
       sessionStorage.removeItem(HANDOFF_KEY);
-      const { allocations } = JSON.parse(raw);
-      if (!allocations || typeof allocations !== 'object') return;
+      const parsed = JSON.parse(raw);
 
-      // Build splits keyed by fund id, rounding to 1 decimal
+      // Use clustered allocations when available and feature is on
+      const sourceAllocations =
+        useClusters && parsed.clusteredAllocations
+          ? parsed.clusteredAllocations
+          : parsed.allocations;
+      if (!sourceAllocations || typeof sourceAllocations !== 'object') return;
+
+      const ids = activeFunds.map((f) => f.id);
+
+      // Build splits keyed by fund/cluster id, rounding to 1 decimal
       const splits = {};
       let total = 0;
-      const ids = config.funds.map((f) => f.id);
       for (const id of ids) {
-        const raw = allocations[id];
-        const val = Math.round((raw != null ? Number(raw) : 0) * 10) / 10;
+        const rawVal = sourceAllocations[id];
+        const val = Math.round((rawVal != null ? Number(rawVal) : 0) * 10) / 10;
         splits[id] = val;
         total += val;
       }
@@ -73,7 +102,7 @@ export default function DonationPage() {
     } catch {
       // ignore corrupt handoff
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = useCallback((field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -114,7 +143,7 @@ export default function DonationPage() {
     } else if (form.splitPreference === 'custom') {
       splitText = 'Custom split:';
       for (const [id, pct] of Object.entries(form.splits)) {
-        splitText += `\n  ${fundNameById[id] || id}: ${pct}%`;
+        splitText += `\n  ${activeFundNameById[id] || id}: ${pct}%`;
       }
     }
 
@@ -126,7 +155,7 @@ Split preference: ${splitText}`;
     if (form.amount) text += `\nApproximate amount: $${parseFloat(form.amount).toLocaleString()}`;
     text += `\nReference: ${refId.current}`;
     return text;
-  }, [form]);
+  }, [form, activeFundNameById]);
 
   // --- Actions ---
   async function handleSubmit() {
@@ -297,6 +326,7 @@ Split preference: ${splitText}`;
                 splits={form.splitPreference === 'recommended' ? DEFAULT_SPLIT : form.splits}
                 onChange={setSplit}
                 readOnly={form.splitPreference === 'recommended'}
+                funds={activeFunds}
               />
             )}
 

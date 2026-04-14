@@ -1,3 +1,4 @@
+import InfoTooltip from './InfoTooltip';
 import styles from '../../styles/components/CauseBar.module.css';
 
 /**
@@ -28,6 +29,7 @@ function roundToHalfPercent(amount, budget) {
  */
 const CauseBar = ({
   name,
+  info = null,
   percentage,
   color,
   originalPercentage = null,
@@ -47,7 +49,10 @@ const CauseBar = ({
   return (
     <div className={`${styles.causeBar} ${simpleMode ? styles.compact : ''}`}>
       <div className={styles.header}>
-        <span className={styles.name}>{name}</span>
+        <span className={styles.name}>
+          {name}
+          {info && <InfoTooltip content={info} size={13} />}
+        </span>
         {dollarAmount ? (
           <span className={styles.dollarAmount}>{dollarAmount}</span>
         ) : (
