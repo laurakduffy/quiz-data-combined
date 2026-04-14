@@ -244,122 +244,172 @@ def build_document():
     doc.add_heading("Part I — Output Metrics", 1)
 
     doc.add_paragraph(
-        "Three metrics are computed for every sensitivity scenario. "
-        "They operate at different levels of granularity: the sensitivity index "
-        "summarises the whole portfolio in a single number; the log-ratio of scores "
-        "explains the mechanism per fund; and rank change flags qualitative threshold "
-        "crossings. Together they answer: how much did the recommendation change, "
-        "why did it change, and did anything cross an important boundary?"
+        "For every scenario we report five metrics. The first two summarise the whole "
+        "portfolio in one or two numbers; the remaining three break down what happened "
+        "fund-by-fund and perspective-by-perspective. Together they answer: how much "
+        "did the recommended donation split change, why did it change, and did anything "
+        "cross a meaningful threshold?"
     )
     doc.add_paragraph()
 
     # Metric 1
     _add_metric_block(
         doc,
-        title="1.  Sensitivity Index  (headline metric — one number per scenario)",
-        formula="sensitivity_index  =  Σ |Δ alloc%| / 2",
+        title="1.  Portfolio shift  (headline — one number per scenario)",
+        formula="portfolio shift  =  ( Σ |new allocation% − old allocation%| )  ÷  2",
         description=(
-            "The sum of absolute allocation changes across all funds, divided by two. "
-            "Reported in percentage points (pp). A value of 15 pp means that 15% of "
-            "the total portfolio was reallocated between funds when the parameter changed."
+            "For each fund, we take the absolute difference between its allocation "
+            "percentage before and after the parameter change, sum those differences "
+            "across all funds, then divide by two. The result is in percentage points "
+            "(pp).\n\n"
+            "Example: if the scenario moves 15% of the budget from GiveWell to "
+            "Sentinel Bio and nothing else changes, the portfolio shift = 15 pp."
         ),
         rationale=(
-            "Because portfolio allocations must sum to 100%, every pp gained by one "
-            "fund is lost by others — so the sum of all absolute changes always equals "
-            "twice the mass transferred. Dividing by two gives a single, interpretable "
-            "number: 'X pp of the portfolio shifted.' "
-            "This is preferable to max(|Δ alloc|), which is dominated by whichever "
-            "single fund sits closest to a scoring threshold, ignoring system-wide "
-            "reallocation. It is also preferable to mean(|Δ alloc|), which depends on "
-            "the arbitrary number of funds in the model.\n\n"
-            "Why the raw sensitivity index is the primary metric: The perturbation sizes "
-            "for each scenario are not arbitrary — they are calibrated to represent "
-            "plausible real-world uncertainty ranges (e.g. a 100× uncertainty on r_inf "
-            "reflects genuine expert disagreement, not a hypothetical). The raw SI "
-            "therefore directly answers the decision-relevant question: 'If the world "
-            "actually looks like scenario X, how much would my portfolio shift?' That "
-            "is what a donor needs to know.\n\n"
-            "Why normalized_SI is also reported: When comparing parameter importance "
-            "across scenarios, scenarios with larger perturbations mechanically tend to "
-            "produce larger SI values. The normalized sensitivity index — SI divided by "
-            "log₁₀(perturbation_ratio) — controls for this, expressing sensitivity as "
-            "pp of reallocation per order-of-magnitude of parameter change. It answers "
-            "a different question: 'Which parameter, if I were equally uncertain about "
-            "it on a log scale, has the most leverage over the portfolio?' Both metrics "
-            "are reported; neither should be used alone. normalized_SI is left blank "
-            "for categorical scenarios (no_cubic_growth, near_pessimistic_outcomes) "
-            "that do not have a natural scalar perturbation ratio."
+            "Because the allocations across all funds must always add up to 100%, "
+            "every percentage point gained by one fund is lost by others. The raw sum "
+            "of all changes therefore double-counts every transfer; dividing by two "
+            "gives the actual amount of money that moved. This produces a single, "
+            "intuitive number: 'X% of the total donation budget was reallocated.'\n\n"
+            "Why this is the primary metric: The size of each scenario's parameter "
+            "change is not arbitrary — it is set to represent a realistic range of "
+            "expert uncertainty. So the portfolio shift directly answers the decision- "
+            "relevant question: 'If our assumptions about this parameter are wrong by "
+            "this much, how different would a donor's recommended split be?' That is "
+            "what a donor needs to know.\n\n"
+            "Why the per-order-of-magnitude version (Metric 1b) is also reported: "
+            "Some scenarios test a 100× change in a parameter; others test only a 10× "
+            "change. All else equal, larger perturbations produce larger portfolio "
+            "shifts, making it hard to compare parameter importance across scenarios. "
+            "Dividing by the size of the perturbation (on a log scale) puts scenarios "
+            "on a common footing — expressing sensitivity as 'how many percentage "
+            "points shift per factor-of-10 change in this parameter.' Both versions "
+            "are reported; neither should be used alone. The per-OOM version is left "
+            "blank for scenarios that cannot be expressed as a factor change (e.g. "
+            "'assume stellar expansion never happens')."
         ),
     )
 
     # Metric 1b
     _add_metric_block(
         doc,
-        title="1b.  Normalized Sensitivity Index  (secondary — controls for perturbation scale)",
-        formula="normalized_SI  =  sensitivity_index / log₁₀(perturbation_ratio)",
+        title="1b.  Portfolio shift per order of magnitude  (secondary)",
+        formula=(
+            "shift per OOM  =  portfolio shift  ÷  log₁₀(perturbation factor)\n"
+            "e.g. for a 100× change:  shift per OOM  =  portfolio shift  ÷  2"
+        ),
         description=(
-            "The sensitivity index divided by the base-10 logarithm of the perturbation "
-            "ratio. Units: pp per order-of-magnitude (pp/OOM). A value of 8 pp/OOM means "
-            "that each factor-of-10 change in the parameter is associated with 8 pp of "
-            "portfolio reallocation. Left blank for categorical scenarios."
+            "The portfolio shift (Metric 1) divided by the base-10 logarithm of the "
+            "perturbation factor. Units: percentage points per order of magnitude "
+            "(pp/OOM). A value of 8 pp/OOM means that each factor-of-10 change in "
+            "the parameter is associated with 8 pp of budget reallocation.\n\n"
+            "Left blank for scenarios that represent a categorical change rather than "
+            "a scalar one."
         ),
         rationale=(
-            "See the discussion under Metric 1. This metric is reported alongside "
-            "the raw SI — not instead of it — because the uncertainty ranges themselves "
-            "carry information about which parameters matter in practice."
+            "See discussion under Metric 1. Reported alongside the raw portfolio shift "
+            "— not instead of it — because the actual uncertainty ranges matter for "
+            "real decisions."
         ),
     )
 
     # Metric 2
     _add_metric_block(
         doc,
-        title="2.  Log-ratio of scores  (per-fund, per-worldview — explains the mechanism)",
-        formula="log_ratio_{worldview}  =  log₁₀( score_new / score_base )",
+        title="2.  Score magnitude change, per perspective  (explains the mechanism)",
+        formula=(
+            "magnitude change  =  log₁₀(|score after|) − log₁₀(|score before|)\n"
+            "equivalently:      =  log₁₀( |score after| ÷ |score before| )"
+        ),
         description=(
-            "The base-10 logarithm of the ratio of new to base-case score, computed "
-            "separately for each fund under each worldview. Columns in the output are "
-            "named log_ratio_human_focused, log_ratio_animal_welfare, and "
-            "log_ratio_longtermist. A value of 1 indicates a 10× change; 0.3 ≈ 2×; "
-            "−1 = a 10-fold decrease. NaN is reported when either score is non-positive."
+            "For each fund and each ethical perspective, we measure how many orders "
+            "of magnitude the fund's cost-effectiveness score changed. A value of 1 "
+            "means the score became 10× larger in magnitude; 0.3 ≈ 2×; −1 means it "
+            "shrank to one-tenth its original size. The sign of the score (whether "
+            "the fund looks beneficial or harmful) is reported separately in Metric 2b.\n\n"
+            "This is computed three times per fund — once under each ethical "
+            "perspective — so a reader can see whether a scenario affects all "
+            "perspectives equally or only some."
         ),
         rationale=(
-            "GCR fund scores span many orders of magnitude depending on world-prior "
-            "assumptions (e.g., 10¹ to 10⁸ life-years per $1M). A percentage-change "
-            "metric would produce misleading comparisons across this range. "
-            "The log-ratio is scale-invariant and symmetric: a doubling and a halving "
-            "each have magnitude ≈ 0.3. It reveals the mechanism behind allocation "
-            "shifts — did fund X increase by 2 orders of magnitude, or did fund Y "
-            "decrease by 1 — which the headline sensitivity index alone cannot show.\n\n"
-            "Why per-worldview rather than an aggregate: Taking a credence-weighted "
-            "average of scores across worldviews is itself a substantive aggregation "
-            "choice that is not assumed here. A parameter change may shift fund scores "
-            "in one worldview while leaving others unaffected — for example, a change "
-            "to the stellar settlement speed has large effects under the longtermist "
-            "worldview but near-zero effects under the human-focused worldview. "
-            "Averaging would obscure this structure. Reporting per-worldview log-ratios "
-            "lets analysts see exactly which ethical perspectives are driving any given "
-            "scenario's allocation shift."
+            "Fund scores in this model range across many orders of magnitude. Under "
+            "perspectives that place high weight on the very long-run future, a fund "
+            "that prevents extinction may score trillions of times higher than one "
+            "that improves animal welfare. A simple percentage change would be "
+            "meaningless at these scales. Log-scale differences are the natural "
+            "unit: a change of 1 always means a factor of 10, regardless of whether "
+            "the baseline score is 100 or 10¹⁸.\n\n"
+            "We use the absolute value of scores before taking the logarithm because "
+            "some ethical perspectives assign negative scores to GCR funds (reflecting "
+            "risk aversion about outcomes that could also be harmful). Without this, "
+            "the calculation would be undefined whenever a score is negative or zero, "
+            "and the sign change would be hidden inside the magnitude metric. Keeping "
+            "them separate makes both signals unambiguous.\n\n"
+            "We report one value per ethical perspective rather than a single weighted "
+            "average, because collapsing across perspectives is itself a value judgment "
+            "we do not want to embed in the analysis. A parameter change might shift "
+            "scores dramatically for someone who cares about the long-run future but "
+            "be completely irrelevant to someone focused on near-term animal welfare — "
+            "and a weighted average would hide that distinction."
+        ),
+    )
+
+    # Metric 2b
+    _add_metric_block(
+        doc,
+        title="2b.  Score direction, per perspective  (captures sign flips)",
+        formula='direction  =  "<before sign> / <after sign>"   where sign is + or −',
+        description=(
+            "For each fund and each ethical perspective, we record whether the "
+            "fund's score was positive or negative before the scenario, and positive "
+            "or negative after. The four possible values are:\n"
+            "  +/+  score was positive and stayed positive\n"
+            "  +/−  score flipped from positive to negative\n"
+            "  −/+  score flipped from negative to positive\n"
+            "  −/−  score was negative and stayed negative\n\n"
+            "A score of exactly zero is marked 0 (rare in practice)."
+        ),
+        rationale=(
+            "A fund whose score changes sign has crossed a fundamental threshold: "
+            "it has gone from looking beneficial to looking harmful (or vice versa) "
+            "under that ethical perspective. This is a qualitatively different kind "
+            "of change from a shift in magnitude — and it cannot be detected from "
+            "the magnitude metric alone, which works on absolute values. Reporting "
+            "direction separately ensures that both 'how much did the score change?' "
+            "and 'did it cross from good to bad?' are always clearly visible."
         ),
     )
 
     # Metric 3
     _add_metric_block(
         doc,
-        title="3.  Rank change  (per-fund — diagnostic for threshold crossings)",
-        formula="rank_delta  =  rank_new − rank_base   (rank 1 = highest score)",
+        title="3.  Ranking change, per perspective  (detects threshold crossings)",
+        formula=(
+            "ranking change  =  rank after scenario − rank before scenario\n"
+            "(rank 1 = highest-scoring fund;  positive value = fund fell in ranking)"
+        ),
         description=(
-            "The change in a fund's rank by score under the perturbed vs. base-case "
-            "worldview. Positive = fund fell in the ranking; negative = fund improved."
+            "For each ethical perspective, funds are ranked by their cost-effectiveness "
+            "score from highest (rank 1) to lowest. We report how each fund's rank "
+            "changed between the base case and the scenario. A positive number means "
+            "the fund fell; a negative number means it rose."
         ),
         rationale=(
-            "The greedy allocation algorithm has winner-take-all tendencies: a fund "
-            "just below another fund's marginal cost-effectiveness may receive zero "
-            "allocation, while a fund just above may receive a disproportionate share. "
-            "A parameter change that looks modest in the sensitivity index can "
-            "nonetheless flip the rank of two funds and cross a qualitative threshold — "
-            "for example, moving a fund from 'receives nothing' to 'receives 30% of "
-            "the portfolio.' Rank change flags this type of structural shift that the "
-            "headline metric would understate."
+            "The allocation model tends to concentrate funding: the highest-ranked "
+            "fund receives money first, then the next-highest, and so on, with each "
+            "fund receiving less as more money flows to it. A fund that slips from "
+            "second place to third — even if its score barely changed — may drop from "
+            "'receives 20% of the budget' to 'receives nothing,' because the fund "
+            "that overtook it now absorbs all the marginal dollars.\n\n"
+            "Rank change separates two distinct reasons a fund's allocation might "
+            "shift: (a) its score changed in magnitude, or (b) the scores of other "
+            "funds changed and it was overtaken. The magnitude metric (Metric 2) "
+            "captures (a); rank change captures (b). Together they explain whether "
+            "a portfolio shift was driven by a fund improving in absolute terms, or "
+            "by the competitive landscape changing around it.\n\n"
+            "Ranks are based on scores alone — before the allocation process applies "
+            "diminishing returns — so rank reflects pure cost-effectiveness ordering, "
+            "not the final funding outcome."
         ),
     )
 
@@ -371,13 +421,14 @@ def build_document():
     doc.add_heading("Part II — Parameter Scenarios", 1)
 
     doc.add_paragraph(
-        f"The following {len(SCENARIO_METADATA)} scenarios are defined in "
-        "run_sensitivity.py. Each modifies one parameter group while holding all "
-        "others at their base-case distributions. Perturbation magnitudes were "
-        "chosen to be large enough to produce unambiguous signal: order-of-magnitude "
-        "(OOM) shifts for continuous parameters, and large probability-mass transfers "
-        "for Dirichlet parameters. The 'Ratio' column shows the perturbation_ratio "
-        "recorded in each scenario JSON, used to compute the normalized sensitivity index."
+        f"The following {len(SCENARIO_METADATA)} scenarios each test what happens "
+        "when one group of assumptions is changed while everything else is held fixed "
+        "at its central estimate. The size of each change is chosen to be large "
+        "enough to produce a clear signal — typically a factor-of-10 or factor-of-100 "
+        "shift for quantities that vary continuously, or a complete redistribution of "
+        "probability for quantities that sum to one. The 'Ratio' column records the "
+        "factor by which the parameter was shifted, used to compute the per-OOM "
+        "sensitivity metric."
     )
     doc.add_paragraph()
 
@@ -414,24 +465,24 @@ def build_document():
     _set_col_widths(table, col_widths)
     doc.add_paragraph()
 
-    # ── Worldview mixture used for comparison ────────────────────────────
-    doc.add_heading("Worldview Mixture Used in compare_sensitivity.py", 2)
+    # ── Ethical perspectives used for comparison ─────────────────────────
+    doc.add_heading("Ethical Perspectives Used in the Comparison", 2)
     doc.add_paragraph(
-        "Allocation comparisons use a moral parliament of three worldviews loaded from "
-        "config/worldviewPresets.json. At each $2M allocation step, each worldview "
-        "independently directs its credence-share of the budget to the fund with the "
-        "highest marginal cost-effectiveness under that worldview's own parameters. "
-        "This mirrors the quiz's voteCredenceWeightedCustom method and ensures that "
-        "the analysis respects ethical pluralism rather than assuming a single "
-        "aggregated view."
+        "Rather than assuming a single set of values, the analysis runs under three "
+        "distinct ethical perspectives simultaneously. The budget is divided across "
+        "perspectives in proportion to their credence weights. At each $2M step, each "
+        "perspective independently directs its share of the money to whichever fund "
+        "looks most cost-effective from that perspective's point of view. The final "
+        "allocation reflects all three perspectives in proportion to how much weight "
+        "is placed on each."
     )
     doc.add_paragraph()
 
-    wv_table = doc.add_table(rows=4, cols=4)
+    wv_table = doc.add_table(rows=1, cols=4)
     wv_table.style = "Table Grid"
     wv_hdr = wv_table.rows[0]
     _shade_row(wv_hdr, "1A237E")
-    for i, hdr in enumerate(["Worldview", "Credence", "Risk profile", "p_extinction"]):
+    for i, hdr in enumerate(["Perspective", "Weight", "Attitude to risk", "Extinction discount"]):
         wv_hdr.cells[i].text = hdr
         run = wv_hdr.cells[i].paragraphs[0].runs[0]
         run.bold = True
@@ -439,15 +490,20 @@ def build_document():
         run.font.size = Pt(9)
 
     wv_rows = [
-        ("human_focused\n(near-term, human-centred)",
-         "35%", "0 — neutral expected value",
-         "10% (low concern for near-term extinction)"),
-        ("animal_welfare\n(near-term, cross-species)",
-         "40%", "1 — WLU-low (modest loss aversion)",
-         "5%"),
-        ("longtermist\n(high extinction concern)",
-         "25%", "2 — WLU-moderate",
-         "50% (high discount on non-xrisk futures)"),
+        ("Human-focused, near-term",
+         "35%",
+         "Risk-neutral (takes expected values at face value)",
+         "10% — relatively low concern that civilisation will not survive to benefit "
+         "from long-run investments"),
+        ("Animal welfare, near-term",
+         "40%",
+         "Mildly loss-averse (bad outcomes weighted slightly more than good ones)",
+         "5% — very low extinction concern; near-term welfare dominates"),
+        ("Longtermist, high extinction concern",
+         "25%",
+         "Moderately loss-averse",
+         "50% — high concern that future generations may not exist; strongly discounts "
+         "benefits that only materialise if civilisation survives"),
     ]
     for row_idx, (name, cred, rp, pext) in enumerate(wv_rows):
         data_row = wv_table.add_row()
@@ -458,15 +514,18 @@ def build_document():
                 for run in para.runs:
                     run.font.size = Pt(9)
 
-    _set_col_widths(wv_table, [2.0, 0.8, 2.2, 3.0])
+    _set_col_widths(wv_table, [1.8, 0.7, 2.3, 3.2])
     doc.add_paragraph()
 
     doc.add_paragraph(
-        "Each worldview also has distinct moral weights (e.g. the human-focused worldview "
-        "assigns near-zero weight to animal welfare; the animal welfare worldview assigns "
-        "high weight to chickens and mammals) and discount factors (the longtermist "
-        "worldview is nearly undiscounted out to 500 years; the human-focused worldview "
-        "discounts sharply beyond 20 years). Full values are in config/worldviewPresets.json."
+        "Each perspective also assigns different relative values to human and animal "
+        "welfare (the human-focused perspective places near-zero weight on animal "
+        "wellbeing; the animal welfare perspective weights chickens, fish, and mammals "
+        "substantially) and discounts the future at different rates (the longtermist "
+        "perspective treats outcomes 500 years from now as nearly as important as "
+        "outcomes today; the human-focused perspective discounts sharply beyond 20 "
+        "years). These differences mean the three perspectives often disagree sharply "
+        "on which fund deserves the most money."
     )
     doc.add_paragraph()
 
