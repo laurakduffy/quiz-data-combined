@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import { useDataset } from '../../context/DatasetContext';
 import ManualInput from './ManualInput';
 import quizConfig from '../../../config/simpleQuizConfig.json';
+import copy from '../../../config/copy.json';
 import styles from '../../styles/components/SimpleQuiz.module.css';
 
 const questions = quizConfig.questions;
@@ -145,7 +146,7 @@ function EditAnswerItem({
                   size={12}
                   className={`${styles.moreOptionsToggleIcon} ${showMore ? styles.moreOptionsToggleIconOpen : ''}`}
                 />
-                More options
+                {copy.simpleQuiz?.moreOptionsToggle || 'More options'}
               </button>
 
               {showMore && (

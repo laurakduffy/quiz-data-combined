@@ -100,6 +100,9 @@
       }
     }
   },
+  "simpleQuiz": {
+    "moreOptionsToggle": "More options (show underlying values)"
+  },
   "editPanel": {
     "modifiedBadge": "modified",
     "sliderNote": "Sliders auto-balance to 100%",
