@@ -1,0 +1,27 @@
+# Coefficient Giving — TEMPLATE (awaiting data from Lewis)
+#
+# This file is a placeholder. When Coefficient Giving split data arrives:
+#   1. Update annual_budget_M with their AW allocation
+#   2. Fill in splits based on their intervention breakdown
+#   3. Run: python run.py --fund coefficient_giving
+
+fund:
+  project_id: coefficient_giving
+  display_name: "Coefficient Giving (Animal Welfare)"
+  annual_budget_M: 0.0
+  room_for_more_M: 0.0
+  source_year: 2024
+
+  splits:
+    chicken_corporate_campaigns: 0.0
+    shrimp_welfare: 0.0
+    fish_welfare: 0.0
+    invertebrate_welfare: 0.0
+    policy_advocacy: 0.0
+    movement_building: 0.0
+    wild_animal_welfare: 0.0
+
+  diminishing_anchors:
+    - [1.0, 1.0]
+    - [5.0, 0.90]
+    - [10.0, 0.75]

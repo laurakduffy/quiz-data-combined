@@ -1,0 +1,19 @@
+# EA Animal Welfare Fund — Estimated intervention splits
+#
+# Sources:
+#   - Correspondence with EA AWF
+
+fund:
+  project_id: ea_awf
+  display_name: "EA Animal Welfare Fund"
+  annual_budget_M: 7.0 #22.5% growth YoY, 26M over 3 years
+  source_year: 2026
+
+  splits:
+    chicken_corporate_campaigns: 0.36
+    fish_welfare: 0.07
+    shrimp_welfare: 0.19
+    invertebrate_welfare: 0.22
+    policy_advocacy: 0.045 # 9% affects, split evenly with movement building
+    movement_building: 0.045 # assume equally split with policy advocacy
+    wild_animal_welfare: 0.07

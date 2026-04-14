@@ -1,0 +1,47 @@
+# Fund Template — Copy this file for a new fund
+#
+# Instructions:
+#   1. Copy this file to <fund_name>.yaml (e.g. navigation_fund.yaml)
+#   2. Fill in project_id, display_name, annual_budget_M
+#   3. Set splits — these must be decimal fractions that sum to ~1.0
+#      Each key must match an intervention name in aw_model_intervention_estimates.yaml
+#   4. Optionally set diminishing_anchors (cumulative $M → CE multiplier)
+#   5. Run: python run.py --fund <fund_name>
+#
+# Available intervention keys (from aw_model_intervention_estimates.yaml):
+#   - chicken_corporate_campaigns
+#   - shrimp_welfare
+#   - fish_welfare
+#   - invertebrate_welfare
+#   - policy_advocacy
+#   - movement_building
+#   - wild_animal_welfare
+#
+# Splits should reflect % of budget going to each intervention type.
+# If an intervention is not funded, omit it or set to 0.
+# Splits don't need to sum to exactly 1.0 — they will be normalized.
+
+fund:
+  project_id: CHANGE_ME
+  display_name: "Fund Display Name"
+  annual_budget_M: 0.0
+  room_for_more_M: 0.0
+  source_year: 2024
+
+  splits:
+    chicken_corporate_campaigns: 0.0
+    shrimp_welfare: 0.0
+    fish_welfare: 0.0
+    invertebrate_welfare: 0.0
+    policy_advocacy: 0.0
+    movement_building: 0.0
+    wild_animal_welfare: 0.0
+
+  # Diminishing returns anchors: [cumulative $M, marginal CE multiplier]
+  # First anchor should be [starting_amount, 1.0]
+  # Subsequent anchors show how CE declines with more funding
+  # Leave as-is if unknown
+  diminishing_anchors:
+    - [1.0, 1.0]
+    - [5.0, 0.90]
+    - [10.0, 0.75]

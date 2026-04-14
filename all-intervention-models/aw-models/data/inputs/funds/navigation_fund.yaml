@@ -1,0 +1,40 @@
+# Navigation Fund — Combined (General + Cage-Free)
+#
+# Source: TNF future spending sheets (Jesse, Feb 2026)
+#
+# Run the sub-funds separately for more detail:
+#   python run.py --fund navigation_fund_general --verbose
+#   python run.py --fund navigation_fund_cagefree --verbose
+#
+# Marginal splits, budget-weighted: general=$40M RFMF, cagefree=$33M RFMF
+# Total marginal: $73M
+#   chicken = (0.19 × 40 + 1.00 × 33) / 73 = 0.556
+#   movement = 0.44 × 40 / 73 = 0.241
+#   policy = 0.22 × 40 / 73 = 0.121
+#   fish = 0.07 × 40 / 73 = 0.038
+#   shrimp = 0.03 × 40 / 73 = 0.016
+#   invertebrate = 0.025 × 40 / 73 = 0.014
+#   wild = 0.025 × 40 / 73 = 0.014
+
+fund:
+  project_id: navigation_fund
+  display_name: "Navigation Fund (Combined)"
+  annual_budget_M: 22.8
+  room_for_more_M: 73.0
+  source_year: 2026
+
+  splits:
+    chicken_corporate_campaigns: 0.556
+    movement_building: 0.241
+    policy_advocacy: 0.121
+    fish_welfare: 0.038
+    shrimp_welfare: 0.016
+    invertebrate_welfare: 0.014
+    wild_animal_welfare: 0.014
+
+  diminishing_anchors:
+    - [10.0, 1.0]
+    - [23.0, 0.95]
+    - [50.0, 0.82]
+    - [80.0, 0.60]
+    - [120.0, 0.40]

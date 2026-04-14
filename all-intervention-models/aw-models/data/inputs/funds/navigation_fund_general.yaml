@@ -1,0 +1,37 @@
+# Navigation Fund — General Farm Animal Grantmaking (excluding Cage-Free Fund)
+#
+# Source: "TNF - Summary of Grantmaking for RP - Future General Spending"
+# (Jesse, Feb 2026) — shows how TNF would spend $40M RFMF in 2026.
+#
+# See data/inputs/funds/TNF_README.md for full categorisation methodology.
+#
+# These are MARGINAL splits — how the next dollar would be allocated,
+# not how past dollars were spent. This is what we want for marginal CE.
+#
+# The future spending sheet explicitly lays out $40M across regions/areas.
+# Regional lines (EU, LatAm, Asia, Africa) were allocated using species
+# lists and area descriptions. See TNF_README.md for ratios.
+#
+# Note from Jesse: "You can assume a similar breakdown if our budget
+# increases further in 2027. As absorbency and tractability in Asia,
+# Latin America and Africa increase, we would expect to increase the
+# ratios in those regions by tapering increases in the US and EU."
+
+fund:
+  project_id: navigation_fund_general
+  display_name: "Navigation Fund — General Farm Animal"
+  annual_budget_M: 16.7
+  source_year: 2026
+
+  # Marginal splits from future general spending sheet ($40M RFMF)
+
+
+  splits:
+    movement_building: 0.33
+    policy_advocacy: 0.10
+    chicken_corporate_campaigns: 0.07
+    fish_welfare: 0.125
+    shrimp_welfare: 0.125
+    invertebrate_welfare: 0.025
+    wild_animal_welfare: 0.025 
+# 20% unallocated, will assume splits across these proportionally

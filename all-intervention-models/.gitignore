@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+
+# Generated outputs (regenerable by running the models)
+# NONE
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

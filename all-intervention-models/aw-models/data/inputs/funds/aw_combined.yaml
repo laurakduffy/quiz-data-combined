@@ -1,0 +1,44 @@
+# Combined AW Fund Estimate — Weighted aggregate of all AW funds
+#
+# Marginal RFMF weights:
+#   EA AWF:             $6.3M RFMF
+#   TNF General:       $40.0M RFMF
+#   TNF Cage-Free:     $33.0M RFMF
+#   CG:                 $0.0M (template, not yet filled)
+#   Total marginal:    $79.3M
+#
+# Budget-weighted marginal splits:
+#   chicken = (0.35×6.3 + 0.19×40 + 1.00×33) / 79.3 = 0.512
+#   movement = (0.12×6.3 + 0.44×40) / 79.3 = 0.231
+#   policy = (0.10×6.3 + 0.22×40) / 79.3 = 0.119
+#   fish = (0.12×6.3 + 0.07×40) / 79.3 = 0.045
+#   shrimp = (0.05×6.3 + 0.03×40) / 79.3 = 0.019
+#   wild = (0.14×6.3 + 0.025×40) / 79.3 = 0.024
+#   invert = (0.02×6.3 + 0.025×40) / 79.3 = 0.014
+#   mammals = 0.0 (not yet included in splits)
+#
+# TNF dominates (~92% of marginal budget). Splits will shift when CG
+# data arrives. EA AWF splits are historical (marginal not yet available).
+
+fund:
+  project_id: aw_combined
+  display_name: "Combined AW Funds (Marginal)"
+  annual_budget_M: 26.5
+  room_for_more_M: 79.3
+  source_year: 2026
+
+  splits:
+    chicken_corporate_campaigns: 0.512
+    movement_building: 0.231
+    policy_advocacy: 0.119
+    fish_welfare: 0.045
+    shrimp_welfare: 0.019
+    wild_animal_welfare: 0.024
+    invertebrate_welfare: 0.014
+
+  diminishing_anchors:
+    - [10.0, 1.0]
+    - [26.5, 0.95]
+    - [55.0, 0.82]
+    - [100.0, 0.55]
+    - [160.0, 0.35]
