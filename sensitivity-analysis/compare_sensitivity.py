@@ -55,6 +55,19 @@ CONFIG_DIR  = SCRIPT_DIR.parent / "config"                  # quiz-demo/config/
 
 COMPARISON_BUDGET_DEFAULT = 400  # $M — sector budget we evaluate up to
 
+# Risk profile names and time-period indices — must match the order used in
+# the values matrices (values[t][risk_profile]) and in all_risk_adjusted.csv.
+RISK_PROFILE_NAMES = [
+    "neutral", "wlu - low", "wlu - moderate", "wlu - high",
+    "upside", "downside", "combined", "ambiguity",
+]
+EFFECT_VALUE_COLS = [
+    col
+    for rp in RISK_PROFILE_NAMES
+    for t in range(6)
+    for col in (f"{rp}_t{t}_oom", f"{rp}_t{t}_sign")
+]
+
 
 # ---------------------------------------------------------------------------
 # Worldview loading
@@ -170,6 +183,58 @@ def aggregate_scores(wv_scores_list, worldviews):
         for pid in pids:
             agg[pid] += w * scores_i[pid]
     return agg
+
+
+# ---------------------------------------------------------------------------
+# Raw effect-level OOM change table
+# ---------------------------------------------------------------------------
+
+def _sign_char(v):
+    return "+" if v > 0 else ("-" if v < 0 else "0")
+
+
+def compute_effects_changes(base_projects, sc_projects):
+    """Return one row per (project_id, effect_id) with paired OOM and sign columns.
+
+    For each (risk_profile, time_period) combination two adjacent columns appear:
+      {rp}_t{t}_oom  : log10(|new|) − log10(|base|)
+                         0.0 when both values are zero (genuine structural zero)
+                         nan when exactly one is zero (ill-defined transition)
+      {rp}_t{t}_sign : "<base_sign>/<new_sign>"  e.g. "+/+", "+/-", "-/+", "-/-"
+                         "0" used for exact-zero values
+    """
+    rows = []
+    for pid, base_proj in base_projects.items():
+        sc_proj    = sc_projects.get(pid, {})
+        sc_effects = sc_proj.get("effects", {})
+        for eid, base_eff in base_proj["effects"].items():
+            sc_eff    = sc_effects.get(eid, {})
+            base_vals = base_eff["values"]          # base_vals[t][risk_profile]
+            sc_vals   = sc_eff.get("values", [[0] * len(RISK_PROFILE_NAMES)] * 6)
+            row = {
+                "project_id":      pid,
+                "effect_id":       eid,
+                "recipient_type":  base_eff["recipient_type"],
+                "near_term_xrisk": base_proj.get("tags", {}).get("near_term_xrisk", False),
+            }
+            for ri, rp_name in enumerate(RISK_PROFILE_NAMES):
+                for t in range(6):
+                    try:
+                        bv = base_vals[t][ri]
+                        nv = sc_vals[t][ri]
+                    except (IndexError, TypeError):
+                        row[f"{rp_name}_t{t}_oom"]  = float("nan")
+                        row[f"{rp_name}_t{t}_sign"] = "?"
+                        continue
+                    if bv == 0 and nv == 0:
+                        row[f"{rp_name}_t{t}_oom"] = 0.0
+                    elif bv == 0 or nv == 0:
+                        row[f"{rp_name}_t{t}_oom"] = float("nan")
+                    else:
+                        row[f"{rp_name}_t{t}_oom"] = math.log10(abs(nv)) - math.log10(abs(bv))
+                    row[f"{rp_name}_t{t}_sign"] = f"{_sign_char(bv)}/{_sign_char(nv)}"
+            rows.append(row)
+    return rows
 
 
 # ---------------------------------------------------------------------------
@@ -326,8 +391,9 @@ def main():
     print(f"\nFound {len(scenario_files)} scenario(s) in {sens_dir.relative_to(SCRIPT_DIR)}")
 
     # ── Compare each scenario ────────────────────────────────────────────────
-    by_fund_rows = []
-    index_rows   = []
+    by_fund_rows   = []
+    effects_rows   = []
+    index_rows     = []
 
     for sc_path in scenario_files:
         scenario_name = sc_path.stem
@@ -347,35 +413,15 @@ def main():
         si        = sensitivity_index(fund_rows)
         nsi       = normalized_sensitivity_index(si, perturbation_ratio)
 
-        # Per-worldview log ratios, sign transitions, and rank deltas.
-        # All keyed by project_id → {wv_id: value}.
-        #
-        # log_ratio: log10(|new|) − log10(|base|)  — OOM magnitude change.
-        #   NaN only when either value is exactly zero.
-        # sign: "base_sign/new_sign" where each sign is "+" or "-".
-        #   "0" used for the rare exact-zero edge case.
-        # rank_delta: new_rank − base_rank (rank 1 = highest score; positive = fell).
-        def _sign_char(v):
-            return "+" if v > 0 else ("-" if v < 0 else "0")
-
-        wv_log_ratios  = {pid: {} for pid in base_projects}
-        wv_signs       = {pid: {} for pid in base_projects}
+        # Per-worldview rank deltas (pre-DR score ordering, worldview-specific)
         wv_rank_deltas = {pid: {} for pid in base_projects}
         for wv_id, base_sc, sc_sc in zip(wv_ids, base_wv_scores, sc_wv_scores):
             base_ranks = rank_dict(base_sc)
             sc_ranks   = rank_dict(sc_sc)
             for pid in base_projects:
-                bs = base_sc[pid]
-                ns = sc_sc[pid]
-                if bs == 0 or ns == 0:
-                    lr = float("nan")
-                else:
-                    lr = math.log10(abs(ns)) - math.log10(abs(bs))
-                wv_log_ratios[pid][wv_id]  = lr
-                wv_signs[pid][wv_id]       = f"{_sign_char(bs)}/{_sign_char(ns)}"
-                wv_rank_deltas[pid][wv_id] = sc_ranks[pid] - base_ranks[pid]
+                wv_rank_deltas[pid][wv_id] = base_ranks[pid] - sc_ranks[pid]
 
-        # Per-fund output rows
+        # Per-fund allocation rows
         for row in fund_rows:
             pid = row["project_id"]
             row_dict = {
@@ -386,13 +432,12 @@ def main():
                 "alloc_delta_pp": f"{row['alloc_delta_pp']:.4f}",
             }
             for wv_id in wv_ids:
-                lr = wv_log_ratios[pid][wv_id]
-                row_dict[f"log_ratio_{wv_id}"] = (
-                    f"{lr:.4f}" if not math.isnan(lr) else "nan"
-                )
-                row_dict[f"sign_{wv_id}"]       = wv_signs[pid][wv_id]
                 row_dict[f"rank_delta_{wv_id}"] = wv_rank_deltas[pid][wv_id]
             by_fund_rows.append(row_dict)
+
+        # Raw effect-level OOM + sign changes (worldview-independent)
+        for eff_row in compute_effects_changes(base_projects, sc_projects):
+            effects_rows.append({"scenario": scenario_name, **eff_row})
 
         # Index row
         most_affected = max(fund_rows, key=lambda r: abs(r["alloc_delta_pp"]))
@@ -420,19 +465,23 @@ def main():
 
     # ── Write CSVs ───────────────────────────────────────────────────────────
     print()
-    per_wv_cols = [
-        col
-        for wv_id in wv_ids
-        for col in (f"log_ratio_{wv_id}", f"sign_{wv_id}", f"rank_delta_{wv_id}")
-    ]
+    rank_delta_cols = [f"rank_delta_{wv_id}" for wv_id in wv_ids]
     write_csv(
         str(SCRIPT_DIR / "outputs" / "sensitivity_by_fund.csv"),
         fieldnames=[
             "scenario", "project_id",
-            *per_wv_cols,
+            *rank_delta_cols,
             "base_alloc_pct", "new_alloc_pct", "alloc_delta_pp",
         ],
         rows=by_fund_rows,
+    )
+    write_csv(
+        str(SCRIPT_DIR / "outputs" / "sensitivity_effects_oom.csv"),
+        fieldnames=[
+            "scenario", "project_id", "effect_id", "recipient_type", "near_term_xrisk",
+            *EFFECT_VALUE_COLS,
+        ],
+        rows=effects_rows,
     )
     write_csv(
         str(SCRIPT_DIR / "outputs" / "sensitivity_index.csv"),

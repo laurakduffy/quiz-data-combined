@@ -262,25 +262,25 @@ PERSISTENCE_EFFECT_DIST = {
 
 SENTINEL_REL_REDUCTION_PER_M_DIST = {
     "dist": "loguniform",
-    "ci_90": [2e-5, 2e-3],
-    "bounds": [None, 5e-3], 
+    "ci_90": [5e-5, 5e-4],
+    "bounds": [None, 1e-3], 
     # Relative cause-specific risk reduction per $1M for Sentinel Bio.
     # Previous: {values: [0.0002, 0.002, 0.02], p: [0.25, 0.60, 0.15] in increments of $10M}
 }
 
 NUCLEAR_REL_REDUCTION_PER_M_DIST = {
     "dist": "loguniform",
-    "ci_90": [2e-5, 2e-3],
-    "bounds": [None, 5e-3], 
+    "ci_90": [5e-5, 5e-4],
+    "bounds": [None, 1e-3], 
     # Same as Sentinel per $1M.
     # Previous: same as Sentinel.
 }
 
 AI_REL_REDUCTION_PER_M_DIST = {
     "dist": "loguniform",
-    "ci_90": [5e-6, 5e-4],
-    "bounds": [None, 1e-3], 
-    # 1/4 of nuclear per $1M (Longview AI is ~10× more funded).
+    "ci_90": [1e-5, 1e-4],
+    "bounds": [None, 3e-4], 
+    # 1/5 of nuclear per $1M (Longview AI is ~10× more funded).
     # Previous: 1/4 × nuclear values: [0.00005, 0.0005, 0.005] per $10M
 }
 

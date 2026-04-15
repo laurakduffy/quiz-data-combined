@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-BUDGET_M = 400 
+BUDGET_M = 400
 INCREMENT_SIZE = 2 # in Millions
 
 _GCR_DMR_SCENARIOS = ['optimistic', 'pessimistic', 'median', 'fund_estimated']
@@ -18,22 +18,16 @@ if __name__ == '__main__':
         '--gcr-dmr-scenario', default='median', choices=_GCR_DMR_SCENARIOS,
         help='GCR diminishing returns scenario (default: median)'
     )
-    _parser.add_argument(
-        '--gcr-model', default='gcr-models', choices=['gcr-models', 'gcr-models-mc'],
-        help='GCR model folder to read outputs from (default: gcr-models)'
-    )
     _args = _parser.parse_args()
     GCR_DMR_SCENARIO = _args.gcr_dmr_scenario
-    GCR_MODEL = _args.gcr_model
 else:
     GCR_DMR_SCENARIO = 'median'
-    GCR_MODEL = 'gcr-models'
 
 # combine the diminishing returns data from the three models into a single dataframe
 gw_diminishing_returns = pd.read_csv('gw-models/givewell_diminishing_returns_{}M.csv'.format(INCREMENT_SIZE))
 ea_awf_diminishing_returns = pd.read_csv('aw-models/data/inputs/ea_awf_diminishing_returns_{}M.csv'.format(INCREMENT_SIZE))
 navigation_fund_diminishing_returns = pd.read_csv('aw-models/data/inputs/navigation_fund_diminishing_returns_{}M.csv'.format(INCREMENT_SIZE))
-gcr_diminishing_returns = pd.read_csv('{}/diminishing_returns/{}_diminishing_returns_gcr_{}M.csv'.format(GCR_MODEL, GCR_DMR_SCENARIO, INCREMENT_SIZE))
+gcr_diminishing_returns = pd.read_csv('gcr-models-mc/diminishing_returns/{}_diminishing_returns_gcr_{}M.csv'.format(GCR_DMR_SCENARIO, INCREMENT_SIZE))
 leaf_diminishing_returns = pd.read_csv('leaf-models/leaf_diminishing_returns_{}M.csv'.format(INCREMENT_SIZE))
 
 FUND_NAME_MAP = {
@@ -114,7 +108,7 @@ gw_risk_scores = pd.read_csv('gw-models/gw_risk_adjusted.csv')
 ea_awf_risk_scores = pd.read_csv('aw-models/outputs/ea_awf_dataset.csv')
 navigation_fund_general_risk_scores = pd.read_csv('aw-models/outputs/navigation_fund_general_dataset.csv')
 navigation_fund_cagefree_risk_scores = pd.read_csv('aw-models/outputs/navigation_fund_cagefree_dataset.csv')
-gcr_risk_scores = pd.read_csv('{}/gcr_output.csv'.format(GCR_MODEL), skiprows=1)
+gcr_risk_scores = pd.read_csv('gcr-models-mc/gcr_output.csv', skiprows=1)
 leaf_risk_scores = pd.read_csv('leaf-models/leaf_risk_adjusted.csv')
 
 
@@ -264,10 +258,10 @@ final_json_structure = {
 os.makedirs('outputs', exist_ok=True)
 
 # Export the generated dictionary to JSON
-with open('outputs/output_data_{}.json'.format(GCR_DMR_SCENARIO), 'w') as f:
+with open('outputs/output_data_{}_{}M.json'.format(GCR_DMR_SCENARIO, INCREMENT_SIZE), 'w') as f:
     json.dump(final_json_structure, f, indent=2)
 
-print("Data successfully mapped and exported to outputs/output_data_{}.json".format(GCR_DMR_SCENARIO))
+print("Data successfully mapped and exported to outputs/output_data_{}_{}M.json".format(GCR_DMR_SCENARIO, INCREMENT_SIZE))
 
 # Export normalized risk-adjusted data to CSV
 time_labels = ['t0', 't1', 't2', 't3', 't4', 't5']

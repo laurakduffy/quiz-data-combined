@@ -316,67 +316,73 @@ def build_document():
     # Metric 2
     _add_metric_block(
         doc,
-        title="2.  Score magnitude change, per perspective  (explains the mechanism)",
+        title="2.  Effect magnitude change, by risk attitude and time period  (explains the mechanism)",
         formula=(
-            "magnitude change  =  log₁₀(|score after|) − log₁₀(|score before|)\n"
-            "equivalently:      =  log₁₀( |score after| ÷ |score before| )"
+            "magnitude change  =  log₁₀(|value after|) − log₁₀(|value before|)\n"
+            "equivalently:      =  log₁₀( |value after| ÷ |value before| )"
         ),
         description=(
-            "For each fund and each ethical perspective, we measure how many orders "
-            "of magnitude the fund's cost-effectiveness score changed. A value of 1 "
-            "means the score became 10× larger in magnitude; 0.3 ≈ 2×; −1 means it "
-            "shrank to one-tenth its original size. The sign of the score (whether "
-            "the fund looks beneficial or harmful) is reported separately in Metric 2b.\n\n"
-            "This is computed three times per fund — once under each ethical "
-            "perspective — so a reader can see whether a scenario affects all "
-            "perspectives equally or only some."
+            "Each fund is made up of individual effects — for example, 'human "
+            "life-years saved per dollar' or 'chicken welfare improvements per dollar.' "
+            "For each effect, each risk attitude (8 profiles, from risk-neutral to "
+            "ambiguity-averse), and each time horizon (6 periods covering near-term "
+            "through very long-run), we measure how many orders of magnitude the "
+            "underlying effect value changed. A value of 1 means the quantity became "
+            "10× larger in magnitude; 0.3 ≈ 2×; −1 means it shrank to one-tenth its "
+            "original size. The direction of the change (whether the value turned from "
+            "positive to negative or vice versa) is reported separately in Metric 2b.\n\n"
+            "The result is a table with one row per fund-effect pair and 96 measurement "
+            "columns — one OOM column and one sign column for each of the 48 "
+            "risk-attitude × time-period combinations."
         ),
         rationale=(
-            "Fund scores in this model range across many orders of magnitude. Under "
-            "perspectives that place high weight on the very long-run future, a fund "
-            "that prevents extinction may score trillions of times higher than one "
-            "that improves animal welfare. A simple percentage change would be "
-            "meaningless at these scales. Log-scale differences are the natural "
-            "unit: a change of 1 always means a factor of 10, regardless of whether "
-            "the baseline score is 100 or 10¹⁸.\n\n"
-            "We use the absolute value of scores before taking the logarithm because "
-            "some ethical perspectives assign negative scores to GCR funds (reflecting "
-            "risk aversion about outcomes that could also be harmful). Without this, "
-            "the calculation would be undefined whenever a score is negative or zero, "
-            "and the sign change would be hidden inside the magnitude metric. Keeping "
-            "them separate makes both signals unambiguous.\n\n"
-            "We report one value per ethical perspective rather than a single weighted "
-            "average, because collapsing across perspectives is itself a value judgment "
-            "we do not want to embed in the analysis. A parameter change might shift "
-            "scores dramatically for someone who cares about the long-run future but "
-            "be completely irrelevant to someone focused on near-term animal welfare — "
-            "and a weighted average would hide that distinction."
+            "Effect values in this model span many orders of magnitude. A simple "
+            "percentage change would be meaningless at these scales. Log-scale "
+            "differences are the natural unit: a change of 1 always means a factor "
+            "of 10, regardless of whether the baseline value is 100 or 10¹⁸.\n\n"
+            "We measure at the level of raw effect values — before moral weights, "
+            "discount rates, or extinction probabilities are applied — because that "
+            "makes the metric independent of any particular ethical perspective. "
+            "Every reader, regardless of their values, sees exactly the same number. "
+            "The ethical weighting happens later, when these raw changes flow through "
+            "to fund scores and ultimately to allocations.\n\n"
+            "We use the absolute value before taking the logarithm because some risk "
+            "attitudes assign negative values to outcomes that could be harmful. "
+            "Without this, the calculation would be undefined whenever a value is "
+            "negative or zero, and a sign flip would be hidden inside the magnitude "
+            "number. Keeping them separate makes both signals unambiguous.\n\n"
+            "We report separately for each risk attitude and time period rather than "
+            "collapsing to a single number, because collapsing is itself a value "
+            "judgment we do not want to embed in the analysis. A parameter change "
+            "might substantially shift what a risk-neutral model says while leaving "
+            "a loss-averse model unchanged — and an average would hide that."
         ),
     )
 
     # Metric 2b
     _add_metric_block(
         doc,
-        title="2b.  Score direction, per perspective  (captures sign flips)",
+        title="2b.  Effect direction, by risk attitude and time period  (captures sign flips)",
         formula='direction  =  "<before sign> / <after sign>"   where sign is + or −',
         description=(
-            "For each fund and each ethical perspective, we record whether the "
-            "fund's score was positive or negative before the scenario, and positive "
-            "or negative after. The four possible values are:\n"
-            "  +/+  score was positive and stayed positive\n"
-            "  +/−  score flipped from positive to negative\n"
-            "  −/+  score flipped from negative to positive\n"
-            "  −/−  score was negative and stayed negative\n\n"
-            "A score of exactly zero is marked 0 (rare in practice)."
+            "For each fund-effect pair, risk attitude, and time period, we record "
+            "whether the underlying effect value was positive or negative before the "
+            "scenario and positive or negative after. The four possible values are:\n"
+            "  +/+  value was positive and stayed positive\n"
+            "  +/−  value flipped from positive to negative\n"
+            "  −/+  value flipped from negative to positive\n"
+            "  −/−  value was negative and stayed negative\n\n"
+            "A value of exactly zero is marked 0 (rare in practice)."
         ),
         rationale=(
-            "A fund whose score changes sign has crossed a fundamental threshold: "
-            "it has gone from looking beneficial to looking harmful (or vice versa) "
-            "under that ethical perspective. This is a qualitatively different kind "
-            "of change from a shift in magnitude — and it cannot be detected from "
-            "the magnitude metric alone, which works on absolute values. Reporting "
-            "direction separately ensures that both 'how much did the score change?' "
-            "and 'did it cross from good to bad?' are always clearly visible."
+            "An effect value that changes sign has crossed a fundamental threshold: "
+            "the scenario has caused a fund to look beneficial under one risk attitude "
+            "but harmful under another, or has reversed that picture. This is a "
+            "qualitatively different kind of change from a shift in magnitude — and "
+            "it cannot be detected from the magnitude metric alone, which works on "
+            "absolute values. Reporting direction separately ensures that both "
+            "'how much did the value change?' and 'did it cross from good to bad?' "
+            "are always clearly visible."
         ),
     )
 
@@ -385,14 +391,15 @@ def build_document():
         doc,
         title="3.  Ranking change, per perspective  (detects threshold crossings)",
         formula=(
-            "ranking change  =  rank after scenario − rank before scenario\n"
-            "(rank 1 = highest-scoring fund;  positive value = fund fell in ranking)"
+            "ranking change  =  rank before scenario − rank after scenario\n"
+            "(rank 1 = highest-scoring fund;  positive value = fund rose in ranking)"
         ),
         description=(
             "For each ethical perspective, funds are ranked by their cost-effectiveness "
             "score from highest (rank 1) to lowest. We report how each fund's rank "
             "changed between the base case and the scenario. A positive number means "
-            "the fund fell; a negative number means it rose."
+            "the fund rose (e.g. moved from 3rd to 1st = +2); a negative number means "
+            "it fell."
         ),
         rationale=(
             "The allocation model tends to concentrate funding: the highest-ranked "
@@ -548,7 +555,7 @@ def main():
     doc = build_document()
     doc.save(str(out_path))
     print(f"Saved: {out_path}")
-    print(f"  Part I:  3 output metrics")
+    print(f"  Part I:  5 output metrics")
     print(f"  Part II: {len(SCENARIO_METADATA)} parameter scenarios")
 
 

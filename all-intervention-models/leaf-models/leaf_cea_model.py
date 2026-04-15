@@ -25,6 +25,8 @@ from risk_profiles import compute_risk_profiles, RISK_PROFILES
 
 N_SAMPLES = 10000
 
+np.random.seed(43)
+
 
 # Cost-effectiveness percentiles per $1M (10th, 50th, 90th).
 percentile_inputs = {
@@ -75,11 +77,11 @@ effects_distribution_dict = fit_gev_from_percentiles(percentile_inputs)
 
 temporal_breakdown_by_type_dict = {
     'YLDs_averted': 
-        {'0-5 years': 0.0499, '5-10 years': 0.0891, '10-20 years': 0.2073, '20-100 years': 0.6537, '100-500 years': 0, '500+ years': 0},
+        {'0-5 years': 0.0468, '5-10 years': 0.0752, '10-20 years': 0.1923, '20-100 years': 0.6857, '100-500 years': 0, '500+ years': 0},
     'life_years_saved': 
         {'0-5 years': 0.0331, '5-10 years': 0.0496, '10-20 years': 0.1210, '20-100 years': 0.7964, '100-500 years': 0, '500+ years': 0},
     'income_doublings': 
-        {'0-5 years': 0.0123, '5-10 years': 0.0307, '10-20 years': 0.1736, '20-100 years': 0.7834, '100-500 years': 0, '500+ years': 0},
+        {'0-5 years': 0.0123, '5-10 years': 0.0307, '10-20 years': 0.1582, '20-100 years': 0.7988, '100-500 years': 0, '500+ years': 0},
 }
 
 def sample_impacts_per_m():
