@@ -18,11 +18,11 @@ Parameters:
   NotifyEmail:
     Type: String
     Description: Email address to receive donation notifications
-    Default: giving@rethinkpriorities.org
+    Default: fund@rethinkpriorities.org
   SenderEmail:
     Type: String
     Description: Verified SES sender email address
-    Default: noreply@rethinkpriorities.org
+    Default: fund@rethinkpriorities.org
 
 Resources:
   ShareFunction:
