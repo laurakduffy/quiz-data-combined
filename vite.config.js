@@ -45,5 +45,5 @@ function datasetManifestPlugin() {
 export default defineConfig({
   plugins: [react(), datasetManifestPlugin()],
   // eslint-disable-next-line no-undef
-  base: process.env.VITE_BASE_PATH || '/quiz-demo/',
+  base: process.env.VITE_BASE_PATH || '/',
 });
