@@ -706,8 +706,8 @@ def main():
         description="Export RP-style CSV for all GCR fund profiles (Monte Carlo)."
     )
     parser.add_argument(
-        "-o", "--output", default=str(Path(__file__).parent / "gcr_output.csv"),
-        help="Output CSV path for effects (default: gcr_output.csv). Diminishing returns will be saved to diminishing_returns/gcr_diminishing_returns_{N}yr.csv",
+        "-o", "--output", default=str(Path(__file__).parent / "outputs" / "gcr_output.csv"),
+        help="Output CSV path for effects (default: outputs/gcr_output.csv). Diminishing returns will be saved to diminishing_returns/gcr_diminishing_returns_{N}yr.csv",
     )
     parser.add_argument(
         "--n-samples", type=int, default=1000000,
@@ -727,6 +727,8 @@ def main():
     )
     args = parser.parse_args()
     verbose = not args.quiet
+
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
 
     print("=" * 70)
     print("RP CSV EXPORT — ALL FUNDS (MONTE CARLO)")

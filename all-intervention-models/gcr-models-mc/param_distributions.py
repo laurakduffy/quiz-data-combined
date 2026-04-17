@@ -664,7 +664,9 @@ def write_param_percentiles():
 
     # ── write CSV ────────────────────────────────────────────────────────────
     fieldnames = ["section", "param", "dist", "note"] + PCT_COLS + ["mean"]
-    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "param_percentiles.csv")
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "outputs")
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, "param_percentiles.csv")
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore", restval="")
         writer.writeheader()

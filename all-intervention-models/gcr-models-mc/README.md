@@ -20,9 +20,7 @@ A rewrite of `gcr-models/` that replaces discrete scenario sweeps with continuou
 | `param_distributions.py` | Distribution specs for all model parameters — edit here to change priors |
 | `fund_profiles.py` | Per-fund configuration (budgets, p_harm, p_zero, param specs) |
 | `export_rp_csv.py` | Main entry point — runs all funds and writes output CSVs and histograms |
-| `run_analysis.py` | Simpler runner with fewer output files |
-| `compare_funds.py` | Side-by-side comparison across funds |
-| `test_gcr_model.py` | Unit and integration tests |
+| `tests/test_gcr_model.py` | Unit and integration tests |
 
 ## Running
 
@@ -43,14 +41,6 @@ Key flags:
 | `-o` | `gcr_output.csv` | Output CSV path |
 | `--quiet` | off | Suppress per-fund progress |
 
-### Simple runner
-
-```bash
-python run_analysis.py [-n N_SAMPLES] [-o OUTPUT] [--fund {sentinel,longview_nuclear,longview_ai,all}]
-```
-
-Outputs only `rp_output.csv` (no histograms or summary stats CSVs).
-
 ### Via `run_all.py`
 
 ```bash
@@ -64,11 +54,12 @@ python run_all.py --gcr-model gcr-models-mc
 
 | File | Contents |
 |---|---|
-| `gcr_output.csv` | RP-format effects matrix: 9 risk profiles × 6 time periods per fund, plus diminishing returns section |
-| `gcr_output_summary_stats.csv` | Per-fund percentiles (p1/p5/p10/p50/p90/p95/p99) and mean of total QALYs/$1M |
-| `gcr_output_absolute_ev_percentiles.csv` | Percentiles of the absolute EV of the future under each intervention |
-| `histograms/` | Distribution plots (linear and log scale) for total EV per fund |
-| `histograms/absolute_ev/` | Distribution plots for absolute EV of the future |
+| `outputs/gcr_output.csv` | RP-format effects matrix: 9 risk profiles × 6 time periods per fund, plus diminishing returns section |
+| `outputs/gcr_output_summary_stats.csv` | Per-fund percentiles (p1/p5/p10/p50/p90/p95/p99) and mean of total QALYs/$1M |
+| `outputs/gcr_output_absolute_ev_percentiles.csv` | Percentiles of the absolute EV of the future under each intervention |
+| `outputs/param_percentiles.csv` | Parameter prior percentiles and means |
+| `outputs/histograms/` | Distribution plots (linear and log scale) for total EV per fund |
+| `outputs/histograms/absolute_ev/` | Distribution plots for absolute EV of the future |
 
 ## Sampling design
 
@@ -97,5 +88,5 @@ The final output concatenates all batches before computing risk profiles and per
 ## Tests
 
 ```bash
-pytest test_gcr_model.py -v
+pytest tests/ -v
 ```

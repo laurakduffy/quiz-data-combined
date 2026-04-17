@@ -1,25 +1,11 @@
 # GCR Analysis - Quick Reference Card
 
-## Three Ways to Run (Pick One)
+## How to Run
 
-### 1. Export to CSV (Most Common) ⭐
 ```bash
-python export_rp_csv.py                    # All 3 funds → rp_output.csv
+python export_rp_csv.py                    # All 3 funds → gcr_output.csv
 python export_rp_csv.py -o results.csv     # Custom filename
 python export_rp_csv.py --n-samples 10000  # Quick test (10k samples)
-```
-
-### 2. Simple Runner Script (Easiest)
-```bash
-python run_analysis.py                     # All 3 funds, 100k samples
-python run_analysis.py -n 10000            # Quick test
-python run_analysis.py --fund sentinel     # Just one fund
-```
-
-### 3. Quick Comparison (View Results in Terminal)
-```bash
-python compare_funds.py        # Fast comparison (10k samples)
-python compare_funds.py 100000 # More precise (100k samples)
 ```
 
 ## Python API (For Custom Analysis)
@@ -53,7 +39,7 @@ results = run_monte_carlo(
 
 ## Output Structure
 
-### CSV Export (rp_output.csv)
+### CSV Export (outputs/gcr_output.csv)
 ```
 project_id,effect_id,spend,0_5,5_10,10_20,...,neutral,upside,downside,...
 sentinel_bio,ext_bio,7.2,...,123456,234567,345678,...
@@ -93,27 +79,17 @@ sentinel_bio,ext_bio,7.2,...,123456,234567,345678,...
 - `export_rp_csv.py` - Risk profiles & CSV export
 - `fund_profiles.py` - Fund configurations
 
-**Helper scripts** (optional):
-- `run_analysis.py` - Simple runner
-- `compare_funds.py` - Quick comparison
-
 ## Common Commands
 
 ```bash
 # Quick test (fast)
-python run_analysis.py -n 1000
+python export_rp_csv.py --n-samples 1000
 
 # Full analysis (recommended)
-python run_analysis.py -n 100000
-
-# Just one fund
-python run_analysis.py --fund sentinel
-
-# Compare all funds
-python compare_funds.py
+python export_rp_csv.py --n-samples 100000
 
 # Help
-python run_analysis.py --help
+python export_rp_csv.py --help
 ```
 
 ## Troubleshooting
@@ -122,13 +98,13 @@ python run_analysis.py --help
 ```bash
 # Make sure you're in the right directory
 cd /path/to/gcr/files
-python run_analysis.py
+python export_rp_csv.py
 ```
 
 **Memory error?**
 ```bash
 # Use fewer samples
-python run_analysis.py -n 10000
+python export_rp_csv.py --n-samples 10000
 ```
 
 ## What You Get
@@ -149,6 +125,6 @@ python run_analysis.py -n 10000
 
 ## That's It!
 
-Start with: `python run_analysis.py -n 10000`
+Start with: `python export_rp_csv.py --n-samples 10000`
 
 Questions? Check `HOW_TO_RUN.md` for detailed examples.
