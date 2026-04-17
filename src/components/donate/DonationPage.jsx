@@ -42,7 +42,7 @@ export default function DonationPage() {
   const [form, setForm] = useState({
     name: '',
     email: '',
-    anonymity: null,
+    anonymity: 'anonymous',
     splitPreference: 'defer',
     splits: { ...DEFAULT_SPLIT },
     amount: '',
