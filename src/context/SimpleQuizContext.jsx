@@ -412,7 +412,8 @@ export function SimpleQuizProvider({ children }) {
       allWorldviews,
       dataset.projects,
       budget,
-      dataset.incrementSize || 10
+      dataset.incrementSize || 10,
+      dataset.drStepSize || 10
     );
   }, [allWorldviews, dataset, budget]);
 

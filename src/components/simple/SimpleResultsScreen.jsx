@@ -163,7 +163,8 @@ function SimpleResultsScreen() {
         combined,
         dataset.projects,
         budget,
-        dataset.incrementSize || 10
+        dataset.incrementSize || 10,
+        dataset.drStepSize || 10
       );
     }
 
@@ -171,7 +172,8 @@ function SimpleResultsScreen() {
       [{ ...activeWorldview, credence: 1.0 }],
       dataset.projects,
       budget,
-      dataset.incrementSize || 10
+      dataset.incrementSize || 10,
+      dataset.drStepSize || 10
     );
   }, [
     activeWorldview,

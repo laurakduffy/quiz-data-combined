@@ -436,7 +436,7 @@ function _normalizeCredences(customWorldviews) {
   return credences.map((c) => c / total);
 }
 
-function _computeWorldviewMarginalValues(data, funding, worldview, fundingCaps) {
+function _computeWorldviewMarginalValues(data, funding, worldview, fundingCaps, drStepSize = 10) {
   const baseValues = calculateAllProjects(
     data,
     worldview.moral_weights,
@@ -452,15 +452,21 @@ function _computeWorldviewMarginalValues(data, funding, worldview, fundingCaps) 
     } else {
       result[projectId] =
         adjustedValues[projectId] *
-        getDiminishingReturnsFactor(data, projectId, funding[projectId]);
+        getDiminishingReturnsFactor(data, projectId, funding[projectId], drStepSize);
     }
   }
   return result;
 }
 
-function _computeAllWorldviewMarginalValues(data, funding, customWorldviews, fundingCaps) {
+function _computeAllWorldviewMarginalValues(
+  data,
+  funding,
+  customWorldviews,
+  fundingCaps,
+  drStepSize = 10
+) {
   return customWorldviews.map((wv) =>
-    _computeWorldviewMarginalValues(data, funding, wv, fundingCaps)
+    _computeWorldviewMarginalValues(data, funding, wv, fundingCaps, drStepSize)
   );
 }
 
@@ -493,7 +499,7 @@ function voteCredenceWeightedCustom(
   funding,
   increment,
   customWorldviews,
-  { fundingCaps } = {}
+  { fundingCaps, drStepSize } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -512,7 +518,8 @@ function voteCredenceWeightedCustom(
       data,
       funding,
       customWorldviews[i],
-      fundingCaps
+      fundingCaps,
+      drStepSize
     );
     let key = customWorldviews[i].name || `wv_${i}`;
     if (key in perWorldviewScores) key = `${key} (${i})`;
@@ -529,7 +536,7 @@ function voteMyFavoriteTheory(
   data,
   funding,
   increment,
-  { customWorldviews = null, tieBreak = null, randomSeed = null, fundingCaps } = {}
+  { customWorldviews = null, tieBreak = null, randomSeed = null, fundingCaps, drStepSize } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -547,7 +554,8 @@ function voteMyFavoriteTheory(
     data,
     funding,
     selectedWorldview,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const bestProject = _argmaxProject(marginalValues, tieBreak, rng);
   allocations[bestProject] = increment;
@@ -555,7 +563,8 @@ function voteMyFavoriteTheory(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   allocations.__scores__ = { marginalValues, selectedWorldview: bestIdx, worldviewScores };
   return allocations;
@@ -565,7 +574,7 @@ function voteMec(
   data,
   funding,
   increment,
-  { customWorldviews = null, tieBreak = null, randomSeed = null, fundingCaps } = {}
+  { customWorldviews = null, tieBreak = null, randomSeed = null, fundingCaps, drStepSize } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -581,7 +590,8 @@ function voteMec(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const expectedScores = {};
   for (const projectId of Object.keys(data)) {
@@ -602,7 +612,7 @@ function voteMet(
   funding,
   increment,
   customWorldviews,
-  { metThreshold = null, tieBreak = null, randomSeed = null, fundingCaps } = {}
+  { metThreshold = null, tieBreak = null, randomSeed = null, fundingCaps, drStepSize } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -616,7 +626,8 @@ function voteMet(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const credences = _normalizeCredences(customWorldviews);
   const maxIdx = argmax(credences);
@@ -754,6 +765,7 @@ function voteNashBargaining(
     randomSeed = null,
     remaining = null,
     fundingCaps,
+    drStepSize,
   } = {}
 ) {
   const allocations = {};
@@ -768,7 +780,8 @@ function voteNashBargaining(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
@@ -849,6 +862,7 @@ function voteMsa(
     tieBreak = null,
     randomSeed = null,
     fundingCaps,
+    drStepSize,
   } = {}
 ) {
   const allocations = {};
@@ -868,7 +882,8 @@ function voteMsa(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
@@ -1003,7 +1018,7 @@ function voteBorda(
   funding,
   increment,
   customWorldviews,
-  { tieBreak = null, randomSeed = null, fundingCaps } = {}
+  { tieBreak = null, randomSeed = null, fundingCaps, drStepSize } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -1015,7 +1030,8 @@ function voteBorda(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
@@ -1061,7 +1077,7 @@ function voteSplitCycle(
   funding,
   increment,
   customWorldviews,
-  { tieBreak = null, randomSeed = null, fundingCaps } = {}
+  { tieBreak = null, randomSeed = null, fundingCaps, drStepSize } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -1073,7 +1089,8 @@ function voteSplitCycle(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
@@ -1169,7 +1186,7 @@ function voteLexicographicMaximin(
   funding,
   increment,
   customWorldviews,
-  { tieBreak = null, randomSeed = null, fundingCaps } = {}
+  { tieBreak = null, randomSeed = null, fundingCaps, drStepSize } = {}
 ) {
   const allocations = {};
   for (const p of Object.keys(data)) allocations[p] = 0;
@@ -1181,7 +1198,8 @@ function voteLexicographicMaximin(
     data,
     funding,
     customWorldviews,
-    fundingCaps
+    fundingCaps,
+    drStepSize
   );
   const credences = _normalizeCredences(customWorldviews);
   const projects = Object.keys(data);
@@ -1221,10 +1239,15 @@ function voteLexicographicMaximin(
 // ITERATION LOOP
 // =============================================================================
 
-function _addDebugExtras(entry, data, fundingBefore, fundingCaps) {
+function _addDebugExtras(entry, data, fundingBefore, fundingCaps, drStepSize = 10) {
   const drFactors = {};
   for (const projectId of Object.keys(data)) {
-    drFactors[projectId] = getDiminishingReturnsFactor(data, projectId, fundingBefore[projectId]);
+    drFactors[projectId] = getDiminishingReturnsFactor(
+      data,
+      projectId,
+      fundingBefore[projectId],
+      drStepSize
+    );
   }
   entry.drFactors = drFactors;
 
@@ -1249,6 +1272,7 @@ function allocateBudget(
   } = {}
 ) {
   const fundingCaps = kwargs.fundingCaps;
+  const drStepSize = kwargs.drStepSize ?? 10;
   const funding = {};
   for (const projectId of Object.keys(data)) {
     funding[projectId] = initialFunding?.[projectId] ?? 0;
@@ -1275,7 +1299,7 @@ function allocateBudget(
           fundingAfter: { ...funding },
           worldviewNames: kwargs.customWorldviews?.map((w, i) => w.name || `wv${i}`),
         };
-        _addDebugExtras(entry, data, fundingBefore, fundingCaps);
+        _addDebugExtras(entry, data, fundingBefore, fundingCaps, drStepSize);
         debugTrace.push(entry);
       }
       break;
@@ -1299,7 +1323,7 @@ function allocateBudget(
         fundingAfter: { ...funding },
         worldviewNames: kwargs.customWorldviews?.map((w, i) => w.name || `wv${i}`),
       };
-      _addDebugExtras(entry, data, fundingBefore, fundingCaps);
+      _addDebugExtras(entry, data, fundingBefore, fundingCaps, drStepSize);
       debugTrace.push(entry);
     }
 
@@ -1337,6 +1361,7 @@ const METHOD_MAP = {
  * @param {string} methodKey - Key from votingMethods config
  * @param {number} totalBudget - Total budget in $M
  * @param {number} incrementSize - Step size in $M
+ * @param {Object} extraOptions - Additional options (e.g. { drStepSize, fundingCaps, debugTrace })
  * @returns {{ allocations: Object<string, number>, funding: Object<string, number> }}
  *   allocations = percentage per project, funding = $M per project
  */
@@ -1385,6 +1410,8 @@ export function computeMarcusAllocation(
  * @param {Array} worldviews - Array of worldview objects with credences
  * @param {Array} stages - Array of { method, budget, options }
  * @param {number} incrementSize - Step size in $M
+ * @param {Object} drOverrides - Per-project DR override powers
+ * @param {number} drStepSize - $M per DR array entry (default 10)
  * @returns {{ allocations: Object, funding: Object, stageResults: Array }}
  */
 export function computeMultiStageAllocation(
@@ -1392,7 +1419,8 @@ export function computeMultiStageAllocation(
   worldviews,
   stages,
   incrementSize,
-  drOverrides
+  drOverrides,
+  drStepSize = 10
 ) {
   // Strip display-only fields once
   let cleanData = {};
@@ -1424,6 +1452,7 @@ export function computeMultiStageAllocation(
       customWorldviews: worldviews,
       debugTrace,
       debugMethod: stage.method,
+      drStepSize,
       ...(stage.options || {}),
     });
 

@@ -3,6 +3,7 @@
   "description": "Updated: March 23, 2026",
   "budget": 897,
   "incrementSize": 10,
+  "drStepSize": 10,
   "moralWeightKeys": [
     {
       "key": "human_life_years",

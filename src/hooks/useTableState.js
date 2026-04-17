@@ -281,7 +281,8 @@ export function useTableState() {
         worldviewsWithCredences,
         stagesWithCaps,
         dataset.incrementSize,
-        drOverrides
+        drOverrides,
+        dataset.drStepSize || 10
       );
       console.log(
         '[table] recalc stages',

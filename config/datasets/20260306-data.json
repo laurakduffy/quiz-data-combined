@@ -3,6 +3,7 @@
   "description": "Dataset with GCR calculations based on monte carlo simulations.",
   "budget": 897,
   "incrementSize": 10,
+  "drStepSize": 10,
   "moralWeightKeys": [
     {
       "key": "human_life_years",

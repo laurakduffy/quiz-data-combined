@@ -48,15 +48,23 @@ export function assembleWorldview(selections, manualOverrides, questions) {
  * @param {Object} projectData - Dataset projects object (keyed by project ID)
  * @param {number} budget - Total budget in $M (default 100 = $100M)
  * @param {number} incrementSize - Step size in $M (default 1)
+ * @param {number} drStepSize - $M per DR array entry (default 10)
  * @returns {Object} { projectId: percentage, ... }
  */
-export function computeSimpleAllocations(worldviews, projectData, budget = 100, incrementSize = 1) {
+export function computeSimpleAllocations(
+  worldviews,
+  projectData,
+  budget = 100,
+  incrementSize = 1,
+  drStepSize = 10
+) {
   const { allocations } = computeMarcusAllocation(
     projectData,
     worldviews,
     'credenceWeighted',
     budget,
-    incrementSize
+    incrementSize,
+    { drStepSize }
   );
   return allocations;
 }
@@ -107,20 +115,23 @@ export function blendWorldviews(blendWvs, userWvs, blendCredence, userCredences)
  * @param {Object} projectData - Dataset projects object (keyed by project ID)
  * @param {number} budget - Total budget in $M (default 100 = $100M)
  * @param {number} incrementSize - Step size in $M (default 1)
+ * @param {number} drStepSize - $M per DR array entry (default 10)
  * @returns {Object} { projectId: percentage, ... }
  */
 export function computeBlendedAllocations(
   worldviews,
   projectData,
   budget = 100,
-  incrementSize = 1
+  incrementSize = 1,
+  drStepSize = 10
 ) {
   const { allocations } = computeMarcusAllocation(
     projectData,
     worldviews,
     'credenceWeighted',
     budget,
-    incrementSize
+    incrementSize,
+    { drStepSize }
   );
   return allocations;
 }
