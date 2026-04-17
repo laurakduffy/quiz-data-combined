@@ -21,7 +21,7 @@
       "options": [
         {
           "value": "anonymous",
-          "label": "Keep my name and donation anonymous to the public"
+          "label": "Make my name known to Rethink Priorities but anonymous to the public"
         },
         {
           "value": "consent",
@@ -69,7 +69,7 @@
     "label": "Your transfer memo",
     "description": "Paste this into the memo or note field when making your transfer from Daffy or another DAF. This allows us to match your donation to your preferences.",
     "placeholder": "Your memo will appear here once you have filled in your name, email, and visibility preference above.",
-    "fundName": "Rethink Priorities Cross-Cause Fund",
+    "fundName": "Rethink Priorities Cross-Cause Fund, community fund code 8tpqgn",
     "refIdPrefix": "ATC"
   },
 
