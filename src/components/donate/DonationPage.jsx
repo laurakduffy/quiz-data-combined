@@ -47,6 +47,7 @@ export default function DonationPage() {
     splits: { ...DEFAULT_SPLIT },
     amount: '',
   });
+  const [copyConfirm, setCopyConfirm] = useState(false);
   const [submitState, setSubmitState] = useState(null); // null | 'submitting' | 'success' | 'error'
   const [warning, setWarning] = useState('');
   const [handoffBanner, setHandoffBanner] = useState(false);
@@ -134,30 +135,27 @@ export default function DonationPage() {
     const anonOpt = config.fields.anonymity.options.find((o) => o.value === form.anonymity);
     const anonText = anonOpt ? anonOpt.label : '\u2014';
 
-    let splitText = config.fields.split.options[0].label; // "defer" label
-    if (form.splitPreference === 'recommended') {
-      splitText = 'RP recommended split:';
-      for (const [id, pct] of Object.entries(DEFAULT_SPLIT)) {
-        splitText += `\n  ${fundNameById[id] || id}: ${pct ?? 0}%`;
-      }
-    } else if (form.splitPreference === 'custom') {
-      splitText = 'Custom split:';
-      for (const [id, pct] of Object.entries(form.splits)) {
-        splitText += `\n  ${activeFundNameById[id] || id}: ${pct}%`;
-      }
-    }
-
-    let text = `Fund: ${config.memo.fundName}
+    return `Fund: ${config.memo.fundName}
 Donor name: ${form.name}
 Donor email: ${form.email}
-Anonymity: ${anonText}
-Split preference: ${splitText}`;
-    if (form.amount) text += `\nApproximate amount: $${parseFloat(form.amount).toLocaleString()}`;
-    text += `\nReference: ${refId.current}`;
-    return text;
-  }, [form, activeFundNameById]);
+Anonymity: ${anonText}`;
+  }, [form]);
 
   // --- Actions ---
+  function handleCopy() {
+    const missing = getMissingFields();
+    if (missing.length) {
+      setWarning(config.validation.copyWarningPrefix + missing.join(', ') + '.');
+      setCopyConfirm(false);
+      return;
+    }
+    setWarning('');
+    navigator.clipboard.writeText(memo).then(() => {
+      setCopyConfirm(true);
+      setTimeout(() => setCopyConfirm(false), 2500);
+    });
+  }
+
   async function handleSubmit() {
     const missing = getMissingFields();
     if (missing.length) {
@@ -183,6 +181,9 @@ Split preference: ${splitText}`;
         }),
       });
       if (!res.ok) throw new Error('Request failed');
+      navigator.clipboard.writeText(memo).catch(() => {});
+      setCopyConfirm(true);
+      setTimeout(() => setCopyConfirm(false), 2500);
       setSubmitState('success');
     } catch (err) {
       if (
@@ -212,6 +213,7 @@ Split preference: ${splitText}`;
   }
 
   const showSplitEditor = form.splitPreference !== 'defer';
+  const isComplete = form.name.trim() && form.email.trim() && form.anonymity;
 
   return (
     <div className="screen">
@@ -322,12 +324,7 @@ Split preference: ${splitText}`;
             </div>
 
             {showSplitEditor && (
-              <SplitEditor
-                splits={form.splitPreference === 'recommended' ? DEFAULT_SPLIT : form.splits}
-                onChange={setSplit}
-                readOnly={form.splitPreference === 'recommended'}
-                funds={activeFunds}
-              />
+              <SplitEditor splits={form.splits} onChange={setSplit} funds={activeFunds} />
             )}
 
             {form.splitPreference === 'custom' && (
@@ -371,9 +368,55 @@ Split preference: ${splitText}`;
             <div className={styles.fieldHint}>{config.fields.amount.hint}</div>
           </div>
 
-          {/* Submit */}
-          <div className={styles.formSection}>
+          {/* Output — always shown */}
+          <div className={styles.outputSection}>
             <div className={styles.divider} />
+            <div className={styles.outputLabel}>{config.memo.label}</div>
+            <div className={styles.outputDesc}>{config.memo.description}</div>
+
+            <div
+              className={`${styles.memoWrap} ${isComplete ? styles.memoWrapClickable : ''}`}
+              onClick={isComplete ? handleCopy : undefined}
+              title={isComplete ? config.actions.copy : undefined}
+            >
+              <div className={`${styles.memoBox} ${!isComplete ? styles.memoBoxIncomplete : ''}`}>
+                {isComplete ? memo : config.memo.placeholder}
+              </div>
+              {isComplete && (
+                <span className={styles.memoCopyIcon}>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                </span>
+              )}
+              {copyConfirm && (
+                <div className={styles.memoCopiedOverlay}>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Copied to clipboard
+                </div>
+              )}
+            </div>
 
             {warning && <div className={styles.missingWarning}>{warning}</div>}
 
@@ -381,7 +424,7 @@ Split preference: ${splitText}`;
               className="btn btn-primary"
               onClick={handleSubmit}
               disabled={submitState === 'submitting' || submitState === 'success'}
-              style={{ marginTop: 8 }}
+              style={{ marginTop: 'var(--spacing-8)', alignSelf: 'center' }}
             >
               {submitState === 'submitting'
                 ? 'Submitting\u2026'

@@ -32,17 +32,12 @@
     "split": {
       "label": "How would you like to split your donation across funds?",
       "hint": "Not sure? [Take our Donor Compass quiz]({quizUrl}) to get a personalised allocation based on your values and risk preferences.",
-      "resetButton": "Reset to recommended split",
+      "resetButton": "Reset percentages",
       "options": [
         {
           "value": "defer",
           "label": "I defer to Rethink Priorities — allocate however you judge is best",
           "sub": "We will apply our best current judgment, which may differ from our publicly published split as our research develops."
-        },
-        {
-          "value": "recommended",
-          "label": "Use the current recommended split",
-          "sub": "Based on our All Things Considered allocation. Selecting this will show you the exact percentages below."
         },
         {
           "value": "custom",
