@@ -323,6 +323,46 @@
   font-family: var(--font-body);
 }
 
+/* === Results Row (chart + explanation side by side) === */
+
+.backRow {
+  margin-bottom: var(--spacing-4);
+}
+
+.budgetLabelRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.resultsRow {
+  display: flex;
+  gap: var(--spacing-12);
+  align-items: flex-start;
+}
+
+.resultsRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.resultsExplanation {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-base);
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.resultsExplanation p {
+  margin: 0 0 var(--spacing-6);
+}
+
+.resultsExplanation p:last-child {
+  margin-bottom: 0;
+}
+
 /* === Controls Row (worldviews + blend side by side) === */
 
 .controlsRow {
@@ -503,20 +543,24 @@
   margin-top: var(--spacing-16);
 }
 
-.actionBlock {
+.primaryCtas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-6);
+  flex-wrap: wrap;
+}
+
+.ctaWithTooltip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.advancedSection {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-4);
-  text-align: center;
-}
-
-.actionBlockText {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  max-width: 28rem;
-  line-height: var(--leading-relaxed);
 }
 
 .advancedToggle {
@@ -790,9 +834,17 @@
     grid-template-columns: 1fr;
   }
 
+  .primaryCtas {
+    flex-direction: column;
+  }
+
   .advancedPanel {
     flex-direction: column;
     align-items: center;
+  }
+
+  .resultsRow {
+    flex-direction: column;
   }
 
   .controlsRow {

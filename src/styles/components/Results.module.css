@@ -416,6 +416,12 @@
   margin: 0 auto;
 }
 
+.singleResultCard .budgetLabel {
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-4);
+}
+
 /* Ensure comparison container works inside calculationSelectContainer */
 .calculationSelectContainer .comparisonContainer {
   margin-bottom: 0;

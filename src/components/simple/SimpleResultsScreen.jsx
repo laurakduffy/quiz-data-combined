@@ -373,37 +373,48 @@ function SimpleResultsScreen() {
                 : 'Based on your preferences, here\u2019s how your budget would be allocated across funds.'}
           </p>
 
-          <div className={resultStyles.budgetRow}>
+          <div className={styles.backRow}>
             <button className={styles.navBack} onClick={goBack}>
               &larr; Back
             </button>
-            <label className={resultStyles.budgetLabel}>
-              {copy.results.budgetLabel}
-              {copy.results.budgetInfo && <InfoTooltip content={copy.results.budgetInfo} />}
-              <div className={resultStyles.budgetInputWrapper}>
-                <span className={resultStyles.currencyPrefix}>$</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={budgetInput}
-                  onChange={handleBudgetChange}
-                  onBlur={handleBudgetBlur}
-                  onKeyDown={handleBudgetKeyDown}
-                  className={resultStyles.budgetInput}
-                />
-                <span className={resultStyles.budgetUnit}>M</span>
-              </div>
-            </label>
           </div>
 
           {displayAllocations && (
-            <div className={resultStyles.singleResultCard}>
-              <ResultCard
-                methodKey={methodKey}
-                results={displayAllocations}
-                causeEntries={causeEntries}
-                simpleMode={true}
-              />
+            <div className={styles.resultsRow}>
+              <div className={resultStyles.singleResultCard}>
+                <label className={resultStyles.budgetLabel}>
+                  <span className={styles.budgetLabelRow}>
+                    {copy.results.budgetLabel}
+                    {copy.results.budgetInfo && <InfoTooltip content={copy.results.budgetInfo} />}
+                  </span>
+                  <div className={resultStyles.budgetInputWrapper}>
+                    <span className={resultStyles.currencyPrefix}>$</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={budgetInput}
+                      onChange={handleBudgetChange}
+                      onBlur={handleBudgetBlur}
+                      onKeyDown={handleBudgetKeyDown}
+                      className={resultStyles.budgetInput}
+                    />
+                    <span className={resultStyles.budgetUnit}>M</span>
+                  </div>
+                </label>
+                <ResultCard
+                  methodKey={methodKey}
+                  results={displayAllocations}
+                  causeEntries={causeEntries}
+                  simpleMode={true}
+                />
+              </div>
+              {copy.results.resultsExplanation && (
+                <div className={styles.resultsExplanation}>
+                  {copy.results.resultsExplanation.split('\n\n').map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -563,21 +574,31 @@ function SimpleResultsScreen() {
           />
 
           <div className={styles.resultsActions}>
-            <div className={styles.actionBlock}>
-              <p className={styles.actionBlockText}>{copy.results.saveAndRetakeDescription}</p>
-              <button className="btn btn-primary btn-sm" onClick={saveAndRetake}>
-                Save &amp; Retake Quiz
-              </button>
+            <div className={styles.primaryCtas}>
+              {features.ui?.shareResults && (
+                <ShareButton
+                  loading={shareLoading}
+                  copied={copied}
+                  error={shareError}
+                  onClick={handleShare}
+                  variant="btn-primary btn-sm"
+                />
+              )}
+              <div className={styles.ctaWithTooltip}>
+                <button className="btn btn-primary btn-sm" onClick={saveAndRetake}>
+                  {copy.results.saveAndRetakeButton}
+                </button>
+                <InfoTooltip content={copy.results.saveAndRetakeDescription} />
+              </div>
+              <div className={styles.ctaWithTooltip}>
+                <button className="btn btn-primary btn-sm" onClick={handleDonate}>
+                  {copy.results.donateButton}
+                </button>
+                <InfoTooltip content={copy.results.donateDescription} />
+              </div>
             </div>
 
-            <div className={styles.actionBlock}>
-              <p className={styles.actionBlockText}>{copy.results.donateDescription}</p>
-              <button className="btn btn-primary btn-sm" onClick={handleDonate}>
-                Donate &rarr;
-              </button>
-            </div>
-
-            <div className={styles.actionBlock}>
+            <div className={styles.advancedSection}>
               <button
                 className={styles.advancedToggle}
                 onClick={() => setAdvancedOpen(!advancedOpen)}
@@ -586,24 +607,15 @@ function SimpleResultsScreen() {
                   size={14}
                   className={`${styles.advancedToggleIcon} ${advancedOpen ? styles.advancedToggleIconOpen : ''}`}
                 />
-                Advanced Options
+                {copy.results.advancedOptionsButton}
               </button>
               {advancedOpen && (
                 <div className={styles.advancedPanel}>
-                  {features.ui?.shareResults && (
-                    <ShareButton
-                      loading={shareLoading}
-                      copied={copied}
-                      error={shareError}
-                      onClick={handleShare}
-                      variant="btn-primary btn-sm"
-                    />
-                  )}
                   <button className="btn btn-primary btn-sm" onClick={goToAdvancedMode}>
-                    Go to Advanced Mode &rarr;
+                    {copy.results.advancedModeButton}
                   </button>
                   <button className="btn btn-primary btn-sm" onClick={handleStartOver}>
-                    Start Over
+                    {copy.results.startOverButton}
                   </button>
                 </div>
               )}
