@@ -2,7 +2,7 @@
   "intro": {
     "eyebrow": "Cross-Cause Fund",
     "title": "Tell us you're planning to donate",
-    "description": "Fill in your details below to generate transfer instructions you can paste directly into your DAF or bank transfer, and to notify us of your intent. If we don't receive your donation within a week, we'll follow up."
+    "description": "Fill in your details below to generate transfer instructions you can paste directly into your DAF or bank transfer, and to notify us of your intent. If we don't receive your donation within two weeks, we'll follow up."
   },
 
   "fields": {
@@ -17,15 +17,18 @@
     },
     "anonymity": {
       "label": "Donor visibility",
-      "hint": "We do not currently publish donor names publicly. If we do so in future, we will only include your name if you have consented here.",
       "options": [
         {
           "value": "anonymous",
-          "label": "Keep my name and donation anonymous to the public"
+          "label": "Make my name known to Rethink Priorities but anonymous to the public"
         },
         {
           "value": "consent",
           "label": "I am happy for my name and donation amount to be published in future"
+        },
+        {
+          "value": "charityvestPublish",
+          "label": "I want CharityVest to publish my name with my donation online"
         }
       ]
     },
@@ -69,7 +72,7 @@
     "label": "Your transfer memo",
     "description": "Paste this into the memo or note field when making your transfer from Daffy or another DAF. This allows us to match your donation to your preferences.",
     "placeholder": "Your memo will appear here once you have filled in your name, email, and visibility preference above.",
-    "fundName": "Rethink Priorities Cross-Cause Fund",
+    "fundName": "Rethink Priorities Cross-Cause Fund, community fund code 8tpqgn",
     "refIdPrefix": "ATC"
   },
 
