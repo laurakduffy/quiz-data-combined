@@ -46,6 +46,8 @@ Resources:
       TargetFunctionArn: !GetAtt ShareFunction.Arn
       Cors:
         AllowOrigins:
+          - 'https://donorcompass.rethinkpriorities.org'
+          - 'https://donorcompass.netlify.app'
           - 'https://rethinkpriorities.github.io'
         AllowMethods:
           - GET
@@ -142,6 +144,8 @@ Resources:
       TargetFunctionArn: !GetAtt DonateFunction.Arn
       Cors:
         AllowOrigins:
+          - 'https://donorcompass.rethinkpriorities.org'
+          - 'https://donorcompass.netlify.app'
           - 'https://rethinkpriorities.github.io'
         AllowMethods:
           - POST

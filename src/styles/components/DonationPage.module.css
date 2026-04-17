@@ -10,7 +10,7 @@
 
 /* --- Intro --- */
 .intro {
-  margin-bottom: var(--spacing-24);
+  margin-bottom: var(--spacing-8);
   animation: fadeUp 0.5s ease both;
 }
 
@@ -42,7 +42,7 @@
 .divider {
   height: 1px;
   background: var(--border-subtle);
-  margin: var(--spacing-16) 0;
+  margin: var(--spacing-8) 0;
 }
 
 /* --- Handoff banner --- */
@@ -322,9 +322,11 @@
 
 /* --- Output / Memo --- */
 .outputSection {
-  margin-top: var(--spacing-20);
+  margin-top: var(--spacing-4);
   animation: fadeUp 0.5s ease both;
   animation-delay: 0.25s;
+  display: flex;
+  flex-direction: column;
 }
 
 .outputLabel {
@@ -343,11 +345,28 @@
   margin-bottom: var(--spacing-6);
 }
 
+.memoWrap {
+  position: relative;
+}
+
+.memoWrapClickable {
+  cursor: pointer;
+}
+
+.memoWrapClickable:hover .memoBox {
+  border-color: var(--border-medium);
+}
+
+.memoWrapClickable:hover .memoCopyIcon {
+  color: var(--text-primary);
+}
+
 .memoBox {
   background: var(--overlay-medium);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: var(--spacing-8);
+  padding-right: calc(var(--spacing-8) + 32px);
   font-size: var(--text-sm);
   line-height: 1.75;
   color: var(--text-primary);
@@ -355,6 +374,7 @@
   word-break: break-word;
   min-height: 120px;
   font-family: 'Courier New', monospace;
+  transition: border-color 0.15s;
 }
 
 .memoBoxIncomplete {
@@ -364,6 +384,51 @@
   color: var(--text-muted);
   display: flex;
   align-items: center;
+  padding-right: var(--spacing-8);
+}
+
+.memoCopyIcon {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  color: var(--text-muted);
+  padding: var(--spacing-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.memoCopiedOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: var(--radius-lg);
+  color: var(--color-teal-light);
+  font-size: var(--text-md);
+  font-weight: var(--font-medium);
+  letter-spacing: var(--tracking-wide);
+  animation: copiedFade 2.5s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes copiedFade {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .missingWarning {
