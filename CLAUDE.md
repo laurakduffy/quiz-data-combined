@@ -360,6 +360,8 @@ aws lambda update-function-code \
 - `defaultPct` values on funds are all `null` (awaiting RP's recommended split)
 - No link from quiz results screen to `#donate` yet
 - No session persistence (form resets on reload)
+- **Counterfactual giving section** — Carmen asked for a "Help us understand your giving" block at the bottom of the form with percentage inputs for how the donor *would have* allocated without RP's recommendations (GHD / animal welfare / GCRs / outside EA / unsure / wouldn't have donated). Specs are not yet nailed down — validation rules (sum to 100%?), required/optional, and exact copy need to be agreed with Carmen before implementation. Answers should be piped through to the team email + `form_data` DB blob, same pattern as the fund split.
+- **Donor confirmation emails** — Carmen asked for a copy of the submission to be emailed to the donor. Blocked on SES: the account is in sandbox mode and the sender is only email-address-verified (`fund@rethinkpriorities.org`), not domain-verified. To unblock: (1) set up DKIM/domain verification for `rethinkpriorities.org` in SES (adds 3 CNAME records to DNS), (2) request SES production access so we can send to unverified recipients. Then we can add a second `SendEmailCommand` in `lambda/donate/index.mjs` targeting `email` (the donor's address) with the same `emailBody` we already build for the team notification.
 
 **Files:**
 
