@@ -1,6 +1,6 @@
 {
   "name": "April 17, 2026 at 11:28 AM",
-  "description": "Updated: April 17, 2026",
+  "description": "Updated: April 17, 2026 with 2M increments",
   "budget": 400,
   "incrementSize": 2,
   "drStepSize": 2,
