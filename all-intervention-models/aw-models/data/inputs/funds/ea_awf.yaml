@@ -6,7 +6,7 @@
 fund:
   project_id: ea_awf
   display_name: "EA Animal Welfare Fund"
-  annual_budget_M: 7.0 #22.5% growth YoY, 26M over 3 years
+  annual_budget_M: 6.6 #22.5% growth YoY, 26M over 3 years
   source_year: 2026
 
   splits:

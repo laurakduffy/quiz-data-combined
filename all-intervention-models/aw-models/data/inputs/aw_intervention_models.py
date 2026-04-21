@@ -86,10 +86,10 @@ def downsample(arr, n_target=10000):
 
 def extended_pcts(arr):
     """Compute extended percentile summary for quality control.
-    
-    Returns dict with mean and percentiles: 0.15, 1, 2.5, 10, 50, 90, 97.5, 99, 99.85
+
+    Returns dict with mean and percentiles: 0.15, 1, 5, 10, 50, 90, 95, 99, 99.85
     """
-    percentiles = [0.15, 1, 2.5, 10, 50, 90, 97.5, 99, 99.85]
+    percentiles = [0.15, 1, 5, 10, 50, 90, 95, 99, 99.85]
     values = np.percentile(arr, percentiles)
     
     result = {"mean": float(np.mean(arr))}
@@ -585,7 +585,7 @@ for intervention_key, samples in intervention_samples.items():
 csv_path = os.path.join(outputs_dir, "aw_model_extended_statistics.csv")
 csv_fieldnames = [
     "intervention", "description", "mean",
-    "p0_15", "p1", "p2_5", "p10", "p50", "p90", "p97_5", "p99", "p99_85"
+    "p0_15", "p1", "p5", "p10", "p50", "p90", "p95", "p99", "p99_85"
 ]
 
 with open(csv_path, "w", newline="") as f:
@@ -610,7 +610,7 @@ for fund_id, fdata in fund_samples.items():
     fund_csv_path = os.path.join(outputs_dir, f"{fund_id}_statistics.csv")
     fund_csv_fieldnames = [
         "intervention", "description", "split_weight", "mean",
-        "p0_15", "p1", "p2_5", "p10", "p50", "p90", "p97_5", "p99", "p99_85",
+        "p0_15", "p1", "p5", "p10", "p50", "p90", "p95", "p99", "p99_85",
     ]
     with open(fund_csv_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fund_csv_fieldnames)

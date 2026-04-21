@@ -270,7 +270,27 @@ final_json_structure = {
     {"value": 6, "label": "Combined"},
     {"value": 7, "label": "Continuous Upside Sceptical"}
   ],
-  "projects": projects_data
+  "projects": projects_data,
+  "clusters": [
+    {
+      "id": "ghd",
+      "name": "Global Health & Development",
+      "color": "#85E4FF",
+      "members": ["givewell", "leaf"]
+    },
+    {
+      "id": "animal_welfare",
+      "name": "Animal Welfare",
+      "color": "#85E4FF",
+      "members": ["navigation_fund_general", "navigation_fund_cagefree", "ea_awf"]
+    },
+    {
+      "id": "gcr",
+      "name": "Global Catastrophic Risks",
+      "color": "#85E4FF",
+      "members": ["longview_ai", "longview_nuclear", "sentinel_bio"]
+    }
+  ]
 }
 
 os.makedirs('outputs', exist_ok=True)

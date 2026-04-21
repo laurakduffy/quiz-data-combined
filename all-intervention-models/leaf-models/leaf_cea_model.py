@@ -77,7 +77,7 @@ effects_distribution_dict = fit_gev_from_percentiles(percentile_inputs)
 
 temporal_breakdown_by_type_dict = {
     'YLDs_averted': 
-        {'0-5 years': 0.0468, '5-10 years': 0.0752, '10-20 years': 0.1819, '20-100 years': 0.6961, '100-500 years': 0, '500+ years': 0},
+        {'0-5 years': 0.0424, '5-10 years': 0.0686, '10-20 years': 0.1691, '20-100 years': 0.7199, '100-500 years': 0, '500+ years': 0},
     'life_years_saved': 
         {'0-5 years': 0.0331, '5-10 years': 0.0496, '10-20 years': 0.1210, '20-100 years': 0.7964, '100-500 years': 0, '500+ years': 0},
     'income_doublings': 
