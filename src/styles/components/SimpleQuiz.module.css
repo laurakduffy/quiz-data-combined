@@ -50,13 +50,13 @@
 }
 
 .optionSelected {
-  background: rgba(42, 154, 181, 0.2);
-  border-color: var(--color-teal-light);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #fff;
 }
 
 .optionSelected:hover {
-  background: rgba(42, 154, 181, 0.25);
-  border-color: var(--color-teal-light);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #fff;
 }
 
 .optionLabel {
@@ -135,6 +135,12 @@
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
   opacity: 0.7;
+}
+
+.manualTitleSubtext {
+  text-transform: none;
+  font-weight: var(--font-normal);
+  letter-spacing: 0;
 }
 
 .manualGrid {

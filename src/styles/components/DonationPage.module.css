@@ -522,7 +522,7 @@
   margin-top: var(--spacing-12);
   padding-top: var(--spacing-8);
   border-top: 1px solid var(--border-subtle);
-  font-size: var(--text-sm);
+  font-size: var(--text-xl);
   color: var(--text-muted);
   line-height: 1.6;
 }

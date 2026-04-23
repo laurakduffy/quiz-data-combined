@@ -52,7 +52,6 @@ function SimpleResultsScreen() {
     updateSavedManualOverride,
     // Results display preferences (persisted in context)
     activeView: activeViewRaw,
-    setActiveView,
     blendEnabled,
     setBlendEnabled,
     blendCredence,
@@ -152,11 +151,16 @@ function SimpleResultsScreen() {
   const rawAllocations = useMemo(() => {
     if (!dataset?.projects) return {};
 
-    if (blendEnabled) {
+    const multipleUserWorldviews = allUserWorldviews.length > 1;
+
+    if (blendEnabled || multipleUserWorldviews) {
+      // Credence-weighted across user worldviews, optionally blended with the RP preset set.
+      // When blendEnabled is off we still want credence weighting across user worldviews;
+      // passing blendCredence=0 zeroes out the RP share without changing the code path.
       const combined = blendWorldviews(
-        specialBlendConfig.worldviews,
+        blendEnabled ? specialBlendConfig.worldviews : [],
         allUserWorldviews,
-        blendCredence,
+        blendEnabled ? blendCredence : 0,
         userCredencesArray
       );
       return computeBlendedAllocations(
@@ -271,12 +275,11 @@ function SimpleResultsScreen() {
 
   const hasSaved = savedWorldviews.length > 0;
 
-  // Which worldview the edit panel is targeting.
-  // When not blending, follows activeView. When blending, independent selection.
+  // Which worldview the edit panel is targeting. The slider list is now always
+  // shown when multiple user worldviews exist, so the edit panel selection is
+  // independent of the old click-to-select activeView.
   const [editViewUid, setEditViewUid] = useState('current');
-
-  // Sync editViewUid to activeView when not blending
-  const effectiveEditView = blendEnabled ? editViewUid : activeView;
+  const effectiveEditView = hasSaved ? editViewUid : 'current';
 
   // Build choices for the edit panel's worldview selector (only used when blending with multiple)
   const editWorldviewChoices = useMemo(() => {
@@ -322,12 +325,6 @@ function SimpleResultsScreen() {
     [effectiveEditView, setManualOverride, updateSavedManualOverride]
   );
 
-  const activeLabel = useMemo(() => {
-    if (activeView === 'current') return currentRunName;
-    const saved = savedWorldviews.find((sw) => sw.uid === activeView);
-    return saved?.name || null;
-  }, [activeView, savedWorldviews, currentRunName]);
-
   // Renders a name + edit icon, or an inline rename input
   const renderNameCell = (id, name) => {
     if (editingId === id) {
@@ -370,8 +367,8 @@ function SimpleResultsScreen() {
           <p className={styles.resultsSubtext}>
             {blendEnabled
               ? 'Your worldviews are blended with RP\u2019s expert views to produce a combined allocation.'
-              : hasSaved && activeLabel
-                ? `Showing results for: ${activeLabel}`
+              : hasSaved
+                ? 'Your worldviews are combined using credence-weighted allocation.'
                 : 'Based on your preferences, here\u2019s how your budget would be allocated across funds.'}
           </p>
 
@@ -426,105 +423,60 @@ function SimpleResultsScreen() {
               <div className={styles.savedWorldviewsList}>
                 <h3 className={styles.savedWorldviewsHeading}>Your Worldviews</h3>
 
-                {savedWorldviews.map((sw) =>
-                  blendEnabled ? (
-                    <div
-                      key={sw.uid}
-                      className={`${styles.savedWorldviewItem} ${styles.savedWorldviewWithSlider}`}
-                    >
-                      <span className={styles.savedWorldviewNameGroup}>
-                        {renderNameCell(sw.uid, sw.name)}
-                      </span>
-                      <div className={styles.savedWorldviewSliderCell}>
-                        <CompactSlider
-                          label=""
-                          value={userCredences[sw.uid] || 0}
-                          onChange={(val) => handleUserCredenceChange(sw.uid, val)}
-                          color="#2a9ab5"
-                          credences={userCredences}
-                          sliderKey={sw.uid}
-                          lockedKeys={lockedKeys}
-                          setLockedKeys={setLockedKeys}
-                        />
-                      </div>
-                      <button
-                        className={styles.savedWorldviewRemove}
-                        onClick={() => removeWorldview(sw.uid)}
-                        title="Remove worldview"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  ) : (
-                    <div
-                      key={sw.uid}
-                      className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === sw.uid ? styles.savedWorldviewActive : ''}`}
-                      onClick={() => setActiveView(sw.uid)}
-                    >
-                      <span className={styles.savedWorldviewNameGroup}>
-                        {renderNameCell(sw.uid, sw.name)}
-                      </span>
-                      <button
-                        className={styles.savedWorldviewRemove}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeWorldview(sw.uid);
-                        }}
-                        title="Remove worldview"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  )
-                )}
-
-                {blendEnabled ? (
+                {savedWorldviews.map((sw) => (
                   <div
+                    key={sw.uid}
                     className={`${styles.savedWorldviewItem} ${styles.savedWorldviewWithSlider}`}
                   >
                     <span className={styles.savedWorldviewNameGroup}>
-                      {renderNameCell('current', currentRunName)}
+                      {renderNameCell(sw.uid, sw.name)}
                     </span>
                     <div className={styles.savedWorldviewSliderCell}>
                       <CompactSlider
                         label=""
-                        value={userCredences['current'] || 0}
-                        onChange={(val) => handleUserCredenceChange('current', val)}
+                        value={userCredences[sw.uid] || 0}
+                        onChange={(val) => handleUserCredenceChange(sw.uid, val)}
                         color="#2a9ab5"
                         credences={userCredences}
-                        sliderKey="current"
+                        sliderKey={sw.uid}
                         lockedKeys={lockedKeys}
                         setLockedKeys={setLockedKeys}
                       />
                     </div>
                     <button
                       className={styles.savedWorldviewRemove}
-                      onClick={removeCurrent}
+                      onClick={() => removeWorldview(sw.uid)}
                       title="Remove worldview"
                     >
                       &times;
                     </button>
                   </div>
-                ) : (
-                  <div
-                    className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === 'current' ? styles.savedWorldviewActive : ''}`}
-                    onClick={() => setActiveView('current')}
+                ))}
+
+                <div className={`${styles.savedWorldviewItem} ${styles.savedWorldviewWithSlider}`}>
+                  <span className={styles.savedWorldviewNameGroup}>
+                    {renderNameCell('current', currentRunName)}
+                  </span>
+                  <div className={styles.savedWorldviewSliderCell}>
+                    <CompactSlider
+                      label=""
+                      value={userCredences['current'] || 0}
+                      onChange={(val) => handleUserCredenceChange('current', val)}
+                      color="#2a9ab5"
+                      credences={userCredences}
+                      sliderKey="current"
+                      lockedKeys={lockedKeys}
+                      setLockedKeys={setLockedKeys}
+                    />
+                  </div>
+                  <button
+                    className={styles.savedWorldviewRemove}
+                    onClick={removeCurrent}
+                    title="Remove worldview"
                   >
-                    <span className={styles.savedWorldviewNameGroup}>
-                      {renderNameCell('current', currentRunName)}
-                    </span>
-                    <button
-                      className={styles.savedWorldviewRemove}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeCurrent();
-                      }}
-                      title="Remove worldview"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                )}
+                    &times;
+                  </button>
+                </div>
               </div>
             )}
 
@@ -537,7 +489,9 @@ function SimpleResultsScreen() {
                   onChange={(e) => setBlendEnabled(e.target.checked)}
                 />
                 <span className={styles.blendToggleLabel}>Mix with {specialBlendConfig.label}</span>
-                <InfoTooltip content="When enabled, your preferences are combined with Rethink Priorities' expert worldviews using credence-weighted allocation." />
+                <InfoTooltip
+                  content={`When enabled, your preferences are combined with Rethink Priorities' expert worldviews using credence-weighted allocation. [${specialBlendConfig.tooltipSourceLabel}](${specialBlendConfig.tooltipSourceUrl})`}
+                />
               </label>
 
               {blendEnabled && (
@@ -570,7 +524,7 @@ function SimpleResultsScreen() {
             manualOverrides={editManualOverrides}
             onSelectOption={handleEditSelect}
             onSetManualOverride={handleEditManual}
-            worldviewChoices={blendEnabled ? editWorldviewChoices : null}
+            worldviewChoices={editWorldviewChoices}
             editViewUid={effectiveEditView}
             onChangeEditView={setEditViewUid}
           />

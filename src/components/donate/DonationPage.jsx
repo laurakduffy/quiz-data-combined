@@ -412,6 +412,10 @@ Anonymity: ${anonText}`;
             <div className={styles.fieldHint}>{config.fields.amount.hint}</div>
           </div>
 
+          {config.pageFooter && (
+            <div className={styles.pageFooter}>{renderWithLink(config.pageFooter)}</div>
+          )}
+
           {/* Output — always shown */}
           <div className={styles.outputSection}>
             <div className={styles.divider} />
@@ -511,10 +515,6 @@ Anonymity: ${anonText}`;
           </div>
 
           <div className={styles.legalNote}>{config.legal}</div>
-
-          {config.pageFooter && (
-            <div className={styles.pageFooter}>{renderWithLink(config.pageFooter)}</div>
-          )}
         </div>
       </main>
 
