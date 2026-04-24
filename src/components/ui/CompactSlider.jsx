@@ -11,6 +11,7 @@ import copy from '../../../config/copy.json';
 function CompactSlider({
   label,
   value,
+  thumbValue,
   onChange,
   color,
   credences,
@@ -20,6 +21,10 @@ function CompactSlider({
   hideLock = false,
   inlineValue = false,
 }) {
+  // The thumb position can be animated independently of the displayed percent:
+  // callers pass `thumbValue` to tween the slider while `value` (the text)
+  // jumps straight to the final number.
+  const displayedThumb = thumbValue != null ? thumbValue : value;
   const { isLocked, hasLockedSibling, thumbOffset, canLockMore, featureEnabled } = useLockedSlider({
     sliderKey,
     lockedKeys,
@@ -45,8 +50,8 @@ function CompactSlider({
   };
 
   const sliderBackground = hasLockedSibling
-    ? `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(255,255,255,0.15) ${value}%, rgba(255,255,255,0.15) ${thumbOffset}, rgba(255,255,255,0.08) ${thumbOffset}, rgba(255,255,255,0.08) 100%)`
-    : `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(255,255,255,0.15) ${value}%, rgba(255,255,255,0.15) 100%)`;
+    ? `linear-gradient(to right, ${color} 0%, ${color} ${displayedThumb}%, rgba(255,255,255,0.15) ${displayedThumb}%, rgba(255,255,255,0.15) ${thumbOffset}, rgba(255,255,255,0.08) ${thumbOffset}, rgba(255,255,255,0.08) 100%)`
+    : `linear-gradient(to right, ${color} 0%, ${color} ${displayedThumb}%, rgba(255,255,255,0.15) ${displayedThumb}%, rgba(255,255,255,0.15) 100%)`;
 
   return (
     <div className={styles.compactSlider}>
@@ -66,7 +71,7 @@ function CompactSlider({
             min="0"
             max="100"
             step="any"
-            value={value}
+            value={displayedThumb}
             {...dragHandlers}
             data-dragging={isDragging}
             disabled={isLocked}

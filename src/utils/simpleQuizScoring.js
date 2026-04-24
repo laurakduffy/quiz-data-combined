@@ -69,14 +69,31 @@ function topCredenceOptionId(dist) {
 
 /**
  * Build the default credence distribution for a credence-type question.
- * Returns 100% on isDefault option, else 100% on the first option.
+ * Priority: default preset's credences → 100% on isDefault option → 100% on first option.
  */
 export function defaultCredenceDistribution(question) {
   const dist = {};
   for (const opt of question.options) dist[opt.id] = 0;
+
+  // If any preset is marked isDefault, use its credences
+  const defaultPreset = question.presets?.find((p) => p.isDefault);
+  if (defaultPreset?.credences) {
+    for (const opt of question.options) {
+      dist[opt.id] = defaultPreset.credences[opt.id] || 0;
+    }
+    return dist;
+  }
+
   const def = question.options.find((o) => o.isDefault) || question.options[0];
   if (def) dist[def.id] = 100;
   return dist;
+}
+
+/**
+ * Find the default preset id for a credence question (or null if none).
+ */
+export function defaultPresetId(question) {
+  return question.presets?.find((p) => p.isDefault)?.id || null;
 }
 
 /**

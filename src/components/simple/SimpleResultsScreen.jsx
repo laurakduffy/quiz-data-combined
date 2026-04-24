@@ -41,11 +41,13 @@ function SimpleResultsScreen() {
     selections,
     manualOverrides,
     credences,
+    selectedPresets,
     questionLockedKeys,
     setQuestionLockedKeys,
     selectOption,
     setManualOverride,
     setQuestionCredences,
+    setQuestionSelectedPreset,
     savedWorldviews,
     currentRunName,
     setCurrentRunName,
@@ -59,6 +61,7 @@ function SimpleResultsScreen() {
     updateSavedSelection,
     updateSavedManualOverride,
     updateSavedCredences,
+    updateSavedSelectedPreset,
     // Results display preferences (persisted in context)
     activeView: activeViewRaw,
     blendEnabled,
@@ -357,6 +360,12 @@ function SimpleResultsScreen() {
     return saved?.credences || {};
   }, [effectiveEditView, credences, savedWorldviews]);
 
+  const editSelectedPresets = useMemo(() => {
+    if (effectiveEditView === 'current') return selectedPresets;
+    const saved = savedWorldviews.find((sw) => sw.uid === effectiveEditView);
+    return saved?.selectedPresets || {};
+  }, [effectiveEditView, selectedPresets, savedWorldviews]);
+
   const handleEditSelect = useCallback(
     (questionId, optionId) => {
       if (effectiveEditView === 'current') {
@@ -388,6 +397,17 @@ function SimpleResultsScreen() {
       }
     },
     [effectiveEditView, setQuestionCredences, updateSavedCredences]
+  );
+
+  const handleEditSelectedPreset = useCallback(
+    (questionId, presetId) => {
+      if (effectiveEditView === 'current') {
+        setQuestionSelectedPreset(questionId, presetId);
+      } else {
+        updateSavedSelectedPreset(effectiveEditView, questionId, presetId);
+      }
+    },
+    [effectiveEditView, setQuestionSelectedPreset, updateSavedSelectedPreset]
   );
 
   // Renders a name + edit icon, or an inline rename input
@@ -594,11 +614,13 @@ function SimpleResultsScreen() {
             selections={editSelections}
             manualOverrides={editManualOverrides}
             credences={editCredences}
+            selectedPresets={editSelectedPresets}
             questionLockedKeys={questionLockedKeys}
             onSelectOption={handleEditSelect}
             onSetManualOverride={handleEditManual}
             onSetCredences={handleEditCredences}
             onSetQuestionLockedKeys={setQuestionLockedKeys}
+            onSetSelectedPreset={handleEditSelectedPreset}
             worldviewChoices={editWorldviewChoices}
             editViewUid={effectiveEditView}
             onChangeEditView={setEditViewUid}

@@ -4,6 +4,7 @@ import { useDataset } from '../../context/DatasetContext';
 import CompactSlider from '../ui/CompactSlider';
 import ManualInput from './ManualInput';
 import { adjustCredences, roundCredences } from '../../utils/calculations';
+import { useCredenceAnimation } from '../../hooks/useCredenceAnimation';
 import quizConfig from '../../../config/simpleQuizConfig.json';
 import copy from '../../../config/copy.json';
 import styles from '../../styles/components/SimpleQuiz.module.css';
@@ -30,10 +31,12 @@ function EditAnswersPanel({
   manualOverrides,
   credences,
   questionLockedKeys,
+  selectedPresets,
   onSelectOption,
   onSetManualOverride,
   onSetCredences,
   onSetQuestionLockedKeys,
+  onSetSelectedPreset,
   worldviewChoices,
   editViewUid,
   onChangeEditView,
@@ -86,10 +89,12 @@ function EditAnswersPanel({
                 manualOverride={manualOverrides[question.id]}
                 credences={credences?.[question.id]}
                 lockedKeys={questionLockedKeys?.[question.id]}
+                selectedPresetId={selectedPresets?.[question.id]}
                 onSelectOption={(optionId) => onSelectOption(question.id, optionId)}
                 onSetManualOverride={(value) => onSetManualOverride(question.id, value)}
                 onSetCredences={(dist) => onSetCredences(question.id, dist)}
                 onSetLockedKeys={(keys) => onSetQuestionLockedKeys(question.id, keys)}
+                onSetSelectedPreset={(presetId) => onSetSelectedPreset(question.id, presetId)}
                 isExpanded={expandedId === question.id}
                 onToggle={() => toggleQuestion(question.id)}
               />
@@ -107,10 +112,12 @@ function EditAnswerItem({
   manualOverride,
   credences,
   lockedKeys,
+  selectedPresetId,
   onSelectOption,
   onSetManualOverride,
   onSetCredences,
   onSetLockedKeys,
+  onSetSelectedPreset,
   isExpanded,
   onToggle,
 }) {
@@ -122,13 +129,19 @@ function EditAnswerItem({
   const allOptions = [...question.options, ...(question.moreOptions || [])];
   const currentOption = selectedId ? allOptions.find((opt) => opt.id === selectedId) : null;
 
-  // Label shown on the collapsed header row. For credence questions, show the
-  // single option's label if one is at 100%, else "Mixed (a/b/c)".
-  const currentLabel = hasManualOverride
-    ? 'Custom'
-    : isCredence
-      ? credenceSummaryLabel(question, credences)
-      : currentOption?.shortLabel || currentOption?.label || 'Not set';
+  // Label shown on the collapsed header row.
+  // - Credence question on a named preset: show preset name.
+  // - Credence question on custom / no preset: "Mixed (a/b/c)" or single-option label.
+  // - Non-credence question: the selected option's short/long label, or "Custom" for manual override.
+  let currentLabel;
+  if (hasManualOverride) {
+    currentLabel = 'Custom';
+  } else if (isCredence) {
+    const activePreset = question.presets?.find((p) => p.id === selectedPresetId);
+    currentLabel = activePreset ? activePreset.name : credenceSummaryLabel(question, credences);
+  } else {
+    currentLabel = currentOption?.shortLabel || currentOption?.label || 'Not set';
+  }
 
   // Check if a moreOption or manual override is active — auto-open "More" if so
   const isMoreActive =
@@ -142,6 +155,19 @@ function EditAnswerItem({
   const hasMoreSection = question.moreOptions?.length > 0 || question.manualInputType;
 
   const lockedKeysArr = lockedKeys || [];
+  const { thumbValues, animateTo } = useCredenceAnimation();
+
+  const handleSelectPresetAnimated = (presetId) => {
+    const preset = question.presets?.find((p) => p.id === presetId);
+    if (!preset) return;
+    const fromCredences = thumbValues || credences || {};
+    const toCredences = {};
+    for (const opt of question.options) {
+      toCredences[opt.id] = preset.credences[opt.id] || 0;
+    }
+    onSetSelectedPreset(presetId);
+    animateTo(fromCredences, toCredences);
+  };
 
   const handleCredenceChange = (optionId, newValue, baseCredences, shouldRound) => {
     const adjusted = adjustCredences(
@@ -168,30 +194,48 @@ function EditAnswerItem({
       {isExpanded && (
         <div className={styles.editAnswerBody}>
           {isCredence ? (
-            <div className={styles.editCredenceList}>
-              {question.options.map((option) => (
-                <div key={option.id} className={styles.editCredenceRow}>
-                  <span className={styles.editCredenceLabel}>
-                    {option.shortLabel || option.label}
-                  </span>
-                  <div className={styles.editCredenceSlider}>
-                    <CompactSlider
-                      label=""
-                      value={credences?.[option.id] || 0}
-                      onChange={(val, base, round) =>
-                        handleCredenceChange(option.id, val, base, round)
-                      }
-                      color="#2a9ab5"
-                      credences={credences || {}}
-                      sliderKey={option.id}
-                      lockedKeys={lockedKeysArr}
-                      setLockedKeys={onSetLockedKeys}
-                      inlineValue
-                    />
-                  </div>
+            <>
+              {question.presets?.length > 0 && (
+                <div className={styles.editPresetsRow}>
+                  {question.presets.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      className={`${styles.editPresetButton} ${selectedPresetId === preset.id ? styles.editPresetButtonSelected : ''}`}
+                      onClick={() => handleSelectPresetAnimated(preset.id)}
+                      title={preset.description}
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
+              <div className={styles.editCredenceList}>
+                {question.options.map((option) => (
+                  <div key={option.id} className={styles.editCredenceRow}>
+                    <span className={styles.editCredenceLabel}>
+                      {option.shortLabel || option.label}
+                    </span>
+                    <div className={styles.editCredenceSlider}>
+                      <CompactSlider
+                        label=""
+                        value={credences?.[option.id] || 0}
+                        thumbValue={thumbValues ? (thumbValues[option.id] ?? 0) : undefined}
+                        onChange={(val, base, round) =>
+                          handleCredenceChange(option.id, val, base, round)
+                        }
+                        color="#2a9ab5"
+                        credences={credences || {}}
+                        sliderKey={option.id}
+                        lockedKeys={lockedKeysArr}
+                        setLockedKeys={onSetLockedKeys}
+                        inlineValue
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           ) : (
             <div className={styles.editAnswerOptions}>
               {question.options.map((option) => (

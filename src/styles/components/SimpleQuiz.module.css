@@ -7,6 +7,11 @@
   width: 100%;
 }
 
+/* Credence questions use a wider container to fit the two-column preset/slider layout. */
+.questionContainerWide {
+  max-width: 60rem;
+}
+
 .questionNumber {
   font-size: var(--text-base);
   opacity: 0.6;
@@ -69,6 +74,113 @@
   opacity: 0.7;
   font-family: var(--font-body);
   line-height: var(--leading-relaxed);
+}
+
+/* === Credence question presets === */
+
+/* Two-column layout: presets column on the left, sliders column on the right.
+   Each column's children render as matching cards via .presetsRow / .credenceList. */
+.credenceTwoColumn {
+  display: grid;
+  grid-template-columns: minmax(15rem, 1fr) 1.4fr;
+  gap: var(--spacing-8);
+  margin-bottom: var(--spacing-12);
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .credenceTwoColumn {
+    grid-template-columns: 1fr;
+  }
+}
+
+.credenceColumnHeading {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  opacity: 0.7;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-3);
+}
+
+.presetsRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.presetButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  padding: var(--spacing-8) var(--spacing-10);
+  background: var(--overlay-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-base);
+  text-align: left;
+  width: 100%;
+}
+
+.presetButton:hover {
+  background: var(--overlay-light);
+  border-color: var(--border-medium);
+}
+
+.presetButtonSelected {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #fff;
+}
+
+.presetButtonSelected:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: #fff;
+}
+
+.presetButtonName {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+}
+
+.presetButtonDescription {
+  font-size: var(--text-sm);
+  opacity: 0.7;
+  font-family: var(--font-body);
+  line-height: var(--leading-relaxed);
+}
+
+/* Smaller preset row variant inside the edit panel */
+.editPresetsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+.editPresetButton {
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+  background: var(--overlay-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.editPresetButton:hover {
+  background: var(--overlay-light);
+  border-color: var(--border-medium);
+}
+
+.editPresetButtonSelected {
+  background: rgba(42, 154, 181, 0.2);
+  border-color: var(--color-teal-light);
 }
 
 /* === Credence (slider) question === */
