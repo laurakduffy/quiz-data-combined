@@ -233,7 +233,7 @@
     {
       "name": "Contractualism",
       "presetId": "contractualism",
-      "credence": 0.0957446809,
+      "credence": 0.1,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 0.01,
@@ -283,7 +283,7 @@
     {
       "name": "Contractualism",
       "presetId": "contractualism",
-      "credence": 0.0521276596,
+      "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 0.01,
@@ -308,7 +308,7 @@
     {
       "name": "Kantianism",
       "presetId": "kantianism",
-      "credence": 0.0521276596,
+      "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 0.5,
