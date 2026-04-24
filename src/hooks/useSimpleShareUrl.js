@@ -17,6 +17,7 @@ export function useSimpleShareUrl() {
   const {
     selections,
     manualOverrides,
+    credences,
     savedWorldviews,
     currentRunName,
     budget,
@@ -25,6 +26,7 @@ export function useSimpleShareUrl() {
     blendCredence,
     userCredencesRaw,
     lockedKeys,
+    questionLockedKeys,
   } = useSimpleQuiz();
 
   const [copied, setCopied] = useState(false);
@@ -43,6 +45,7 @@ export function useSimpleShareUrl() {
       const { url } = await generateSimpleShareUrl({
         selections,
         manualOverrides,
+        credences,
         savedWorldviews,
         currentRunName,
         budget,
@@ -51,6 +54,7 @@ export function useSimpleShareUrl() {
         blendCredence,
         userCredencesRaw,
         lockedKeys,
+        questionLockedKeys,
       });
       await copyToClipboard(url);
       setCopied(true);
@@ -69,6 +73,7 @@ export function useSimpleShareUrl() {
   }, [
     selections,
     manualOverrides,
+    credences,
     savedWorldviews,
     currentRunName,
     budget,
@@ -77,6 +82,7 @@ export function useSimpleShareUrl() {
     blendCredence,
     userCredencesRaw,
     lockedKeys,
+    questionLockedKeys,
   ]);
 
   return { copied, loading, error, networkBlocked, dismissNetworkBlocked, handleShare };

@@ -5,23 +5,38 @@ import quizConfig from '../../config/simpleQuizConfig.json';
 /**
  * Assemble a single worldview object from quiz selections and manual overrides.
  *
+ * Credence-type questions (e.g. Q4 risk_profile) are collapsed to the single
+ * highest-credence option here — callers that need the full expansion should
+ * use assembleWorldviewsForRun instead.
+ *
  * @param {Object} selections - Map of questionId → selected optionId
  * @param {Object} manualOverrides - Map of questionId → manual value (or null)
  * @param {Array} questions - Question config array from simpleQuizConfig.json
+ * @param {Object} [credences] - Map of questionId → { optionId: percent } for credence questions
  * @returns {Object} Worldview object with moral_weights, discount_factors, risk_profile, p_extinction
  */
-export function assembleWorldview(selections, manualOverrides, questions) {
+export function assembleWorldview(selections, manualOverrides, questions, credences = {}) {
   // Start from default worldview template
   const worldview = JSON.parse(JSON.stringify(worldviewPresets.defaultWorldview));
   delete worldview.name;
   delete worldview.credence;
 
   for (const question of questions) {
-    const { id, worldviewField, options, moreOptions } = question;
+    const { id, worldviewField, options, moreOptions, type } = question;
 
     // Manual override takes priority
     if (manualOverrides[id] != null) {
       worldview[worldviewField] = manualOverrides[id];
+      continue;
+    }
+
+    if (type === 'credence') {
+      const dist = credences[id];
+      const allOptions = [...options, ...(moreOptions || [])];
+      const topId = topCredenceOptionId(dist);
+      const selected =
+        (topId && allOptions.find((o) => o.id === topId)) || allOptions.find((o) => o.isDefault);
+      if (selected) worldview[worldviewField] = selected.value;
       continue;
     }
 
@@ -37,6 +52,103 @@ export function assembleWorldview(selections, manualOverrides, questions) {
   }
 
   return worldview;
+}
+
+function topCredenceOptionId(dist) {
+  if (!dist) return null;
+  let best = null;
+  let bestVal = -Infinity;
+  for (const [id, val] of Object.entries(dist)) {
+    if (val > bestVal) {
+      best = id;
+      bestVal = val;
+    }
+  }
+  return bestVal > 0 ? best : null;
+}
+
+/**
+ * Build the default credence distribution for a credence-type question.
+ * Returns 100% on isDefault option, else 100% on the first option.
+ */
+export function defaultCredenceDistribution(question) {
+  const dist = {};
+  for (const opt of question.options) dist[opt.id] = 0;
+  const def = question.options.find((o) => o.isDefault) || question.options[0];
+  if (def) dist[def.id] = 100;
+  return dist;
+}
+
+/**
+ * Expand a quiz run into one or more worldviews, one per non-zero credence
+ * option on each credence-type question. Non-credence questions contribute a
+ * single value. Shares on the returned worldviews sum to 1.0.
+ *
+ * Currently there is at most one credence question (Q4), but the implementation
+ * handles a cross-product across any number of credence questions.
+ *
+ * @param {Object} selections - Map of questionId → selected optionId
+ * @param {Object} manualOverrides - Map of questionId → manual value (or null)
+ * @param {Object} credences - Map of questionId → { optionId: percent }
+ * @param {Array} questions - Question config array from simpleQuizConfig.json
+ * @returns {Array<Object>} Array of worldview objects, each with a `share` field (0–1)
+ */
+export function assembleWorldviewsForRun(selections, manualOverrides, credences, questions) {
+  const base = JSON.parse(JSON.stringify(worldviewPresets.defaultWorldview));
+  delete base.name;
+  delete base.credence;
+
+  const credenceQuestions = [];
+  for (const q of questions) {
+    if (q.type === 'credence') {
+      credenceQuestions.push(q);
+      continue;
+    }
+    if (manualOverrides[q.id] != null) {
+      base[q.worldviewField] = manualOverrides[q.id];
+      continue;
+    }
+    const selectedId = selections[q.id];
+    if (!selectedId) continue;
+    const all = [...q.options, ...(q.moreOptions || [])];
+    const selected = all.find((opt) => opt.id === selectedId);
+    if (selected) base[q.worldviewField] = selected.value;
+  }
+
+  let results = [{ ...base, share: 1.0 }];
+
+  for (const q of credenceQuestions) {
+    // Manual override (if ever added) short-circuits the credence split.
+    if (manualOverrides[q.id] != null) {
+      results = results.map((r) => ({ ...r, [q.worldviewField]: manualOverrides[q.id] }));
+      continue;
+    }
+
+    const dist = credences[q.id] || defaultCredenceDistribution(q);
+    const total = Object.values(dist).reduce((s, v) => s + (v > 0 ? v : 0), 0);
+
+    const expanded = [];
+    for (const r of results) {
+      if (total <= 0) {
+        // Fallback: no credence set — use isDefault or first option
+        const def = q.options.find((o) => o.isDefault) || q.options[0];
+        if (def) expanded.push({ ...r, [q.worldviewField]: def.value });
+        continue;
+      }
+      for (const opt of q.options) {
+        const c = dist[opt.id] || 0;
+        if (c <= 0) continue;
+        expanded.push({
+          ...r,
+          [q.worldviewField]: opt.value,
+          share: r.share * (c / total),
+        });
+      }
+    }
+    results = expanded;
+  }
+
+  return results;
 }
 
 /**
@@ -120,6 +232,52 @@ export function blendWorldviews(blendWvs, userWvs, blendCredence, userCredences)
 }
 
 /**
+ * Blend RP worldviews with user *runs*, where each run is an expanded list of
+ * worldviews (e.g. Q4 credence-split worldviews that share Q1-Q3 values).
+ *
+ * Three-level credence split:
+ *   final_credence = blendShare · wv.credence              (for RP blend wvs)
+ *   final_credence = (1-blendShare) · runShare · wv.share  (for user wvs)
+ *
+ * @param {Array<Object>} blendWvs - RP worldviews (each with .credence summing to 1)
+ * @param {Array<Array<Object>>} userRuns - Per-run expanded worldviews (each inner entry has `share`)
+ * @param {number} blendCredence - 0-100, share given to blend vs user
+ * @param {Array<number>} [userCredences] - Per-run credence 0-100 (sum to 100); equal split if omitted
+ * @returns {Array<Object>} Flat list with final .credence summing to 1.0
+ */
+export function blendRunWorldviews(blendWvs, userRuns, blendCredence, userCredences) {
+  const blendShare = blendCredence / 100;
+  const userShare = 1 - blendShare;
+
+  const combined = [];
+
+  for (const wv of blendWvs) {
+    combined.push({ ...wv, credence: wv.credence * blendShare });
+  }
+
+  for (let i = 0; i < userRuns.length; i++) {
+    const runShare = userCredences
+      ? userShare * (userCredences[i] / 100)
+      : userRuns.length > 0
+        ? userShare / userRuns.length
+        : 0;
+    for (const wv of userRuns[i]) {
+      const { share, ...rest } = wv;
+      combined.push({ ...rest, credence: runShare * (share ?? 1) });
+    }
+  }
+
+  // Normalize to guarantee strict sum=1.0 against floating-point drift from
+  // mid-drag slider values or integer rounding.
+  const total = combined.reduce((s, wv) => s + wv.credence, 0);
+  if (total > 0 && Math.abs(total - 1.0) > 1e-9) {
+    for (const wv of combined) wv.credence = wv.credence / total;
+  }
+
+  return combined;
+}
+
+/**
  * Compute allocation percentages using credenceWeighted for blended worldviews.
  *
  * @param {Array<Object>} worldviews - Combined worldviews with .credence fields
@@ -195,28 +353,41 @@ function deepEqual(a, b) {
 }
 
 /**
- * Reverse-map a worldview object back to selections + manualOverrides.
+ * Reverse-map a worldview object back to selections + manualOverrides + credences.
  *
  * For each question, compares the worldview field value against all preset option values.
- * If it matches a preset → selections[qId] = optionId.
- * If no match → manualOverrides[qId] = fieldValue.
+ * - Non-credence questions: match → selections[qId], no match → manualOverrides[qId].
+ * - Credence questions: match → credences[qId] = { matchedId: 100 }, no match → manualOverrides[qId].
  *
  * @param {Object} worldview - Assembled worldview object
  * @param {Array} [questions] - Question config array (defaults to simpleQuizConfig.questions)
- * @returns {{ selections: Object, manualOverrides: Object }}
+ * @returns {{ selections: Object, manualOverrides: Object, credences: Object }}
  */
 export function reverseMapWorldview(worldview, questions = quizConfig.questions) {
   const selections = {};
   const manualOverrides = {};
+  const credences = {};
 
   for (const question of questions) {
-    const { id, worldviewField, options, moreOptions } = question;
+    const { id, worldviewField, options, moreOptions, type } = question;
     const fieldValue = worldview[worldviewField];
 
     if (fieldValue == null) continue;
 
     const allOptions = [...options, ...(moreOptions || [])];
     const matched = allOptions.find((opt) => deepEqual(opt.value, fieldValue));
+
+    if (type === 'credence') {
+      if (matched) {
+        const dist = {};
+        for (const opt of question.options) dist[opt.id] = 0;
+        dist[matched.id] = 100;
+        credences[id] = dist;
+      } else {
+        manualOverrides[id] = fieldValue;
+      }
+      continue;
+    }
 
     if (matched) {
       selections[id] = matched.id;
@@ -225,5 +396,5 @@ export function reverseMapWorldview(worldview, questions = quizConfig.questions)
     }
   }
 
-  return { selections, manualOverrides };
+  return { selections, manualOverrides, credences };
 }

@@ -164,9 +164,10 @@
     },
     {
       "id": "risk_profile",
+      "type": "credence",
       "title": "Risk Attitude",
       "heading": "How do you want to handle uncertainty and risk when comparing funds?",
-      "info": "Each fund's impact is estimated as an expected value across a range of scenarios with different probabilities. The risk profile determines how those scenarios are weighted. A risk-neutral approach takes expected value at face value. Other options adjust for uncertainty by discounting optimistic outliers, putting extra weight on potential harms, or both.",
+      "info": "Each fund's impact is estimated as an expected value across a range of scenarios with different probabilities. The risk profile determines how those scenarios are weighted. A risk-neutral approach takes expected value at face value. Other options adjust for uncertainty by discounting optimistic outliers, putting extra weight on potential harms, or both.\n\nAssign a credence to each option to reflect how much you lean toward that view. Each non-zero option becomes a separate worldview weighted by its slider value.",
       "icon": "dice",
       "previewText": "Risk profile",
       "worldviewField": "risk_profile",

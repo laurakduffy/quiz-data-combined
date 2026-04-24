@@ -40,12 +40,13 @@ function validateQuestionsConfig(questionsToValidate) {
 
 /**
  * Generate a shareable URL for the simple quiz.
- * Stores selections, manual overrides, saved worldviews, run name, and budget.
+ * Stores selections, manual overrides, credences, saved worldviews, run name, and budget.
  *
  * @param {Object} payload
  * @param {Object} payload.selections - { questionId: optionId }
  * @param {Object} payload.manualOverrides - { questionId: value|null }
- * @param {Array} payload.savedWorldviews - [{ worldview, name, uid }]
+ * @param {Object} payload.credences - { questionId: { optionId: pct } } for credence-type questions
+ * @param {Array} payload.savedWorldviews - [{ worldview, name, uid, selections, manualOverrides, credences }]
  * @param {string|null} payload.currentRunName
  * @param {number} payload.budget
  * @returns {Promise<{ url: string, id: string }>}
@@ -54,6 +55,7 @@ function validateQuestionsConfig(questionsToValidate) {
 export async function generateSimpleShareUrl({
   selections,
   manualOverrides,
+  credences,
   savedWorldviews,
   currentRunName,
   budget,
@@ -62,6 +64,7 @@ export async function generateSimpleShareUrl({
   blendCredence,
   userCredencesRaw,
   lockedKeys,
+  questionLockedKeys,
 }) {
   const sessionId = getOrCreateSessionId();
 
@@ -70,6 +73,7 @@ export async function generateSimpleShareUrl({
     sessionId,
     selections,
     manualOverrides,
+    credences,
     savedWorldviews,
     currentRunName,
     budget,
@@ -78,6 +82,7 @@ export async function generateSimpleShareUrl({
     blendCredence,
     userCredencesRaw,
     lockedKeys,
+    questionLockedKeys,
   };
 
   const response = await fetch(endpoints.share, {
@@ -225,6 +230,7 @@ export async function parseShareUrl() {
       type: 'simple',
       selections: shareData.selections || {},
       manualOverrides: shareData.manualOverrides || {},
+      credences: shareData.credences || {},
       savedWorldviews: shareData.savedWorldviews || [],
       currentRunName: shareData.currentRunName || null,
       budget: shareData.budget || 100,
@@ -233,6 +239,7 @@ export async function parseShareUrl() {
       blendCredence: shareData.blendCredence,
       userCredencesRaw: shareData.userCredencesRaw || {},
       lockedKeys: shareData.lockedKeys || [],
+      questionLockedKeys: shareData.questionLockedKeys || {},
     };
   }
 

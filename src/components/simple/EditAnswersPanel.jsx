@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useDataset } from '../../context/DatasetContext';
+import CompactSlider from '../ui/CompactSlider';
 import ManualInput from './ManualInput';
+import { adjustCredences, roundCredences } from '../../utils/calculations';
 import quizConfig from '../../../config/simpleQuizConfig.json';
 import copy from '../../../config/copy.json';
 import styles from '../../styles/components/SimpleQuiz.module.css';
@@ -15,8 +17,10 @@ const questions = quizConfig.questions;
  * Props:
  *  - selections: { questionId: optionId }
  *  - manualOverrides: { questionId: value | null }
+ *  - credences: { questionId: { optionId: pct } } — for credence-type questions
  *  - onSelectOption: (questionId, optionId) => void
  *  - onSetManualOverride: (questionId, value) => void
+ *  - onSetCredences: (questionId, { optionId: pct }) => void
  *  - worldviewChoices: [{ uid, name }] | null — when provided, renders a selector to pick which worldview to edit
  *  - editViewUid: string — currently selected worldview uid for editing
  *  - onChangeEditView: (uid) => void
@@ -24,8 +28,12 @@ const questions = quizConfig.questions;
 function EditAnswersPanel({
   selections,
   manualOverrides,
+  credences,
+  questionLockedKeys,
   onSelectOption,
   onSetManualOverride,
+  onSetCredences,
+  onSetQuestionLockedKeys,
   worldviewChoices,
   editViewUid,
   onChangeEditView,
@@ -76,8 +84,12 @@ function EditAnswersPanel({
                 question={question}
                 selectedId={selections[question.id]}
                 manualOverride={manualOverrides[question.id]}
+                credences={credences?.[question.id]}
+                lockedKeys={questionLockedKeys?.[question.id]}
                 onSelectOption={(optionId) => onSelectOption(question.id, optionId)}
                 onSetManualOverride={(value) => onSetManualOverride(question.id, value)}
+                onSetCredences={(dist) => onSetCredences(question.id, dist)}
+                onSetLockedKeys={(keys) => onSetQuestionLockedKeys(question.id, keys)}
                 isExpanded={expandedId === question.id}
                 onToggle={() => toggleQuestion(question.id)}
               />
@@ -93,20 +105,30 @@ function EditAnswerItem({
   question,
   selectedId,
   manualOverride,
+  credences,
+  lockedKeys,
   onSelectOption,
   onSetManualOverride,
+  onSetCredences,
+  onSetLockedKeys,
   isExpanded,
   onToggle,
 }) {
   const { dataset } = useDataset();
   const [moreOpen, setMoreOpen] = useState(false);
 
+  const isCredence = question.type === 'credence';
   const hasManualOverride = manualOverride != null;
   const allOptions = [...question.options, ...(question.moreOptions || [])];
   const currentOption = selectedId ? allOptions.find((opt) => opt.id === selectedId) : null;
+
+  // Label shown on the collapsed header row. For credence questions, show the
+  // single option's label if one is at 100%, else "Mixed (a/b/c)".
   const currentLabel = hasManualOverride
     ? 'Custom'
-    : currentOption?.shortLabel || currentOption?.label || 'Not set';
+    : isCredence
+      ? credenceSummaryLabel(question, credences)
+      : currentOption?.shortLabel || currentOption?.label || 'Not set';
 
   // Check if a moreOption or manual override is active — auto-open "More" if so
   const isMoreActive =
@@ -118,6 +140,19 @@ function EditAnswerItem({
   const selectedValue = selectedOption?.value ?? null;
 
   const hasMoreSection = question.moreOptions?.length > 0 || question.manualInputType;
+
+  const lockedKeysArr = lockedKeys || [];
+
+  const handleCredenceChange = (optionId, newValue, baseCredences, shouldRound) => {
+    const adjusted = adjustCredences(
+      optionId,
+      newValue,
+      credences || {},
+      baseCredences,
+      lockedKeysArr
+    );
+    onSetCredences(shouldRound ? roundCredences(adjusted) : adjusted);
+  };
 
   return (
     <div className={styles.editAnswerItem}>
@@ -132,17 +167,44 @@ function EditAnswerItem({
 
       {isExpanded && (
         <div className={styles.editAnswerBody}>
-          <div className={styles.editAnswerOptions}>
-            {question.options.map((option) => (
-              <button
-                key={option.id}
-                className={`${styles.editOptionButton} ${selectedId === option.id && !hasManualOverride ? styles.editOptionSelected : ''}`}
-                onClick={() => onSelectOption(option.id)}
-              >
-                {option.shortLabel || option.label}
-              </button>
-            ))}
-          </div>
+          {isCredence ? (
+            <div className={styles.editCredenceList}>
+              {question.options.map((option) => (
+                <div key={option.id} className={styles.editCredenceRow}>
+                  <span className={styles.editCredenceLabel}>
+                    {option.shortLabel || option.label}
+                  </span>
+                  <div className={styles.editCredenceSlider}>
+                    <CompactSlider
+                      label=""
+                      value={credences?.[option.id] || 0}
+                      onChange={(val, base, round) =>
+                        handleCredenceChange(option.id, val, base, round)
+                      }
+                      color="#2a9ab5"
+                      credences={credences || {}}
+                      sliderKey={option.id}
+                      lockedKeys={lockedKeysArr}
+                      setLockedKeys={onSetLockedKeys}
+                      inlineValue
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.editAnswerOptions}>
+              {question.options.map((option) => (
+                <button
+                  key={option.id}
+                  className={`${styles.editOptionButton} ${selectedId === option.id && !hasManualOverride ? styles.editOptionSelected : ''}`}
+                  onClick={() => onSelectOption(option.id)}
+                >
+                  {option.shortLabel || option.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {hasMoreSection && (
             <>
@@ -189,6 +251,25 @@ function EditAnswerItem({
       )}
     </div>
   );
+}
+
+/**
+ * Summary label for a credence-type question's collapsed header.
+ * Shows the single option's label if one is at (near) 100%, else "Mixed (a/b)".
+ */
+function credenceSummaryLabel(question, credences) {
+  if (!credences) return 'Not set';
+  const entries = question.options
+    .map((opt) => [opt, credences[opt.id] || 0])
+    .filter(([, v]) => v > 0);
+  if (entries.length === 0) return 'Not set';
+  if (entries.length === 1) {
+    const [opt] = entries[0];
+    return opt.shortLabel || opt.label;
+  }
+  // Multiple non-zero: show rounded percentages joined with /
+  const parts = entries.sort(([, a], [, b]) => b - a).map(([, v]) => `${Math.round(v)}%`);
+  return `Mixed (${parts.join(' / ')})`;
 }
 
 export default EditAnswersPanel;

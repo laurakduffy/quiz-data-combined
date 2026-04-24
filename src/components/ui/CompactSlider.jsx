@@ -18,6 +18,7 @@ function CompactSlider({
   lockedKeys = [],
   setLockedKeys,
   hideLock = false,
+  inlineValue = false,
 }) {
   const { isLocked, hasLockedSibling, thumbOffset, canLockMore, featureEnabled } = useLockedSlider({
     sliderKey,
@@ -49,11 +50,16 @@ function CompactSlider({
 
   return (
     <div className={styles.compactSlider}>
-      <div className={styles.header}>
-        <span className={styles.label}>{label}</span>
-        <span className={styles.value}>{Math.round(value)}%</span>
-      </div>
+      {!inlineValue && (
+        <div className={styles.header}>
+          <span className={styles.label}>{label}</span>
+          <span className={styles.value}>{Math.round(value)}%</span>
+        </div>
+      )}
       <div className={styles.sliderRow}>
+        {inlineValue && (
+          <span className={`${styles.value} ${styles.inlineValue}`}>{Math.round(value)}%</span>
+        )}
         <div className={styles.sliderContainer}>
           <input
             type="range"

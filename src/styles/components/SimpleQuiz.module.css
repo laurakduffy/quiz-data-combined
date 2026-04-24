@@ -71,6 +71,51 @@
   line-height: var(--leading-relaxed);
 }
 
+/* === Credence (slider) question === */
+
+.credenceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  margin-bottom: var(--spacing-12);
+}
+
+.credenceRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-8) var(--spacing-10);
+  background: var(--overlay-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+}
+
+.credenceRowText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.credenceRowLabel {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+}
+
+.credenceRowDescription {
+  font-size: var(--text-base);
+  opacity: 0.7;
+  font-family: var(--font-body);
+  line-height: var(--leading-relaxed);
+}
+
+.credenceRowSlider {
+  min-width: 0;
+}
+
+.credenceRowSlider > * {
+  margin-bottom: 0;
+}
+
 /* === More Options === */
 
 .moreOptionsToggle {
@@ -806,6 +851,40 @@
 .editOptionSelected:hover {
   background: rgba(42, 154, 181, 0.25);
   border-color: var(--color-teal-light);
+}
+
+/* Credence-question edit list (slider per option) */
+.editCredenceList {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--spacing-4);
+  row-gap: var(--spacing-3);
+  align-items: center;
+}
+
+.editCredenceRow {
+  /* Row is a layout container only — its children become direct grid items
+     of editCredenceList so labels share a column width and all sliders line up. */
+  display: contents;
+}
+
+.editCredenceLabel {
+  font-size: var(--text-sm);
+  font-family: var(--font-body);
+}
+
+.editCredenceSlider {
+  min-width: 0;
+}
+
+.editCredenceSlider > * {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .editCredenceList {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* === Welcome Screen === */

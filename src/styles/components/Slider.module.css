@@ -119,6 +119,12 @@
   color: var(--text-primary);
 }
 
+.compactSlider .inlineValue {
+  min-width: 2.75rem;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
 .compactSlider .sliderRow {
   display: flex;
   align-items: center;
