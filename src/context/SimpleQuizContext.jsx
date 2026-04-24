@@ -10,9 +10,12 @@ import {
 import { useDataset } from './DatasetContext';
 import {
   assembleWorldview,
+  assembleWorldviewsForRun,
   computeSimpleAllocations,
   worldviewToTableHandoff,
   reverseMapWorldview,
+  defaultCredenceDistribution,
+  defaultPresetId,
 } from '../utils/simpleQuizScoring';
 import { detectShareUrl, parseShareUrl, clearShareHash } from '../utils/shareUrl';
 import quizConfig from '../../config/simpleQuizConfig.json';
@@ -30,8 +33,20 @@ const totalQuestions = questions.length;
 // Pre-select the isDefault option for each question that has one
 const defaultSelections = {};
 for (const q of questions) {
+  if (q.type === 'credence') continue;
   const def = q.options.find((o) => o.isDefault);
   if (def) defaultSelections[q.id] = def.id;
+}
+
+// Default credence distributions for credence-type questions
+const defaultCredences = {};
+const defaultSelectedPresets = {};
+for (const q of questions) {
+  if (q.type === 'credence') {
+    defaultCredences[q.id] = defaultCredenceDistribution(q);
+    const def = defaultPresetId(q);
+    if (def) defaultSelectedPresets[q.id] = def;
+  }
 }
 
 // --- Reducer ---
@@ -42,7 +57,9 @@ const initialState = {
   currentStep: firstStep, // 'disclaimer' | 'welcome' | 0..N-1 | 'results'
   selections: { ...defaultSelections },
   manualOverrides: {},
-  savedWorldviews: [], // [{ worldview, name, uid }]
+  credences: JSON.parse(JSON.stringify(defaultCredences)), // { [qId]: { [optId]: pct } } for credence questions
+  selectedPresets: { ...defaultSelectedPresets }, // { [qId]: presetId | null } — null = no preset highlighted
+  savedWorldviews: [], // [{ worldview, name, uid, selections, manualOverrides, credences, selectedPresets }]
   currentRunName: null, // null = auto-generated, string = user-set
   budget: 100, // in $M, default 100
   // Results display preferences
@@ -50,21 +67,67 @@ const initialState = {
   blendEnabled: specialBlendConfig.defaultEnabled,
   blendCredence: specialBlendConfig.defaultCredence,
   userCredencesRaw: {}, // per-run credence sliders
-  lockedKeys: [], // locked credence slider keys
+  lockedKeys: [], // locked credence slider keys (run-level)
+  questionLockedKeys: {}, // { [qId]: string[] } — locked option keys per credence question
 };
 
 /**
- * Ensure all saved worldviews have selections + manualOverrides.
- * For legacy entries that only have { worldview, name, uid }, reverse-map
- * the worldview back to selections/manualOverrides via reverseMapWorldview().
+ * Ensure all saved worldviews have selections + manualOverrides + credences.
+ * For legacy entries, reverse-map the worldview to backfill missing fields.
  */
 function normalizeSavedWorldviews(savedWorldviews) {
   if (!savedWorldviews?.length) return savedWorldviews || [];
   return savedWorldviews.map((sw) => {
-    if (sw.selections != null) return sw;
-    const { selections, manualOverrides } = reverseMapWorldview(sw.worldview);
-    return { ...sw, selections, manualOverrides };
+    let { selections, manualOverrides, credences } = sw;
+    if (selections == null || credences == null) {
+      const reversed = reverseMapWorldview(sw.worldview);
+      selections = selections ?? reversed.selections;
+      manualOverrides = manualOverrides ?? reversed.manualOverrides;
+      credences = credences ?? reversed.credences;
+    }
+    // Ensure every credence question has a distribution
+    const filledCredences = { ...defaultCredences, ...(credences || {}) };
+    const filledSelectedPresets = {
+      ...defaultSelectedPresets,
+      ...(sw.selectedPresets || {}),
+    };
+    // Legacy entries (no stored selectedPresets): if the credences match a
+    // preset exactly, mark that preset as selected; otherwise leave null.
+    if (sw.selectedPresets == null) {
+      for (const q of questions) {
+        if (q.type !== 'credence') continue;
+        filledSelectedPresets[q.id] = matchPresetId(q, filledCredences[q.id]);
+      }
+    }
+    return {
+      ...sw,
+      selections,
+      manualOverrides,
+      credences: filledCredences,
+      selectedPresets: filledSelectedPresets,
+    };
   });
+}
+
+/**
+ * Find the preset id whose credences exactly match the given distribution.
+ * Returns null if none match.
+ */
+function matchPresetId(question, credences) {
+  if (!question.presets || !credences) return null;
+  for (const preset of question.presets) {
+    let matches = true;
+    for (const opt of question.options) {
+      const expected = preset.credences[opt.id] || 0;
+      const actual = credences[opt.id] || 0;
+      if (Math.round(expected) !== Math.round(actual)) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) return preset.id;
+  }
+  return null;
 }
 
 function reducer(state, action) {
@@ -88,6 +151,36 @@ function reducer(state, action) {
         ...state,
         manualOverrides: { ...state.manualOverrides, [action.questionId]: null },
       };
+    case 'SET_QUESTION_CREDENCES':
+      return {
+        ...state,
+        credences: { ...state.credences, [action.questionId]: action.credences },
+        // Dragging a slider unsets the preset (no button highlighted).
+        selectedPresets: {
+          ...state.selectedPresets,
+          [action.questionId]: null,
+        },
+        // Clear manual override on the same question
+        manualOverrides: { ...state.manualOverrides, [action.questionId]: null },
+      };
+    case 'SET_QUESTION_SELECTED_PRESET': {
+      // If a preset id is passed, its credences become the new credences.
+      // null means no preset — credences stay as-is.
+      const presetId = action.presetId;
+      const question = questions.find((q) => q.id === action.questionId);
+      const preset = question?.presets?.find((p) => p.id === presetId);
+      const nextCredences = preset
+        ? { ...defaultCredences[action.questionId], ...preset.credences }
+        : state.credences[action.questionId];
+      return {
+        ...state,
+        selectedPresets: { ...state.selectedPresets, [action.questionId]: presetId },
+        credences: { ...state.credences, [action.questionId]: nextCredences },
+        // Clear per-question locks when switching presets
+        questionLockedKeys: { ...state.questionLockedKeys, [action.questionId]: [] },
+        manualOverrides: { ...state.manualOverrides, [action.questionId]: null },
+      };
+    }
     case 'GO_TO_STEP':
       return { ...state, currentStep: action.step };
     case 'SET_BUDGET':
@@ -103,11 +196,15 @@ function reducer(state, action) {
             uid: crypto.randomUUID(),
             selections: { ...state.selections },
             manualOverrides: { ...state.manualOverrides },
+            credences: JSON.parse(JSON.stringify(state.credences)),
+            selectedPresets: { ...state.selectedPresets },
           },
         ],
         // Reset quiz selections for a new run (re-apply defaults)
         selections: { ...defaultSelections },
         manualOverrides: {},
+        credences: JSON.parse(JSON.stringify(defaultCredences)),
+        selectedPresets: { ...defaultSelectedPresets },
         currentStep: 0,
         currentRunName: null,
       };
@@ -123,6 +220,8 @@ function reducer(state, action) {
         ...state,
         selections: { ...defaultSelections },
         manualOverrides: {},
+        credences: JSON.parse(JSON.stringify(defaultCredences)),
+        selectedPresets: { ...defaultSelectedPresets },
         currentRunName: null,
       };
     case 'RENAME_WORLDVIEW':
@@ -142,6 +241,14 @@ function reducer(state, action) {
       return { ...state, userCredencesRaw: action.userCredencesRaw };
     case 'SET_LOCKED_KEYS':
       return { ...state, lockedKeys: action.lockedKeys };
+    case 'SET_QUESTION_LOCKED_KEYS':
+      return {
+        ...state,
+        questionLockedKeys: {
+          ...state.questionLockedKeys,
+          [action.questionId]: action.lockedKeys,
+        },
+      };
     case 'UPDATE_SAVED_SELECTION':
       return {
         ...state,
@@ -153,7 +260,12 @@ function reducer(state, action) {
             ...sw,
             selections: newSelections,
             manualOverrides: newManualOverrides,
-            worldview: assembleWorldview(newSelections, newManualOverrides, questions),
+            worldview: assembleWorldview(
+              newSelections,
+              newManualOverrides,
+              questions,
+              sw.credences
+            ),
           };
         }),
       };
@@ -168,16 +280,80 @@ function reducer(state, action) {
             ...sw,
             selections: newSelections,
             manualOverrides: newManualOverrides,
-            worldview: assembleWorldview(newSelections, newManualOverrides, questions),
+            worldview: assembleWorldview(
+              newSelections,
+              newManualOverrides,
+              questions,
+              sw.credences
+            ),
           };
         }),
       };
+    case 'UPDATE_SAVED_CREDENCES':
+      return {
+        ...state,
+        savedWorldviews: state.savedWorldviews.map((sw) => {
+          if (sw.uid !== action.uid) return sw;
+          const newCredences = { ...sw.credences, [action.questionId]: action.credences };
+          const newManualOverrides = { ...sw.manualOverrides, [action.questionId]: null };
+          const newSelectedPresets = {
+            ...(sw.selectedPresets || {}),
+            [action.questionId]: null,
+          };
+          return {
+            ...sw,
+            credences: newCredences,
+            manualOverrides: newManualOverrides,
+            selectedPresets: newSelectedPresets,
+            worldview: assembleWorldview(
+              sw.selections,
+              newManualOverrides,
+              questions,
+              newCredences
+            ),
+          };
+        }),
+      };
+    case 'UPDATE_SAVED_SELECTED_PRESET': {
+      const { uid, questionId, presetId } = action;
+      const question = questions.find((q) => q.id === questionId);
+      const preset = question?.presets?.find((p) => p.id === presetId);
+      return {
+        ...state,
+        savedWorldviews: state.savedWorldviews.map((sw) => {
+          if (sw.uid !== uid) return sw;
+          const nextCredences = preset
+            ? {
+                ...sw.credences,
+                [questionId]: { ...defaultCredences[questionId], ...preset.credences },
+              }
+            : sw.credences;
+          return {
+            ...sw,
+            selectedPresets: { ...(sw.selectedPresets || {}), [questionId]: presetId },
+            credences: nextCredences,
+            manualOverrides: { ...sw.manualOverrides, [questionId]: null },
+            worldview: assembleWorldview(
+              sw.selections,
+              sw.manualOverrides,
+              questions,
+              nextCredences
+            ),
+          };
+        }),
+      };
+    }
     case 'RESET':
       return { ...initialState };
     case 'HYDRATE':
       return {
         ...initialState,
         ...action.state,
+        credences: { ...defaultCredences, ...(action.state.credences || {}) },
+        selectedPresets: {
+          ...defaultSelectedPresets,
+          ...(action.state.selectedPresets || {}),
+        },
         savedWorldviews: normalizeSavedWorldviews(action.state.savedWorldviews),
       };
     case 'RESTORE_FROM_URL':
@@ -186,6 +362,8 @@ function reducer(state, action) {
         currentStep: 'results',
         selections: action.selections || {},
         manualOverrides: action.manualOverrides || {},
+        credences: { ...defaultCredences, ...(action.credences || {}) },
+        selectedPresets: { ...defaultSelectedPresets, ...(action.selectedPresets || {}) },
         savedWorldviews: normalizeSavedWorldviews(action.savedWorldviews || []),
         currentRunName: action.currentRunName || null,
         budget: action.budget || state.budget,
@@ -194,6 +372,7 @@ function reducer(state, action) {
         blendCredence: action.blendCredence ?? state.blendCredence,
         userCredencesRaw: action.userCredencesRaw || {},
         lockedKeys: action.lockedKeys || [],
+        questionLockedKeys: action.questionLockedKeys || {},
       };
     default:
       return state;
@@ -207,7 +386,7 @@ function loadState() {
     const stored = sessionStorage.getItem(STORAGE_KEY);
     if (!stored) return null;
     const parsed = JSON.parse(stored);
-    if (parsed.version !== 3) return null;
+    if (parsed.version !== 4) return null;
     return parsed.state;
   } catch {
     return null;
@@ -216,7 +395,7 @@ function loadState() {
 
 function saveState(state) {
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 3, state }));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 4, state }));
   } catch {
     // sessionStorage full or unavailable
   }
@@ -245,6 +424,11 @@ export function SimpleQuizProvider({ children }) {
       ? {
           ...initialState,
           ..._savedState,
+          credences: { ...defaultCredences, ...(_savedState.credences || {}) },
+          selectedPresets: {
+            ...defaultSelectedPresets,
+            ...(_savedState.selectedPresets || {}),
+          },
           savedWorldviews: normalizeSavedWorldviews(_savedState.savedWorldviews),
         }
       : initialState
@@ -362,6 +546,12 @@ export function SimpleQuizProvider({ children }) {
     (v) => dispatch({ type: 'SET_LOCKED_KEYS', lockedKeys: v }),
     []
   );
+  const questionLockedKeys = state.questionLockedKeys;
+  const setQuestionLockedKeys = useCallback(
+    (questionId, keys) =>
+      dispatch({ type: 'SET_QUESTION_LOCKED_KEYS', questionId, lockedKeys: keys }),
+    []
+  );
 
   // --- Selections ---
   const selectOption = useCallback(
@@ -379,6 +569,17 @@ export function SimpleQuizProvider({ children }) {
     []
   );
 
+  const setQuestionCredences = useCallback(
+    (questionId, credences) => dispatch({ type: 'SET_QUESTION_CREDENCES', questionId, credences }),
+    []
+  );
+
+  const setQuestionSelectedPreset = useCallback(
+    (questionId, presetId) =>
+      dispatch({ type: 'SET_QUESTION_SELECTED_PRESET', questionId, presetId }),
+    []
+  );
+
   // --- Current question ---
   const currentQuestion = useMemo(() => {
     if (typeof state.currentStep === 'number') {
@@ -393,18 +594,43 @@ export function SimpleQuizProvider({ children }) {
   }, [state.currentStep]);
 
   // --- Scoring ---
+  // Single-worldview collapse (used for display / handoff); scoring uses the
+  // expanded list below so credence splits on Q4 produce multiple worldviews.
   const worldview = useMemo(
-    () => assembleWorldview(state.selections, state.manualOverrides, questions),
-    [state.selections, state.manualOverrides]
+    () => assembleWorldview(state.selections, state.manualOverrides, questions, state.credences),
+    [state.selections, state.manualOverrides, state.credences]
   );
 
-  // Merge saved worldviews + current worldview, each at equal credence (1/N)
+  // Current run expanded into [{ ...wv, share }] where shares sum to 1.0
+  const currentRunWorldviews = useMemo(
+    () =>
+      assembleWorldviewsForRun(state.selections, state.manualOverrides, state.credences, questions),
+    [state.selections, state.manualOverrides, state.credences]
+  );
+
+  // Merge saved worldviews (expanded) + current run (expanded). Each run gets
+  // an equal outer share (1/N); each run's inner `share` multiplies that.
+  // Used for simple default allocation; results screen uses its own blending.
   const allWorldviews = useMemo(() => {
-    const saved = state.savedWorldviews.map((sw) => ({ ...sw.worldview }));
-    const all = [...saved, worldview];
-    const credence = 1 / all.length;
-    return all.map((wv) => ({ ...wv, credence }));
-  }, [state.savedWorldviews, worldview]);
+    const runs = [];
+    for (const sw of state.savedWorldviews) {
+      runs.push(
+        assembleWorldviewsForRun(
+          sw.selections || {},
+          sw.manualOverrides || {},
+          sw.credences || defaultCredences,
+          questions
+        )
+      );
+    }
+    runs.push(currentRunWorldviews);
+    const outer = 1 / runs.length;
+    const flat = [];
+    for (const run of runs) {
+      for (const wv of run) flat.push({ ...wv, credence: outer * wv.share });
+    }
+    return flat;
+  }, [state.savedWorldviews, currentRunWorldviews]);
 
   const allocations = useMemo(() => {
     if (!dataset?.projects) return {};
@@ -449,6 +675,14 @@ export function SimpleQuizProvider({ children }) {
     dispatch({ type: 'UPDATE_SAVED_MANUAL_OVERRIDE', uid, questionId, value });
   }, []);
 
+  const updateSavedCredences = useCallback((uid, questionId, credences) => {
+    dispatch({ type: 'UPDATE_SAVED_CREDENCES', uid, questionId, credences });
+  }, []);
+
+  const updateSavedSelectedPreset = useCallback((uid, questionId, presetId) => {
+    dispatch({ type: 'UPDATE_SAVED_SELECTED_PRESET', uid, questionId, presetId });
+  }, []);
+
   // --- Table handoff ---
   const goToAdvancedMode = useCallback(() => {
     // Build handoff from all worldviews (saved + current)
@@ -471,6 +705,8 @@ export function SimpleQuizProvider({ children }) {
       currentStep: state.currentStep,
       selections: state.selections,
       manualOverrides: state.manualOverrides,
+      credences: state.credences,
+      selectedPresets: state.selectedPresets,
       savedWorldviews: state.savedWorldviews,
       currentQuestion,
       questions,
@@ -479,6 +715,7 @@ export function SimpleQuizProvider({ children }) {
       isHydrating,
       // Scoring
       worldview,
+      currentRunWorldviews,
       allocations,
       budget,
       setBudget,
@@ -502,26 +739,35 @@ export function SimpleQuizProvider({ children }) {
       setUserCredencesRaw,
       lockedKeys,
       setLockedKeys,
+      questionLockedKeys,
+      setQuestionLockedKeys,
       // Actions
       selectOption,
       setManualOverride,
       clearManualOverride,
+      setQuestionCredences,
+      setQuestionSelectedPreset,
       saveAndRetake,
       removeWorldview,
       removeCurrent,
       renameWorldview,
       updateSavedSelection,
       updateSavedManualOverride,
+      updateSavedCredences,
+      updateSavedSelectedPreset,
     }),
     [
       state.currentStep,
       state.selections,
       state.manualOverrides,
+      state.credences,
+      state.selectedPresets,
       state.savedWorldviews,
       currentQuestion,
       progressPercentage,
       isHydrating,
       worldview,
+      currentRunWorldviews,
       allocations,
       budget,
       currentRunName,
@@ -535,6 +781,8 @@ export function SimpleQuizProvider({ children }) {
       setUserCredencesRaw,
       lockedKeys,
       setLockedKeys,
+      questionLockedKeys,
+      setQuestionLockedKeys,
       setBudget,
       startQuiz,
       goToStep,
@@ -545,6 +793,8 @@ export function SimpleQuizProvider({ children }) {
       selectOption,
       setManualOverride,
       clearManualOverride,
+      setQuestionCredences,
+      setQuestionSelectedPreset,
       setCurrentRunName,
       saveAndRetake,
       removeCurrent,
@@ -552,6 +802,8 @@ export function SimpleQuizProvider({ children }) {
       renameWorldview,
       updateSavedSelection,
       updateSavedManualOverride,
+      updateSavedCredences,
+      updateSavedSelectedPreset,
     ]
   );
 

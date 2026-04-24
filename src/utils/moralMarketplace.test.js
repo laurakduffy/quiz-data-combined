@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateMoralMarketplace } from './moralMarketplace.js';
-import datasetConfig from '../../config/datasets/20260306-data.json';
+import datasetConfig from '../../config/datasets/archive/20260306-data.json';
 
 /**
  * Reference implementation — mirrors the new moralMarketplace.js which uses

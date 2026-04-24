@@ -164,9 +164,10 @@
     },
     {
       "id": "risk_profile",
+      "type": "credence",
       "title": "Risk Attitude",
       "heading": "How do you want to handle uncertainty and risk when comparing funds?",
-      "info": "Each fund's impact is estimated as an expected value across a range of scenarios with different probabilities. The risk profile determines how those scenarios are weighted. A risk-neutral approach takes expected value at face value. Other options adjust for uncertainty by discounting optimistic outliers, putting extra weight on potential harms, or both.",
+      "info": "Each fund's impact is estimated as an expected value (an average across a range of possible scenarios, weighted by how likely each one is). Your choices here adjust how those scenarios are weighted. For example, you can give lower scores to funds based on very unlikely positive outcomes or to funds that risk doing harm. You can split your view across several buckets to assign weight to different views.",
       "icon": "dice",
       "previewText": "Risk profile",
       "worldviewField": "risk_profile",
@@ -175,30 +176,76 @@
           "id": "neutral",
           "label": "Risk neutral",
           "shortLabel": "Neutral",
-          "description": "Take expected value estimates at face value. If something has a 10% chance of saving 1,000 lives, count it as 100 expected lives saved. No adjustment for uncertainty or risk.",
+          "description": "Takes expected value estimates at face value. A 10% chance of saving 1,000 lives scores the same as 100% chance of saving 100 lives. No extra adjustment for uncertainty or risk.",
           "value": 0
         },
         {
           "id": "upside_skeptical",
           "label": "Skeptical of very large claimed benefits",
           "shortLabel": "Upside skeptical",
-          "description": "Reduces the contribution of the most optimistic impact scenarios on the score. Funds whose scores depend heavily on low-probability, very large outcomes will score lower.",
+          "description": "Very unlikely best-case scenarios count for less. Gives lower scores to funds based on their least likely positive outcomes.",
           "value": 4
         },
         {
           "id": "downside_critical",
           "label": "Put extra weight on avoiding harms",
           "shortLabel": "Downside averse",
-          "description": "Applies extra weight to scenarios where an intervention backfires or causes harm. Funds with significant downside risk will score lower even if their expected value is high.",
+          "description": "Possible harmful outcomes count for more. Gives lower scores to funds based on possible harmful outcomes.",
           "value": 5
         },
         {
           "id": "wlu_moderate",
-          "label": "Stake-sensitive",
-          "shortLabel": "Stake-sensitive",
-          "description": "Reduces the weight of large benefits and increases the weight of large harms relative to the standard expected value.",
-          "isDefault": true,
+          "label": "Sceptical of large claimed benefits and averse to possible harms",
+          "shortLabel": "Combined",
+          "description": "Gives lower scores to funds both based on very unlikely positive outcomes and for possible harms.",
           "value": 2
+        }
+      ],
+      "presets": [
+        {
+          "id": "moderately_cautious",
+          "name": "Moderately cautious",
+          "description": "Scores are mostly based on a mix of cautious views, though the largest single view is risk neutral.",
+          "credences": {
+            "neutral": 40,
+            "wlu_moderate": 15,
+            "upside_skeptical": 22,
+            "downside_critical": 23
+          }
+        },
+        {
+          "id": "moderately_neutral",
+          "name": "Moderately risk neutral",
+          "description": "Scores are mostly based on being risk neutral, but with significant weight given to cautious views.",
+          "credences": {
+            "neutral": 60,
+            "wlu_moderate": 15,
+            "upside_skeptical": 13,
+            "downside_critical": 12
+          }
+        },
+        {
+          "id": "strongly_neutral",
+          "name": "Strongly risk neutral",
+          "description": "Scores are heavily based on risk neutral expected value, with only a small degree of caution.",
+          "credences": {
+            "neutral": 80,
+            "wlu_moderate": 10,
+            "upside_skeptical": 5,
+            "downside_critical": 5
+          }
+        },
+        {
+          "id": "strongly_cautious",
+          "name": "Strongly cautious",
+          "description": "Scores are heavily based on caution both about speculative best case scenarios and possible harms, with a small amount of weight given to other views.",
+          "isDefault": true,
+          "credences": {
+            "neutral": 10,
+            "wlu_moderate": 80,
+            "upside_skeptical": 5,
+            "downside_critical": 5
+          }
         }
       ],
       "moreOptions": []
