@@ -281,7 +281,8 @@ export function useTableState() {
         worldviewsWithCredences,
         stagesWithCaps,
         dataset.incrementSize,
-        drOverrides
+        drOverrides,
+        dataset.drStepSize || 10
       );
       console.log(
         '[table] recalc stages',
@@ -417,22 +418,34 @@ export function useTableState() {
   }, []);
 
   const hydrateFromShare = useCallback((shareData) => {
-    if (shareData.worldviews) setWorldviews(shareData.worldviews);
-    if (shareData.credences) setCredences(shareData.credences);
+    let newStages;
     if (shareData.stages) {
-      setStages(shareData.stages);
+      newStages = shareData.stages;
     } else if (shareData.selectedMethod) {
       // Backward compat: convert old format to single stage
-      setStages([
+      newStages = [
         {
           id: crypto.randomUUID(),
           method: shareData.selectedMethod,
           budget: shareData.totalBudget ?? tableConfig.totalBudget,
           options: shareData.methodOptions?.[shareData.selectedMethod] ?? {},
         },
-      ]);
+      ];
     }
+
+    // Apply state updates
+    if (shareData.worldviews) setWorldviews(shareData.worldviews);
+    if (shareData.credences) setCredences(shareData.credences);
+    if (newStages) setStages(newStages);
     setLockedKeys([]);
+
+    // Flush debounced state immediately so the first render uses hydrated values
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    setDebouncedState((prev) => ({
+      worldviews: shareData.worldviews ?? prev.worldviews,
+      credences: shareData.credences ?? prev.credences,
+      stages: newStages ?? prev.stages,
+    }));
   }, []);
 
   return {

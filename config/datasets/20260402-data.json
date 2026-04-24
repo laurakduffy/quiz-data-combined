@@ -3,6 +3,7 @@
   "description": "higher risk fraction from nuclear (4% vs 3%) and lower for bio (1% vs 3%)",
   "budget": 897,
   "incrementSize": 10,
+  "drStepSize": 10,
   "moralWeightKeys": [
     {
       "key": "human_life_years",

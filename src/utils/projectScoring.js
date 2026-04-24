@@ -91,11 +91,12 @@ export function adjustForExtinctionRisk(projectValues, data, pExtinction) {
  * @param {Object} data - Project definitions (need diminishing_returns arrays)
  * @param {string} projectId - Project ID
  * @param {number} currentFunding - Current funding level ($M)
+ * @param {number} drStepSize - $M per DR array entry (default 10)
  * @returns {number} Diminishing returns multiplier
  */
-export function getDiminishingReturnsFactor(data, projectId, currentFunding) {
+export function getDiminishingReturnsFactor(data, projectId, currentFunding, drStepSize = 10) {
   const drArray = data[projectId].diminishing_returns;
-  const i = currentFunding / 10;
+  const i = currentFunding / drStepSize;
 
   if (i >= drArray.length - 1) {
     return drArray[drArray.length - 1];

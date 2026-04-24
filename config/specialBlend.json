@@ -2,6 +2,8 @@
   "label": "RP preset worldviews",
   "defaultEnabled": true,
   "defaultCredence": 50,
+  "tooltipSourceLabel": "source",
+  "tooltipSourceUrl": "https://docs.google.com/spreadsheets/d/1J6VYya3p_uOTQzq5CZ1Fgy3Ai-cbud-kn05b_xRsS0w/edit?gid=1516960048#gid=1516960048",
   "worldviews": [
     {
       "name": "Total Utilitarianism — Default",

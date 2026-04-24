@@ -733,6 +733,56 @@
   color: var(--text-primary);
 }
 
+/* === CLUSTER GROUP === */
+
+.clusterGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.clusterHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s ease;
+}
+
+.clusterHeader:hover {
+  opacity: 0.85;
+}
+
+.clusterHeader:focus-visible {
+  outline: 1px solid var(--border-bright);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.clusterChevron {
+  flex-shrink: 0;
+  color: var(--text-gray-medium);
+  transition: transform 0.15s ease;
+  margin-top: 4px;
+}
+
+.clusterChevronOpen {
+  transform: rotate(90deg);
+}
+
+.clusterHeaderBar {
+  flex: 1;
+  min-width: 0;
+}
+
+.clusterMembers {
+  padding-left: calc(14px + var(--spacing-2));
+  display: flex;
+  flex-direction: column;
+  gap: var(--allocation-gap, var(--spacing-3));
+  margin-top: var(--allocation-gap, var(--spacing-3));
+}
+
 /* === RESPONSIVE === */
 
 @media (max-width: 900px) {

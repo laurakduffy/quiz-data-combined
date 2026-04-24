@@ -1,8 +1,10 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { ChevronRight } from 'lucide-react';
 import Header from '../layout/Header';
 import ResultCard from '../ui/ResultCard';
 import CompactSlider from '../ui/CompactSlider';
 import InfoTooltip from '../ui/InfoTooltip';
+import EditAnswersPanel from './EditAnswersPanel';
 import { useSimpleQuiz } from '../../context/useSimpleQuiz';
 import { useDataset } from '../../context/DatasetContext';
 import { adjustCredences } from '../../utils/calculations';
@@ -11,10 +13,17 @@ import {
   blendWorldviews,
   computeBlendedAllocations,
 } from '../../utils/simpleQuizScoring';
+import { clusterAllocations, getClusterEntries } from '../../utils/fundClusters';
+import ShareButton from '../ui/ShareButton';
+import NetworkBlockedModal from '../ui/NetworkBlockedModal';
+import SupportFooter from '../ui/SupportFooter';
+import { useSimpleShareUrl } from '../../hooks/useSimpleShareUrl';
 import specialBlendConfig from '../../../config/specialBlend.json';
+import features from '../../../config/features.json';
 import styles from '../../styles/components/SimpleQuiz.module.css';
 import resultStyles from '../../styles/components/Results.module.css';
 import copy from '../../../config/copy.json';
+import donationConfig from '../../../config/donationPage.json';
 
 const DONATE_HANDOFF_KEY = 'donate_handoff';
 
@@ -27,6 +36,10 @@ function SimpleResultsScreen() {
     worldview,
     budget,
     setBudget,
+    selections,
+    manualOverrides,
+    selectOption,
+    setManualOverride,
     savedWorldviews,
     currentRunName,
     setCurrentRunName,
@@ -37,25 +50,27 @@ function SimpleResultsScreen() {
     goToAdvancedMode,
     resetQuiz,
     goBack,
+    updateSavedSelection,
+    updateSavedManualOverride,
+    // Results display preferences (persisted in context)
+    activeView: activeViewRaw,
+    blendEnabled,
+    setBlendEnabled,
+    blendCredence,
+    setBlendCredence,
+    userCredencesRaw,
+    setUserCredencesRaw,
+    lockedKeys,
+    setLockedKeys,
   } = useSimpleQuiz();
   const { dataset } = useDataset();
 
-  // uid of a saved worldview | 'current'
-  const [activeViewRaw, setActiveView] = useState('current');
   const [editingId, setEditingId] = useState(null); // uid | 'current' | null
   const [editingName, setEditingName] = useState('');
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const editInputRef = useRef(null);
 
   const [budgetInput, setBudgetInput] = useState(String(budget));
-
-  // Blend state
-  const [blendEnabled, setBlendEnabled] = useState(specialBlendConfig.defaultEnabled);
-  const [blendCredence, setBlendCredence] = useState(specialBlendConfig.defaultCredence);
-
-  // Per-run credence sliders (keyed by 'current' + saved uids).
-  // Raw state holds user adjustments; derived credences reconcile against current keys.
-  const [userCredencesRaw, setUserCredencesRaw] = useState({});
-  const [lockedKeys, setLockedKeys] = useState([]);
 
   // Derive credences: if keys match raw state, use it; otherwise equal split.
   const userCredences = useMemo(() => {
@@ -88,13 +103,17 @@ function SimpleResultsScreen() {
     }
   }, [editingId]);
 
+  const useClusters = features.ui?.fundClusters && dataset.clusters?.length > 0;
+
   const causeEntries = useMemo(
     () =>
-      Object.entries(dataset.projects).map(([key, project]) => [
-        key,
-        { name: project.name, color: project.color },
-      ]),
-    [dataset]
+      useClusters
+        ? getClusterEntries(dataset.clusters, dataset.projects)
+        : Object.entries(dataset.projects).map(([key, project]) => [
+            key,
+            { name: project.name, color: project.color },
+          ]),
+    [dataset, useClusters]
   );
 
   // Active worldview (for non-blend single-view display)
@@ -122,7 +141,7 @@ function SimpleResultsScreen() {
       const adjusted = adjustCredences(key, newValue, userCredences, null, lockedKeys);
       setUserCredencesRaw(adjusted);
     },
-    [userCredences, lockedKeys]
+    [userCredences, lockedKeys, setUserCredencesRaw]
   );
 
   // Build userCredences array in worldview order for blendWorldviews
@@ -130,25 +149,46 @@ function SimpleResultsScreen() {
     return allUserWorldviewKeys.map((k) => userCredences[k] || 0);
   }, [allUserWorldviewKeys, userCredences]);
 
-  // Compute allocations for the active view
-  const displayAllocations = useMemo(() => {
+  // Compute allocations for the active view (per-fund). Wrapped in try/catch
+  // so a transient invalid state (e.g. credences briefly drifting due to rapid
+  // slider drags) can't blank the entire results view — null signals failure
+  // and we fall back to the last successful result.
+  const freshAllocations = useMemo(() => {
     if (!dataset?.projects) return {};
 
-    if (blendEnabled) {
-      const combined = blendWorldviews(
-        specialBlendConfig.worldviews,
-        allUserWorldviews,
-        blendCredence,
-        userCredencesArray
-      );
-      return computeBlendedAllocations(combined, dataset.projects, budget);
-    }
+    try {
+      const multipleUserWorldviews = allUserWorldviews.length > 1;
 
-    return computeSimpleAllocations(
-      [{ ...activeWorldview, credence: 1.0 }],
-      dataset.projects,
-      budget
-    );
+      if (blendEnabled || multipleUserWorldviews) {
+        // Credence-weighted across user worldviews, optionally blended with the RP preset set.
+        // When blendEnabled is off we still want credence weighting across user worldviews;
+        // passing blendCredence=0 zeroes out the RP share without changing the code path.
+        const combined = blendWorldviews(
+          blendEnabled ? specialBlendConfig.worldviews : [],
+          allUserWorldviews,
+          blendEnabled ? blendCredence : 0,
+          userCredencesArray
+        );
+        return computeBlendedAllocations(
+          combined,
+          dataset.projects,
+          budget,
+          dataset.incrementSize || 10,
+          dataset.drStepSize || 10
+        );
+      }
+
+      return computeSimpleAllocations(
+        [{ ...activeWorldview, credence: 1.0 }],
+        dataset.projects,
+        budget,
+        dataset.incrementSize || 10,
+        dataset.drStepSize || 10
+      );
+    } catch (err) {
+      console.error('Allocation compute failed — keeping previous results:', err);
+      return null;
+    }
   }, [
     activeWorldview,
     allUserWorldviews,
@@ -158,6 +198,23 @@ function SimpleResultsScreen() {
     blendCredence,
     userCredencesArray,
   ]);
+
+  // Cache the last successful allocations so a transient compute error falls
+  // back to what the user last saw instead of blanking the results view.
+  // Adjusting state during render is supported by React for this "remember
+  // last valid value" pattern — see react.dev.
+  const [lastGoodAllocations, setLastGoodAllocations] = useState({});
+  if (freshAllocations !== null && freshAllocations !== lastGoodAllocations) {
+    setLastGoodAllocations(freshAllocations);
+  }
+
+  const rawAllocations = freshAllocations ?? lastGoodAllocations;
+
+  // Cluster allocations for display when fund clustering is enabled
+  const displayAllocations = useMemo(
+    () => (useClusters ? clusterAllocations(rawAllocations, dataset.clusters) : rawAllocations),
+    [rawAllocations, useClusters, dataset.clusters]
+  );
 
   const methodKey = 'credenceWeighted';
 
@@ -193,8 +250,16 @@ function SimpleResultsScreen() {
   };
 
   const handleDonate = () => {
-    if (!displayAllocations) return;
-    sessionStorage.setItem(DONATE_HANDOFF_KEY, JSON.stringify({ allocations: displayAllocations }));
+    if (!rawAllocations) return;
+    const handoff = { allocations: rawAllocations };
+    if (useClusters) {
+      handoff.clusteredAllocations = displayAllocations;
+      handoff.clusters = dataset.clusters.map((c) => ({
+        ...c,
+        memberNames: c.members.map((m) => dataset.projects[m]?.name || m),
+      }));
+    }
+    sessionStorage.setItem(DONATE_HANDOFF_KEY, JSON.stringify(handoff));
     window.location.hash = 'donate';
   };
 
@@ -220,13 +285,66 @@ function SimpleResultsScreen() {
     if (e.key === 'Escape') setEditingId(null);
   };
 
+  const {
+    copied,
+    loading: shareLoading,
+    error: shareError,
+    networkBlocked,
+    dismissNetworkBlocked,
+    handleShare,
+  } = useSimpleShareUrl();
+
   const hasSaved = savedWorldviews.length > 0;
 
-  const activeLabel = useMemo(() => {
-    if (activeView === 'current') return currentRunName;
-    const saved = savedWorldviews.find((sw) => sw.uid === activeView);
-    return saved?.name || null;
-  }, [activeView, savedWorldviews, currentRunName]);
+  // Which worldview the edit panel is targeting. The slider list is now always
+  // shown when multiple user worldviews exist, so the edit panel selection is
+  // independent of the old click-to-select activeView.
+  const [editViewUid, setEditViewUid] = useState('current');
+  const effectiveEditView = hasSaved ? editViewUid : 'current';
+
+  // Build choices for the edit panel's worldview selector (only used when blending with multiple)
+  const editWorldviewChoices = useMemo(() => {
+    if (!hasSaved) return null; // single worldview, no selector needed
+    return [
+      ...savedWorldviews.map((sw) => ({ uid: sw.uid, name: sw.name })),
+      { uid: 'current', name: currentRunName },
+    ];
+  }, [savedWorldviews, currentRunName, hasSaved]);
+
+  // Edit panel: route to the targeted view's selections/overrides + handlers
+  const editSelections = useMemo(() => {
+    if (effectiveEditView === 'current') return selections;
+    const saved = savedWorldviews.find((sw) => sw.uid === effectiveEditView);
+    return saved?.selections || {};
+  }, [effectiveEditView, selections, savedWorldviews]);
+
+  const editManualOverrides = useMemo(() => {
+    if (effectiveEditView === 'current') return manualOverrides;
+    const saved = savedWorldviews.find((sw) => sw.uid === effectiveEditView);
+    return saved?.manualOverrides || {};
+  }, [effectiveEditView, manualOverrides, savedWorldviews]);
+
+  const handleEditSelect = useCallback(
+    (questionId, optionId) => {
+      if (effectiveEditView === 'current') {
+        selectOption(questionId, optionId);
+      } else {
+        updateSavedSelection(effectiveEditView, questionId, optionId);
+      }
+    },
+    [effectiveEditView, selectOption, updateSavedSelection]
+  );
+
+  const handleEditManual = useCallback(
+    (questionId, value) => {
+      if (effectiveEditView === 'current') {
+        setManualOverride(questionId, value);
+      } else {
+        updateSavedManualOverride(effectiveEditView, questionId, value);
+      }
+    },
+    [effectiveEditView, setManualOverride, updateSavedManualOverride]
+  );
 
   // Renders a name + edit icon, or an inline rename input
   const renderNameCell = (id, name) => {
@@ -270,49 +388,69 @@ function SimpleResultsScreen() {
           <p className={styles.resultsSubtext}>
             {blendEnabled
               ? 'Your worldviews are blended with RP\u2019s expert views to produce a combined allocation.'
-              : hasSaved && activeLabel
-                ? `Showing results for: ${activeLabel}`
+              : hasSaved
+                ? 'Your worldviews are combined using credence-weighted allocation.'
                 : 'Based on your preferences, here\u2019s how your budget would be allocated across funds.'}
           </p>
 
-          <div className={resultStyles.budgetRow}>
-            <label className={resultStyles.budgetLabel}>
-              {copy.results.budgetLabel}
-              {copy.results.budgetInfo && <InfoTooltip content={copy.results.budgetInfo} />}
-              <div className={resultStyles.budgetInputWrapper}>
-                <span className={resultStyles.currencyPrefix}>$</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={budgetInput}
-                  onChange={handleBudgetChange}
-                  onBlur={handleBudgetBlur}
-                  onKeyDown={handleBudgetKeyDown}
-                  className={resultStyles.budgetInput}
-                />
-                <span className={resultStyles.budgetUnit}>M</span>
-              </div>
-            </label>
+          <div className={styles.backRow}>
+            <button className={styles.navBack} onClick={goBack}>
+              &larr; Back
+            </button>
           </div>
 
           {displayAllocations && (
-            <div className={resultStyles.singleResultCard}>
-              <ResultCard
-                methodKey={methodKey}
-                results={displayAllocations}
-                causeEntries={causeEntries}
-                simpleMode={true}
-              />
+            <div className={styles.resultsRow}>
+              <label className={styles.resultsBudgetLabel}>
+                <span className={styles.budgetLabelRow}>
+                  {copy.results.budgetLabel}
+                  {copy.results.budgetInfo && <InfoTooltip content={copy.results.budgetInfo} />}
+                </span>
+                <div className={resultStyles.budgetInputWrapper}>
+                  <span className={resultStyles.currencyPrefix}>$</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={budgetInput}
+                    onChange={handleBudgetChange}
+                    onBlur={handleBudgetBlur}
+                    onKeyDown={handleBudgetKeyDown}
+                    className={resultStyles.budgetInput}
+                  />
+                  <span className={resultStyles.budgetUnit}>M</span>
+                </div>
+              </label>
+              <div className={styles.resultsCardCell}>
+                <ResultCard
+                  methodKey={methodKey}
+                  results={displayAllocations}
+                  causeEntries={causeEntries}
+                  simpleMode={true}
+                />
+              </div>
+              {(copy.results.resultsExplanationLead || copy.results.resultsExplanation) && (
+                <div className={styles.resultsExplanation}>
+                  <p>
+                    {copy.results.resultsExplanationLead && (
+                      <span className={styles.resultsExplanationLead}>
+                        {copy.results.resultsExplanationLead}
+                      </span>
+                    )}
+                    {copy.results.resultsExplanationLead && copy.results.resultsExplanation && ' '}
+                    {copy.results.resultsExplanation}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Worldview list (always shown when there are saved runs) */}
-          {hasSaved && (
-            <div className={styles.savedWorldviewsList}>
-              <h3 className={styles.savedWorldviewsHeading}>Your Worldviews</h3>
+          {/* Worldview list + blend controls side by side */}
+          <div className={styles.controlsRow}>
+            {hasSaved && (
+              <div className={styles.savedWorldviewsList}>
+                <h3 className={styles.savedWorldviewsHeading}>Your Worldviews</h3>
 
-              {savedWorldviews.map((sw) =>
-                blendEnabled ? (
+                {savedWorldviews.map((sw) => (
                   <div
                     key={sw.uid}
                     className={`${styles.savedWorldviewItem} ${styles.savedWorldviewWithSlider}`}
@@ -340,30 +478,8 @@ function SimpleResultsScreen() {
                       &times;
                     </button>
                   </div>
-                ) : (
-                  <div
-                    key={sw.uid}
-                    className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === sw.uid ? styles.savedWorldviewActive : ''}`}
-                    onClick={() => setActiveView(sw.uid)}
-                  >
-                    <span className={styles.savedWorldviewNameGroup}>
-                      {renderNameCell(sw.uid, sw.name)}
-                    </span>
-                    <button
-                      className={styles.savedWorldviewRemove}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeWorldview(sw.uid);
-                      }}
-                      title="Remove worldview"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                )
-              )}
+                ))}
 
-              {blendEnabled ? (
                 <div className={`${styles.savedWorldviewItem} ${styles.savedWorldviewWithSlider}`}>
                   <span className={styles.savedWorldviewNameGroup}>
                     {renderNameCell('current', currentRunName)}
@@ -388,84 +504,115 @@ function SimpleResultsScreen() {
                     &times;
                   </button>
                 </div>
-              ) : (
-                <div
-                  className={`${styles.savedWorldviewItem} ${styles.savedWorldviewClickable} ${activeView === 'current' ? styles.savedWorldviewActive : ''}`}
-                  onClick={() => setActiveView('current')}
-                >
-                  <span className={styles.savedWorldviewNameGroup}>
-                    {renderNameCell('current', currentRunName)}
-                  </span>
-                  <button
-                    className={styles.savedWorldviewRemove}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeCurrent();
-                    }}
-                    title="Remove worldview"
-                  >
-                    &times;
+              </div>
+            )}
+
+            {/* Blend controls */}
+            <div className={styles.blendControls}>
+              <label className={styles.blendToggle}>
+                <input
+                  type="checkbox"
+                  checked={blendEnabled}
+                  onChange={(e) => setBlendEnabled(e.target.checked)}
+                />
+                <span className={styles.blendToggleLabel}>Mix with {specialBlendConfig.label}</span>
+                <InfoTooltip
+                  content={`When enabled, your preferences are combined with Rethink Priorities' expert worldviews using credence-weighted allocation. [${specialBlendConfig.tooltipSourceLabel}](${specialBlendConfig.tooltipSourceUrl})`}
+                />
+              </label>
+
+              {blendEnabled && (
+                <div className={styles.blendSliders}>
+                  <CompactSlider
+                    label="Your views"
+                    value={100 - blendCredence}
+                    onChange={(val) => setBlendCredence(100 - val)}
+                    color="#2a9ab5"
+                    credences={{ user: 100 - blendCredence, blend: blendCredence }}
+                    sliderKey="user"
+                    hideLock
+                  />
+                  <CompactSlider
+                    label={specialBlendConfig.label}
+                    value={blendCredence}
+                    onChange={(val) => setBlendCredence(val)}
+                    color="#2a9ab5"
+                    credences={{ user: 100 - blendCredence, blend: blendCredence }}
+                    sliderKey="blend"
+                    hideLock
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <EditAnswersPanel
+            selections={editSelections}
+            manualOverrides={editManualOverrides}
+            onSelectOption={handleEditSelect}
+            onSetManualOverride={handleEditManual}
+            worldviewChoices={editWorldviewChoices}
+            editViewUid={effectiveEditView}
+            onChangeEditView={setEditViewUid}
+          />
+
+          <div className={styles.resultsActions}>
+            <div className={styles.primaryCtas}>
+              {features.ui?.shareResults && (
+                <ShareButton
+                  loading={shareLoading}
+                  copied={copied}
+                  error={shareError}
+                  onClick={handleShare}
+                  variant="btn-primary btn-sm"
+                />
+              )}
+              <div className={styles.ctaWithTooltip}>
+                <button className="btn btn-primary btn-sm" onClick={saveAndRetake}>
+                  {copy.results.saveAndRetakeButton}
+                </button>
+                <InfoTooltip content={copy.results.saveAndRetakeDescription} />
+              </div>
+              <div className={styles.ctaWithTooltip}>
+                <button className="btn btn-primary btn-sm" onClick={handleDonate}>
+                  {copy.results.donateButton}
+                </button>
+                <InfoTooltip content={copy.results.donateDescription} />
+              </div>
+            </div>
+
+            <div className={styles.advancedSection}>
+              <button
+                className={styles.advancedToggle}
+                onClick={() => setAdvancedOpen(!advancedOpen)}
+              >
+                <ChevronRight
+                  size={14}
+                  className={`${styles.advancedToggleIcon} ${advancedOpen ? styles.advancedToggleIconOpen : ''}`}
+                />
+                {copy.results.advancedOptionsButton}
+              </button>
+              {advancedOpen && (
+                <div className={styles.advancedPanel}>
+                  <button className="btn btn-primary btn-sm" onClick={goToAdvancedMode}>
+                    {copy.results.advancedModeButton}
+                  </button>
+                  <button className="btn btn-primary btn-sm" onClick={handleStartOver}>
+                    {copy.results.startOverButton}
                   </button>
                 </div>
               )}
             </div>
-          )}
-
-          {/* Blend controls */}
-          <div className={styles.blendControls}>
-            <label className={styles.blendToggle}>
-              <input
-                type="checkbox"
-                checked={blendEnabled}
-                onChange={(e) => setBlendEnabled(e.target.checked)}
-              />
-              <span className={styles.blendToggleLabel}>Mix with {specialBlendConfig.label}</span>
-              <InfoTooltip content="When enabled, your preferences are combined with Rethink Priorities' expert worldviews using credence-weighted allocation." />
-            </label>
-
-            {blendEnabled && (
-              <div className={styles.blendSliders}>
-                <CompactSlider
-                  label="Your views"
-                  value={100 - blendCredence}
-                  onChange={(val) => setBlendCredence(100 - val)}
-                  color="#2a9ab5"
-                  credences={{ user: 100 - blendCredence, blend: blendCredence }}
-                  sliderKey="user"
-                  hideLock
-                />
-                <CompactSlider
-                  label={specialBlendConfig.label}
-                  value={blendCredence}
-                  onChange={(val) => setBlendCredence(val)}
-                  color="#2a9ab5"
-                  credences={{ user: 100 - blendCredence, blend: blendCredence }}
-                  sliderKey="blend"
-                  hideLock
-                />
-              </div>
-            )}
           </div>
 
-          <div className={styles.resultsActions}>
-            <button className="btn btn-secondary btn-sm" onClick={goBack}>
-              &larr; Back
-            </button>
-            <button className="btn btn-primary btn-sm" onClick={handleDonate}>
-              Donate &rarr;
-            </button>
-            <button className="btn btn-primary btn-sm" onClick={saveAndRetake}>
-              Save &amp; Retake Quiz
-            </button>
-            <button className="btn btn-primary btn-sm" onClick={goToAdvancedMode}>
-              Go to Advanced Mode &rarr;
-            </button>
-            <button className="btn btn-secondary btn-sm" onClick={handleStartOver}>
-              Start Over
-            </button>
-          </div>
+          <SupportFooter
+            lead={donationConfig.pageFooterLead}
+            contact={copy.results.supportContact}
+          />
         </div>
       </main>
+
+      {networkBlocked && <NetworkBlockedModal onDismiss={dismissNetworkBlocked} context="share" />}
     </div>
   );
 }

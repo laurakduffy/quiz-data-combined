@@ -5,44 +5,6 @@
 [build.environment]
   NODE_VERSION = "20"
 
-[functions]
-  directory = "netlify/functions"
-
-# API route for share function
-[[redirects]]
-  from = "/api/share"
-  to = "/.netlify/functions/share"
-  status = 200
-
-# API route for explain function
-[[redirects]]
-  from = "/api/explain"
-  to = "/.netlify/functions/explain"
-  status = 200
-
-# API route for donate function
-[[redirects]]
-  from = "/api/donate"
-  to = "/.netlify/functions/donate"
-  status = 200
-
-[[redirects]]
-  from = "/api/share/:id"
-  to = "/.netlify/functions/share?id=:id"
-  status = 200
-
-# Short share URLs - redirect to SPA with hash
-[[redirects]]
-  from = "/s/:id"
-  to = "/#s=:id"
-  status = 302
-
-# Redirect old /quiz-demo/ paths (prototypes were built with old base)
-[[redirects]]
-  from = "/quiz-demo/*"
-  to = "/:splat"
-  status = 200
-
 # Serve prototypes as static files (not SPA)
 [[redirects]]
   from = "/prototypes/*"

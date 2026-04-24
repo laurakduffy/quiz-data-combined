@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Expand } from 'lucide-react';
 import AllocationBar from './AllocationBar';
+import ClusterGroup from './ClusterGroup';
 import StageCard from './StageCard';
 import ResultsModal from './ResultsModal';
 import { useDataset } from '../../context/DatasetContext';
 import { useQuiz } from '../../context/useQuiz';
+import { clusterAllocations } from '../../utils/fundClusters';
+import features from '../../../config/features.json';
 import tableConfig from '../../../config/tableMode.json';
 import styles from '../../styles/components/TableMode.module.css';
 
@@ -25,6 +28,18 @@ function ResultsPanel({
   const projectEntries = Object.entries(dataset.projects);
   const totalBudget = stages.reduce((sum, s) => sum + s.budget, 0);
   const canAddStage = totalBudget < MAX_TOTAL_BUDGET;
+
+  const useClusters = features.ui?.fundClusters && dataset.clusters?.length > 0;
+
+  const clusteredAllocations = useMemo(
+    () => (useClusters ? clusterAllocations(results.allocations, dataset.clusters) : null),
+    [useClusters, results.allocations, dataset.clusters]
+  );
+
+  const clusteredFunding = useMemo(
+    () => (useClusters ? clusterAllocations(results.funding, dataset.clusters) : null),
+    [useClusters, results.funding, dataset.clusters]
+  );
 
   // Check if any active method ignores credences
   const ignoresCredences = stages.some((stage) => {
@@ -83,17 +98,37 @@ function ResultsPanel({
 
       <div className={styles.resultsCard} onClick={() => setShowModal(true)}>
         <div className={styles.allocationList}>
-          {projectEntries.map(([id, project]) => (
-            <AllocationBar
-              key={id}
-              name={project.name}
-              percentage={results.allocations[id] || 0}
-              funding={results.funding[id] || 0}
-              color={project.color}
-              cap={fundingCaps[id]}
-              totalBudget={totalBudget}
-            />
-          ))}
+          {useClusters
+            ? dataset.clusters.map((cluster) => {
+                const memberEntries = cluster.members
+                  .map((id) => [id, dataset.projects[id]])
+                  .filter(([, p]) => p);
+                return (
+                  <div key={cluster.id} onClick={(e) => e.stopPropagation()}>
+                    <ClusterGroup
+                      cluster={cluster}
+                      clusterPercentage={clusteredAllocations[cluster.id] || 0}
+                      clusterFunding={clusteredFunding[cluster.id] || 0}
+                      memberEntries={memberEntries}
+                      totalBudget={totalBudget}
+                      fundingCaps={fundingCaps}
+                      allocations={results.allocations}
+                      funding={results.funding}
+                    />
+                  </div>
+                );
+              })
+            : projectEntries.map(([id, project]) => (
+                <AllocationBar
+                  key={id}
+                  name={project.name}
+                  percentage={results.allocations[id] || 0}
+                  funding={results.funding[id] || 0}
+                  color={project.color}
+                  cap={fundingCaps[id]}
+                  totalBudget={totalBudget}
+                />
+              ))}
         </div>
         <div className={styles.resultsCardHint}>
           <Expand size={12} />
@@ -113,6 +148,10 @@ function ResultsPanel({
           projectEntries={projectEntries}
           fundingCaps={fundingCaps}
           totalBudget={totalBudget}
+          useClusters={useClusters}
+          clusters={dataset.clusters}
+          clusteredAllocations={clusteredAllocations}
+          clusteredFunding={clusteredFunding}
           onClose={() => setShowModal(false)}
         />
       )}

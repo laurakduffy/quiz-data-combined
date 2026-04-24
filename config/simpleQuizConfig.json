@@ -3,7 +3,7 @@
     {
       "id": "animal_weights",
       "title": "Animal Moral Weights",
-      "heading": "How much moral weight do you give to the welfare of animals compared to humans?",
+      "heading": "How much should animal welfare factor into funding decisions?",
       "info": "Moral weights determine how much you value improvements to different types of beings. Human life-years are the baseline (1.0). Your answer here affects how the model scores funds that focus on animal welfare.",
       "icon": "paw",
       "previewText": "Animal welfare weights",
@@ -12,7 +12,8 @@
         {
           "id": "only_humans",
           "label": "Only humans matter",
-          "description": "Animal welfare is not counted. Only effects on humans are included in fund scores.",
+          "shortLabel": "Humans only",
+          "description": "Animal welfare isn't considered. Funding decisions are based solely on benefits to people.",
           "value": {
             "human_life_years": 1.0,
             "human_ylds": 1.0,
@@ -27,7 +28,8 @@
         {
           "id": "low_animals",
           "label": "Animals matter, but much less than humans",
-          "description": "Gives animals meaningful but low moral weight. Reflects substantial scepticism about the depth of animal experience relative to human experience.",
+          "shortLabel": "Low animal weight",
+          "description": "Animal welfare counts, but is given substantially lower weight than human welfare.",
           "value": {
             "human_life_years": 1.0,
             "human_ylds": 1.0,
@@ -41,8 +43,9 @@
         },
         {
           "id": "rp_default",
-          "label": "Animals matter, but less than humans (RP starting point)",
-          "description": "Moral weights based on research done in the moral weights project, giving animals meaningful but not equal weight to humans.",
+          "label": "Animals matter, but less than humans",
+          "shortLabel": "Moderate animal weight",
+          "description": "Animal welfare is given meaningful consideration though not weighted equally with human welfare.",
           "isDefault": true,
           "value": {
             "human_life_years": 1.0,
@@ -57,8 +60,9 @@
         },
         {
           "id": "all_equal",
-          "label": "All sentient beings count equally",
-          "description": "A year of suffering counts the same regardless of species. Strong moral egalitarianism across all sentient life.",
+          "label": "All sentient beings matter equally",
+          "shortLabel": "All equal",
+          "description": "A year of suffering matters the same whether experienced by a human or an animal. No species is prioritized over another.",
           "value": {
             "human_life_years": 1.0,
             "human_ylds": 1.0,
@@ -77,36 +81,40 @@
     {
       "id": "discount_factors",
       "title": "Time Discounting",
-      "heading": "How much do you care about effects that happen in the future, compared to effects happening now?",
+      "heading": "How much should future benefits and harms count compared to those happening now?",
       "info": "You might have reasons to discount effects that happen in the future. For example, the further out an effect is, the greater the chance that something intervenes and the estimated effect never occurs.\n\nThe model divides effects into six time periods: 0\u20135 years, 5\u201310 years, 10\u201320 years, 20\u2013100 years, 100\u2013500 years, and 500+ years. Each option sets a multiplier for each period. A multiplier of 0 means effects in that period are ignored entirely; 1 means they count fully.",
       "icon": "hourglass",
       "previewText": "Time horizon preferences",
       "worldviewField": "discount_factors",
       "options": [
         {
-          "id": "all_equal",
-          "label": "All time periods count equally",
-          "description": "Effects are valued the same regardless of when they occur. No discounting applied.",
-          "value": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+          "id": "near_term_only",
+          "label": "Near term only",
+          "shortLabel": "Near term only",
+          "description": "Only effects in the next decade matter. Everything beyond that is ignored.",
+          "value": [1.0, 0.9, 0.0, 0.0, 0.0, 0.0]
+        },
+        {
+          "id": "next_100_years",
+          "label": "Mid-term only",
+          "shortLabel": "Mid-term only",
+          "description": "Only the next century matters, with more weight on the near term. Effects beyond 100 years are ignored.",
+          "value": [1.0, 0.9, 0.8, 0.6, 0.0, 0.0]
         },
         {
           "id": "rp_default",
-          "label": "All time periods matter, but the near term gets more weight (RP starting point)",
+          "label": "All time periods matter, near term gets more weight",
+          "shortLabel": "Near-term focus",
           "description": "Near-term effects count fully. Effects further out are progressively discounted, with distant effects counting very little.",
           "isDefault": true,
           "value": [1.0, 0.9, 0.8, 0.1, 0.001, 0.00001]
         },
         {
-          "id": "next_100_years",
-          "label": "Only the next century matters, with more weight on the near term",
-          "description": "Effects within the next century count, with more weight on the near term. Effects beyond that are ignored.",
-          "value": [1.0, 0.9, 0.8, 0.6, 0.0, 0.0]
-        },
-        {
-          "id": "near_term_only",
-          "label": "Near term only",
-          "description": "Only effects in the next decade matter. Everything beyond that is ignored.",
-          "value": [1.0, 0.9, 0.0, 0.0, 0.0, 0.0]
+          "id": "all_equal",
+          "label": "All time periods count equally",
+          "shortLabel": "All equal",
+          "description": "Benefits and harms are valued equally, whether they occur tomorrow or a century from now.",
+          "value": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         }
       ],
       "moreOptions": [],
@@ -115,7 +123,7 @@
     {
       "id": "p_extinction",
       "title": "Non-AI X-Risk Discount",
-      "heading": "Do you want to apply an extra discount to the scores of interventions that do not work on reducing existential risks from AI?",
+      "heading": "How much priority should reducing existential risk from AI receive over other causes?",
       "info": "This adjustment applies only to interventions that do not focus on reducing existential risk from AI. Global health and development, animal welfare, biosecurity, and nuclear risk interventions are reduced in value. The value is a discount fraction: 0.0 means no discount, 0.4 means a 40% discount, 1.0 means that all non-AI interventions score zero.",
       "icon": "alert-triangle",
       "previewText": "Non-AI x-risk discount",
@@ -123,27 +131,31 @@
       "options": [
         {
           "id": "no_discount",
-          "label": "No discount",
-          "description": "Non-AI existential risk interventions are evaluated the same way as all other interventions.",
+          "label": "No extra priority",
+          "shortLabel": "None",
+          "description": "Work on AI risk is evaluated the same way as all other interventions.",
           "value": 0.0
         },
         {
           "id": "small_discount",
-          "label": "Small discount (10%)",
-          "description": "Non-AI x-risk interventions are scored at 90% of their otherwise calculated value.",
+          "label": "Slight priority for AI risk (10% discount)",
+          "shortLabel": "Slight (10%)",
+          "description": "Other interventions are scored at 90% of their calculated value.",
           "value": 0.1
         },
         {
           "id": "rp_default",
-          "label": "Large discount (40%) (RP starting point)",
-          "description": "Non-AI interventions are scored at 60% of their otherwise calculated value.",
+          "label": "Strong priority for AI risk (40% discount)",
+          "shortLabel": "Strong (40%)",
+          "description": "Other interventions are scored at 60% of their calculated value.",
           "isDefault": true,
           "value": 0.4
         },
         {
           "id": "ai_only",
-          "label": "Very large discount (80% discount)",
-          "description": "Non-AI interventions are scored at 20% of their otherwise calculated value.",
+          "label": "Very strong priority for AI risk (80% discount)",
+          "shortLabel": "Very strong (80%)",
+          "description": "Other interventions are scored at 20% of their calculated value.",
           "value": 0.8
         }
       ],
@@ -162,25 +174,29 @@
         {
           "id": "neutral",
           "label": "Risk neutral",
+          "shortLabel": "Neutral",
           "description": "Take expected value estimates at face value. If something has a 10% chance of saving 1,000 lives, count it as 100 expected lives saved. No adjustment for uncertainty or risk.",
           "value": 0
         },
         {
           "id": "upside_skeptical",
-          "label": "Skeptical of large upsides",
-          "description": "Puts lower weight on the most optimistic scenarios. If a model says there's a small chance of enormous impact, this heavily discounts that claim.",
+          "label": "Skeptical of very large claimed benefits",
+          "shortLabel": "Upside skeptical",
+          "description": "Reduces the contribution of the most optimistic impact scenarios on the score. Funds whose scores depend heavily on low-probability, very large outcomes will score lower.",
           "value": 4
         },
         {
           "id": "downside_critical",
-          "label": "Extra weight on potential harms",
-          "description": "Put extra weight on avoiding harms. Scenarios where an intervention backfires are weighted 5x more heavily than equivalent positive outcomes.",
+          "label": "Put extra weight on avoiding harms",
+          "shortLabel": "Downside averse",
+          "description": "Applies extra weight to scenarios where an intervention backfires or causes harm. Funds with significant downside risk will score lower even if their expected value is high.",
           "value": 5
         },
         {
           "id": "wlu_moderate",
-          "label": "Cautious across the board (RP starting point)",
-          "description": "Penalizes high-variance outcomes: less impressed by very large claimed benefits and more concerned about very large potential harms. RP's recommended approach.",
+          "label": "Stake-sensitive",
+          "shortLabel": "Stake-sensitive",
+          "description": "Reduces the weight of large benefits and increases the weight of large harms relative to the standard expected value.",
           "isDefault": true,
           "value": 2
         }

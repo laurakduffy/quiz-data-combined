@@ -27,7 +27,8 @@
 .popover {
   position: fixed;
   z-index: 1000;
-  width: min(600px, calc(100vw - 2rem));
+  width: max-content;
+  max-width: min(600px, calc(100vw - 2rem));
   padding: 1rem 1.25rem;
   background: #1a2a3a;
   color: #ffffff;

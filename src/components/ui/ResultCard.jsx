@@ -25,19 +25,22 @@ function ResultCard({
 
   return (
     <div className={`${styles.resultCard} ${simpleMode ? styles.compactCard : ''}`}>
-      <div className={styles.cardHeader}>
-        <div className={styles.cardIcon}>
-          <MethodIcon name={method.icon} size={18} />
+      {!simpleMode && (
+        <div className={styles.cardHeader}>
+          <div className={styles.cardIcon}>
+            <MethodIcon name={method.icon} size={18} />
+          </div>
+          <div>
+            <h3 className={styles.cardTitle}>{method.title}</h3>
+            <p className={styles.cardSubtitle}>{method.subtitle}</p>
+          </div>
         </div>
-        <div>
-          <h3 className={styles.cardTitle}>{method.title}</h3>
-          {!simpleMode && <p className={styles.cardSubtitle}>{method.subtitle}</p>}
-        </div>
-      </div>
+      )}
       {causeEntries.map(([causeKey, cause]) => (
         <CauseBar
           key={causeKey}
           name={cause.name}
+          info={cause.info}
           percentage={results[causeKey]}
           originalPercentage={originalResults?.[causeKey]}
           color={cause.color}

@@ -39,8 +39,18 @@
     "adjustCredencesHeading": "Adjust Your Credences",
     "resetAllButton": "Reset All",
     "resetConfirmation": "Are you sure? This will clear all your answers and return to the beginning.",
+    "saveAndRetakeDescription": "Save your current worldview and retake the quiz to compare different perspectives.",
+    "saveAndRetakeButton": "Combine with another quiz run",
+    "donateDescription": "Your recommended allocation will carry over to the donation form.",
+    "donateButton": "Donate →",
     "shareButton": "Share Results",
+    "advancedOptionsButton": "Advanced Options",
+    "advancedModeButton": "Go to Advanced Mode →",
+    "startOverButton": "Start Over",
     "shareCopied": "Link copied!",
+    "supportContact": "Questions or comments? Email [fund@rethinkpriorities.org](mailto:fund@rethinkpriorities.org)",
+    "resultsExplanationLead": "We encourage you to blend your results with RP's preset views, or retake the quiz and combine multiple runs.",
+    "resultsExplanation": "These are hard philosophical questions with no single correct answer, and your allocation will be stronger for reflecting a range of perspectives rather than just one.",
     "calculationSelectTooltip": "There are different ways to advise allocations based on your inputs. The next version of the tool will let you compare different methods and explain clearly what is happening behind the scenes for each of these options. The current calculations are placeholders.",
     "methodsInfo": {
       "buttonLabel": "How do these calculations work?",
@@ -69,7 +79,7 @@
     },
     "methods": {
       "credenceWeighted": {
-        "icon": "shopping-cart",
+        "icon": "bar-chart",
         "title": "Credence-Weighted",
         "subtitle": "25,600 worldview parliament",
         "footerLabel": null,
@@ -97,6 +107,9 @@
         "footerText": "Finds the fairest compromise across all worldviews"
       }
     }
+  },
+  "simpleQuiz": {
+    "moreOptionsToggle": "More options (show underlying values)"
   },
   "editPanel": {
     "modifiedBadge": "modified",

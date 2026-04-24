@@ -1,5 +1,6 @@
 import { computeMarcusAllocation } from './marcusCalculation';
 import worldviewPresets from '../../config/worldviewPresets.json';
+import quizConfig from '../../config/simpleQuizConfig.json';
 
 /**
  * Assemble a single worldview object from quiz selections and manual overrides.
@@ -47,15 +48,23 @@ export function assembleWorldview(selections, manualOverrides, questions) {
  * @param {Object} projectData - Dataset projects object (keyed by project ID)
  * @param {number} budget - Total budget in $M (default 100 = $100M)
  * @param {number} incrementSize - Step size in $M (default 1)
+ * @param {number} drStepSize - $M per DR array entry (default 10)
  * @returns {Object} { projectId: percentage, ... }
  */
-export function computeSimpleAllocations(worldviews, projectData, budget = 100, incrementSize = 1) {
+export function computeSimpleAllocations(
+  worldviews,
+  projectData,
+  budget = 100,
+  incrementSize = 1,
+  drStepSize = 10
+) {
   const { allocations } = computeMarcusAllocation(
     projectData,
     worldviews,
     'credenceWeighted',
     budget,
-    incrementSize
+    incrementSize,
+    { drStepSize }
   );
   return allocations;
 }
@@ -96,6 +105,17 @@ export function blendWorldviews(blendWvs, userWvs, blendCredence, userCredences)
     });
   }
 
+  // Normalize to guarantee strict sum=1.0 regardless of any floating-point drift
+  // in the caller's credences (e.g. rapid slider drags can leave user credences
+  // summing to 100.49 instead of 100). The downstream voting method enforces
+  // sum==1.0 within 1e-6 tolerance, so we correct any drift here.
+  const total = combined.reduce((s, wv) => s + wv.credence, 0);
+  if (total > 0 && Math.abs(total - 1.0) > 1e-9) {
+    for (const wv of combined) {
+      wv.credence = wv.credence / total;
+    }
+  }
+
   return combined;
 }
 
@@ -106,20 +126,23 @@ export function blendWorldviews(blendWvs, userWvs, blendCredence, userCredences)
  * @param {Object} projectData - Dataset projects object (keyed by project ID)
  * @param {number} budget - Total budget in $M (default 100 = $100M)
  * @param {number} incrementSize - Step size in $M (default 1)
+ * @param {number} drStepSize - $M per DR array entry (default 10)
  * @returns {Object} { projectId: percentage, ... }
  */
 export function computeBlendedAllocations(
   worldviews,
   projectData,
   budget = 100,
-  incrementSize = 1
+  incrementSize = 1,
+  drStepSize = 10
 ) {
   const { allocations } = computeMarcusAllocation(
     projectData,
     worldviews,
     'credenceWeighted',
     budget,
-    incrementSize
+    incrementSize,
+    { drStepSize }
   );
   return allocations;
 }
@@ -145,4 +168,62 @@ export function worldviewToTableHandoff(worldviews) {
     };
   });
   return { worldviews: wvs, credences };
+}
+
+/**
+ * Deep equality check for scalars, arrays, and plain objects.
+ * Sufficient for worldview field values (numbers, arrays of numbers, objects of numbers).
+ */
+function deepEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (typeof a !== typeof b) return false;
+
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b) || a.length !== b.length) return false;
+    return a.every((val, i) => deepEqual(val, b[i]));
+  }
+
+  if (typeof a === 'object') {
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    if (keysA.length !== keysB.length) return false;
+    return keysA.every((key) => deepEqual(a[key], b[key]));
+  }
+
+  return false;
+}
+
+/**
+ * Reverse-map a worldview object back to selections + manualOverrides.
+ *
+ * For each question, compares the worldview field value against all preset option values.
+ * If it matches a preset → selections[qId] = optionId.
+ * If no match → manualOverrides[qId] = fieldValue.
+ *
+ * @param {Object} worldview - Assembled worldview object
+ * @param {Array} [questions] - Question config array (defaults to simpleQuizConfig.questions)
+ * @returns {{ selections: Object, manualOverrides: Object }}
+ */
+export function reverseMapWorldview(worldview, questions = quizConfig.questions) {
+  const selections = {};
+  const manualOverrides = {};
+
+  for (const question of questions) {
+    const { id, worldviewField, options, moreOptions } = question;
+    const fieldValue = worldview[worldviewField];
+
+    if (fieldValue == null) continue;
+
+    const allOptions = [...options, ...(moreOptions || [])];
+    const matched = allOptions.find((opt) => deepEqual(opt.value, fieldValue));
+
+    if (matched) {
+      selections[id] = matched.id;
+    } else {
+      manualOverrides[id] = fieldValue;
+    }
+  }
+
+  return { selections, manualOverrides };
 }

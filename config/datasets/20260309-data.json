@@ -3,6 +3,7 @@
   "description": "Updated GW data and risk profile values.",
   "budget": 897,
   "incrementSize": 10,
+  "drStepSize": 10,
   "moralWeightKeys": [
     {
       "key": "human_life_years",

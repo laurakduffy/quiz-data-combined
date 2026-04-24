@@ -52,14 +52,14 @@ function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function logEmail(name, refId, memo) {
+function logEmail(name, refId, body) {
   const date = new Date().toISOString().split('T')[0];
   console.log('========== EMAIL NOTIFICATION (local dev) ==========');
   console.log(`To:      ${process.env.NOTIFY_EMAIL || 'giving@rethinkpriorities.org'}`);
   console.log(`From:    ${process.env.SENDER_EMAIL || 'noreply@rethinkpriorities.org'}`);
   console.log(`Subject: Donation intent: ${name} — ${date}`);
   console.log('--- Body ---');
-  console.log(memo);
+  console.log(body);
   console.log('================================================');
 }
 
@@ -76,15 +76,15 @@ exports.handler = async function (event) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { name, email, anonymity, splitPreference, splits, amount, refId, memo } = body;
+    const { name, email, anonymity, splitPreference, splits, refId, memo, emailExtras } = body;
 
     // Validate required fields
     const errors = [];
     if (!name || !name.trim()) errors.push('name is required');
     if (!email || !validateEmail(email)) errors.push('a valid email is required');
-    if (!anonymity || !['anonymous', 'consent'].includes(anonymity))
+    if (!anonymity || !['anonymous', 'consent', 'charityvestPublish'].includes(anonymity))
       errors.push('anonymity selection is required');
-    if (!splitPreference || !['defer', 'recommended', 'custom'].includes(splitPreference))
+    if (!splitPreference || !['defer', 'custom'].includes(splitPreference))
       errors.push('split preference is required');
 
     if (splitPreference === 'custom' && splits) {
@@ -129,7 +129,8 @@ exports.handler = async function (event) {
     console.log('Donation intent saved:', { id, refId, email: email.trim() });
 
     // Log email locally (no SES in dev)
-    logEmail(name.trim(), refId, memo);
+    const emailBody = emailExtras ? `${memo}\n\n${emailExtras}` : memo;
+    logEmail(name.trim(), refId, emailBody);
 
     return jsonResponse(201, { success: true, refId, id, emailSent: false });
   } catch (error) {

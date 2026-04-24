@@ -11,6 +11,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import AllocationBar from './AllocationBar';
+import ClusterGroup from './ClusterGroup';
 import { copyToClipboard } from '../../utils/clipboard';
 import styles from '../../styles/components/ResultsModal.module.css';
 import tableStyles from '../../styles/components/TableMode.module.css';
@@ -26,7 +27,17 @@ function truncLabel(s, max = 16) {
   return s.length > max ? s.slice(0, max - 1) + '\u2026' : s;
 }
 
-function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, onClose }) {
+function ResultsModal({
+  results,
+  projectEntries,
+  fundingCaps = {},
+  totalBudget,
+  useClusters = false,
+  clusters = [],
+  clusteredAllocations = null,
+  clusteredFunding = null,
+  onClose,
+}) {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('results');
   const [selectedIteration, setSelectedIteration] = useState(() => results.debugTrace?.length || 0);
@@ -152,13 +163,32 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
   }, []);
 
   const handleCopy = async () => {
-    const header = 'Project\tAllocation %\tFunding ($M)';
-    const rows = projectEntries.map(([id, project]) => {
-      const pct = (results.allocations[id] || 0).toFixed(1);
-      const funding = Math.round(results.funding[id] || 0);
-      return `${project.name}\t${pct}\t${funding}`;
-    });
-    await copyToClipboard([header, ...rows].join('\n'));
+    let text;
+    if (activeTab === 'results' && useClusters && clusteredAllocations && clusteredFunding) {
+      const lines = ['Cluster\tAllocation %\tFunding ($M)'];
+      for (const cluster of clusters) {
+        const pct = (clusteredAllocations[cluster.id] || 0).toFixed(1);
+        const fund = Math.round(clusteredFunding[cluster.id] || 0);
+        lines.push(`${cluster.name}\t${pct}\t${fund}`);
+        for (const memberId of cluster.members) {
+          const project = projectEntries.find(([id]) => id === memberId)?.[1];
+          if (!project) continue;
+          const mPct = (results.allocations[memberId] || 0).toFixed(1);
+          const mFund = Math.round(results.funding[memberId] || 0);
+          lines.push(`  ${project.name}\t${mPct}\t${mFund}`);
+        }
+      }
+      text = lines.join('\n');
+    } else {
+      const header = 'Project\tAllocation %\tFunding ($M)';
+      const rows = projectEntries.map(([id, project]) => {
+        const pct = (results.allocations[id] || 0).toFixed(1);
+        const funding = Math.round(results.funding[id] || 0);
+        return `${project.name}\t${pct}\t${funding}`;
+      });
+      text = [header, ...rows].join('\n');
+    }
+    await copyToClipboard(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -174,6 +204,14 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
             >
               Results
             </button>
+            {useClusters && (
+              <button
+                className={`${styles.tab} ${activeTab === 'detailed' ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab('detailed')}
+              >
+                Detailed
+              </button>
+            )}
             <button
               className={`${styles.tab} ${activeTab === 'debug' ? styles.tabActive : ''}`}
               onClick={() => setActiveTab('debug')}
@@ -186,7 +224,28 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
           </button>
         </div>
         <div className={styles.content}>
-          {activeTab === 'results' ? (
+          {activeTab === 'results' && useClusters ? (
+            <div className={tableStyles.allocationList}>
+              {clusters.map((cluster) => {
+                const memberEntries = cluster.members
+                  .map((id) => [id, projectEntries.find(([pid]) => pid === id)?.[1]])
+                  .filter(([, p]) => p);
+                return (
+                  <ClusterGroup
+                    key={cluster.id}
+                    cluster={cluster}
+                    clusterPercentage={clusteredAllocations?.[cluster.id] || 0}
+                    clusterFunding={clusteredFunding?.[cluster.id] || 0}
+                    memberEntries={memberEntries}
+                    totalBudget={totalBudget}
+                    fundingCaps={fundingCaps}
+                    allocations={results.allocations}
+                    funding={results.funding}
+                  />
+                );
+              })}
+            </div>
+          ) : activeTab === 'results' || activeTab === 'detailed' ? (
             <div className={tableStyles.allocationList}>
               {projectEntries.map(([id, project]) => (
                 <AllocationBar
@@ -358,7 +417,7 @@ function ResultsModal({ results, projectEntries, fundingCaps = {}, totalBudget, 
             </>
           )}
         </div>
-        {activeTab === 'results' && (
+        {(activeTab === 'results' || activeTab === 'detailed') && (
           <div className={styles.footer}>
             <button
               className={`btn btn-secondary ${styles.copyButton} ${copied ? styles.copied : ''}`}

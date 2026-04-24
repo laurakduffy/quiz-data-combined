@@ -2,7 +2,8 @@
   "intro": {
     "eyebrow": "Cross-Cause Fund",
     "title": "Tell us you're planning to donate",
-    "description": "Fill in your details below to generate transfer instructions you can paste directly into your DAF or bank transfer, and to notify us of your intent. If we don't receive your donation within a week, we'll follow up."
+    "description": "Fill in your details below to generate transfer instructions you can paste directly into your DAF or bank transfer, and to notify us of your intent. If we don't receive your donation within three weeks, we'll follow up.",
+    "about": "The Rethink Priorities Cross-Cause Fund pools donations from multiple donors and allocates them across cause areas such as Global Health and Development, Animal Welfare, and Global Catastrophic Risks, using a curated set of high-impact giving funds selected and weighted by Rethink Priorities' research team. Use this form to inform us about a donation you're doing. Read more about the fund [here](https://docs.google.com/document/d/18JVVgfFcXcPGKinLAiiP-ad_Did-W_5BoapmX1hP2BA/edit?tab=t.u6v95h243ssc#heading=h.w6i1vg8t9ycr)."
   },
 
   "fields": {
@@ -17,32 +18,30 @@
     },
     "anonymity": {
       "label": "Donor visibility",
-      "hint": "We do not currently publish donor names publicly. If we do so in future, we will only include your name if you have consented here.",
       "options": [
         {
           "value": "anonymous",
-          "label": "Keep my name and donation anonymous to the public"
+          "label": "Make my name known to Rethink Priorities but anonymous to the public"
         },
         {
           "value": "consent",
           "label": "I am happy for my name and donation amount to be published in future"
+        },
+        {
+          "value": "charityvestPublish",
+          "label": "I want CharityVest to publish my name with my donation online"
         }
       ]
     },
     "split": {
       "label": "How would you like to split your donation across funds?",
       "hint": "Not sure? [Take our Donor Compass quiz]({quizUrl}) to get a personalised allocation based on your values and risk preferences.",
-      "resetButton": "Reset to recommended split",
+      "resetButton": "Reset percentages",
       "options": [
         {
           "value": "defer",
           "label": "I defer to Rethink Priorities — allocate however you judge is best",
           "sub": "We will apply our best current judgment, which may differ from our publicly published split as our research develops."
-        },
-        {
-          "value": "recommended",
-          "label": "Use the current recommended split",
-          "sub": "Based on our All Things Considered allocation. Selecting this will show you the exact percentages below."
         },
         {
           "value": "custom",
@@ -74,17 +73,21 @@
     "label": "Your transfer memo",
     "description": "Paste this into the memo or note field when making your transfer from Daffy or another DAF. This allows us to match your donation to your preferences.",
     "placeholder": "Your memo will appear here once you have filled in your name, email, and visibility preference above.",
-    "fundName": "Rethink Priorities Cross-Cause Fund",
-    "refIdPrefix": "ATC"
+    "fundName": "Rethink Priorities Cross-Cause Fund, community fund code 8tpqgn",
+    "refIdPrefix": "ATC",
+    "transferInstructions": "Transfer to CharityVest (EIN: 81-2771871) via your DAF (e.g. Daffy), credit/debit card, stock, or crypto at [CharityVest fund link](https://www.charityvest.org/community-funds/8tpqgn/rethink-priorities-cross-cause-fund). Include the memo above in the note field.",
+    "detailedInstructionsText": "Click here for more detailed transfer instructions →",
+    "detailedInstructionsUrl": "https://docs.google.com/document/d/1SnYcPUnH_CajebBX3ZIRdU9IWeSmw9LOJ-6b4G8PeBM/edit?tab=t.9srduohoyoiq#heading=h.1xu14lnchg7p"
   },
 
   "actions": {
     "copy": "Copy to clipboard",
     "copyConfirm": "Copied to clipboard",
     "submit": "Notify Rethink Priorities",
+    "submitSubtext": "This will notify our team to expect your contribution.",
     "submitted": "Submitted",
-    "successMessage": "We've been notified. If we don't receive your donation within a week, someone from the Rethink Priorities team will be in touch at {email}.",
-    "errorMessage": "Something went wrong submitting your intent. Please try again or copy the memo and email it to giving@rethinkpriorities.org directly."
+    "successMessage": "We've been notified. If we don't receive your donation within three weeks, someone from the Rethink Priorities team will be in touch at {email}.",
+    "errorMessage": "Something went wrong submitting your intent. Please try again or email your donation details to fund@rethinkpriorities.org directly."
   },
 
   "validation": {
@@ -97,5 +100,8 @@
     "splitTotalError": "— must equal 100%"
   },
 
-  "legal": "Contributions to the Rethink Priorities Cross-Cause Fund are irrevocable charitable donations administered by CharityVest, a 501(c)(3) public charity. CharityVest retains ultimate discretion over all disbursements. Contributions are tax-deductible to the extent permitted by law. Rethink Priorities does not provide legal or tax advice."
+  "legal": "Contributions to the Rethink Priorities Cross-Cause Fund are irrevocable charitable donations administered by CharityVest, a 501(c)(3) public charity. CharityVest retains ultimate discretion over all disbursements. Contributions are tax-deductible to the extent permitted by law. Rethink Priorities does not provide legal or tax advice.",
+
+  "pageFooterLead": "If you find these tools useful, consider [supporting us](https://rethinkpriorities.org/donate/) so we can keep refining our models and updating our data.",
+  "pageFooter": "100% of your donation goes towards philanthropic funds, Rethink Priorities does not charge a fee. The research behind the Cross-Cause Fund and Donor Compass was made possible by individual donors who supported Rethink Priorities."
 }

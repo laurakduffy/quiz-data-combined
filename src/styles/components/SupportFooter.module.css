@@ -1,0 +1,26 @@
+.footer {
+  margin-top: var(--spacing-12);
+  padding-top: var(--spacing-8);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--text-xl);
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.footer a {
+  color: var(--color-teal-light);
+  text-decoration: underline;
+}
+
+.paragraph {
+  margin: 0 0 var(--spacing-4) 0;
+}
+
+.paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.lead {
+  color: var(--text-tertiary);
+  font-weight: var(--font-medium);
+}

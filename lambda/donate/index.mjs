@@ -44,7 +44,7 @@ function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-async function sendNotificationEmail(name, refId, memo) {
+async function sendNotificationEmail(name, refId, body) {
   const senderEmail = process.env.SENDER_EMAIL;
   const notifyEmail = process.env.NOTIFY_EMAIL;
 
@@ -61,7 +61,7 @@ async function sendNotificationEmail(name, refId, memo) {
     Destination: { ToAddresses: [notifyEmail] },
     Message: {
       Subject: { Data: `Donation intent: ${name} — ${date}` },
-      Body: { Text: { Data: memo } },
+      Body: { Text: { Data: body } },
     },
   }));
 
@@ -86,15 +86,15 @@ export async function handler(event) {
     }
 
     const body = JSON.parse(bodyStr);
-    const { name, email, anonymity, splitPreference, splits, amount, refId, memo } = body;
+    const { name, email, anonymity, splitPreference, splits, refId, memo, emailExtras } = body;
 
     // Validate required fields
     const errors = [];
     if (!name || !name.trim()) errors.push('name is required');
     if (!email || !validateEmail(email)) errors.push('a valid email is required');
-    if (!anonymity || !['anonymous', 'consent'].includes(anonymity))
+    if (!anonymity || !['anonymous', 'consent', 'charityvestPublish'].includes(anonymity))
       errors.push('anonymity selection is required');
-    if (!splitPreference || !['defer', 'recommended', 'custom'].includes(splitPreference))
+    if (!splitPreference || !['defer', 'custom'].includes(splitPreference))
       errors.push('split preference is required');
 
     if (splitPreference === 'custom' && splits) {
@@ -139,9 +139,10 @@ export async function handler(event) {
     console.log('Donation intent saved:', { id, refId, email: email.trim() });
 
     // Send email notification
+    const emailBody = emailExtras ? `${memo}\n\n${emailExtras}` : memo;
     let emailSent = false;
     try {
-      emailSent = await sendNotificationEmail(name.trim(), refId, memo);
+      emailSent = await sendNotificationEmail(name.trim(), refId, emailBody);
     } catch (error) {
       console.error('Email send failed:', error);
     }

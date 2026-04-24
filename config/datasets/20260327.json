@@ -3,6 +3,7 @@
   "description": "Updated: March 27, 2026, separating out AW funds",
   "budget": 897,
   "incrementSize": 10,
+  "drStepSize": 10,
   "moralWeightKeys": [
     {
       "key": "human_life_years",

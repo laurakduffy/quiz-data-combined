@@ -44,5 +44,6 @@ function datasetManifestPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), datasetManifestPlugin()],
-  base: '/quiz-demo/',
+  // eslint-disable-next-line no-undef
+  base: process.env.VITE_BASE_PATH || '/',
 });

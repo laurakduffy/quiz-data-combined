@@ -1,9 +1,14 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import Header from '../layout/Header';
+import NetworkBlockedModal from '../ui/NetworkBlockedModal';
+import SupportFooter from '../ui/SupportFooter';
 import styles from '../../styles/components/DonationPage.module.css';
 import SplitEditor from './SplitEditor';
 import { endpoints } from '../../config/api';
+import { renderMarkdownLink } from '../../utils/renderMarkdownLink';
 import config from '../../../config/donationPage.json';
+import features from '../../../config/features.json';
+import { useDataset } from '../../context/DatasetContext';
 
 const HANDOFF_KEY = 'donate_handoff';
 
@@ -21,18 +26,40 @@ function genRefId() {
 }
 
 export default function DonationPage() {
+  const { dataset } = useDataset();
+
+  // Derive cluster fund list from the dataset when feature is on
+  const useClusters = features.ui?.fundClusters && dataset.clusters?.length > 0;
+  const activeFunds = useMemo(() => {
+    if (!useClusters) return config.funds;
+    return dataset.clusters.map((c) => ({
+      id: c.id,
+      name: c.name,
+      sub: null,
+      defaultPct: null,
+      info: c.members.map((m) => dataset.projects[m]?.name || m).join('  \n'),
+    }));
+  }, [useClusters, dataset]);
+
   const [form, setForm] = useState({
     name: '',
     email: '',
-    anonymity: null,
+    anonymity: 'anonymous',
     splitPreference: 'defer',
     splits: { ...DEFAULT_SPLIT },
     amount: '',
   });
+  const [copyConfirm, setCopyConfirm] = useState(false);
   const [submitState, setSubmitState] = useState(null); // null | 'submitting' | 'success' | 'error'
   const [warning, setWarning] = useState('');
   const [handoffBanner, setHandoffBanner] = useState(false);
+  const [networkBlocked, setNetworkBlocked] = useState(false);
   const refId = useRef(genRefId());
+
+  const activeFundNameById = useMemo(
+    () => Object.fromEntries(activeFunds.map(({ id, name }) => [id, name])),
+    [activeFunds]
+  );
 
   // Read donate handoff from sessionStorage on mount
   useEffect(() => {
@@ -40,16 +67,23 @@ export default function DonationPage() {
       const raw = sessionStorage.getItem(HANDOFF_KEY);
       if (!raw) return;
       sessionStorage.removeItem(HANDOFF_KEY);
-      const { allocations } = JSON.parse(raw);
-      if (!allocations || typeof allocations !== 'object') return;
+      const parsed = JSON.parse(raw);
 
-      // Build splits keyed by fund id, rounding to 1 decimal
+      // Use clustered allocations when available and feature is on
+      const sourceAllocations =
+        useClusters && parsed.clusteredAllocations
+          ? parsed.clusteredAllocations
+          : parsed.allocations;
+      if (!sourceAllocations || typeof sourceAllocations !== 'object') return;
+
+      const ids = activeFunds.map((f) => f.id);
+
+      // Build splits keyed by fund/cluster id, rounding to 1 decimal
       const splits = {};
       let total = 0;
-      const ids = config.funds.map((f) => f.id);
       for (const id of ids) {
-        const raw = allocations[id];
-        const val = Math.round((raw != null ? Number(raw) : 0) * 10) / 10;
+        const rawVal = sourceAllocations[id];
+        const val = Math.round((rawVal != null ? Number(rawVal) : 0) * 10) / 10;
         splits[id] = val;
         total += val;
       }
@@ -71,7 +105,7 @@ export default function DonationPage() {
     } catch {
       // ignore corrupt handoff
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = useCallback((field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -103,30 +137,52 @@ export default function DonationPage() {
     const anonOpt = config.fields.anonymity.options.find((o) => o.value === form.anonymity);
     const anonText = anonOpt ? anonOpt.label : '\u2014';
 
-    let splitText = config.fields.split.options[0].label; // "defer" label
-    if (form.splitPreference === 'recommended') {
-      splitText = 'RP recommended split:';
-      for (const [id, pct] of Object.entries(DEFAULT_SPLIT)) {
-        splitText += `\n  ${fundNameById[id] || id}: ${pct ?? 0}%`;
-      }
+    return `Fund: ${config.memo.fundName}
+Donor name: ${form.name}
+Donor email: ${form.email}
+Anonymity: ${anonText}`;
+  }, [form]);
+
+  // --- Email extras (team-only; not shown in memo) ---
+  const emailExtras = useMemo(() => {
+    const lines = [];
+
+    if (form.amount) {
+      lines.push(`Amount: $${form.amount}`);
+    } else {
+      lines.push('Amount: (not specified)');
+    }
+
+    if (form.splitPreference === 'defer') {
+      lines.push('Split: deferring to RP');
     } else if (form.splitPreference === 'custom') {
-      splitText = 'Custom split:';
-      for (const [id, pct] of Object.entries(form.splits)) {
-        splitText += `\n  ${fundNameById[id] || id}: ${pct}%`;
+      lines.push('Split:');
+      for (const fund of activeFunds) {
+        const pct = form.splits[fund.id];
+        if (pct != null && pct !== '') {
+          lines.push(`  - ${fund.name}: ${pct}%`);
+        }
       }
     }
 
-    let text = `Fund: ${config.memo.fundName}
-Donor name: ${form.name}
-Donor email: ${form.email}
-Anonymity: ${anonText}
-Split preference: ${splitText}`;
-    if (form.amount) text += `\nApproximate amount: $${parseFloat(form.amount).toLocaleString()}`;
-    text += `\nReference: ${refId.current}`;
-    return text;
-  }, [form]);
+    return lines.join('\n');
+  }, [form, activeFunds]);
 
   // --- Actions ---
+  function handleCopy() {
+    const missing = getMissingFields();
+    if (missing.length) {
+      setWarning(config.validation.copyWarningPrefix + missing.join(', ') + '.');
+      setCopyConfirm(false);
+      return;
+    }
+    setWarning('');
+    navigator.clipboard.writeText(memo).then(() => {
+      setCopyConfirm(true);
+      setTimeout(() => setCopyConfirm(false), 2500);
+    });
+  }
+
   async function handleSubmit() {
     const missing = getMissingFields();
     if (missing.length) {
@@ -149,11 +205,21 @@ Split preference: ${splitText}`;
           amount: form.amount || undefined,
           refId: refId.current,
           memo,
+          emailExtras,
         }),
       });
       if (!res.ok) throw new Error('Request failed');
+      navigator.clipboard.writeText(memo).catch(() => {});
+      setCopyConfirm(true);
+      setTimeout(() => setCopyConfirm(false), 2500);
       setSubmitState('success');
-    } catch {
+    } catch (err) {
+      if (
+        err instanceof TypeError &&
+        /failed to fetch|networkerror|load failed/i.test(err.message)
+      ) {
+        setNetworkBlocked(true);
+      }
       setSubmitState('error');
     }
   }
@@ -174,7 +240,10 @@ Split preference: ${splitText}`;
     );
   }
 
+  const renderWithLink = renderMarkdownLink;
+
   const showSplitEditor = form.splitPreference !== 'defer';
+  const isComplete = form.name.trim() && form.email.trim() && form.anonymity;
 
   return (
     <div className="screen">
@@ -187,6 +256,9 @@ Split preference: ${splitText}`;
             <div className={styles.eyebrow}>{config.intro.eyebrow}</div>
             <h1 className={styles.introTitle}>{config.intro.title}</h1>
             <p className={styles.introDesc}>{config.intro.description}</p>
+            {config.intro.about && (
+              <p className={styles.introAbout}>{renderWithLink(config.intro.about)}</p>
+            )}
           </div>
 
           <div className={styles.divider} />
@@ -285,11 +357,7 @@ Split preference: ${splitText}`;
             </div>
 
             {showSplitEditor && (
-              <SplitEditor
-                splits={form.splitPreference === 'recommended' ? DEFAULT_SPLIT : form.splits}
-                onChange={setSplit}
-                readOnly={form.splitPreference === 'recommended'}
-              />
+              <SplitEditor splits={form.splits} onChange={setSplit} funds={activeFunds} />
             )}
 
             {form.splitPreference === 'custom' && (
@@ -333,9 +401,73 @@ Split preference: ${splitText}`;
             <div className={styles.fieldHint}>{config.fields.amount.hint}</div>
           </div>
 
-          {/* Submit */}
-          <div className={styles.formSection}>
+          <SupportFooter lead={config.pageFooterLead} body={config.pageFooter} />
+
+          {/* Output — always shown */}
+          <div className={styles.outputSection}>
             <div className={styles.divider} />
+            <div className={styles.outputLabel}>{config.memo.label}</div>
+            <div className={styles.outputDesc}>{config.memo.description}</div>
+
+            <div
+              className={`${styles.memoWrap} ${isComplete ? styles.memoWrapClickable : ''}`}
+              onClick={isComplete ? handleCopy : undefined}
+              title={isComplete ? config.actions.copy : undefined}
+            >
+              <div className={`${styles.memoBox} ${!isComplete ? styles.memoBoxIncomplete : ''}`}>
+                {isComplete ? memo : config.memo.placeholder}
+              </div>
+              {isComplete && (
+                <span className={styles.memoCopyIcon}>
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                </span>
+              )}
+              {copyConfirm && (
+                <div className={styles.memoCopiedOverlay}>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Copied to clipboard
+                </div>
+              )}
+            </div>
+
+            {config.memo.transferInstructions && (
+              <div className={styles.transferInstructions}>
+                <p>{renderWithLink(config.memo.transferInstructions)}</p>
+                {config.memo.detailedInstructionsUrl && (
+                  <a
+                    href={config.memo.detailedInstructionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.transferLink}
+                  >
+                    {config.memo.detailedInstructionsText}
+                  </a>
+                )}
+              </div>
+            )}
 
             {warning && <div className={styles.missingWarning}>{warning}</div>}
 
@@ -343,7 +475,7 @@ Split preference: ${splitText}`;
               className="btn btn-primary"
               onClick={handleSubmit}
               disabled={submitState === 'submitting' || submitState === 'success'}
-              style={{ marginTop: 8 }}
+              style={{ marginTop: 'var(--spacing-8)', alignSelf: 'center' }}
             >
               {submitState === 'submitting'
                 ? 'Submitting\u2026'
@@ -351,6 +483,10 @@ Split preference: ${splitText}`;
                   ? config.actions.submitted
                   : config.actions.submit}
             </button>
+
+            {config.actions.submitSubtext && submitState !== 'success' && (
+              <p className={styles.submitSubtext}>{config.actions.submitSubtext}</p>
+            )}
 
             {submitState === 'success' && (
               <div className={styles.notifyConfirm}>
@@ -368,6 +504,10 @@ Split preference: ${splitText}`;
           <div className={styles.legalNote}>{config.legal}</div>
         </div>
       </main>
+
+      {networkBlocked && (
+        <NetworkBlockedModal onDismiss={() => setNetworkBlocked(false)} context="donate" />
+      )}
     </div>
   );
 }

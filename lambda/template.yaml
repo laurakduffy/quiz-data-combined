@@ -18,11 +18,11 @@ Parameters:
   NotifyEmail:
     Type: String
     Description: Email address to receive donation notifications
-    Default: giving@rethinkpriorities.org
+    Default: fund@rethinkpriorities.org
   SenderEmail:
     Type: String
     Description: Verified SES sender email address
-    Default: noreply@rethinkpriorities.org
+    Default: fund@rethinkpriorities.org
 
 Resources:
   ShareFunction:
@@ -46,6 +46,8 @@ Resources:
       TargetFunctionArn: !GetAtt ShareFunction.Arn
       Cors:
         AllowOrigins:
+          - 'https://donorcompass.rethinkpriorities.org'
+          - 'https://donorcompass.netlify.app'
           - 'https://rethinkpriorities.github.io'
         AllowMethods:
           - GET
@@ -142,6 +144,8 @@ Resources:
       TargetFunctionArn: !GetAtt DonateFunction.Arn
       Cors:
         AllowOrigins:
+          - 'https://donorcompass.rethinkpriorities.org'
+          - 'https://donorcompass.netlify.app'
           - 'https://rethinkpriorities.github.io'
         AllowMethods:
           - POST

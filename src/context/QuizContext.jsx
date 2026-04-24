@@ -572,8 +572,8 @@ export function QuizProvider({ children }) {
 
   // Hydration effect: check for share URL and/or session storage on mount
   useEffect(() => {
-    if (!features.ui?.shareResults) {
-      // No share feature, just try to restore from session
+    if (!features.ui?.shareResults || features.ui?.simpleQuiz !== false) {
+      // No share feature or simple quiz is active (SimpleQuizContext handles share URLs)
       const savedState = loadQuizState();
       if (savedState) {
         dispatch({ type: ACTIONS.RESTORE_FROM_SESSION, payload: savedState });

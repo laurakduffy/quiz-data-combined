@@ -13,7 +13,15 @@ import styles from '../../styles/components/ShareButton.module.css';
  * @param {boolean} [props.disabled] - Additional disabled state
  * @param {string} [props.className] - Additional CSS classes
  */
-function ShareButton({ loading, copied, error, onClick, disabled, className = '' }) {
+function ShareButton({
+  loading,
+  copied,
+  error,
+  onClick,
+  disabled,
+  className = '',
+  variant = 'btn-secondary',
+}) {
   const getIcon = () => {
     if (loading) return <Loader2 size={16} className={styles.spinning} />;
     if (copied) return <Check size={16} />;
@@ -33,7 +41,7 @@ function ShareButton({ loading, copied, error, onClick, disabled, className = ''
     <button
       onClick={onClick}
       disabled={loading || disabled}
-      className={`btn btn-secondary ${styles.shareButton} ${stateClasses} ${className}`}
+      className={`btn ${variant} ${styles.shareButton} ${stateClasses} ${className}`}
     >
       {getIcon()}
       {getText()}
