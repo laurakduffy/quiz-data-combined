@@ -102,5 +102,6 @@
 
   "legal": "Contributions to the Rethink Priorities Cross-Cause Fund are irrevocable charitable donations administered by CharityVest, a 501(c)(3) public charity. CharityVest retains ultimate discretion over all disbursements. Contributions are tax-deductible to the extent permitted by law. Rethink Priorities does not provide legal or tax advice.",
 
-  "pageFooter": "If you find these tools useful, consider [supporting us](https://rethinkpriorities.org/donate/) so we can keep refining our models and updating our data. 100% of your donation goes towards philanthropic funds, Rethink Priorities does not charge a fee. The research behind the Cross-Cause Fund and Donor Compass was made possible by individual donors who supported Rethink Priorities."
+  "pageFooterLead": "If you find these tools useful, consider [supporting us](https://rethinkpriorities.org/donate/) so we can keep refining our models and updating our data.",
+  "pageFooter": "100% of your donation goes towards philanthropic funds, Rethink Priorities does not charge a fee. The research behind the Cross-Cause Fund and Donor Compass was made possible by individual donors who supported Rethink Priorities."
 }

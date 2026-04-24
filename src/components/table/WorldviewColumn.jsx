@@ -5,6 +5,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useSliderDrag } from '../../hooks/useSliderDrag';
 import { useLockedSlider } from '../../hooks/useLockedSlider';
 import { useDataset } from '../../context/DatasetContext';
+import PreciseNumberInput from '../ui/PreciseNumberInput';
 import tableConfig from '../../../config/tableMode.json';
 import styles from '../../styles/components/TableMode.module.css';
 
@@ -212,17 +213,12 @@ function WorldviewColumn({
       const rawVal = worldview.discount_factors[factorIndex] ?? 0;
       return (
         <div className={styles.cell}>
-          <input
-            type="number"
+          <PreciseNumberInput
             className={styles.cellInput}
-            value={Math.round(rawVal * 100)}
+            value={rawVal * 100}
             min="0"
             max="100"
-            step="5"
-            onChange={(e) => {
-              const pct = e.target.value === '' ? 0 : Number(e.target.value);
-              if (!isNaN(pct)) onUpdateDiscount(index, factorIndex, Math.round(pct) / 100);
-            }}
+            onChange={(pct) => onUpdateDiscount(index, factorIndex, pct / 100)}
             {...cellProps}
           />
           <span className={styles.cellSuffix}>%</span>

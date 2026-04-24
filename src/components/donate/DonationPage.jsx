@@ -1,9 +1,11 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import Header from '../layout/Header';
 import NetworkBlockedModal from '../ui/NetworkBlockedModal';
+import SupportFooter from '../ui/SupportFooter';
 import styles from '../../styles/components/DonationPage.module.css';
 import SplitEditor from './SplitEditor';
 import { endpoints } from '../../config/api';
+import { renderMarkdownLink } from '../../utils/renderMarkdownLink';
 import config from '../../../config/donationPage.json';
 import features from '../../../config/features.json';
 import { useDataset } from '../../context/DatasetContext';
@@ -238,20 +240,7 @@ Anonymity: ${anonText}`;
     );
   }
 
-  // Render a string containing one markdown link [text](url)
-  function renderWithLink(text) {
-    const match = text.match(/^(.*?)\[(.+?)\]\((.+?)\)(.*)$/);
-    if (!match) return text;
-    return (
-      <>
-        {match[1]}
-        <a href={match[3]} target="_blank" rel="noopener noreferrer">
-          {match[2]}
-        </a>
-        {match[4]}
-      </>
-    );
-  }
+  const renderWithLink = renderMarkdownLink;
 
   const showSplitEditor = form.splitPreference !== 'defer';
   const isComplete = form.name.trim() && form.email.trim() && form.anonymity;
@@ -412,9 +401,7 @@ Anonymity: ${anonText}`;
             <div className={styles.fieldHint}>{config.fields.amount.hint}</div>
           </div>
 
-          {config.pageFooter && (
-            <div className={styles.pageFooter}>{renderWithLink(config.pageFooter)}</div>
-          )}
+          <SupportFooter lead={config.pageFooterLead} body={config.pageFooter} />
 
           {/* Output — always shown */}
           <div className={styles.outputSection}>

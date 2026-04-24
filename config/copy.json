@@ -48,7 +48,9 @@
     "advancedModeButton": "Go to Advanced Mode →",
     "startOverButton": "Start Over",
     "shareCopied": "Link copied!",
-    "resultsExplanation": "We encourage you to blend your results with RP's preset views, or retake the quiz and combine multiple runs. These are hard philosophical questions with no single correct answer, and your allocation will be stronger for reflecting a range of perspectives rather than just one.",
+    "supportContact": "Questions or comments? Email [fund@rethinkpriorities.org](mailto:fund@rethinkpriorities.org)",
+    "resultsExplanationLead": "We encourage you to blend your results with RP's preset views, or retake the quiz and combine multiple runs.",
+    "resultsExplanation": "These are hard philosophical questions with no single correct answer, and your allocation will be stronger for reflecting a range of perspectives rather than just one.",
     "calculationSelectTooltip": "There are different ways to advise allocations based on your inputs. The next version of the tool will let you compare different methods and explain clearly what is happening behind the scenes for each of these options. The current calculations are placeholders.",
     "methodsInfo": {
       "buttonLabel": "How do these calculations work?",

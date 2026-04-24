@@ -342,18 +342,36 @@
 }
 
 .resultsRow {
-  display: flex;
-  gap: var(--spacing-12);
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: var(--spacing-10);
+  row-gap: 0;
+  align-items: start;
 }
 
-.resultsRow > :first-child {
-  flex: 1;
-  min-width: 0;
+.resultsBudgetLabel {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+  font-size: var(--text-sm);
+  color: var(--text-gray);
+  font-family: var(--font-body);
+}
+
+.resultsCardCell {
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .resultsExplanation {
-  flex: 1;
+  grid-column: 2;
+  grid-row: 2;
   min-width: 0;
   font-size: var(--text-base);
   font-family: var(--font-body);
@@ -369,11 +387,16 @@
   margin-bottom: 0;
 }
 
+.resultsExplanationLead {
+  color: var(--text-tertiary);
+  font-weight: var(--font-medium);
+}
+
 /* === Controls Row (worldviews + blend side by side) === */
 
 .controlsRow {
   display: flex;
-  gap: var(--spacing-6);
+  gap: var(--spacing-10);
   align-items: flex-start;
   margin-top: var(--spacing-8);
   margin-bottom: var(--spacing-4);
@@ -613,18 +636,14 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
-  font-size: var(--text-base);
+  font-size: var(--text-2xl);
   font-weight: var(--font-semibold);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   background: none;
   border: none;
   padding: var(--spacing-4) 0;
   transition: var(--transition-fast);
-}
-
-.editAnswersToggle:hover {
-  color: var(--text-primary);
 }
 
 .editAnswersToggleIcon {
@@ -635,13 +654,32 @@
   transform: rotate(90deg);
 }
 
-.editAnswersPanel {
+.editAnswersCollapser {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows 0.3s ease,
+    margin-top 0.3s ease,
+    opacity 0.25s ease;
+  opacity: 0;
+}
+
+.editAnswersCollapserOpen {
+  grid-template-rows: 1fr;
   margin-top: var(--spacing-4);
+  opacity: 1;
+}
+
+.editAnswersCollapserInner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.editAnswersPanel {
   padding: var(--spacing-8) var(--spacing-10);
   background: var(--overlay-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  animation: fadeIn 0.2s ease;
 }
 
 .editViewSelector {
@@ -850,7 +888,16 @@
   }
 
   .resultsRow {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    row-gap: var(--spacing-6);
+  }
+
+  .resultsBudgetLabel,
+  .resultsCardCell,
+  .resultsExplanation {
+    grid-column: 1;
+    grid-row: auto;
   }
 
   .controlsRow {

@@ -1,4 +1,5 @@
 import { ShieldAlert } from 'lucide-react';
+import MailtoLink from './MailtoLink';
 import styles from '../../styles/components/NetworkBlockedModal.module.css';
 
 /**
@@ -22,9 +23,8 @@ function NetworkBlockedModal({ onDismiss, context = 'share' }) {
         </p>
         {context === 'donate' && (
           <p className={styles.fallback}>
-            If the problem persists, please email{' '}
-            <a href="mailto:fund@rethinkpriorities.org">fund@rethinkpriorities.org</a> with your
-            donation details.
+            If the problem persists, please email <MailtoLink email="fund@rethinkpriorities.org" />{' '}
+            with your donation details.
           </p>
         )}
         <button onClick={onDismiss} className={`btn btn-primary ${styles.dismissButton}`}>

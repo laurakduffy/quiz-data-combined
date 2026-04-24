@@ -16,12 +16,14 @@ import {
 import { clusterAllocations, getClusterEntries } from '../../utils/fundClusters';
 import ShareButton from '../ui/ShareButton';
 import NetworkBlockedModal from '../ui/NetworkBlockedModal';
+import SupportFooter from '../ui/SupportFooter';
 import { useSimpleShareUrl } from '../../hooks/useSimpleShareUrl';
 import specialBlendConfig from '../../../config/specialBlend.json';
 import features from '../../../config/features.json';
 import styles from '../../styles/components/SimpleQuiz.module.css';
 import resultStyles from '../../styles/components/Results.module.css';
 import copy from '../../../config/copy.json';
+import donationConfig from '../../../config/donationPage.json';
 
 const DONATE_HANDOFF_KEY = 'donate_handoff';
 
@@ -380,26 +382,26 @@ function SimpleResultsScreen() {
 
           {displayAllocations && (
             <div className={styles.resultsRow}>
-              <div className={resultStyles.singleResultCard}>
-                <label className={resultStyles.budgetLabel}>
-                  <span className={styles.budgetLabelRow}>
-                    {copy.results.budgetLabel}
-                    {copy.results.budgetInfo && <InfoTooltip content={copy.results.budgetInfo} />}
-                  </span>
-                  <div className={resultStyles.budgetInputWrapper}>
-                    <span className={resultStyles.currencyPrefix}>$</span>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={budgetInput}
-                      onChange={handleBudgetChange}
-                      onBlur={handleBudgetBlur}
-                      onKeyDown={handleBudgetKeyDown}
-                      className={resultStyles.budgetInput}
-                    />
-                    <span className={resultStyles.budgetUnit}>M</span>
-                  </div>
-                </label>
+              <label className={styles.resultsBudgetLabel}>
+                <span className={styles.budgetLabelRow}>
+                  {copy.results.budgetLabel}
+                  {copy.results.budgetInfo && <InfoTooltip content={copy.results.budgetInfo} />}
+                </span>
+                <div className={resultStyles.budgetInputWrapper}>
+                  <span className={resultStyles.currencyPrefix}>$</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={budgetInput}
+                    onChange={handleBudgetChange}
+                    onBlur={handleBudgetBlur}
+                    onKeyDown={handleBudgetKeyDown}
+                    className={resultStyles.budgetInput}
+                  />
+                  <span className={resultStyles.budgetUnit}>M</span>
+                </div>
+              </label>
+              <div className={styles.resultsCardCell}>
                 <ResultCard
                   methodKey={methodKey}
                   results={displayAllocations}
@@ -407,11 +409,17 @@ function SimpleResultsScreen() {
                   simpleMode={true}
                 />
               </div>
-              {copy.results.resultsExplanation && (
+              {(copy.results.resultsExplanationLead || copy.results.resultsExplanation) && (
                 <div className={styles.resultsExplanation}>
-                  {copy.results.resultsExplanation.split('\n\n').map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
+                  <p>
+                    {copy.results.resultsExplanationLead && (
+                      <span className={styles.resultsExplanationLead}>
+                        {copy.results.resultsExplanationLead}
+                      </span>
+                    )}
+                    {copy.results.resultsExplanationLead && copy.results.resultsExplanation && ' '}
+                    {copy.results.resultsExplanation}
+                  </p>
                 </div>
               )}
             </div>
@@ -577,6 +585,11 @@ function SimpleResultsScreen() {
               )}
             </div>
           </div>
+
+          <SupportFooter
+            lead={donationConfig.pageFooterLead}
+            contact={copy.results.supportContact}
+          />
         </div>
       </main>
 

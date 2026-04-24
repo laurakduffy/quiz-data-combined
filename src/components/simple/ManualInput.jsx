@@ -1,47 +1,5 @@
-import { useState } from 'react';
+import PreciseNumberInput from '../ui/PreciseNumberInput';
 import styles from '../../styles/components/SimpleQuiz.module.css';
-
-// Format a number as a string with up to 10 decimal places, stripping trailing zeros
-// and absorbing float noise (e.g. 0.8 * 100 === 80.00000000000001 → "80").
-function formatNumber(n) {
-  if (!n) return '0';
-  const fixed = n.toFixed(10);
-  return fixed.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
-}
-
-// Number input that preserves typing precision. Keeps a local string state so
-// intermediate values like "0." or "0.00" aren't clobbered between keystrokes,
-// and re-syncs only when the external value changes independently (e.g. a preset
-// is selected) using React's "adjust state during render" pattern.
-function PreciseNumberInput({ value, onChange, className, min, max }) {
-  const [text, setText] = useState(() => formatNumber(value));
-  const [lastValue, setLastValue] = useState(value);
-
-  if (value !== lastValue) {
-    setLastValue(value);
-    setText(formatNumber(value));
-  }
-
-  return (
-    <input
-      type="number"
-      className={className}
-      value={text}
-      min={min}
-      max={max}
-      step="any"
-      onChange={(e) => {
-        const raw = e.target.value;
-        setText(raw);
-        const n = raw === '' ? 0 : Number(raw);
-        if (!isNaN(n)) {
-          setLastValue(n);
-          onChange(n);
-        }
-      }}
-    />
-  );
-}
 
 /**
  * Get the current value to display in a manual input.
@@ -115,6 +73,7 @@ function ManualInput({ type, question, selectedValue, override, onSet, dataset, 
                 value={(value[i] ?? 0) * 100}
                 min="0"
                 max="100"
+                suffix="%"
                 onChange={(pct) => {
                   const next = [...value];
                   next[i] = pct / 100;

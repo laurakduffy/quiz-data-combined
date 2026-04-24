@@ -44,42 +44,47 @@ function EditAnswersPanel({
           size={14}
           className={`${styles.editAnswersToggleIcon} ${isOpen ? styles.editAnswersToggleIconOpen : ''}`}
         />
-        Edit Answers
+        Edit your quiz answers
       </button>
 
-      {isOpen && (
-        <div className={styles.editAnswersPanel}>
-          {worldviewChoices && (
-            <div className={styles.editViewSelector}>
-              <label className={styles.editViewSelectorLabel}>Editing:</label>
-              <select
-                className={styles.editViewSelectorSelect}
-                value={editViewUid}
-                onChange={(e) => onChangeEditView(e.target.value)}
-              >
-                {worldviewChoices.map((wv) => (
-                  <option key={wv.uid} value={wv.uid}>
-                    {wv.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+      <div
+        className={`${styles.editAnswersCollapser} ${isOpen ? styles.editAnswersCollapserOpen : ''}`}
+        aria-hidden={!isOpen}
+      >
+        <div className={styles.editAnswersCollapserInner}>
+          <div className={styles.editAnswersPanel}>
+            {worldviewChoices && (
+              <div className={styles.editViewSelector}>
+                <label className={styles.editViewSelectorLabel}>Editing:</label>
+                <select
+                  className={styles.editViewSelectorSelect}
+                  value={editViewUid}
+                  onChange={(e) => onChangeEditView(e.target.value)}
+                >
+                  {worldviewChoices.map((wv) => (
+                    <option key={wv.uid} value={wv.uid}>
+                      {wv.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-          {questions.map((question) => (
-            <EditAnswerItem
-              key={question.id}
-              question={question}
-              selectedId={selections[question.id]}
-              manualOverride={manualOverrides[question.id]}
-              onSelectOption={(optionId) => onSelectOption(question.id, optionId)}
-              onSetManualOverride={(value) => onSetManualOverride(question.id, value)}
-              isExpanded={expandedId === question.id}
-              onToggle={() => toggleQuestion(question.id)}
-            />
-          ))}
+            {questions.map((question) => (
+              <EditAnswerItem
+                key={question.id}
+                question={question}
+                selectedId={selections[question.id]}
+                manualOverride={manualOverrides[question.id]}
+                onSelectOption={(optionId) => onSelectOption(question.id, optionId)}
+                onSetManualOverride={(value) => onSetManualOverride(question.id, value)}
+                isExpanded={expandedId === question.id}
+                onToggle={() => toggleQuestion(question.id)}
+              />
+            ))}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
