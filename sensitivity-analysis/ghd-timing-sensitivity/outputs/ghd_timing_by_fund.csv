@@ -1,0 +1,25 @@
+scenario,project_id,base_alloc,new_alloc,alloc_delta,rank_delta
+all effects far,ea_awf,0.117833,0.117833,0.000000,0
+all effects far,givewell,0.406944,0.406944,0.000000,0
+all effects far,leaf,0.038889,0.038889,0.000000,0
+all effects far,longview_ai,0.050333,0.050333,0.000000,0
+all effects far,longview_nuclear,0.029722,0.029722,0.000000,0
+all effects far,navigation_fund_cagefree,0.110833,0.110833,0.000000,0
+all effects far,navigation_fund_general,0.206667,0.206667,0.000000,0
+all effects far,sentinel_bio,0.038778,0.038778,0.000000,0
+all effects near,ea_awf,0.117833,0.117833,0.000000,0
+all effects near,givewell,0.406944,0.441167,0.034222,0
+all effects near,leaf,0.038889,0.066833,0.027944,1
+all effects near,longview_ai,0.050333,0.039167,-0.011167,-1
+all effects near,longview_nuclear,0.029722,0.028833,-0.000889,0
+all effects near,navigation_fund_cagefree,0.110833,0.110833,0.000000,0
+all effects near,navigation_fund_general,0.206667,0.158333,-0.048333,0
+all effects near,sentinel_bio,0.038778,0.037000,-0.001778,0
+health effects near,ea_awf,0.117833,0.117833,0.000000,0
+health effects near,givewell,0.406944,0.437444,0.030500,0
+health effects near,leaf,0.038889,0.061778,0.022889,1
+health effects near,longview_ai,0.050333,0.038833,-0.011500,-1
+health effects near,longview_nuclear,0.029722,0.028333,-0.001389,0
+health effects near,navigation_fund_cagefree,0.110833,0.110833,0.000000,0
+health effects near,navigation_fund_general,0.206667,0.167778,-0.038889,0
+health effects near,sentinel_bio,0.038778,0.037167,-0.001611,0

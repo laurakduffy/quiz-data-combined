@@ -1,0 +1,4 @@
+scenario,sensitivity_index,most_affected_fund,most_affected_delta
+all effects near,0.062167,navigation_fund_general,-0.048333
+health effects near,0.053389,navigation_fund_general,-0.038889
+all effects far,0.000000,ea_awf,0.000000

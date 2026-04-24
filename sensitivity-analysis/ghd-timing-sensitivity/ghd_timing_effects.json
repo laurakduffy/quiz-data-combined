@@ -1,0 +1,38 @@
+{
+  "all effects far": {
+    "givewell": {
+      "YLDs_averted":     { "0-5 years": 0.800, "5-10 years": 0.05,  "10-20 years": 0.05,  "20-100 years": 0.10,  "100-500 years": 0, "500+ years": 0 },
+      "lives_saved":      { "0-5 years": 0.0833,"5-10 years": 0.0833,"10-20 years": 0.1667,"20-100 years": 0.6667,"100-500 years": 0, "500+ years": 0 },
+      "income_doublings": { "0-5 years": 0.180, "5-10 years": 0.014, "10-20 years": 0.125, "20-100 years": 0.681, "100-500 years": 0, "500+ years": 0 }
+    },
+    "leaf": {
+      "YLDs_averted":     { "0-5 years": 0.0424,"5-10 years": 0.0686,"10-20 years": 0.1691,"20-100 years": 0.7199,"100-500 years": 0, "500+ years": 0 },
+      "life_years_saved": { "0-5 years": 0.0331,"5-10 years": 0.0496,"10-20 years": 0.1210,"20-100 years": 0.7964,"100-500 years": 0, "500+ years": 0 },
+      "income_doublings": { "0-5 years": 0.0073,"5-10 years": 0.0182,"10-20 years": 0.1319,"20-100 years": 0.8426,"100-500 years": 0, "500+ years": 0 }
+    }
+  },
+  "all effects near": {
+    "givewell": {
+      "YLDs_averted":     { "0-5 years": 0.800, "5-10 years": 0.10, "10-20 years": 0.05, "20-100 years": 0.05, "100-500 years": 0, "500+ years": 0 },
+      "lives_saved":      { "0-5 years": 0.800, "5-10 years": 0.10, "10-20 years": 0.05, "20-100 years": 0.05, "100-500 years": 0, "500+ years": 0 },
+      "income_doublings": { "0-5 years": 0.80,  "5-10 years": 0.10, "10-20 years": 0.05, "20-100 years": 0.05, "100-500 years": 0, "500+ years": 0 }
+    },
+    "leaf": {
+      "YLDs_averted":     { "0-5 years": 0.20, "5-10 years": 0.40, "10-20 years": 0.30, "20-100 years": 0.10, "100-500 years": 0, "500+ years": 0 },
+      "life_years_saved": { "0-5 years": 0.20, "5-10 years": 0.40, "10-20 years": 0.30, "20-100 years": 0.10, "100-500 years": 0, "500+ years": 0 },
+      "income_doublings": { "0-5 years": 0.20, "5-10 years": 0.40, "10-20 years": 0.30, "20-100 years": 0.10, "100-500 years": 0, "500+ years": 0 }
+    }
+  },
+  "health effects near": {
+    "givewell": {
+      "YLDs_averted":     { "0-5 years": 0.800, "5-10 years": 0.10, "10-20 years": 0.05, "20-100 years": 0.05, "100-500 years": 0, "500+ years": 0 },
+      "lives_saved":      { "0-5 years": 0.800, "5-10 years": 0.10, "10-20 years": 0.05, "20-100 years": 0.05, "100-500 years": 0, "500+ years": 0 },
+      "income_doublings": { "0-5 years": 0.180, "5-10 years": 0.014,"10-20 years": 0.125, "20-100 years": 0.681,"100-500 years": 0, "500+ years": 0 }
+    },
+    "leaf": {
+      "YLDs_averted":     { "0-5 years": 0.20, "5-10 years": 0.40, "10-20 years": 0.30, "20-100 years": 0.10, "100-500 years": 0, "500+ years": 0 },
+      "life_years_saved": { "0-5 years": 0.20, "5-10 years": 0.40, "10-20 years": 0.30, "20-100 years": 0.10, "100-500 years": 0, "500+ years": 0 },
+      "income_doublings": { "0-5 years": 0.0073,"5-10 years": 0.0182,"10-20 years": 0.1319,"20-100 years": 0.8426,"100-500 years": 0, "500+ years": 0 }
+    }
+  }
+}

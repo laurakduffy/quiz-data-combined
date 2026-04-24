@@ -24,12 +24,15 @@ Usage
 
 import argparse
 import contextlib
+import csv as _csv_module
 import os
 import shutil
 import subprocess
 import sys
 from copy import deepcopy
 from pathlib import Path
+
+import numpy as np
 
 SCRIPT_DIR = Path(__file__).parent                          # quiz-demo/sensitivity-analysis/
 MODEL_ROOT = SCRIPT_DIR.parent / "all-intervention-models"  # quiz-demo/all-intervention-models/
@@ -71,6 +74,131 @@ _BASE_RR = {
     for fk in FUND_KEYS
 }
 
+
+# ---------------------------------------------------------------------------
+# Perturbation ratio helpers
+# ---------------------------------------------------------------------------
+
+# Load empirical means from param_percentiles.csv (accounts for truncation bounds).
+_PARAM_PERCENTILES_CSV = GCR_MC / "outputs" / "param_percentiles.csv"
+
+def _load_baseline_means():
+    means = {}
+    try:
+        with open(_PARAM_PERCENTILES_CSV, newline="") as f:
+            for row in _csv_module.DictReader(f):
+                m = row.get("mean", "").strip()
+                if m:
+                    means[row["param"]] = float(m)
+    except FileNotFoundError:
+        pass
+    return means
+
+_BASELINE_MEANS = _load_baseline_means()
+
+# CSV param name for each fund's rel_risk_reduction.
+_REL_RISK_CSV_KEY = {
+    "sentinel":         "sentinel_rel_per_1m",
+    "longview_nuclear": "nuclear_rel_per_1m",
+    "longview_ai":      "ai_rel_per_1m",
+}
+
+
+def _spec_mean(spec, n=10_000, seed=42):
+    """Representative mean of a dist spec.
+
+    Dirichlet  → {key: mean} from spec's means (exact; no bounds apply).
+    Constant   → scalar value.
+    Bernoulli  → probability p.
+    Continuous → empirical mean from n LHS samples via gcr_model._ppf
+                 (correctly accounts for ci_90, dist shape, and bounds).
+    """
+    if spec is None:
+        return None
+    dist = spec["dist"]
+    if dist == "dirichlet":
+        return dict(zip(spec["keys"], spec["means"]))
+    if dist == "constant":
+        return float(spec["value"])
+    if dist == "bernoulli":
+        return float(spec["p"])
+    if dist == "bernoulli_from":
+        return None
+    from gcr_model import _ppf  # noqa: PLC0415 — lazy import avoids circular issues
+    rng = np.random.default_rng(seed)
+    u = (np.arange(n, dtype=float) + rng.random(n)) / n
+    return float(np.mean(_ppf(spec, u)))
+
+
+def _baseline_mean(param_name, base_spec, fund_key=None):
+    """Baseline representative mean: CSV-first for continuous, spec for Dirichlet.
+
+    For continuous params the CSV mean reflects actual sampling (including bounds).
+    Dirichlet means are exact from the spec so no CSV lookup is needed.
+    """
+    if base_spec is None:
+        return None
+    if base_spec.get("dist") == "dirichlet":
+        return _spec_mean(base_spec)
+    # Resolve CSV key (fund-specific for rel_risk_reduction)
+    if param_name == "rel_risk_reduction" and fund_key is not None:
+        csv_key = _REL_RISK_CSV_KEY.get(fund_key)
+    else:
+        csv_key = param_name
+    if csv_key and csv_key in _BASELINE_MEANS:
+        return _BASELINE_MEANS[csv_key]
+    # Fallback: sample from spec (e.g. param not yet in CSV)
+    return _spec_mean(base_spec)
+
+
+def _spec_ratio(base_val, pert_val):
+    """Ratio pert/base; elementwise for dicts.  Returns None if not computable."""
+    if isinstance(base_val, dict) and isinstance(pert_val, dict):
+        return {
+            k: float(pert_val[k]) / base_val[k] if base_val[k] != 0 else None
+            for k in base_val
+            if k in pert_val
+        }
+    if base_val is None or pert_val is None or base_val == 0:
+        return None
+    return float(pert_val) / float(base_val)
+
+
+def compute_perturbation_ratios(scenario):
+    """Compute actual perturbation ratios (perturbed / baseline).
+
+    World patches use the first fund as reference (all funds share world params).
+    Fund patches produce per-fund ratios grouped by param name.
+    Dirichlet params yield nested {component_key: ratio} dicts.
+    Returns {param_name: ratio_or_dict}.
+    """
+    ratios = {}
+
+    ref_ps = fp_module.FUND_PROFILES[FUND_KEYS[0]]["param_specs"]
+    for param_name, new_spec in scenario.get("world_patches", {}).items():
+        base_spec = ref_ps.get(param_name)
+        ratios[param_name] = _spec_ratio(
+            _baseline_mean(param_name, base_spec),
+            _spec_mean(new_spec),
+        )
+
+    fund_patches = scenario.get("fund_patches", {})
+    all_fund_param_names = {pn for patches in fund_patches.values() for pn in patches}
+    for param_name in sorted(all_fund_param_names):
+        per_fund = {}
+        for fk in FUND_KEYS:
+            new_spec = fund_patches.get(fk, {}).get(param_name)
+            if new_spec is None:
+                continue
+            base_spec = fp_module.FUND_PROFILES[fk]["param_specs"].get(param_name)
+            per_fund[fk] = _spec_ratio(
+                _baseline_mean(param_name, base_spec, fund_key=fk),
+                _spec_mean(new_spec),
+            )
+        ratios[param_name] = per_fund
+
+    return ratios
+
 # ---------------------------------------------------------------------------
 # Scenario definitions
 # ---------------------------------------------------------------------------
@@ -98,23 +226,21 @@ SCENARIOS = {
     # ── Long-run background x-risk level ────────────────────────────────────
     "r_inf_100x_up": {
         "description": "Background x-risk floor 100× higher  (ci_90: [1e-6, 5e-3])",
-        "perturbation_ratio": 100,   # median shifted 100× upward
         "world_patches": {
             "r_inf": {
                 "dist": "loguniform",
                 "ci_90": [1e-6, 5e-3],
-                "bounds": [1e-10, 5e-2],
+                "bounds": [1e-8, 5e-2],
             },
         },
     },
     "r_inf_100x_down": {
         "description": "Background x-risk floor 100× lower   (ci_90: [1e-10, 5e-7])",
-        "perturbation_ratio": 100,   # median shifted 100× downward
         "world_patches": {
             "r_inf": {
                 "dist": "loguniform",
                 "ci_90": [1e-10, 5e-7],
-                "bounds": [1e-10, 5e-5],
+                "bounds": [1e-12, 5e-5],
             },
         },
     },
@@ -122,7 +248,6 @@ SCENARIOS = {
     # ── Probability of stellar expansion (cubic growth) ──────────────────────
     "no_cubic_growth": {
         "description": "Degenerate: no stellar expansion at all (p_cubic_growth = 0)",
-        "perturbation_ratio": None,  # categorical — no scalar ratio
         "world_patches": {
             # Setting p_cubic_growth to a constant(0) causes gcr_model.py to
             # treat cubic_growth (bernoulli_from) as a plain Bernoulli(p=0),
@@ -134,7 +259,6 @@ SCENARIOS = {
     # ── Rate of stellar settlement (s = ly/yr, fraction of speed of light) ──
     "s_10x_faster": {
         "description": "Stellar settlement speed 10× faster   (ci_90: [4e-4, 0.1])",
-        "perturbation_ratio": 10,
         "world_patches": {
             "s": {
                 "dist": "loguniform",
@@ -145,12 +269,10 @@ SCENARIOS = {
     },
     "s_10x_slower": {
         "description": "Stellar settlement speed 10× slower   (ci_90: [4e-6, 1e-3])",
-        "perturbation_ratio": 10,
         "world_patches": {
             "s": {
-                "dist": "loguniform",
-                "ci_90": [4e-6, 1e-3],
-                "bounds": [1e-7, 1e-2],
+                "dist": "constant", 
+                "value": 0.00004
             },
         },
     },
@@ -158,13 +280,46 @@ SCENARIOS = {
     # ── Cause fractions of x-risk ────────────────────────────────────────────
     # Default: AI dominates at 90%; bio and nuclear each 3%.
     # This scenario: bio and nuclear each ~10× higher (30%), AI reduced to 36%.
-    "cause_fractions_bio_nuclear_higher": {
-        "description": "Cause fractions roughly uniform: bio=0.30, nuclear=0.30, AI=0.36",
-        "perturbation_ratio": 10,    # bio/nuclear means ~10× higher (0.03 → 0.30)
+    "cause_fractions_equal": {
+        "description": "Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",
         "world_patches": {
             "cause_fractions": {
                 "dist": "dirichlet",
-                "means": [0.30, 0.30, 0.36, 0.04],
+                "means": [0.32, 0.32, 0.32, 0.04],
+                "concentration": 10,
+                "keys": [
+                    "cause_fraction_bio",
+                    "cause_fraction_nuclear",
+                    "cause_fraction_ai",
+                    "cause_fraction_other",
+                ],
+            },
+        },
+    },
+
+    "cause_fractions_bio_nuclear_5x_higher": {
+        "description": "Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",
+        "world_patches": {
+            "cause_fractions": {
+                "dist": "dirichlet",
+                "means": [0.15, 0.15, 0.66, 0.04],
+                "concentration": 10,
+                "keys": [
+                    "cause_fraction_bio",
+                    "cause_fraction_nuclear",
+                    "cause_fraction_ai",
+                    "cause_fraction_other",
+                ],
+            },
+        },
+    },
+
+    "cause_fractions_bio_nuclear_unequal": {
+        "description": "Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",
+        "world_patches": {
+            "cause_fractions": {
+                "dist": "dirichlet",
+                "means": [0.04, 0.02, 0.90, 0.04],
                 "concentration": 10,
                 "keys": [
                     "cause_fraction_bio",
@@ -181,7 +336,6 @@ SCENARIOS = {
     # param_specs by multiplying both CI bounds by the desired factor.
     "rel_risk_10x_up": {
         "description": "Relative risk reduction 10× higher for all GCR funds",
-        "perturbation_ratio": 10,
         "fund_patches": {
             fk: {"rel_risk_reduction": scale_ci(_BASE_RR[fk], 10)}
             for fk in FUND_KEYS
@@ -189,7 +343,6 @@ SCENARIOS = {
     },
     "rel_risk_10x_down": {
         "description": "Relative risk reduction 10× lower for all GCR funds",
-        "perturbation_ratio": 10,
         "fund_patches": {
             fk: {"rel_risk_reduction": scale_ci(_BASE_RR[fk], 0.1)}
             for fk in FUND_KEYS
@@ -197,7 +350,6 @@ SCENARIOS = {
     },
     "rel_risk_100x_down": {
         "description": "Relative risk reduction 100× lower for all GCR funds",
-        "perturbation_ratio": 100,
         "fund_patches": {
             fk: {"rel_risk_reduction": scale_ci(_BASE_RR[fk], 0.01)}
             for fk in FUND_KEYS
@@ -215,7 +367,6 @@ SCENARIOS = {
     #     p_positive = 0.35 × (0.90/0.50) = 0.63
     "p_zero_5x_lower": {
         "description": "p(zero impact) 5× lower; surplus redistributed proportionally",
-        "perturbation_ratio": 5,
         "fund_patches": {
             "sentinel": {
                 "harm_zero_positive": {
@@ -244,13 +395,74 @@ SCENARIOS = {
         },
     },
 
+    # P(Zero) increased to 75%, while maintaining same ratio of pos/neg
+    "p_zero_75_pct": {
+        "description": "p(zero impact) =75% ; P(harm)/p(positive) remains same",
+        "fund_patches": {
+            "sentinel": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.025, 0.75, 0.225],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"],
+                },
+            },
+            "longview_nuclear": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.025, 0.75, 0.225],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"],
+                },
+            },
+            "longview_ai": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.075, 0.75, 0.175],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"],
+                },
+            },
+        },
+    },
+
+    # P(harm) higher by 25%; P(zero)=50%
+    "p_harm_5pp_higher": {
+        "description": "p(harm) 25 percent higher; p(zero) constant at 50%",
+        "fund_patches": {
+            "sentinel": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.0625, 0.50, 0.385],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"],
+                },
+            },
+            "longview_nuclear": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.0625, 0.50, 0.385],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"],
+                },
+            },
+            "longview_ai": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.1875, 0.50, 0.3125],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"],
+                },
+            },
+        },
+    },
+
     # ── Near-pessimistic outcomes: p(positive) − p(harm) = 0.05 ─────────────
     # p_zero unchanged at 0.50; the remaining 0.50 is split almost evenly:
     #   p_harm = 0.225, p_positive = 0.275  (gap = 0.05)
     # Applied identically to all three funds.
     "near_pessimistic_outcomes": {
         "description": "p(positive) − p(harm) = 0.05; p_zero unchanged at 0.50",
-        "perturbation_ratio": None,  # categorical shift in sign balance, not a scalar ratio
         "fund_patches": {
             fk: {
                 "harm_zero_positive": {
@@ -374,12 +586,15 @@ def run_scenario(scenario_name, scenario, n_samples, n_batches, seed, verbose):
     with open(MODEL_ROOT / "outputs" / "output_data_median.json") as f:
         data = _json.load(f)
 
+    perturbation_ratios = compute_perturbation_ratios(scenario)
+    print(f"  Perturbation ratios (perturbed / baseline): {perturbation_ratios}")
+
     data["sensitivity_metadata"] = {
-        "scenario_name":    scenario_name,
-        "description":      scenario["description"],
-        "perturbation_ratio": scenario.get("perturbation_ratio"),  # None for categorical
-        "n_samples":        n_samples,
-        "seed":             seed,
+        "scenario_name":       scenario_name,
+        "description":         scenario["description"],
+        "perturbation_ratios": perturbation_ratios,
+        "n_samples":           n_samples,
+        "seed":                seed,
     }
 
     with open(out_json, "w") as f:

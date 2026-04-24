@@ -25,6 +25,8 @@ LIFE_YEARS_PER_LIFE = 60 # assumed for the average life saved by GW
 
 np.random.seed(43)
 
+TIME_EFFECTS_FAR = True
+
 ## overall cost-effectiveness distribution for GW's portfolio, in terms of units value per $1M spent, using GW moral weights. 
 below_8x_dist = sq.lognorm(2, 8, lclip=0.5, rclip=16, credibility=90)
 between_8x_and_16x_dist = sq.norm(8, 16, lclip=2, rclip=32, credibility=90)
@@ -148,14 +150,24 @@ def get_distribution_effect_per_M(sample_effect_by_type, to_print=False):
 
     return distribution_effect_per_M
 
-temporal_breakdown_by_type_dict = {
-    'YLDs_averted': 
-        {'0-5 years': 0.800, '5-10 years': 0.05, '10-20 years': 0.05, '20-100 years': 0.10, '100-500 years': 0, '500+ years': 0},
-    'lives_saved': 
-        {'0-5 years': 0.0833, '5-10 years': 0.0833, '10-20 years': 0.1667, '20-100 years': 0.6667, '100-500 years': 0, '500+ years': 0},
-    'income_doublings': 
-        {'0-5 years': 0.180, '5-10 years': 0.014, '10-20 years': 0.125, '20-100 years': 0.681, '100-500 years': 0, '500+ years': 0},
-}
+if TIME_EFFECTS_FAR: 
+    temporal_breakdown_by_type_dict = {
+        'YLDs_averted': 
+            {'0-5 years': 0.800, '5-10 years': 0.05, '10-20 years': 0.05, '20-100 years': 0.10, '100-500 years': 0, '500+ years': 0},
+        'lives_saved': 
+            {'0-5 years': 0.0833, '5-10 years': 0.0833, '10-20 years': 0.1667, '20-100 years': 0.6667, '100-500 years': 0, '500+ years': 0},
+        'income_doublings': 
+            {'0-5 years': 0.180, '5-10 years': 0.014, '10-20 years': 0.125, '20-100 years': 0.681, '100-500 years': 0, '500+ years': 0},
+    }
+else: 
+    temporal_breakdown_by_type_dict = {
+        'YLDs_averted': 
+            {'0-5 years': 0.800, '5-10 years': 0.10, '10-20 years': 0.05, '20-100 years': 0.05, '100-500 years': 0, '500+ years': 0},
+        'lives_saved': 
+            {'0-5 years': 0.800, '5-10 years': 0.100, '10-20 years': 0.05, '20-100 years': 0.05, '100-500 years': 0, '500+ years': 0},
+        'income_doublings': 
+            {'0-5 years': 0.80, '5-10 years': 0.10, '10-20 years': 0.05, '20-100 years': 0.05, '100-500 years': 0, '500+ years': 0},
+    }
 
 def get_effect_per_M_by_time(distribution_effect_by_type, temporal_breakdown_by_type_dict, to_print=False):
     effect_per_M_by_time = {}

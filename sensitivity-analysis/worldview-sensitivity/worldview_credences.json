@@ -1,0 +1,30 @@
+{
+  "Total Utilitarianism — Default":
+    { "best_guess": 0.10, "low": 0.05, "high": 0.25 },
+  "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios":
+    { "best_guess": 0.10, "low": 0.05, "high": 0.20 },
+  "Total Utilitarianism — Weighted Linear Utility":
+    { "best_guess": 0.10, "low": 0.05, "high": 0.20 },
+  "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases":
+    { "best_guess": 0.05, "low": 0.02, "high": 0.15 },
+  "Total Utilitarianism — Suffering forward, clueless, and only sentience discount":
+    { "best_guess": 0.05, "low": 0.02, "high": 0.15 },
+  "Non-Utilitarian Consequentialism — Default":
+    { "best_guess": 0.05, "low": 0.02, "high": 0.20 },
+  "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals":
+    { "best_guess": 0.05, "low": 0.02, "high": 0.15 },
+  "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness":
+    { "best_guess": 0.05, "low": 0.02, "high": 0.20 },
+  "Non-Utilitarian Consequentialism — Weighted Linear Utility":
+    { "best_guess": 0.05, "low": 0.02, "high": 0.15 },
+  "Contractualism — Person-Affecting/Cluelessness and Animals Baseline":
+    { "best_guess": 0.10, "low": 0.05, "high": 0.25 },
+  "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral":
+    { "best_guess": 0.10, "low": 0.01, "high": 0.20 },
+  "Contractualism — Default + cluelessness":
+    { "best_guess": 0.05, "low": 0.02, "high": 0.15 },
+  "Kantianism — Low animals":
+    { "best_guess": 0.05, "low": 0.01, "high": 0.20 },
+  "Kantianism — Low animals / downside critical":
+    { "best_guess": 0.10, "low": 0.01, "high": 0.20 }
+}

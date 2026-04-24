@@ -1,0 +1,9 @@
+[
+  { "jsKey": "nashBargaining",       "label": "nashBargaining",       "best_guess": 0.35, "low": 0.15, "high": 0.50 },
+  { "jsKey": "credenceWeighted",     "label": "marketplace",          "best_guess": 0.30, "low": 0.20, "high": 0.50 },
+  { "jsKey": "mec",                  "label": "MEC",                  "best_guess": 0.15, "low": 0.10, "high": 0.20 },
+  { "jsKey": "met",                  "label": "MET",                  "best_guess": 0.10, "low": 0.05, "high": 0.15 },
+  { "jsKey": "splitCycle",           "label": "splitCycle",           "best_guess": 0.08, "low": 0.02, "high": 0.10 },
+  { "jsKey": "borda",                "label": "borda",                "best_guess": 0.02, "low": 0.00, "high": 0.05 },
+  { "jsKey": "lexicographicMaximin", "label": "lexicographicMaximin", "best_guess": 0.00, "low": 0.00, "high": 0.05 }
+]

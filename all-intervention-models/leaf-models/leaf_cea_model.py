@@ -27,6 +27,7 @@ N_SAMPLES = 10000
 
 np.random.seed(43)
 
+TIME_EFFECTS_FAR = True
 
 # Cost-effectiveness percentiles per $1M (10th, 50th, 90th).
 percentile_inputs = {
@@ -75,13 +76,23 @@ def fit_gev_from_percentiles(percentiles_dict):
 
 effects_distribution_dict = fit_gev_from_percentiles(percentile_inputs)
 
-temporal_breakdown_by_type_dict = {
+if TIME_EFFECTS_FAR:
+    temporal_breakdown_by_type_dict = {
+        'YLDs_averted': 
+            {'0-5 years': 0.0424, '5-10 years': 0.0686, '10-20 years': 0.1691, '20-100 years': 0.7199, '100-500 years': 0, '500+ years': 0},
+        'life_years_saved': 
+            {'0-5 years': 0.0331, '5-10 years': 0.0496, '10-20 years': 0.1210, '20-100 years': 0.7964, '100-500 years': 0, '500+ years': 0},
+        'income_doublings': 
+            {'0-5 years': 0.0073, '5-10 years': 0.0182, '10-20 years': 0.1319, '20-100 years': 0.8426, '100-500 years': 0, '500+ years': 0},
+    }
+else:
+    temporal_breakdown_by_type_dict = {
     'YLDs_averted': 
-        {'0-5 years': 0.0424, '5-10 years': 0.0686, '10-20 years': 0.1691, '20-100 years': 0.7199, '100-500 years': 0, '500+ years': 0},
+        {'0-5 years': 0.20, '5-10 years': 0.40, '10-20 years': 0.30, '20-100 years': 0.10, '100-500 years': 0, '500+ years': 0},
     'life_years_saved': 
-        {'0-5 years': 0.0331, '5-10 years': 0.0496, '10-20 years': 0.1210, '20-100 years': 0.7964, '100-500 years': 0, '500+ years': 0},
+        {'0-5 years': 0.20, '5-10 years': 0.40, '10-20 years': 0.30, '20-100 years': 0.10, '100-500 years': 0, '500+ years': 0},
     'income_doublings': 
-        {'0-5 years': 0.0073, '5-10 years': 0.0182, '10-20 years': 0.1319, '20-100 years': 0.8426, '100-500 years': 0, '500+ years': 0},
+        {'0-5 years': 0.20, '5-10 years': 0.40, '10-20 years': 0.30, '20-100 years': 0.10, '100-500 years': 0, '500+ years': 0},
 }
 
 def sample_impacts_per_m():
