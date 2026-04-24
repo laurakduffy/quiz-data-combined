@@ -352,7 +352,7 @@ function mecAggregateCardinalTheories(interventions, cardinalTheories, credenceD
 
 const AGGREGATION_DEFAULTS = {
   met_threshold: 0.5,
-  nash_disagreement_point: 'zero_spending',
+  nash_disagreement_point: 'budget_by_credence',
   default_random_seed: 0,
   msa_permissibility_mode: 'winner_take_all',
   msa_top_k: 2,
