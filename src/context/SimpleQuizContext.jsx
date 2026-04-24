@@ -79,12 +79,16 @@ function normalizeSavedWorldviews(savedWorldviews) {
   if (!savedWorldviews?.length) return savedWorldviews || [];
   return savedWorldviews.map((sw) => {
     let { selections, manualOverrides, credences } = sw;
-    if (selections == null || credences == null) {
+    if ((selections == null || credences == null) && sw.worldview) {
       const reversed = reverseMapWorldview(sw.worldview);
       selections = selections ?? reversed.selections;
       manualOverrides = manualOverrides ?? reversed.manualOverrides;
       credences = credences ?? reversed.credences;
     }
+    // Final fallbacks — never leave these undefined
+    selections = selections || {};
+    manualOverrides = manualOverrides || {};
+    credences = credences || {};
     // Ensure every credence question has a distribution
     const filledCredences = { ...defaultCredences, ...(credences || {}) };
     const filledSelectedPresets = {
@@ -451,6 +455,8 @@ export function SimpleQuizProvider({ children }) {
             type: 'RESTORE_FROM_URL',
             selections: shareResult.selections,
             manualOverrides: shareResult.manualOverrides,
+            credences: shareResult.credences,
+            selectedPresets: shareResult.selectedPresets,
             savedWorldviews: shareResult.savedWorldviews,
             currentRunName: shareResult.currentRunName,
             budget: shareResult.budget,
@@ -459,6 +465,7 @@ export function SimpleQuizProvider({ children }) {
             blendCredence: shareResult.blendCredence,
             userCredencesRaw: shareResult.userCredencesRaw,
             lockedKeys: shareResult.lockedKeys,
+            questionLockedKeys: shareResult.questionLockedKeys,
           });
           clearShareHash();
         }
