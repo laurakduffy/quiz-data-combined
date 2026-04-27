@@ -1,60 +1,49 @@
-import { readFileSync, mkdirSync, writeFileSync } from 'fs';
-import { dirname } from 'path';
+import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'fs';
+import { dirname, join } from 'path';
 
 export function loadJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
 }
 
-export function loadSpecialBlend(path) {
+/**
+ * Mirrors DatasetContext.pickDefault() — returns the most recent dated
+ * JSON file from config/datasets/, exactly as the website selects its dataset.
+ */
+export function pickDefaultDataset(repoRoot) {
+  const dir = join(repoRoot, 'config', 'datasets');
+  const files = readdirSync(dir)
+    .filter(f => /^\d{8}.*\.json$/.test(f))
+    .sort()
+    .reverse();
+  if (!files.length) throw new Error(`No dated dataset files found in ${dir}`);
+  return join(dir, files[0]);
+}
+
+/**
+ * Load a dataset file — returns the object that gets passed to
+ * computeMultiStageAllocation as { projects, incrementSize, drStepSize }.
+ */
+export function loadDataset(path) {
+  const data = loadJson(path);
+  return {
+    projects: data.projects,
+    incrementSize: data.incrementSize,
+    drStepSize: data.drStepSize ?? 10,
+  };
+}
+
+/**
+ * Load worldviews from specialBlend.json.
+ * Credences are normalized to sum to 1.0, matching the website:
+ *   website stores credences as 0-100 integers summing to 100, then divides by 100.
+ *   specialBlend.json stores them as 0-1 decimals summing to 1.0 — identical result.
+ */
+export function loadWorldviews(path) {
   const data = loadJson(path);
   const wvs = Array.isArray(data) ? data : (data.worldviews ?? Object.values(data));
   const total = wvs.reduce((s, wv) => s + wv.credence, 0);
   if (total > 0) wvs.forEach(wv => { wv.credence /= total; });
   return wvs;
-}
-
-export function loadProjects(path) {
-  const data = loadJson(path);
-  return { projects: data.projects, incrementSize: data.incrementSize };
-}
-
-/**
- * Build a stages array for computeMultiStageAllocation.
- * Each method gets budget = credence × totalBudget.
- * Methods with zero credence are omitted.
- * Order is preserved from the methods array (order matters for DR compounding).
- */
-export function buildStages(methods, credences, totalBudget) {
-  return methods
-    .filter(m => (credences[m.jsKey] ?? 0) > 0)
-    .map(m => ({ method: m.jsKey, budget: credences[m.jsKey] * totalBudget }));
-}
-
-/**
- * Run the staged allocation. Returns { fundId: decimal (0-1) }.
- */
-export function runStaged(computeMultiStageFn, projects, worldviews, stages, incrementM) {
-  try {
-    const { allocations } = computeMultiStageFn(projects, worldviews, stages, incrementM);
-    return Object.fromEntries(Object.entries(allocations).map(([k, v]) => [k, v / 100]));
-  } catch (e) {
-    console.error(`  ERROR in runStaged: ${e.message}`);
-    return null;
-  }
-}
-
-/**
- * Run a single method on the full budget. Returns { fundId: decimal (0-1) }.
- * Used for per-method Form 1 breakdowns only.
- */
-export function runMethod(computeMarcusFn, projects, worldviews, jsKey, budgetM, incrementM) {
-  try {
-    const { allocations } = computeMarcusFn(projects, worldviews, jsKey, budgetM, incrementM);
-    return Object.fromEntries(Object.entries(allocations).map(([k, v]) => [k, v / 100]));
-  } catch (e) {
-    console.error(`  ERROR in ${jsKey}: ${e.message}`);
-    return null;
-  }
 }
 
 export function rankDict(alloc) {
@@ -80,11 +69,10 @@ export function writeCsv(path, fieldnames, rows) {
 }
 
 export function parseArgs(argv) {
-  const args = { budget: 200, base: null, worldviewsFile: null, dryRun: false };
+  const args = { base: null, worldviewsFile: null, dryRun: false };
   for (let i = 2; i < argv.length; i++) {
     if (argv[i] === '--dry-run') args.dryRun = true;
-    else if (argv[i] === '--budget' && argv[i + 1]) args.budget = parseFloat(argv[++i]);
-    else if (argv[i] === '--base' && argv[i + 1]) args.base = argv[++i];
+    else if (argv[i] === '--base'            && argv[i + 1]) args.base = argv[++i];
     else if (argv[i] === '--worldviews-file' && argv[i + 1]) args.worldviewsFile = argv[++i];
   }
   return args;

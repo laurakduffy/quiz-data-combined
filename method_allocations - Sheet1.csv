@@ -1,0 +1,19 @@
+method,ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
+marketplace,10.70%,20.20%,0.90%,35.00%,0.10%,15.50%,7.80%,9.70%
+nashBargaining,0.17,0.53,0.01,0,0,0.16,0.13,0
+MEC,17.00%,0.00%,0.00%,0.00%,15.00%,16.00%,33.00%,19.00%
+MET,17.00%,4.00%,0.00%,12.00%,1.00%,16.00%,42.00%,8.00%
+splitCycle,17.00%,20.00%,0.00%,0.00%,2.00%,16.00%,42.00%,3.00%
+borda,17.00%,24.00%,0.00%,0.00%,0.00%,16.00%,42.00%,1.00%
+,,,,,,,,
+Combined,15.11%,27.09%,0.62%,11.70%,2.54%,15.85%,20.24%,6.82%
+,,,,,,,,
+"What Laura sees when replicating the stages in the Donor Compass, total allocations ($M)",ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
+Stage 1: Nash $70M,$22,$0,$0,$0,$0,$32,$16,$0
+Stage 2: Add $60M Credence-Weighted,$31,$12,$3,$24,$0,$32,$22,$6
+Stage 3: Add $30M MEC,$31,$12,$3,$24,$10,$32,$22,$26
+Stage 4: Add $20M MET,$33,$12,$3,$24,$10,$32,$40,$26
+Stage 5: Add $16M Split Cycle,$35,$12,$3,$24,$10,$32,$54,$26
+Stage 6: Add $4M Borda,$35,$12,$3,$24,$10,$32,$58,$26
+Final Allocations,$35,$12,$3,$24,$10,$32,$58,$26
+Final %,17.50%,6.00%,1.50%,12.00%,5.00%,16.00%,29.00%,13.00%

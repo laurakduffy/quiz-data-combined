@@ -1,0 +1,10 @@
+{
+  "stages": [
+    { "method": "nashBargaining",       "budget": 70, "options": { "disagreementPoint": "budget_by_credence" } },
+    { "method": "credenceWeighted",     "budget": 60, "options": {} },
+    { "method": "mec",                  "budget": 30, "options": {} },
+    { "method": "met",                  "budget": 20, "options": {} },
+    { "method": "splitCycle",           "budget": 16, "options": {} },
+    { "method": "borda",                "budget":  4, "options": {} }
+  ]
+}

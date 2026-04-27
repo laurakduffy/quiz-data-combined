@@ -8,11 +8,11 @@
  *         the remainder proportionally across the other worldviews, and evaluate
  *         how the staged allocation changes. Generates 28 scenarios.
  *
- * Aggregation method credences are held fixed at best-guess throughout.
+ * Stages are loaded from baseline.json (same configuration as the website).
  * Uses computeMultiStageAllocation — identical to the website's staged approach.
  *
  * Usage:
- *   node run_wv_sensitivity.js [--dry-run] [--budget 200] [--base PATH] [--worldviews-file PATH]
+ *   node run_wv_sensitivity.js [--dry-run] [--base PATH] [--worldviews-file PATH]
  */
 
 import { fileURLToPath } from 'url';
@@ -23,8 +23,8 @@ const REPO_ROOT = join(__dirname, '..', '..');
 
 import { computeMultiStageAllocation } from '../../src/utils/marcusCalculation.js';
 import {
-  loadJson, loadSpecialBlend, loadProjects,
-  buildStages, runStaged, rankDict, writeCsv, parseArgs,
+  loadJson, loadWorldviews, loadDataset, pickDefaultDataset,
+  rankDict, writeCsv, parseArgs,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -35,25 +35,22 @@ const OUTPUT_DIR = join(__dirname, 'outputs');
 
 const args = parseArgs(process.argv);
 
-const methods = loadJson(join(__dirname, '..', 'aggregation-methods', 'agg_methods_sensitivity.json'));
 const wvCreds = loadJson(join(__dirname, 'worldview_credences.json'));
-const worldviews = loadSpecialBlend(
+const worldviews = loadWorldviews(
   args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
 );
-const { projects, incrementSize } = loadProjects(
-  args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json')
+const { projects, incrementSize: incrementM, drStepSize } = loadDataset(
+  args.base ?? pickDefaultDataset(REPO_ROOT)
 );
+const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
+const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 
 const fundIds = Object.keys(projects).sort();
-const budgetM = args.budget;
-const incrementM = incrementSize;
-const bestCreds = Object.fromEntries(methods.map(m => [m.jsKey, m.best_guess]));
-const bestStages = buildStages(methods, bestCreds, budgetM);
 
 console.log('\nWorldview credence sensitivity');
 console.log(`  Worldviews:  ${worldviews.length}`);
-console.log(`  Methods:     ${methods.map(m => m.label).join(', ')} (best-guess credences fixed)`);
-console.log(`  Budget:      $${budgetM}M,  increment: $${incrementM}M`);
+console.log(`  Stages:      ${stages.length}  total $${totalBudget}M (from baseline.json)`);
+console.log(`  Increment:   $${incrementM}M,  drStepSize: $${drStepSize}M`);
 console.log(`  Funds:       ${fundIds.length}`);
 
 if (args.dryRun) {
@@ -76,11 +73,13 @@ const origCredences = Object.fromEntries(worldviews.map(wv => [wv.name, wv.crede
 // ---------------------------------------------------------------------------
 
 console.log(`\n${'-'.repeat(60)}`);
-console.log('Computing base allocation (specialBlend credences, best-guess methods, staged)...');
-const baseAlloc = runStaged(computeMultiStageAllocation, projects, worldviews, bestStages, incrementM);
+console.log('Computing base allocation (specialBlend credences, staged)...');
+const { allocations: baseAlloc } = computeMultiStageAllocation(
+  projects, worldviews, stages, incrementM, undefined, drStepSize
+);
 const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => baseAlloc[a] > baseAlloc[b] ? a : b);
-console.log(`  Top fund: ${topBase} (${(baseAlloc[topBase] * 100).toFixed(1)}%)`);
+console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 
 // ---------------------------------------------------------------------------
 // Form 1 — single-worldview staged runs
@@ -92,14 +91,16 @@ console.log('Form 1 — Running each worldview at 100% credence (staged)...');
 const form1Rows = [];
 for (const wv of worldviews) {
   process.stdout.write(`  ${wv.name.slice(0, 65)}...`);
-  const alloc = runStaged(computeMultiStageAllocation, projects, [{ ...wv, credence: 1.0 }], bestStages, incrementM);
-  const top = fundIds.reduce((a, b) => alloc[a] > alloc[b] ? a : b);
-  console.log(`  top: ${top} (${(alloc[top] * 100).toFixed(1)}%)`);
-  form1Rows.push({ worldview: wv.name, ...Object.fromEntries(fundIds.map(f => [f, alloc[f].toFixed(6)])) });
+  const { allocations } = computeMultiStageAllocation(
+    projects, [{ ...wv, credence: 1.0 }], stages, incrementM, undefined, drStepSize
+  );
+  const top = fundIds.reduce((a, b) => allocations[a] > allocations[b] ? a : b);
+  console.log(`  top: ${top} (${allocations[top].toFixed(1)}%)`);
+  form1Rows.push({ worldview: wv.name, ...Object.fromEntries(fundIds.map(f => [f, allocations[f].toFixed(2)])) });
 }
 
 // ---------------------------------------------------------------------------
-// Form 2 — 28 credence sensitivity scenarios
+// Form 2 — credence sensitivity scenarios
 // ---------------------------------------------------------------------------
 
 console.log(`\n${'-'.repeat(60)}`);
@@ -130,26 +131,30 @@ for (const wv of worldviews) {
     }
 
     process.stdout.write(`  ${scenario.slice(0, 60)}...`);
-    const newAlloc = runStaged(computeMultiStageAllocation, projects, worldviews, bestStages, incrementM);
+    const { allocations: newAlloc } = computeMultiStageAllocation(
+      projects, worldviews, stages, incrementM, undefined, drStepSize
+    );
     const newRanks = rankDict(newAlloc);
 
     for (const w of worldviews) w.credence = origCredences[w.name];
 
     const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
-    const scaledSi = Math.abs(delta) > 1e-9 ? si / Math.abs(delta) / 100 : null;
-    const mostAff = fundIds.reduce((a, b) => Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b);
+    const scaledSi = Math.abs(delta) > 1e-9 ? si / Math.abs(delta) : null;
+    const mostAff = fundIds.reduce((a, b) =>
+      Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b
+    );
 
-    const scaledStr = scaledSi !== null ? `  scaled=${scaledSi.toFixed(6)}` : '  (no change)';
-    console.log(`  SI=${si.toFixed(6)}${scaledStr}`);
+    const scaledStr = scaledSi !== null ? `  scaled=${scaledSi.toFixed(4)}pp/cred` : '  (no change)';
+    console.log(`  SI=${si.toFixed(4)}pp${scaledStr}`);
 
     for (const fid of fundIds) {
       byFundRows.push({
         scenario, worldview: name, bound,
         credence_base: baseCred.toFixed(4), credence_scenario: boundVal.toFixed(4),
         project_id: fid,
-        base_alloc: baseAlloc[fid].toFixed(6),
-        new_alloc: newAlloc[fid].toFixed(6),
-        alloc_delta: (newAlloc[fid] - baseAlloc[fid]).toFixed(6),
+        base_alloc: baseAlloc[fid].toFixed(2),
+        new_alloc: newAlloc[fid].toFixed(2),
+        alloc_delta: (newAlloc[fid] - baseAlloc[fid]).toFixed(2),
         rank_delta: baseRanks[fid] - newRanks[fid],
       });
     }
@@ -157,16 +162,16 @@ for (const wv of worldviews) {
     form2RawRows.push({
       scenario, worldview: name, bound,
       credence_base: baseCred.toFixed(4), credence_scenario: boundVal.toFixed(4),
-      ...Object.fromEntries(fundIds.map(f => [f, newAlloc[f].toFixed(6)])),
+      ...Object.fromEntries(fundIds.map(f => [f, newAlloc[f].toFixed(2)])),
     });
 
     indexRows.push({
       scenario, worldview: name, bound,
       credence_base: baseCred.toFixed(4), credence_scenario: boundVal.toFixed(4),
-      sensitivity_index: si.toFixed(6),
-      scaled_SI: scaledSi !== null ? scaledSi.toFixed(6) : '',
+      sensitivity_index: si.toFixed(4),
+      scaled_SI: scaledSi !== null ? scaledSi.toFixed(4) : '',
       most_affected_fund: mostAff,
-      most_affected_delta: (newAlloc[mostAff] - baseAlloc[mostAff]).toFixed(6),
+      most_affected_delta: (newAlloc[mostAff] - baseAlloc[mostAff]).toFixed(2),
     });
   }
 }
@@ -176,8 +181,8 @@ indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitiv
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Form 2 — Sensitivity index ranking (top 10):');
 for (const r of indexRows.slice(0, 10)) {
-  const scaledStr = r.scaled_SI ? `  scaled=${r.scaled_SI}` : '';
-  console.log(`  ${r.scenario.slice(0, 60).padEnd(60)}  SI=${r.sensitivity_index}${scaledStr}`);
+  const scaledStr = r.scaled_SI ? `  scaled=${r.scaled_SI}pp/cred` : '';
+  console.log(`  ${r.scenario.slice(0, 60).padEnd(60)}  SI=${r.sensitivity_index}pp${scaledStr}`);
 }
 
 writeCsv(join(OUTPUT_DIR, 'single_worldview_allocations.csv'), ['worldview', ...fundIds], form1Rows);

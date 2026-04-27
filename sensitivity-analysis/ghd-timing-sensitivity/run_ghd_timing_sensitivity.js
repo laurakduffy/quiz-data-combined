@@ -7,10 +7,11 @@
  *   - all effects near
  *   - health effects near
  *
+ * Stages are loaded from baseline.json (same configuration as the website).
  * Uses computeMultiStageAllocation — identical to the website's staged approach.
  *
  * Usage:
- *   node run_ghd_timing_sensitivity.js [--dry-run] [--budget 200] [--base PATH]
+ *   node run_ghd_timing_sensitivity.js [--dry-run] [--base PATH]
  */
 
 import { fileURLToPath } from 'url';
@@ -21,8 +22,8 @@ const REPO_ROOT = join(__dirname, '..', '..');
 
 import { computeMultiStageAllocation } from '../../src/utils/marcusCalculation.js';
 import {
-  loadJson, loadSpecialBlend, loadProjects,
-  buildStages, runStaged, rankDict, writeCsv, parseArgs,
+  loadJson, loadWorldviews, loadDataset, pickDefaultDataset,
+  rankDict, writeCsv, parseArgs,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -63,26 +64,23 @@ function patchProjectsTiming(projects, fundTimingDict) {
 
 const args = parseArgs(process.argv);
 
-const methods = loadJson(join(__dirname, '..', 'aggregation-methods', 'agg_methods_sensitivity.json'));
 const timingEffects = loadJson(join(__dirname, 'ghd_timing_effects.json'));
-const worldviews = loadSpecialBlend(
+const worldviews = loadWorldviews(
   args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
 );
-const { projects, incrementSize } = loadProjects(
-  args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json')
+const { projects, incrementSize: incrementM, drStepSize } = loadDataset(
+  args.base ?? pickDefaultDataset(REPO_ROOT)
 );
+const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
+const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 
 const fundIds = Object.keys(projects).sort();
-const budgetM = args.budget;
-const incrementM = incrementSize;
-const bestCreds = Object.fromEntries(methods.map(m => [m.jsKey, m.best_guess]));
-const bestStages = buildStages(methods, bestCreds, budgetM);
 const scenarioNames = Object.keys(timingEffects);
 
 console.log('\nGHD effect timing sensitivity');
 console.log(`  Worldviews:  ${worldviews.length}`);
-console.log(`  Methods:     ${methods.map(m => m.label).join(', ')} (best-guess credences fixed)`);
-console.log(`  Budget:      $${budgetM}M,  increment: $${incrementM}M`);
+console.log(`  Stages:      ${stages.length}  total $${totalBudget}M (from baseline.json)`);
+console.log(`  Increment:   $${incrementM}M,  drStepSize: $${drStepSize}M`);
 console.log(`  Funds:       ${fundIds.length}`);
 console.log(`  Scenarios:   ${scenarioNames.join(', ')}`);
 
@@ -107,16 +105,18 @@ if (args.dryRun) {
 
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Computing base allocation (unpatched, staged)...');
-const baseAlloc = runStaged(computeMultiStageAllocation, projects, worldviews, bestStages, incrementM);
+const { allocations: baseAlloc } = computeMultiStageAllocation(
+  projects, worldviews, stages, incrementM, undefined, drStepSize
+);
 const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => baseAlloc[a] > baseAlloc[b] ? a : b);
-console.log(`  Top fund: ${topBase} (${(baseAlloc[topBase] * 100).toFixed(1)}%)`);
+console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 
 // ---------------------------------------------------------------------------
 // Scenario loop
 // ---------------------------------------------------------------------------
 
-const allocRows = [{ scenario: 'baseline', ...Object.fromEntries(fundIds.map(f => [f, baseAlloc[f].toFixed(6)])) }];
+const allocRows = [{ scenario: 'baseline', ...Object.fromEntries(fundIds.map(f => [f, baseAlloc[f].toFixed(2)])) }];
 const byFundRows = [];
 const indexRows = [];
 
@@ -124,31 +124,35 @@ console.log(`\n${'-'.repeat(60)}`);
 for (const [scenarioName, fundTiming] of Object.entries(timingEffects)) {
   console.log(`\nScenario: ${scenarioName}`);
   const patchedProjects = patchProjectsTiming(projects, fundTiming);
-  const newAlloc = runStaged(computeMultiStageAllocation, patchedProjects, worldviews, bestStages, incrementM);
+  const { allocations: newAlloc } = computeMultiStageAllocation(
+    patchedProjects, worldviews, stages, incrementM, undefined, drStepSize
+  );
   const newRanks = rankDict(newAlloc);
 
   const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
-  const mostAff = fundIds.reduce((a, b) => Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b);
+  const mostAff = fundIds.reduce((a, b) =>
+    Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b
+  );
   const delta = newAlloc[mostAff] - baseAlloc[mostAff];
-  console.log(`  SI=${si.toFixed(6)}  most affected: ${mostAff} (${delta >= 0 ? '+' : ''}${delta.toFixed(4)})`);
+  console.log(`  SI=${si.toFixed(4)}pp  most affected: ${mostAff} (${delta >= 0 ? '+' : ''}${delta.toFixed(2)}pp)`);
 
-  allocRows.push({ scenario: scenarioName, ...Object.fromEntries(fundIds.map(f => [f, newAlloc[f].toFixed(6)])) });
+  allocRows.push({ scenario: scenarioName, ...Object.fromEntries(fundIds.map(f => [f, newAlloc[f].toFixed(2)])) });
 
   for (const fid of fundIds) {
     byFundRows.push({
       scenario: scenarioName, project_id: fid,
-      base_alloc: baseAlloc[fid].toFixed(6),
-      new_alloc: newAlloc[fid].toFixed(6),
-      alloc_delta: (newAlloc[fid] - baseAlloc[fid]).toFixed(6),
+      base_alloc: baseAlloc[fid].toFixed(2),
+      new_alloc: newAlloc[fid].toFixed(2),
+      alloc_delta: (newAlloc[fid] - baseAlloc[fid]).toFixed(2),
       rank_delta: baseRanks[fid] - newRanks[fid],
     });
   }
 
   indexRows.push({
     scenario: scenarioName,
-    sensitivity_index: si.toFixed(6),
+    sensitivity_index: si.toFixed(4),
     most_affected_fund: mostAff,
-    most_affected_delta: delta.toFixed(6),
+    most_affected_delta: delta.toFixed(2),
   });
 }
 
@@ -157,7 +161,7 @@ indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitiv
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Scenario ranking by sensitivity index:');
 for (const r of indexRows) {
-  console.log(`  ${r.scenario.padEnd(25)}  SI=${r.sensitivity_index}  most affected: ${r.most_affected_fund} (${r.most_affected_delta})`);
+  console.log(`  ${r.scenario.padEnd(25)}  SI=${r.sensitivity_index}pp  most affected: ${r.most_affected_fund} (${r.most_affected_delta}pp)`);
 }
 
 writeCsv(join(OUTPUT_DIR, 'ghd_timing_allocations.csv'), ['scenario', ...fundIds], allocRows);
