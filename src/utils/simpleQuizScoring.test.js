@@ -68,9 +68,11 @@ describe('assembleWorldview', () => {
       animal_weights: 'rp_default',
       discount_factors: 'all_equal',
       p_extinction: 'rp_default',
-      risk_profile: 'upside_skeptical',
     };
-    const wv = assembleWorldview(selections, {}, questions);
+    const credences = {
+      risk_profile: { neutral: 0, upside_skeptical: 100, downside_critical: 0, wlu_moderate: 0 },
+    };
+    const wv = assembleWorldview(selections, {}, questions, credences);
     expect(wv.moral_weights.chickens_birds).toBe(0.4);
     expect(wv.discount_factors).toEqual([1, 1, 1, 1, 1, 1]);
     expect(wv.p_extinction).toBe(0.4);
@@ -428,14 +430,19 @@ describe('reverseMapWorldview', () => {
       animal_weights: 'rp_default',
       discount_factors: 'all_equal',
       p_extinction: 'rp_default',
-      risk_profile: 'upside_skeptical',
     };
-    const wv = assembleWorldview(selections, {}, questions);
+    const credences = {
+      risk_profile: { neutral: 0, upside_skeptical: 100, downside_critical: 0, wlu_moderate: 0 },
+    };
+    const wv = assembleWorldview(selections, {}, questions, credences);
     const result = reverseMapWorldview(wv);
     expect(result.selections.animal_weights).toBe('rp_default');
     expect(result.selections.discount_factors).toBe('all_equal');
     expect(result.selections.p_extinction).toBe('rp_default');
-    expect(result.selections.risk_profile).toBe('upside_skeptical');
+    // risk_profile is credence-type → reverse-mapped to credences, not selections
+    expect(result.selections.risk_profile).toBeUndefined();
+    expect(result.credences.risk_profile).toBeDefined();
+    expect(result.credences.risk_profile.upside_skeptical).toBe(100);
     expect(Object.values(result.manualOverrides).filter((v) => v != null)).toHaveLength(0);
   });
 

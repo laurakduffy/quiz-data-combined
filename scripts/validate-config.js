@@ -4,7 +4,7 @@
  * Validates all config JSON files
  */
 
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import process from 'node:process';
@@ -132,11 +132,15 @@ if (copyConfig) {
 }
 
 // Validate dataset files in config/datasets/
+// Subdirectories (e.g. "archive/") are ignored — only files directly in
+// config/datasets/ are bundled into the app (import.meta.glob is non-recursive).
 const datasetsDir = join(projectRoot, 'config', 'datasets');
 const allDatasetEntries = existsSync(datasetsDir) ? readdirSync(datasetsDir) : [];
 
-// Flag any non-.json files in the datasets directory
-const nonJsonFiles = allDatasetEntries.filter((f) => !f.startsWith('.') && !f.endsWith('.json'));
+const fileEntries = allDatasetEntries.filter(
+  (f) => !f.startsWith('.') && statSync(join(datasetsDir, f)).isFile()
+);
+const nonJsonFiles = fileEntries.filter((f) => !f.endsWith('.json'));
 if (nonJsonFiles.length > 0) {
   console.error('✗ Non-.json files found in config/datasets/:');
   nonJsonFiles.forEach((f) => console.error(`  ${f} (must have .json extension)`));

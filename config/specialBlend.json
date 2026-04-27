@@ -6,8 +6,9 @@
   "tooltipSourceUrl": "https://docs.google.com/spreadsheets/d/1J6VYya3p_uOTQzq5CZ1Fgy3Ai-cbud-kn05b_xRsS0w/edit?gid=1516960048#gid=1516960048",
   "worldviews": [
     {
-      "name": "Total Utilitarianism — Default",
-      "credence": 0.10,
+      "name": "Total Utilitarian",
+      "presetId": "total_utilitarian",
+      "credence": 0.1,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 1,
@@ -18,13 +19,21 @@
         "non_shrimp_invertebrates": 0.07,
         "mammals": 0.44
       },
-      "discount_factors": [1, 0.9, 0.8, 0.6, 0.4, 0.01],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.6,
+        0.4,
+        0.01
+      ],
       "risk_profile": 0,
       "p_extinction": 0.4
     },
     {
-      "name": "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",
-      "credence": 0.10,
+      "name": "Total Utilitarian",
+      "presetId": "total_utilitarian",
+      "credence": 0.1,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 1,
@@ -35,13 +44,21 @@
         "non_shrimp_invertebrates": 0.2,
         "mammals": 0.9
       },
-      "discount_factors": [1, 0.9, 0.8, 0.1, 0, 0],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.1,
+        0,
+        0
+      ],
       "risk_profile": 7,
       "p_extinction": 0.4
     },
     {
-      "name": "Total Utilitarianism — Weighted Linear Utility",
-      "credence": 0.10,
+      "name": "Total Utilitarian",
+      "presetId": "total_utilitarian",
+      "credence": 0.1,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 1,
@@ -52,12 +69,20 @@
         "non_shrimp_invertebrates": 0.07,
         "mammals": 0.44
       },
-      "discount_factors": [1, 0.9, 0.8, 0.6, 0.4, 0.01],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.6,
+        0.4,
+        0.01
+      ],
       "risk_profile": 2,
       "p_extinction": 0.4
     },
     {
-      "name": "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",
+      "name": "Total Utilitarian",
+      "presetId": "total_utilitarian",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
@@ -69,12 +94,20 @@
         "non_shrimp_invertebrates": 0.07,
         "mammals": 0.44
       },
-      "discount_factors": [1, 0.9, 0.8, 0.1, 0.001, 0.00001],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.1,
+        0.001,
+        1e-05
+      ],
       "risk_profile": 6,
       "p_extinction": 0.4
     },
     {
-      "name": "Total Utilitarianism — Suffering forward, clueless, and only sentience discount",
+      "name": "Total Utilitarian",
+      "presetId": "total_utilitarian",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 0.1,
@@ -86,12 +119,20 @@
         "non_shrimp_invertebrates": 0.2,
         "mammals": 0.9
       },
-      "discount_factors": [1, 0.9, 0.8, 0.6, 0, 0],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.6,
+        0,
+        0
+      ],
       "risk_profile": 0,
       "p_extinction": 0.4
     },
     {
-      "name": "Non-Utilitarian Consequentialism — Default",
+      "name": "Consequentialism (Non-Utilitarian)",
+      "presetId": "non_util_consequentialism",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
@@ -103,12 +144,20 @@
         "non_shrimp_invertebrates": 0.02,
         "mammals": 0.11
       },
-      "discount_factors": [1, 0.9, 0.8, 0.6, 0.4, 0.01],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.6,
+        0.4,
+        0.01
+      ],
       "risk_profile": 0,
       "p_extinction": 0.4
     },
     {
-      "name": "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals",
+      "name": "Consequentialism (Non-Utilitarian)",
+      "presetId": "non_util_consequentialism",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
@@ -120,12 +169,20 @@
         "non_shrimp_invertebrates": 0.001,
         "mammals": 0.05
       },
-      "discount_factors": [1, 0.9, 0.8, 0.6, 0, 0],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.6,
+        0,
+        0
+      ],
       "risk_profile": 0,
       "p_extinction": 0.4
     },
     {
-      "name": "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness",
+      "name": "Consequentialism (Non-Utilitarian)",
+      "presetId": "non_util_consequentialism",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
@@ -137,12 +194,20 @@
         "non_shrimp_invertebrates": 0.02,
         "mammals": 0.11
       },
-      "discount_factors": [1, 0.9, 0.8, 0.6, 0, 0],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.6,
+        0,
+        0
+      ],
       "risk_profile": 0,
       "p_extinction": 0.4
     },
     {
-      "name": "Non-Utilitarian Consequentialism — Weighted Linear Utility",
+      "name": "Consequentialism (Non-Utilitarian)",
+      "presetId": "non_util_consequentialism",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
@@ -154,30 +219,21 @@
         "non_shrimp_invertebrates": 0.02,
         "mammals": 0.11
       },
-      "discount_factors": [1, 0.9, 0.8, 0.6, 0.4, 0.01],
+      "discount_factors": [
+        1,
+        0.9,
+        0.8,
+        0.6,
+        0.4,
+        0.01
+      ],
       "risk_profile": 2,
       "p_extinction": 0.4
     },
     {
-      "name": "Contractualism — Person-Affecting/Cluelessness and Animals Baseline",
-      "credence": 0.10,
-      "moral_weights": {
-        "human_life_years": 1,
-        "human_ylds": 0.01,
-        "human_income_doublings": 0.001,
-        "chickens_birds": 0.4,
-        "fish": 0.24,
-        "shrimp": 0.08,
-        "non_shrimp_invertebrates": 0.07,
-        "mammals": 0.44
-      }, 
-      "discount_factors": [1, 1, 0.5, 0.1, 0.001, 0.00001],
-      "risk_profile": 5,
-      "p_extinction": 0.4
-    },
-    {
-      "name": "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral",
-      "credence": 0.10,
+      "name": "Contractualism",
+      "presetId": "contractualism",
+      "credence": 0.1,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 0.01,
@@ -188,12 +244,45 @@
         "non_shrimp_invertebrates": 0.07,
         "mammals": 0.44
       },
-      "discount_factors": [1, 1, 0.5, 0.1, 0.001, 0.00001],
+      "discount_factors": [
+        1,
+        1,
+        0.5,
+        0.1,
+        0.001,
+        1e-05
+      ],
+      "risk_profile": 5,
+      "p_extinction": 0.4
+    },
+    {
+      "name": "Contractualism",
+      "presetId": "contractualism",
+      "credence": 0.1,
+      "moral_weights": {
+        "human_life_years": 1,
+        "human_ylds": 0.01,
+        "human_income_doublings": 0.001,
+        "chickens_birds": 0.4,
+        "fish": 0.24,
+        "shrimp": 0.08,
+        "non_shrimp_invertebrates": 0.07,
+        "mammals": 0.44
+      },
+      "discount_factors": [
+        1,
+        1,
+        0.5,
+        0.1,
+        0.001,
+        1e-05
+      ],
       "risk_profile": 0,
       "p_extinction": 0.4
     },
     {
-      "name": "Contractualism — Default + cluelessness",
+      "name": "Contractualism",
+      "presetId": "contractualism",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
@@ -205,12 +294,20 @@
         "non_shrimp_invertebrates": 0.0014,
         "mammals": 0.0044
       },
-      "discount_factors": [1, 1, 0.5, 0.1, 0, 0],
+      "discount_factors": [
+        1,
+        1,
+        0.5,
+        0.1,
+        0,
+        0
+      ],
       "risk_profile": 2,
       "p_extinction": 0.4
     },
     {
-      "name": "Kantianism — Low animals",
+      "name": "Kantianism",
+      "presetId": "kantianism",
       "credence": 0.05,
       "moral_weights": {
         "human_life_years": 1,
@@ -222,13 +319,21 @@
         "non_shrimp_invertebrates": 0.0001,
         "mammals": 0.005
       },
-      "discount_factors": [1, 1, 0.5, 0.1, 0.001, 0.00001],
+      "discount_factors": [
+        1,
+        1,
+        0.5,
+        0.1,
+        0.001,
+        1e-05
+      ],
       "risk_profile": 3,
       "p_extinction": 0.4
     },
     {
-      "name": "Kantianism — Low animals / downside critical",
-      "credence": 0.10,
+      "name": "Custom",
+      "presetId": null,
+      "credence": 0.1,
       "moral_weights": {
         "human_life_years": 1,
         "human_ylds": 0.5,
@@ -239,7 +344,14 @@
         "non_shrimp_invertebrates": 0.0001,
         "mammals": 0.005
       },
-      "discount_factors": [1, 1, 0.5, 0.1, 0.001, 0.00001],
+      "discount_factors": [
+        1,
+        1,
+        0.5,
+        0.1,
+        0.001,
+        1e-05
+      ],
       "risk_profile": 6,
       "p_extinction": 0.4
     }
