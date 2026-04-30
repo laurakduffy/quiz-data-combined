@@ -244,12 +244,12 @@ describe('voteNashBargaining proportional fallback', () => {
    * Test 5: Non-divisible budget — remaining != increment.
    *
    * Same divergent setup as Test 1, but budget=95, increment=30.
-   * First iteration: increment=30, remaining=95. All infeasible →
-   * fallback allocates remaining (95) proportionally, not increment (30).
+   * All iterations infeasible → fallback allocates one increment at a time
+   * (3×30 + 1×5). Full budget is still spent across iterations.
    *
    * Expected: A=47.5, B=47.5 (total=95, full budget spent)
    */
-  it('allocates full remaining budget (not just increment) on proportional fallback', () => {
+  it('allocates full budget across incremental proportional fallback steps', () => {
     const projectData = {
       projectA: makeProject('type_a', 1),
       projectB: makeProject('type_b', 1),

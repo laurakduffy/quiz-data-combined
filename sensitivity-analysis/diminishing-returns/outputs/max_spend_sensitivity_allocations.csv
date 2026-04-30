@@ -1,0 +1,5 @@
+scenario,ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
+baseline_5x,9.10,7.52,9.78,21.49,3.08,24.27,15.43,9.32
+max_spend_2_5x,5.72,20.73,10.80,22.07,1.83,19.14,12.15,7.57
+max_spend_7_5x,9.53,4.91,9.25,20.99,4.33,28.77,10.90,11.32
+max_spend_10x,8.98,4.59,8.78,20.99,5.88,29.57,7.34,13.87

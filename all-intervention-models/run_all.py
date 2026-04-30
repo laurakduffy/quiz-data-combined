@@ -27,7 +27,7 @@ scripts = [
     (ROOT / "aw-models/run.py",                                ROOT / "aw-models", []),
     (ROOT / "gw-models/gw_cea_modeling.py",                    ROOT,             []),
     (ROOT / "leaf-models/leaf_cea_model.py",                   ROOT,             []),
-    (ROOT / _args.gcr_model / "export_rp_csv.py",              ROOT,             ['--n-samples', str(_args.n_samples), '--n-batches', str(_args.n_batches)]),
+    (ROOT /  "gcr-models-mc" / "export_rp_csv.py",              ROOT,             ['--n-samples', str(_args.n_samples), '--n-batches', str(_args.n_batches)]),
     (ROOT / "combine_data.py",                                  ROOT,             ['--gcr-dmr-scenario', _args.gcr_dmr_scenario]),
 ]
 

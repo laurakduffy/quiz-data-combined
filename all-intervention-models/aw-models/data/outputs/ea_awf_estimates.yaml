@@ -1,7 +1,7 @@
 metadata:
   fund_id: ea_awf
   display_name: EA Animal Welfare Fund
-  annual_budget_M: 7.00
+  annual_budget_M: 6.60
   unit: suffering-years averted per $1000 (pre-moral-weight, fund-weighted average)
   note: Splits normalized to sum to 1 before weighting.
 percentiles_per_1000:

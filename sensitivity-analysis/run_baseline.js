@@ -18,10 +18,18 @@ import { mkdirSync } from 'fs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
 
-import { computeMarcusAllocation, computeMultiStageAllocation } from '../src/utils/marcusCalculation.js';
 import {
-  loadJson, loadDataset, loadWorldviews, pickDefaultDataset,
-  rankDict, writeCsv, parseArgs,
+  computeMarcusAllocation,
+  computeMultiStageAllocation,
+} from '../src/utils/marcusCalculation.js';
+import { computeWeightedAllocation } from './computeWeightedAllocation.js';
+import {
+  loadJson,
+  loadDataset,
+  loadWorldviews,
+  rankDict,
+  writeCsv,
+  parseArgs,
 } from './sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -31,7 +39,8 @@ const args = parseArgs(process.argv);
 // Load inputs — same sources as the website
 // ---------------------------------------------------------------------------
 
-const datasetPath = args.base ?? pickDefaultDataset(REPO_ROOT);
+const datasetPath =
+  args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
 const dataset = loadDataset(datasetPath);
 const worldviews = loadWorldviews(
   args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
@@ -40,12 +49,14 @@ const { stages } = loadJson(join(__dirname, 'baseline.json'));
 
 const fundIds = Object.keys(dataset.projects).sort();
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
+const isWeighted = args.approach === 'weighted';
 
 console.log('\nBaseline allocation');
 console.log(`  Dataset:    ${datasetPath.split(/[/\\]/).pop()}`);
 console.log(`  Worldviews: ${worldviews.length} (specialBlend.json)`);
 console.log(`  Increment:  $${dataset.incrementSize}M,  drStepSize: $${dataset.drStepSize}M`);
 console.log(`  Stages:     ${stages.length}  total $${totalBudget}M`);
+console.log(`  Approach:   ${isWeighted ? 'weighted-average' : 'staged'}`);
 console.log(`  Funds:      ${fundIds.length}`);
 
 // ---------------------------------------------------------------------------
@@ -57,7 +68,9 @@ console.log(`\n${'-'.repeat(60)}`);
 console.log('Per-method allocations (each on full budget independently)...');
 const methodAllocs = {};
 for (const stage of stages) {
-  process.stdout.write(`  ${stage.method.padEnd(25)}  $${String(stage.budget).padStart(3)}M  running...`);
+  process.stdout.write(
+    `  ${stage.method.padEnd(25)}  $${String(stage.budget).padStart(3)}M  running...`
+  );
   try {
     const { allocations } = computeMarcusAllocation(
       dataset.projects,
@@ -68,7 +81,7 @@ for (const stage of stages) {
       { drStepSize: dataset.drStepSize }
     );
     methodAllocs[stage.method] = allocations;
-    const top = fundIds.reduce((a, b) => allocations[a] > allocations[b] ? a : b);
+    const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
     console.log(`  top: ${top} (${allocations[top].toFixed(1)}%)`);
   } catch (e) {
     console.log(`  FAILED: ${e.message}`);
@@ -82,58 +95,89 @@ for (const stage of stages) {
 // ---------------------------------------------------------------------------
 
 console.log(`\n${'-'.repeat(60)}`);
-console.log('Staged combined allocation (website call)...');
+let combined, finalFunding, stageResults, perMethod;
 
-const { allocations: combined, funding: finalFunding, stageResults } = computeMultiStageAllocation(
-  dataset.projects,
-  worldviews,
-  stages,
-  dataset.incrementSize,
-  undefined,           // no drOverrides
-  dataset.drStepSize   // mirrors: dataset.drStepSize || 10
-);
+if (isWeighted) {
+  console.log('Weighted-average combined allocation...');
+  const methodEntries = stages.map((s) => ({
+    jsKey: s.method,
+    weight: s.budget / totalBudget,
+    options: s.options ?? {},
+  }));
+  ({
+    allocations: combined,
+    funding: finalFunding,
+    perMethod,
+  } = computeWeightedAllocation(
+    dataset.projects,
+    worldviews,
+    methodEntries,
+    totalBudget,
+    dataset.incrementSize,
+    { drStepSize: dataset.drStepSize }
+  ));
 
-console.log('\nStage-by-stage contributions ($M):');
-let cumulative = {};
-for (const fid of fundIds) cumulative[fid] = 0;
-for (let i = 0; i < stageResults.length; i++) {
-  const contrib = stageResults[i].funding;
-  for (const fid of fundIds) cumulative[fid] += contrib[fid] || 0;
-  const stageTotal = Object.values(contrib).reduce((s, v) => s + v, 0);
-  const gwContrib = contrib['givewell'] || 0;
-  const gwCum = cumulative['givewell'];
-  console.log(`  Stage ${i+1} (${stages[i].method.padEnd(20)} $${stages[i].budget}M allocated):  givewell +$${gwContrib.toFixed(1)}M  cumul=$${gwCum.toFixed(1)}M  stageTotal=$${stageTotal.toFixed(1)}M`);
+  console.log('\nPer-method contributions ($M):');
+  for (const stage of stages) {
+    const entry = perMethod[stage.method];
+    if (!entry) continue;
+    const { allocations: mAlloc, normWeight } = entry;
+    const gwContrib = ((mAlloc['givewell'] ?? 0) * normWeight * totalBudget) / 100;
+    const methodTotal = Object.values(mAlloc).reduce(
+      (s, v) => s + (v * normWeight * totalBudget) / 100,
+      0
+    );
+    console.log(
+      `  ${stage.method.padEnd(22)}  weight=${normWeight.toFixed(3)}  givewell +$${gwContrib.toFixed(1)}M  total=$${methodTotal.toFixed(1)}M`
+    );
+  }
+} else {
+  console.log('Staged combined allocation (website call)...');
+  ({
+    allocations: combined,
+    funding: finalFunding,
+    stageResults,
+  } = computeMultiStageAllocation(
+    dataset.projects,
+    worldviews,
+    stages,
+    dataset.incrementSize,
+    undefined,
+    dataset.drStepSize
+  ));
+
+  console.log('\nStage-by-stage contributions ($M):');
+  let cumulative = {};
+  for (const fid of fundIds) cumulative[fid] = 0;
+  for (let i = 0; i < stageResults.length; i++) {
+    const contrib = stageResults[i].funding;
+    for (const fid of fundIds) cumulative[fid] += contrib[fid] || 0;
+    const stageTotal = Object.values(contrib).reduce((s, v) => s + v, 0);
+    const gwContrib = contrib['givewell'] || 0;
+    const gwCum = cumulative['givewell'];
+    console.log(
+      `  Stage ${i + 1} (${stages[i].method.padEnd(20)} $${stages[i].budget}M allocated):  givewell +$${gwContrib.toFixed(1)}M  cumul=$${gwCum.toFixed(1)}M  stageTotal=$${stageTotal.toFixed(1)}M`
+    );
+  }
 }
-console.log(`  Final funding: givewell=$${finalFunding['givewell']?.toFixed(1)}M  total=$${Object.values(finalFunding).reduce((s,v)=>s+v,0).toFixed(1)}M`);
+console.log(
+  `  Final funding: givewell=$${finalFunding['givewell']?.toFixed(1)}M  total=$${Object.values(
+    finalFunding
+  )
+    .reduce((s, v) => s + v, 0)
+    .toFixed(1)}M`
+);
 
 const ranks = rankDict(combined);
 
-// ---------------------------------------------------------------------------
-// Print results table
-// ---------------------------------------------------------------------------
-
-const colW = 9;
-const validStages = stages.filter(s => methodAllocs[s.method]);
 console.log(`\n${'-'.repeat(60)}`);
-console.log('Allocation by fund (%):\n');
-let hdr = `  ${'Fund'.padEnd(30)}`;
-for (const s of validStages) hdr += ` ${s.method.slice(0, colW).padStart(colW)}`;
-hdr += ` ${'STAGED'.padStart(colW)}`;
-console.log(hdr);
-console.log('  ' + '-'.repeat(30) + (' ' + '-'.repeat(colW)).repeat(validStages.length + 1));
-for (const fid of fundIds) {
-  let row = `  ${fid.padEnd(30)}`;
-  for (const s of validStages) row += ` ${(methodAllocs[s.method][fid] ?? 0).toFixed(1).padStart(colW)}`;
-  row += ` ${combined[fid].toFixed(1).padStart(colW)}`;
-  console.log(row);
-}
-
-console.log(`\n${'-'.repeat(60)}`);
-console.log('Staged combined allocation (ranked):');
+console.log(`${isWeighted ? 'Weighted-average' : 'Staged'} combined allocation (ranked):`);
 const sorted = fundIds.slice().sort((a, b) => combined[b] - combined[a]);
 for (const fid of sorted) {
-  const bar = '█'.repeat(Math.round(combined[fid] / 100 * 40));
-  console.log(`  ${String(ranks[fid]).padStart(2)}. ${fid.padEnd(30)} ${combined[fid].toFixed(1).padStart(5)}%  ${bar}`);
+  const bar = '█'.repeat(Math.round((combined[fid] / 100) * 40));
+  console.log(
+    `  ${String(ranks[fid]).padStart(2)}. ${fid.padEnd(30)} ${combined[fid].toFixed(1).padStart(5)}%  ${bar}`
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -142,37 +186,63 @@ for (const fid of sorted) {
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
-// CSV 1: per-method vs staged allocation (%)
-const rows = fundIds.map(fid => {
+// CSV 1: per-method vs combined allocation (%)
+const combinedColName = isWeighted ? 'weighted_combined' : 'staged_combined';
+const rows = fundIds.map((fid) => {
   const row = { fund: fid };
-  for (const s of stages) row[s.method] = methodAllocs[s.method] ? methodAllocs[s.method][fid].toFixed(2) : '';
-  row['staged_combined'] = combined[fid].toFixed(2);
+  for (const s of stages)
+    row[s.method] = methodAllocs[s.method] ? methodAllocs[s.method][fid].toFixed(2) : '';
+  row[combinedColName] = combined[fid].toFixed(2);
   return row;
 });
 writeCsv(
   join(OUTPUT_DIR, 'baseline_allocation.csv'),
-  ['fund', ...stages.map(s => s.method), 'staged_combined'],
+  ['fund', ...stages.map((s) => s.method), combinedColName],
   rows
 );
 
-// CSV 2: per-stage funding contributions ($M) and cumulative totals
-const stageLabels = stages.map((s, i) => `stage${i + 1}_${s.method}`);
-const cumAfterLabels = stages.map((s, i) => `cum_after_stage${i + 1}`);
-const stageRows = fundIds.map(fid => {
-  const row = { fund: fid };
-  let cum = 0;
-  for (let i = 0; i < stages.length; i++) {
-    const contrib = stageResults[i].funding[fid] || 0;
-    cum += contrib;
-    row[stageLabels[i]] = contrib.toFixed(2);
-    row[cumAfterLabels[i]] = cum.toFixed(2);
-  }
-  row['total_funding_M'] = finalFunding[fid].toFixed(2);
-  row['allocation_pct'] = combined[fid].toFixed(2);
-  return row;
-});
-writeCsv(
-  join(OUTPUT_DIR, 'baseline_by_stage.csv'),
-  ['fund', ...stageLabels, ...cumAfterLabels, 'total_funding_M', 'allocation_pct'],
-  stageRows
-);
+// CSV 2: per-stage (staged) or per-method (weighted) funding contributions ($M)
+if (isWeighted) {
+  // Each *_alloc_M column shows what that method independently allocates on the
+  // full $200M budget (pre-weighting). Columns each sum to $200M.
+  // total_funding_M is the credence-weighted average across methods.
+  const methodAllocLabels = stages.map((s) => `${s.method}_alloc_M`);
+  const methodRows = fundIds.map((fid) => {
+    const row = { fund: fid };
+    for (const stage of stages) {
+      const entry = perMethod[stage.method];
+      row[`${stage.method}_alloc_M`] = entry
+        ? ((entry.allocations[fid] * totalBudget) / 100).toFixed(2)
+        : '';
+    }
+    row['total_funding_M'] = finalFunding[fid].toFixed(2);
+    row['allocation_pct'] = combined[fid].toFixed(2);
+    return row;
+  });
+  writeCsv(
+    join(OUTPUT_DIR, 'baseline_by_method.csv'),
+    ['fund', ...methodAllocLabels, 'total_funding_M', 'allocation_pct'],
+    methodRows
+  );
+} else {
+  const stageLabels = stages.map((s, i) => `stage${i + 1}_${s.method}`);
+  const cumAfterLabels = stages.map((s, i) => `cum_after_stage${i + 1}`);
+  const stageRows = fundIds.map((fid) => {
+    const row = { fund: fid };
+    let cum = 0;
+    for (let i = 0; i < stages.length; i++) {
+      const contrib = stageResults[i].funding[fid] || 0;
+      cum += contrib;
+      row[stageLabels[i]] = contrib.toFixed(2);
+      row[cumAfterLabels[i]] = cum.toFixed(2);
+    }
+    row['total_funding_M'] = finalFunding[fid].toFixed(2);
+    row['allocation_pct'] = combined[fid].toFixed(2);
+    return row;
+  });
+  writeCsv(
+    join(OUTPUT_DIR, 'baseline_by_stage.csv'),
+    ['fund', ...stageLabels, ...cumAfterLabels, 'total_funding_M', 'allocation_pct'],
+    stageRows
+  );
+}

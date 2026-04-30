@@ -1,0 +1,9 @@
+combo,sensitivity_index,most_affected_fund,most_affected_delta
+gcr_high_aw_low_power,4.4950,navigation_fund_general,-3.48
+gcr_and_aw_low_power,4.2750,navigation_fund_general,-3.48
+aw_low_power,3.7650,navigation_fund_general,-3.48
+gcr_and_aw_high_power,3.5550,longview_ai,1.66
+gcr_high_power,1.9300,sentinel_bio,1.93
+aw_high_power,1.8400,navigation_fund_general,1.27
+gcr_low_aw_high_power,1.8100,navigation_fund_general,1.27
+gcr_low_power,0.7100,sentinel_bio,-0.61

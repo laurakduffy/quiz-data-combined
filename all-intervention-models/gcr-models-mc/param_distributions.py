@@ -299,16 +299,14 @@ AI_REL_REDUCTION_PER_M_DIST = {
 
 SENTINEL_COUNTERFACTUAL_DIST = {
     "dist": "beta",
-    "ci_90": [0.73, 0.97],
+    "ci_90": [0.70, 0.96],
     "bounds": [0.1, 1.0],
-    # Central ~0.875. 90% CI: most draws between 0.73 and 0.97.
 }
 
 NUCLEAR_COUNTERFACTUAL_DIST = {
     "dist": "beta",
-    "ci_90": [0.68, 0.96],
+    "ci_90": [0.70, 0.96],
     "bounds": [0.1, 1.0],
-    # Central ~0.85. Slightly wider CI than Sentinel given higher p_zero scenario.
 }
 
 AI_COUNTERFACTUAL_DIST = {

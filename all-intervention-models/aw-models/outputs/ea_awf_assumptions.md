@@ -1,12 +1,12 @@
 # AW Fund Marginal CE: Assumptions Register
 
-Generated: 2026-04-20
+Generated: 2026-04-29
 
 ## Fund Configuration
 
 - **Project ID**: ea_awf
 - **Display name**: EA Animal Welfare Fund
-- **Annual budget**: $7.0M/year
+- **Annual budget**: $6.6M/year
 
 ## CE Source
 

@@ -27,7 +27,7 @@ N_SAMPLES = 10000
 
 np.random.seed(43)
 
-TIME_EFFECTS_FAR = True
+TIME_EFFECTS_FAR = False
 
 # Cost-effectiveness percentiles per $1M (10th, 50th, 90th).
 percentile_inputs = {
@@ -249,16 +249,39 @@ def apply_risk_adjustments_to_simulations(effect_per_M_by_time):
     return df
 
 # TODO: rewrite
+def _save_raw_samples(effect_per_M_by_time):
+    """Persist per-period effect samples so sensitivity analysis can recompute WLU exactly.
+
+    Saves a compressed NumPy archive to leaf-models/samples/leaf_raw_samples.npz.
+    Keys follow the pattern  {effect_type}_t{0-5}  matching the t0-t5 convention
+    used in the risk-adjusted CSV and the combined dataset JSON.
+    """
+    time_horizon_keys = [
+        '0-5 years', '5-10 years', '10-20 years',
+        '20-100 years', '100-500 years', '500+ years',
+    ]
+    samples_dir = SCRIPT_DIR / 'samples'
+    os.makedirs(samples_dir, exist_ok=True)
+    npz_data = {}
+    for effect_type, time_dict in effect_per_M_by_time.items():
+        for t_idx, th in enumerate(time_horizon_keys):
+            if th in time_dict:
+                npz_data[f'{effect_type}_t{t_idx}'] = time_dict[th]
+    out_path = str(samples_dir / 'leaf_raw_samples.npz')
+    np.savez_compressed(out_path, **npz_data)
+    print(f'✓ Raw samples saved to: {out_path}')
+
+
 def main():
     print("=" * 70)
     print("LEAF COST-EFFECTIVENESS MODELING WITH RISK ADJUSTMENTS")
     print("=" * 70)
-    
+
     # Generate simulations (original code)
     print("\n1. Generating cost-effectiveness simulations...")
-    
+
     sample_units_value_per_M = sample_impacts_per_m()
-    
+
     # Create histograms before splitting by time
     print("\n2. Creating histograms...")
     create_and_save_histograms(sample_units_value_per_M)
@@ -266,6 +289,9 @@ def main():
 
     effect_per_M_by_time = get_impact_per_M_by_time(
         sample_units_value_per_M, temporal_breakdown_by_type_dict, to_print=True)
+
+    # Persist raw samples for sensitivity analysis (exact WLU recomputation).
+    _save_raw_samples(effect_per_M_by_time)
 
     # Create summary statistics (original code)
     print("\n3. Creating summary statistics...")

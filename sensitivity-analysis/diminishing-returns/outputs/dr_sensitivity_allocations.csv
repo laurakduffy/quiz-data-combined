@@ -1,0 +1,10 @@
+combo,ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
+baseline,9.10,7.52,9.78,21.49,3.08,24.27,15.43,9.32
+gcr_low_power,9.10,8.12,9.78,21.39,3.19,24.27,15.43,8.71
+gcr_high_power,9.10,6.52,9.58,21.49,2.35,24.27,15.43,11.25
+aw_low_power,10.39,8.68,10.40,21.49,3.28,23.99,11.95,9.82
+aw_high_power,8.06,7.68,9.59,21.87,2.88,24.31,16.70,8.92
+gcr_and_aw_low_power,10.39,9.68,10.40,21.39,3.29,23.99,11.95,8.91
+gcr_and_aw_high_power,8.07,6.02,9.59,23.15,2.25,24.31,16.67,9.95
+gcr_low_aw_high_power,8.06,7.86,9.63,21.65,3.09,24.31,16.70,8.71
+gcr_high_aw_low_power,10.39,8.38,10.20,21.49,2.35,23.99,11.95,11.25

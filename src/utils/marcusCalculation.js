@@ -809,19 +809,20 @@ function voteNashBargaining(
   }
 
   if (!Object.keys(feasibleScores).length) {
-    // No project Pareto-dominates the disagreement point. Allocate the full
-    // remaining budget proportionally (budget_by_credence style) and stop.
-    const budget = remaining ?? increment;
+    // No project Pareto-dominates the disagreement point for this increment.
+    // Allocate one increment proportionally (budget_by_credence style) and
+    // let the loop continue. This respects diminishing returns: once a fund's
+    // DR hits zero its marginal value drops to zero and it stops being chosen,
+    // so excess budget naturally flows to the next-best fund (e.g. GiveWell).
     return {
       ..._computeBudgetByCredenceAllocation(
         worldviewScores,
         credences,
-        budget,
+        increment,
         projects,
         tieBreak,
         rng
       ),
-      __stopAfterApplying__: true,
       __scores__: {
         feasibleScores,
         fallbackScores,

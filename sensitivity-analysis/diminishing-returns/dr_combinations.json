@@ -1,0 +1,54 @@
+{
+    "gcr_low_power": {
+        "sentinel_bio": "low",
+        "longview_nuclear": "low",
+        "longview_ai": "low"
+    },
+    "gcr_high_power": {
+        "sentinel_bio": "high",
+        "longview_nuclear": "high",
+        "longview_ai": "high"
+    },
+    "aw_low_power": {
+        "ea_awf": "low",
+        "navigation_fund_cagefree": "low",
+        "navigation_fund_general": "low"
+    },
+    "aw_high_power": {
+        "ea_awf": "high",
+        "navigation_fund_cagefree": "high",
+        "navigation_fund_general": "high"
+    },
+    "gcr_and_aw_low_power": {
+        "sentinel_bio": "low",
+        "longview_nuclear": "low",
+        "longview_ai": "low",
+        "ea_awf": "low",
+        "navigation_fund_cagefree": "low",
+        "navigation_fund_general": "low"
+    },
+    "gcr_and_aw_high_power": {
+        "sentinel_bio": "high",
+        "longview_nuclear": "high",
+        "longview_ai": "high",
+        "ea_awf": "high",
+        "navigation_fund_cagefree": "high",
+        "navigation_fund_general": "high"
+    },
+    "gcr_low_aw_high_power": {
+        "sentinel_bio": "low",
+        "longview_nuclear": "low",
+        "longview_ai": "low",
+        "ea_awf": "high",
+        "navigation_fund_cagefree": "high",
+        "navigation_fund_general": "high"
+    },
+    "gcr_high_aw_low_power": {
+        "sentinel_bio": "high",
+        "longview_nuclear": "high",
+        "longview_ai": "high",
+        "ea_awf": "low",
+        "navigation_fund_cagefree": "low",
+        "navigation_fund_general": "low"
+    }
+}

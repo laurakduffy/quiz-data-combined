@@ -22,8 +22,8 @@ Shared cross-fund,persistence_effect,lognormal,,1.104,1.594,2.531,3.321,5.236,8.
 Rel risk reduction per $1M,sentinel_rel_per_1m,loguniform,,4.411e-05,4.513e-05,5.003e-05,5.698e-05,8.345e-05,1.576e-04,2.990e-04,4.407e-04,5.002e-04,5.541e-04,5.669e-04,2.047e-04
 Rel risk reduction per $1M,nuclear_rel_per_1m,loguniform,,4.411e-05,4.514e-05,4.990e-05,5.675e-05,8.329e-05,1.583e-04,3.008e-04,4.406e-04,5.004e-04,5.542e-04,5.667e-04,2.051e-04
 Rel risk reduction per $1M,ai_rel_per_1m,loguniform,,8.822e-06,9.030e-06,1.002e-05,1.139e-05,1.676e-05,3.168e-05,5.988e-05,8.798e-05,9.999e-05,1.107e-04,1.134e-04,4.099e-05
-Counterfactual factor,sentinel_counterfactual,beta,,0.5523,0.6503,0.7297,0.7693,0.8299,0.8864,0.9295,0.9576,0.9701,0.9858,0.9946,0.8728
-Counterfactual factor,nuclear_counterfactual,beta,,0.4963,0.5919,0.6808,0.7249,0.7934,0.8585,0.91,0.9449,0.9603,0.9805,0.9927,0.8445
+Counterfactual factor,sentinel_counterfactual,beta,,0.5196,0.6183,0.6997,0.7408,0.8046,0.8653,0.913,0.9453,0.9602,0.9795,0.9914,0.8521
+Counterfactual factor,nuclear_counterfactual,beta,,0.5274,0.6178,0.7007,0.7417,0.805,0.8651,0.9129,0.9457,0.9603,0.9798,0.992,0.8523
 Counterfactual factor,ai_counterfactual,beta,,0.3025,0.4007,0.4996,0.5534,0.6408,0.7321,0.8123,0.871,0.8998,0.9413,0.9714,0.7203
 Year effect starts,sentinel_year_effect_starts,lognormal,,0.7223,1.06,1.506,1.809,2.463,3.466,4.877,6.644,8.004,11.32,16.6,3.944
 Year effect starts,nuclear_year_effect_starts,lognormal,,0.6848,1.019,1.501,1.857,2.636,3.885,5.739,8.161,10.06,14.87,22.4,4.593

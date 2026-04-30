@@ -1,0 +1,4 @@
+scenario,max_addl_spend_multiplier,sensitivity_index,most_affected_fund,most_affected_delta
+max_spend_2_5x,2.5,14.8000,givewell,13.21
+max_spend_7_5x,7.5,8.1800,navigation_fund_general,-4.53
+max_spend_10x,10,12.6500,navigation_fund_general,-8.09

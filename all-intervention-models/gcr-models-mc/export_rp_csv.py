@@ -158,12 +158,14 @@ def _compute_sub_extinction_rows(profile, n_samples=100000, verbose=True, seed=4
         annual_evs = np.where(is_zero, 0.0, annual_evs)
         annual_evs = np.where(is_harm, -annual_evs * harm_mult_samples, annual_evs)
 
-        horizon_data = {}
+        horizon_data   = {}
+        horizon_per_1m = {}
         for pk, (t_start, t_end) in zip(all_pk, _PERIOD_BOUNDS):
             yrs        = _years_in_period(persistence_samples, year_effect_starts_samples, t_start, t_end)
             period_evs = annual_evs * yrs
             per_1m     = period_evs / budget * 1e6
-            horizon_data[pk] = compute_risk_profiles(per_1m)
+            horizon_data[pk]   = compute_risk_profiles(per_1m)
+            horizon_per_1m[pk] = per_1m
 
         total_per_1m    = annual_evs * persistence_samples / budget * 1e6
         total_profiles  = compute_risk_profiles(total_per_1m)
@@ -185,8 +187,9 @@ def _compute_sub_extinction_rows(profile, n_samples=100000, verbose=True, seed=4
                 "recipient_type": tier["recipient_type"],
                 "tier_name":      tier["tier_name"],
             },
-            "horizon_data": horizon_data,
-            "total_per_1m": total_per_1m,
+            "horizon_data":   horizon_data,
+            "horizon_per_1m": horizon_per_1m,
+            "total_per_1m":   total_per_1m,
         })
 
     return rows
@@ -275,10 +278,12 @@ def run_fund_and_extract(fund_key, n_samples=1000000, n_batches = 10, verbose=Tr
     all_period_keys = SHORT_PERIOD_KEYS + ["after_500_plus"]
 
     # counterfactual_factor is applied per-sample inside run_monte_carlo.
-    horizon_data = {}
+    horizon_data   = {}
+    horizon_per_1m = {}
     for pk in all_period_keys:
         per_1m = horizon_raw[pk] / budget * 1e6
-        horizon_data[pk] = compute_risk_profiles(per_1m)
+        horizon_data[pk]   = compute_risk_profiles(per_1m)
+        horizon_per_1m[pk] = per_1m
 
     total_per_1m = total_raw / budget * 1e6
     total_profiles = compute_risk_profiles(total_per_1m)
@@ -303,11 +308,12 @@ def run_fund_and_extract(fund_key, n_samples=1000000, n_batches = 10, verbose=Tr
     sub_ext_rows = _compute_sub_extinction_rows(profile, n_samples=n_samples, verbose=verbose, seed=seed)
 
     return {
-        "profile": profile,
-        "horizon_data": horizon_data,
-        "summary": summary,
-        "sub_ext_rows": sub_ext_rows,
-        "total_per_1m": total_per_1m,
+        "profile":               profile,
+        "horizon_data":          horizon_data,
+        "horizon_per_1m":        horizon_per_1m,
+        "summary":               summary,
+        "sub_ext_rows":          sub_ext_rows,
+        "total_per_1m":          total_per_1m,
         "absolute_total_values": absolute_total_values_all,
     }
 
@@ -744,7 +750,28 @@ def main():
 
     # Write main effects CSV
     write_rp_csv(fund_results, args.output, verbose=verbose)
-    
+
+    # Persist raw per-period samples for sensitivity analysis (exact WLU recomputation).
+    # GCR samples can be large (1M draws per period × 3 funds).  savez_compressed
+    # typically reduces them 5-10× so the files stay manageable.
+    _all_pk = SHORT_PERIOD_KEYS + ["after_500_plus"]
+    _period_to_tidx = {pk: i for i, pk in enumerate(_all_pk)}
+    _samples_dir = Path(args.output).parent / 'samples'
+    _samples_dir.mkdir(parents=True, exist_ok=True)
+    print(f"\nSaving raw samples to {_samples_dir} ...")
+    for fr in fund_results:
+        fund_key = fr["profile"]["export"]["project_id"]
+        npz_data = {}
+        for pk, arr in fr["horizon_per_1m"].items():
+            npz_data[f't{_period_to_tidx[pk]}'] = arr
+        for sub in fr.get("sub_ext_rows", []):
+            eid = sub["export_meta"]["effect_id"]
+            for pk, arr in sub["horizon_per_1m"].items():
+                npz_data[f'{eid}_t{_period_to_tidx[pk]}'] = arr
+        out_path = str(_samples_dir / f'gcr_raw_samples_{fund_key}.npz')
+        np.savez_compressed(out_path, **npz_data)
+        print(f"  Saved: {out_path}")
+
     n_effect_rows = sum(
         1 + len(fr.get("sub_ext_rows", []))
         for fr in fund_results

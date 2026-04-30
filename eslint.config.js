@@ -70,6 +70,29 @@ export default [
       },
     },
   },
+  // Node.js scripts (sensitivity analysis, CLI scripts, lambda functions)
+  {
+    files: [
+      'sensitivity-analysis/**/*.js',
+      'lambda/**/*.js',
+      'lambda/**/*.mjs',
+      'scripts/**/*.js',
+      'legacy/**/*.js',
+    ],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        require: 'readonly',
+        module: 'readonly',
+        exports: 'readonly',
+        Buffer: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+      },
+    },
+  },
   // Disable ESLint rules that conflict with Prettier
   prettierConfig,
   // Ignore build output and dependencies

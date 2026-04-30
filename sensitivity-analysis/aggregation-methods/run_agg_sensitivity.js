@@ -25,10 +25,19 @@ import { join, dirname } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
 
-import { computeMarcusAllocation, computeMultiStageAllocation } from '../../src/utils/marcusCalculation.js';
 import {
-  loadJson, loadWorldviews, loadDataset, pickDefaultDataset,
-  rankDict, writeCsv, parseArgs,
+  computeMarcusAllocation,
+  computeMultiStageAllocation,
+} from '../../src/utils/marcusCalculation.js';
+import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
+import {
+  loadJson,
+  loadWorldviews,
+  loadDataset,
+  pickDefaultDataset,
+  rankDict,
+  writeCsv,
+  parseArgs,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -43,25 +52,37 @@ const methods = loadJson(join(__dirname, 'agg_methods_sensitivity.json'));
 const worldviews = loadWorldviews(
   args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
 );
-const { projects, incrementSize: incrementM, drStepSize } = loadDataset(
-  args.base ?? pickDefaultDataset(REPO_ROOT)
-);
+const {
+  projects,
+  incrementSize: incrementM,
+  drStepSize,
+} = loadDataset(args.base ?? pickDefaultDataset(REPO_ROOT));
 const { stages: baselineStages } = loadJson(join(__dirname, '..', 'baseline.json'));
 const totalBudget = baselineStages.reduce((s, st) => s + st.budget, 0);
 
 const fundIds = Object.keys(projects).sort();
+const isWeighted = args.approach === 'weighted';
+// Map method jsKey -> options from baseline.json stages (e.g. nashBargaining disagreementPoint)
+const stageOptionsMap = Object.fromEntries(baselineStages.map((s) => [s.method, s.options ?? {}]));
 
 console.log('\nAggregation method credence sensitivity');
 console.log(`  Worldviews:  ${worldviews.length} (from specialBlend.json)`);
-console.log(`  Methods:     ${methods.map(m => m.label).join(', ')}`);
-console.log(`  Total budget: $${totalBudget}M (from baseline.json),  increment: $${incrementM}M,  drStepSize: $${drStepSize}M`);
+console.log(`  Methods:     ${methods.map((m) => m.label).join(', ')}`);
+console.log(
+  `  Total budget: $${totalBudget}M (from baseline.json),  increment: $${incrementM}M,  drStepSize: $${drStepSize}M`
+);
 console.log(`  Funds:       ${fundIds.length}`);
+console.log(`  Approach:    ${isWeighted ? 'weighted-average' : 'staged'}`);
 
 if (args.dryRun) {
   console.log('\n  DRY RUN — credence bounds:');
-  console.log(`  ${'Method'.padEnd(25)}  ${'Best'.padStart(6)}  ${'Low'.padStart(6)}  ${'High'.padStart(6)}`);
+  console.log(
+    `  ${'Method'.padEnd(25)}  ${'Best'.padStart(6)}  ${'Low'.padStart(6)}  ${'High'.padStart(6)}`
+  );
   for (const m of methods) {
-    console.log(`  ${m.label.padEnd(25)}  ${m.best_guess.toFixed(2).padStart(6)}  ${m.low.toFixed(2).padStart(6)}  ${m.high.toFixed(2).padStart(6)}`);
+    console.log(
+      `  ${m.label.padEnd(25)}  ${m.best_guess.toFixed(2).padStart(6)}  ${m.low.toFixed(2).padStart(6)}  ${m.high.toFixed(2).padStart(6)}`
+    );
   }
   console.log(`\n  Form 1: ${methods.length} single-method runs (full budget each).`);
   console.log(`  Form 2: ${methods.length * 2} staged scenarios.`);
@@ -80,10 +101,15 @@ for (const m of methods) {
   process.stdout.write(`  ${m.label}...`);
   try {
     const { allocations } = computeMarcusAllocation(
-      projects, worldviews, m.jsKey, totalBudget, incrementM, { drStepSize }
+      projects,
+      worldviews,
+      m.jsKey,
+      totalBudget,
+      incrementM,
+      { drStepSize }
     );
     methodAllocs[m.jsKey] = allocations;
-    const top = fundIds.reduce((a, b) => allocations[a] > allocations[b] ? a : b);
+    const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
     console.log(`  top fund: ${top} (${allocations[top].toFixed(1)}%)`);
   } catch (e) {
     console.log(`  FAILED: ${e.message}`);
@@ -92,7 +118,7 @@ for (const m of methods) {
 }
 
 // Print Form 1 table
-const validMethods = methods.filter(m => methodAllocs[m.jsKey] !== null);
+const validMethods = methods.filter((m) => methodAllocs[m.jsKey] !== null);
 const colW = 10;
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Form 1 — Allocation (%) per method:');
@@ -101,7 +127,8 @@ for (const m of validMethods) hdr += `  ${m.label.slice(0, colW).padStart(colW)}
 console.log(hdr);
 for (const fid of fundIds) {
   let row = `  ${fid.padEnd(38)}`;
-  for (const m of validMethods) row += `  ${(methodAllocs[m.jsKey][fid] ?? 0).toFixed(1).padStart(colW)}`;
+  for (const m of validMethods)
+    row += `  ${(methodAllocs[m.jsKey][fid] ?? 0).toFixed(1).padStart(colW)}`;
   console.log(row);
 }
 
@@ -122,13 +149,36 @@ writeCsv(join(OUTPUT_DIR, 'method_allocations.csv'), ['method', ...fundIds], for
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Form 2 — Varying one method credence at a time (staged approach)...');
 
-// Baseline: use baseline.json stages directly (best_guess × totalBudget = baseline budgets)
-console.log('\nComputing baseline (staged, best-guess credences = baseline.json)...');
-const { allocations: baseAlloc } = computeMultiStageAllocation(
-  projects, worldviews, baselineStages, incrementM, undefined, drStepSize
+console.log(
+  `\nComputing baseline (${isWeighted ? 'weighted-average' : 'staged'}, best-guess credences)...`
 );
+let baseAlloc;
+if (isWeighted) {
+  const baselineMethods = methods.map((m) => ({
+    jsKey: m.jsKey,
+    weight: m.best_guess,
+    options: stageOptionsMap[m.jsKey] ?? {},
+  }));
+  ({ allocations: baseAlloc } = computeWeightedAllocation(
+    projects,
+    worldviews,
+    baselineMethods,
+    totalBudget,
+    incrementM,
+    { drStepSize }
+  ));
+} else {
+  ({ allocations: baseAlloc } = computeMultiStageAllocation(
+    projects,
+    worldviews,
+    baselineStages,
+    incrementM,
+    undefined,
+    drStepSize
+  ));
+}
 const baseRanks = rankDict(baseAlloc);
-const topBase = fundIds.reduce((a, b) => baseAlloc[a] > baseAlloc[b] ? a : b);
+const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 
 const byFundRows = [];
@@ -143,39 +193,72 @@ for (const m of methods) {
     const scenario = `${m.label}_${bound}`;
 
     // Renormalize other methods proportionally so total credence stays 1
-    const othersBgSum = methods.filter(x => x.jsKey !== m.jsKey).reduce((s, x) => s + x.best_guess, 0);
+    const othersBgSum = methods
+      .filter((x) => x.jsKey !== m.jsKey)
+      .reduce((s, x) => s + x.best_guess, 0);
     const remaining = Math.max(0, 1 - boundVal);
     const newCreds = {};
     for (const x of methods) {
-      newCreds[x.jsKey] = x.jsKey === m.jsKey
-        ? boundVal
-        : (othersBgSum > 0 ? x.best_guess * remaining / othersBgSum : 0);
+      newCreds[x.jsKey] =
+        x.jsKey === m.jsKey
+          ? boundVal
+          : othersBgSum > 0
+            ? (x.best_guess * remaining) / othersBgSum
+            : 0;
     }
 
-    // Build stages: each method's budget = its new credence share × totalBudget
-    const newStages = methods
-      .filter(x => newCreds[x.jsKey] > 0)
-      .map(x => ({ method: x.jsKey, budget: Math.round(newCreds[x.jsKey] * totalBudget), options: {} }));
-
     process.stdout.write(`  ${scenario.padEnd(35)}`);
-    const { allocations: newAlloc } = computeMultiStageAllocation(
-      projects, worldviews, newStages, incrementM, undefined, drStepSize
-    );
+    let newAlloc;
+    if (isWeighted) {
+      const newMethods = methods.map((x) => ({
+        jsKey: x.jsKey,
+        weight: newCreds[x.jsKey],
+        options: stageOptionsMap[x.jsKey] ?? {},
+      }));
+      ({ allocations: newAlloc } = computeWeightedAllocation(
+        projects,
+        worldviews,
+        newMethods,
+        totalBudget,
+        incrementM,
+        { drStepSize }
+      ));
+    } else {
+      // Build stages: each method's budget = its new credence share × totalBudget
+      const newStages = methods
+        .filter((x) => newCreds[x.jsKey] > 0)
+        .map((x) => ({
+          method: x.jsKey,
+          budget: Math.round(newCreds[x.jsKey] * totalBudget),
+          options: {},
+        }));
+      ({ allocations: newAlloc } = computeMultiStageAllocation(
+        projects,
+        worldviews,
+        newStages,
+        incrementM,
+        undefined,
+        drStepSize
+      ));
+    }
     const newRanks = rankDict(newAlloc);
 
     const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
-    const scaledSi = Math.abs(delta) > 1e-9 ? si / Math.abs(delta) : null;
+    const scaledSi = Math.abs(delta) > 1e-9 ? si / (Math.abs(delta) * 100) : null;
     const mostAff = fundIds.reduce((a, b) =>
       Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b
     );
 
-    const scaledStr = scaledSi !== null ? `  scaled=${scaledSi.toFixed(2)}pp/unit` : '  (no change)';
+    const scaledStr = scaledSi !== null ? `  scaled=${scaledSi.toFixed(2)}pp/pp` : '  (no change)';
     console.log(`  SI=${si.toFixed(4)}pp${scaledStr}`);
 
     for (const fid of fundIds) {
       byFundRows.push({
-        scenario, method: m.label, bound,
-        credence_base: bestVal.toFixed(4), credence_scenario: boundVal.toFixed(4),
+        scenario,
+        method: m.label,
+        bound,
+        credence_base: bestVal.toFixed(4),
+        credence_scenario: boundVal.toFixed(4),
         project_id: fid,
         base_alloc: baseAlloc[fid].toFixed(2),
         new_alloc: newAlloc[fid].toFixed(2),
@@ -185,14 +268,20 @@ for (const m of methods) {
     }
 
     form2RawRows.push({
-      scenario, method: m.label, bound,
-      credence_base: bestVal.toFixed(4), credence_scenario: boundVal.toFixed(4),
-      ...Object.fromEntries(fundIds.map(f => [f, newAlloc[f].toFixed(2)])),
+      scenario,
+      method: m.label,
+      bound,
+      credence_base: bestVal.toFixed(4),
+      credence_scenario: boundVal.toFixed(4),
+      ...Object.fromEntries(fundIds.map((f) => [f, newAlloc[f].toFixed(2)])),
     });
 
     indexRows.push({
-      scenario, method: m.label, bound,
-      credence_base: bestVal.toFixed(4), credence_scenario: boundVal.toFixed(4),
+      scenario,
+      method: m.label,
+      bound,
+      credence_base: bestVal.toFixed(4),
+      credence_scenario: boundVal.toFixed(4),
       sensitivity_index: si.toFixed(4),
       scaled_SI: scaledSi !== null ? scaledSi.toFixed(4) : '',
       most_affected_fund: mostAff,
@@ -206,18 +295,43 @@ indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitiv
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Form 2 — Sensitivity index ranking:');
 for (const r of indexRows) {
-  const scaledStr = r.scaled_SI ? `  scaled=${r.scaled_SI.padStart(7)}pp/unit` : '';
+  const scaledStr = r.scaled_SI ? `  scaled=${r.scaled_SI.padStart(7)}pp/pp` : '';
   console.log(`  ${r.scenario.padEnd(35)}  SI=${r.sensitivity_index.padStart(7)}pp${scaledStr}`);
 }
 
-writeCsv(join(OUTPUT_DIR, 'split_credences_by_fund.csv'),
-  ['scenario', 'method', 'bound', 'credence_base', 'credence_scenario',
-   'project_id', 'base_alloc', 'new_alloc', 'alloc_delta', 'rank_delta'],
-  byFundRows);
-writeCsv(join(OUTPUT_DIR, 'split_credences_allocations.csv'),
+writeCsv(
+  join(OUTPUT_DIR, 'split_credences_by_fund.csv'),
+  [
+    'scenario',
+    'method',
+    'bound',
+    'credence_base',
+    'credence_scenario',
+    'project_id',
+    'base_alloc',
+    'new_alloc',
+    'alloc_delta',
+    'rank_delta',
+  ],
+  byFundRows
+);
+writeCsv(
+  join(OUTPUT_DIR, 'split_credences_allocations.csv'),
   ['scenario', 'method', 'bound', 'credence_base', 'credence_scenario', ...fundIds],
-  form2RawRows);
-writeCsv(join(OUTPUT_DIR, 'split_credences_index.csv'),
-  ['scenario', 'method', 'bound', 'credence_base', 'credence_scenario',
-   'sensitivity_index', 'scaled_SI', 'most_affected_fund', 'most_affected_delta'],
-  indexRows);
+  form2RawRows
+);
+writeCsv(
+  join(OUTPUT_DIR, 'split_credences_index.csv'),
+  [
+    'scenario',
+    'method',
+    'bound',
+    'credence_base',
+    'credence_scenario',
+    'sensitivity_index',
+    'scaled_SI',
+    'most_affected_fund',
+    'most_affected_delta',
+  ],
+  indexRows
+);

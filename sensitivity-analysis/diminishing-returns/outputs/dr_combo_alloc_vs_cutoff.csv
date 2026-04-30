@@ -1,0 +1,9 @@
+fund,baseline_budget_$M,ce_cutoff_$M,baseline_alloc_$M,gcr_low_power_alloc_$M,gcr_high_power_alloc_$M,aw_low_power_alloc_$M,aw_high_power_alloc_$M,gcr_and_aw_low_power_alloc_$M,gcr_and_aw_high_power_alloc_$M,gcr_low_aw_high_power_alloc_$M,gcr_high_aw_low_power_alloc_$M
+ea_awf,6.598,34.0,18.2,18.2,18.2,20.78,16.12,20.78,16.14,16.12,20.78
+givewell,N/A,,15.04,16.24,13.04,17.36,15.36,19.36,12.04,15.72,16.76
+leaf,N/A,302.0,19.56,19.56,19.16,20.8,19.18,20.8,19.18,19.26,20.4
+longview_ai,70.0,352.0,42.98,42.78,42.98,42.98,43.74,42.78,46.3,43.3,42.98
+longview_nuclear,5.7,30.0,6.16,6.38,4.7,6.56,5.76,6.58,4.5,6.18,4.7
+navigation_fund_cagefree,6.145,32.0,48.54,48.54,48.54,47.98,48.62,47.98,48.62,48.62,47.98
+navigation_fund_general,16.675,84.0,30.86,30.86,30.86,23.9,33.4,23.9,33.34,33.4,23.9
+sentinel_bio,7.5,38.0,18.64,17.42,22.5,19.64,17.84,17.82,19.9,17.42,22.5

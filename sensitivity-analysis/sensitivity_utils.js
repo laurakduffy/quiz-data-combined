@@ -12,7 +12,7 @@ export function loadJson(path) {
 export function pickDefaultDataset(repoRoot) {
   const dir = join(repoRoot, 'config', 'datasets');
   const files = readdirSync(dir)
-    .filter(f => /^\d{8}.*\.json$/.test(f))
+    .filter((f) => /^\d{8}.*\.json$/.test(f))
     .sort()
     .reverse();
   if (!files.length) throw new Error(`No dated dataset files found in ${dir}`);
@@ -42,7 +42,10 @@ export function loadWorldviews(path) {
   const data = loadJson(path);
   const wvs = Array.isArray(data) ? data : (data.worldviews ?? Object.values(data));
   const total = wvs.reduce((s, wv) => s + wv.credence, 0);
-  if (total > 0) wvs.forEach(wv => { wv.credence /= total; });
+  if (total > 0)
+    wvs.forEach((wv) => {
+      wv.credence /= total;
+    });
   return wvs;
 }
 
@@ -56,24 +59,24 @@ export function rankDict(alloc) {
 
 function csvCell(v) {
   const s = String(v ?? '');
-  return s.includes(',') || s.includes('"') || s.includes('\n')
-    ? `"${s.replace(/"/g, '""')}"` : s;
+  return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 export function writeCsv(path, fieldnames, rows) {
   mkdirSync(dirname(path), { recursive: true });
   const lines = [fieldnames.map(csvCell).join(',')];
-  for (const row of rows) lines.push(fieldnames.map(f => csvCell(row[f] ?? '')).join(','));
+  for (const row of rows) lines.push(fieldnames.map((f) => csvCell(row[f] ?? '')).join(','));
   writeFileSync(path, lines.join('\n') + '\n', 'utf8');
   console.log(`  Written: ${path}`);
 }
 
 export function parseArgs(argv) {
-  const args = { base: null, worldviewsFile: null, dryRun: false };
+  const args = { base: null, worldviewsFile: null, dryRun: false, approach: 'staged' };
   for (let i = 2; i < argv.length; i++) {
     if (argv[i] === '--dry-run') args.dryRun = true;
-    else if (argv[i] === '--base'            && argv[i + 1]) args.base = argv[++i];
+    else if (argv[i] === '--base' && argv[i + 1]) args.base = argv[++i];
     else if (argv[i] === '--worldviews-file' && argv[i + 1]) args.worldviewsFile = argv[++i];
+    else if (argv[i] === '--approach' && argv[i + 1]) args.approach = argv[++i];
   }
   return args;
 }

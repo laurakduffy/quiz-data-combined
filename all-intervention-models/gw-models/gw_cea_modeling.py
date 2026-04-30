@@ -25,7 +25,7 @@ LIFE_YEARS_PER_LIFE = 60 # assumed for the average life saved by GW
 
 np.random.seed(43)
 
-TIME_EFFECTS_FAR = True
+TIME_EFFECTS_FAR = False
 
 ## overall cost-effectiveness distribution for GW's portfolio, in terms of units value per $1M spent, using GW moral weights. 
 below_8x_dist = sq.lognorm(2, 8, lclip=0.5, rclip=16, credibility=90)
@@ -315,20 +315,43 @@ def apply_risk_adjustments_to_simulations(effect_per_M_by_time):
     return df
 
 
+def _save_raw_samples(effect_per_M_by_time):
+    """Persist per-period effect samples so sensitivity analysis can recompute WLU exactly.
+
+    Saves a compressed NumPy archive to gw-models/samples/gw_raw_samples.npz.
+    Keys follow the pattern  {effect_type}_t{0-5}  matching the t0-t5 convention
+    used in the risk-adjusted CSV and the combined dataset JSON.
+    """
+    time_horizon_keys = [
+        '0-5 years', '5-10 years', '10-20 years',
+        '20-100 years', '100-500 years', '500+ years',
+    ]
+    samples_dir = SCRIPT_DIR / 'samples'
+    os.makedirs(samples_dir, exist_ok=True)
+    npz_data = {}
+    for effect_type, time_dict in effect_per_M_by_time.items():
+        for t_idx, th in enumerate(time_horizon_keys):
+            if th in time_dict:
+                npz_data[f'{effect_type}_t{t_idx}'] = time_dict[th]
+    out_path = str(samples_dir / 'gw_raw_samples.npz')
+    np.savez_compressed(out_path, **npz_data)
+    print(f'✓ Raw samples saved to: {out_path}')
+
+
 def main():
     print("=" * 70)
     print("GIVEWELL COST-EFFECTIVENESS MODELING WITH RISK ADJUSTMENTS")
     print("=" * 70)
-    
+
     # Generate simulations (original code)
     print("\n1. Generating cost-effectiveness simulations...")
     weighted_average_percent_effect_by_type = get_weighted_average_percent_effect_by_type(
         percent_effect_by_type_dict, percent_funding_by_dist_dict, True)
-    
+
     sample_units_value_per_M = sample_units_value_per_m()
     sample_effect_by_type = get_sample_units_value_by_type(
         sample_units_value_per_M, weighted_average_percent_effect_by_type, to_print=True)
-    
+
     distribution_effect_by_type = get_distribution_effect_per_M(
         sample_effect_by_type, to_print=True)
 
@@ -341,6 +364,9 @@ def main():
         distribution_effect_by_type, temporal_breakdown_by_type_dict, to_print=True)
 
     effect_per_M_by_time = convert_lives_saved_to_life_years_saved(effect_per_M_by_time, to_print=True)
+
+    # Persist raw samples for sensitivity analysis (exact WLU recomputation).
+    _save_raw_samples(effect_per_M_by_time)
 
     # Create summary statistics (original code)
     print("\n3. Creating summary statistics...")

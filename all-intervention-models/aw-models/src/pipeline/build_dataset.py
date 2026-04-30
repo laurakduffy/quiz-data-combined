@@ -3,11 +3,18 @@
 Orchestrates: effects computation -> risk profiles -> time allocation -> assembled dataset.
 """
 
+import os
+from pathlib import Path
+
 import numpy as np
 
 from models.effects import compute_all_effects
 from models.risk_profiles import compute_risk_profiles, RISK_PROFILES
 from models.allocate_to_periods import allocate_to_periods, PERIOD_KEYS
+
+# Output directory for raw samples (relative to the aw-models root, two levels up).
+_AW_MODELS_DIR = Path(__file__).parent.parent.parent
+_SAMPLES_DIR = _AW_MODELS_DIR / 'outputs' / 'samples'
 
 
 def build_all_effects(fund_key="ea_awf", verbose=False):
@@ -29,6 +36,8 @@ def build_all_effects(fund_key="ea_awf", verbose=False):
         print("=" * 70)
 
     rows = []
+    # Collect pre-temporal draws keyed by effect_id for later npz save.
+    raw_samples_by_effect = {}
     for effect in effects:
         samples = effect.get("animal_dalys_per_M_samples")
         pct_dict = effect.get("animal_dalys_per_M_pct", {})
@@ -39,6 +48,7 @@ def build_all_effects(fund_key="ea_awf", verbose=False):
             print(f"    Using {len(samples)} empirical samples directly")
 
         draws = np.array(samples, dtype=float)
+        raw_samples_by_effect[effect["effect_id"]] = draws
 
         risk = compute_risk_profiles(draws)
 
@@ -84,6 +94,17 @@ def build_all_effects(fund_key="ea_awf", verbose=False):
                   f"Ambiguity: {risk['ambiguity']:,.0f}")
 
         rows.append(row)
+
+    # Persist raw (pre-temporal) samples for sensitivity analysis.
+    # These are the exact draws fed to compute_risk_profiles(), so scaling them
+    # by K and recomputing gives exact WLU values for any CE multiplier scenario.
+    # Keys: {effect_id}  (one 1-D array per effect, ~10k samples each).
+    project_id = fund_config["project_id"]
+    os.makedirs(_SAMPLES_DIR, exist_ok=True)
+    npz_path = str(_SAMPLES_DIR / f'aw_raw_samples_{project_id}.npz')
+    np.savez_compressed(npz_path, **raw_samples_by_effect)
+    if verbose:
+        print(f"\n  Raw samples saved to: {npz_path}")
 
     return {
         "fund_config": fund_config,
