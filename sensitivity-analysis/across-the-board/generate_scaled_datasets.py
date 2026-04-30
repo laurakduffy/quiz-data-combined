@@ -24,7 +24,7 @@ recompute ALL risk profiles — including WLU — exactly:
 
   GW    → gw-models/samples/gw_raw_samples.npz
   LEAF  → leaf-models/samples/leaf_raw_samples.npz
-  GCR   → gcr-models-mc/samples/gcr_raw_samples_{fund}.npz
+  GCR   → gcr-models-mc/outputs/samples/gcr_raw_samples_{fund}.npz
   AW    → aw-models/outputs/samples/aw_raw_samples_{fund}.npz
 
 If a samples file is missing (i.e. the model hasn't been re-run since this
@@ -56,7 +56,8 @@ OUTPUT_DIR    = SCRIPT_DIR / 'outputs' / 'datasets'
 
 # ─── Configuration ─────────────────────────────────────────────────────────
 
-MULTIPLIERS = [0.25, 0.5, 1.0, 2.0, 4.0]
+with open(SCRIPT_DIR / 'config.json') as _f:
+    MULTIPLIERS = json.load(_f)['multipliers']
 
 # None → vary every fund found in the dataset.
 FUNDS_TO_VARY = None
@@ -127,15 +128,15 @@ FUND_SAMPLE_SPECS = {
     },
     # ── GCR funds ─────────────────────────────────────────────────────────────
     'sentinel_bio': {
-        'npz': ALL_MODELS / 'gcr-models-mc' / 'samples' / 'gcr_raw_samples_sentinel_bio.npz',
+        'npz': ALL_MODELS / 'gcr-models-mc' / 'outputs' / 'samples' / 'gcr_raw_samples_sentinel_bio.npz',
         'type': 'gcr',
     },
     'longview_nuclear': {
-        'npz': ALL_MODELS / 'gcr-models-mc' / 'samples' / 'gcr_raw_samples_longview_nuclear.npz',
+        'npz': ALL_MODELS / 'gcr-models-mc' / 'outputs' / 'samples' / 'gcr_raw_samples_longview_nuclear.npz',
         'type': 'gcr',
     },
     'longview_ai': {
-        'npz': ALL_MODELS / 'gcr-models-mc' / 'samples' / 'gcr_raw_samples_longview_ai.npz',
+        'npz': ALL_MODELS / 'gcr-models-mc' / 'outputs' / 'samples' / 'gcr_raw_samples_longview_ai.npz',
         'type': 'gcr',
     },
 }
@@ -198,9 +199,7 @@ def _build_scaled_effects_aw(npz_data, baseline_project, multiplier):
                     t_row[rp_idx] *= multiplier
             continue
 
-        # Recompute risk profiles from K-scaled pre-temporal samples.
         scaled = npz_data[json_effect_id] * multiplier
-        new_rp = compute_risk_profiles(scaled)
 
         # Recover per-period temporal fractions from baseline neutral values.
         # frac[t] = baseline_neutral_t / baseline_neutral_total
@@ -215,7 +214,7 @@ def _build_scaled_effects_aw(npz_data, baseline_project, multiplier):
                 frac = 0.0
             else:
                 frac = baseline_row[neutral_col] / neutral_total
-            new_values.append([new_rp[rp_name] * frac for rp_name in JSON_RISK_PROFILES])
+            new_values.append(_risk_row(scaled * frac))
 
         new_effects[json_effect_id] = {
             **baseline_effect,
@@ -273,15 +272,17 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ─── Main loop ──────────────────────────────────────────────────────────────
 
-n_skip = sum(1 for m in MULTIPLIERS if m == 1.0)
-n_gen  = len(funds_to_vary) * (len(MULTIPLIERS) - n_skip)
+n_gen = sum(
+    sum(1 for m in MULTIPLIERS.get(f, [1.0]) if m != 1.0)
+    for f in funds_to_vary
+)
 print(f"Baseline:          {BASELINE_JSON.name}")
 print(f"Funds to vary:     {funds_to_vary}")
-print(f"Multipliers:       {MULTIPLIERS}")
 print(f"Datasets to write: {n_gen}  (multiplier=1.0 skipped — use baseline directly)")
 print()
 
 for fund_to_vary in funds_to_vary:
+    fund_multipliers = MULTIPLIERS.get(fund_to_vary, [1.0])
     spec       = FUND_SAMPLE_SPECS.get(fund_to_vary)
     npz_path   = spec['npz'] if spec else None
     fund_type  = spec['type'] if spec else None
@@ -296,7 +297,7 @@ for fund_to_vary in funds_to_vary:
         print(f"           Falling back to linear scaling (WLU will be approximate).")
         print(f"           Re-run the {fund_type} model to generate exact samples.\n")
 
-    for multiplier in MULTIPLIERS:
+    for multiplier in fund_multipliers:
         if multiplier == 1.0:
             continue
 

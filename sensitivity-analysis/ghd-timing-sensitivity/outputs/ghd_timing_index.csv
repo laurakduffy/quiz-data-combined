@@ -1,4 +1,4 @@
 scenario,sensitivity_index,most_affected_fund,most_affected_delta
-all effects far,9.5500,leaf,-9.55
-health effects near,5.8500,leaf,-5.85
+all effects far,4.2455,leaf,-4.25
+health effects near,1.2600,longview_ai,0.80
 all effects near,0.0000,sentinel_bio,0.00

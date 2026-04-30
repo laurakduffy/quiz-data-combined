@@ -27,6 +27,7 @@ import {
   rankDict,
   writeCsv,
   parseArgs,
+  checkDrCeilings,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -110,6 +111,18 @@ if (args.dryRun) {
 // Combo loop
 // ---------------------------------------------------------------------------
 
+let drChecksPassed = true;
+let drCheckCount = 0;
+
+// Check baseline (against base projects' DR curves)
+{
+  const baseFunding = Object.fromEntries(
+    fundIds.map((f) => [f, (baseAlloc[f] / 100) * totalBudget])
+  );
+  drChecksPassed &&= checkDrCeilings(baseProjects, incrementSize, baseFunding, 'baseline');
+  drCheckCount++;
+}
+
 const allocRows = [
   { combo: 'baseline', ...Object.fromEntries(fundIds.map((f) => [f, baseAlloc[f].toFixed(2)])) },
 ];
@@ -142,6 +155,13 @@ for (const comboName of comboNames) {
     ));
   }
   const newRanks = rankDict(newAlloc);
+
+  // Check against comboProjects — each combo has its own DR curves and ceilings
+  const comboFunding = Object.fromEntries(
+    fundIds.map((f) => [f, ((newAlloc[f] ?? 0) / 100) * totalBudget])
+  );
+  drChecksPassed &&= checkDrCeilings(comboProjects, incrementSize, comboFunding, comboName);
+  drCheckCount++;
 
   const si =
     fundIds.reduce((s, f) => s + Math.abs((newAlloc[f] ?? 0) - (baseAlloc[f] ?? 0)), 0) / 2;
@@ -218,3 +238,8 @@ writeCsv(
   ['combo', 'sensitivity_index', 'most_affected_fund', 'most_affected_delta'],
   indexRows
 );
+
+console.log(
+  `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
+);
+if (!drChecksPassed) process.exit(1);

@@ -1,9 +1,9 @@
 combo,sensitivity_index,most_affected_fund,most_affected_delta
-gcr_high_aw_low_power,4.4950,navigation_fund_general,-3.48
-gcr_and_aw_low_power,4.2750,navigation_fund_general,-3.48
-aw_low_power,3.7650,navigation_fund_general,-3.48
-gcr_and_aw_high_power,3.5550,longview_ai,1.66
-gcr_high_power,1.9300,sentinel_bio,1.93
-aw_high_power,1.8400,navigation_fund_general,1.27
-gcr_low_aw_high_power,1.8100,navigation_fund_general,1.27
-gcr_low_power,0.7100,sentinel_bio,-0.61
+gcr_high_aw_low_power,6.6568,navigation_fund_general,-4.60
+gcr_and_aw_low_power,5.9435,navigation_fund_general,-4.60
+aw_low_power,5.1872,navigation_fund_general,-4.60
+gcr_and_aw_high_power,4.8408,navigation_fund_general,2.44
+gcr_low_aw_high_power,3.4958,navigation_fund_general,2.51
+aw_high_power,3.1392,navigation_fund_general,2.51
+gcr_high_power,2.6650,sentinel_bio,2.66
+gcr_low_power,0.9550,sentinel_bio,-0.86

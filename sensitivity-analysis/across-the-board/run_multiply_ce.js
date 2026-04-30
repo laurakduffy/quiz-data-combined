@@ -34,6 +34,7 @@ import {
   loadWorldviews,
   writeCsv,
   parseArgs,
+  checkDrCeilings,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -41,9 +42,8 @@ const DATASETS_DIR = join(__dirname, 'outputs', 'datasets');
 
 const args = parseArgs(process.argv);
 
-// Multipliers must match those used in generate_scaled_datasets.py.
 // 1.0 uses the baseline directly (no pre-generated file needed).
-const MULTIPLIERS = [0.25, 0.5, 1.0, 2.0, 4.0];
+const { multipliers: MULTIPLIERS } = loadJson(join(__dirname, 'config.json'));
 
 // ---------------------------------------------------------------------------
 // Load baseline inputs — same sources as the website
@@ -68,7 +68,8 @@ console.log(
 );
 console.log(`  Stages:     ${stages.length}  total $${totalBudget}M`);
 console.log(`  Funds:      ${fundIds.length}  →  ${fundIds.join(', ')}`);
-console.log(`  Multipliers: ${MULTIPLIERS.join(', ')}`);
+const allMultiplierValues = [...new Set(Object.values(MULTIPLIERS).flat())].sort((a, b) => a - b);
+console.log(`  Multipliers: ${allMultiplierValues.join(', ')} (per-fund; see config.json)`);
 
 // ---------------------------------------------------------------------------
 // Helper: run both staged + per-method allocations on a dataset
@@ -109,6 +110,23 @@ console.log('Running baseline allocation...');
 const { staged: baseStaged, perMethod: basePerMethod } = runAllocations(baselineDataset);
 const topBase = fundIds.reduce((a, b) => (baseStaged[a] > baseStaged[b] ? a : b));
 console.log(`  Baseline top fund: ${topBase} (${baseStaged[topBase].toFixed(1)}%)`);
+
+let drChecksPassed = true;
+let drCheckCount = 0;
+
+// Check baseline
+{
+  const baseFunding = Object.fromEntries(
+    fundIds.map((f) => [f, (baseStaged[f] / 100) * totalBudget])
+  );
+  drChecksPassed &&= checkDrCeilings(
+    baselineDataset.projects,
+    baselineDataset.incrementSize,
+    baseFunding,
+    'baseline'
+  );
+  drCheckCount++;
+}
 
 // ---------------------------------------------------------------------------
 // Build output rows — start with the baseline itself
@@ -160,7 +178,7 @@ console.log('Running sensitivity scenarios...\n');
 for (const fundToVary of fundIds) {
   console.log(`  Fund: ${fundToVary}`);
 
-  for (const multiplier of MULTIPLIERS) {
+  for (const multiplier of MULTIPLIERS[fundToVary] ?? [1.0]) {
     // 1.0× is the baseline — no pre-generated file needed.
     let dataset;
     if (multiplier === 1.0) {
@@ -183,6 +201,18 @@ for (const fundToVary of fundIds) {
       console.log(`    FAIL  ${multiplier}x — ${e.message}`);
       continue;
     }
+
+    // CE scaling modifies effect values only — DR arrays (and ceilings) are unchanged
+    const scenFunding = Object.fromEntries(
+      fundIds.map((f) => [f, (staged[f] / 100) * totalBudget])
+    );
+    drChecksPassed &&= checkDrCeilings(
+      dataset.projects,
+      dataset.incrementSize,
+      scenFunding,
+      `${fundToVary}_${multiplier}x`
+    );
+    drCheckCount++;
 
     // SI = maximum absolute deviation (in percentage points) across all funds.
     let siMaxAbs = 0;
@@ -229,5 +259,10 @@ mkdirSync(OUTPUT_DIR, { recursive: true });
 
 writeCsv(join(OUTPUT_DIR, 'ce_multiplier_allocations.csv'), allocFields, allocRows);
 writeCsv(join(OUTPUT_DIR, 'ce_multiplier_si.csv'), siFields, siRows);
+
+console.log(
+  `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
+);
+if (!drChecksPassed) process.exit(1);
 
 console.log('\nDone.');

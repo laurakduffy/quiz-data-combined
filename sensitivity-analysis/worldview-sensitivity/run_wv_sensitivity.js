@@ -30,6 +30,7 @@ import {
   rankDict,
   writeCsv,
   parseArgs,
+  checkDrCeilings,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -140,12 +141,15 @@ console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Form 1 — Running each worldview at 100% credence (staged)...');
 
+let drChecksPassed = true;
+let drCheckCount = 0;
+
 const form1Rows = [];
 for (const wv of worldviews) {
   process.stdout.write(`  ${wv.name.slice(0, 65)}...`);
-  let allocations;
+  let allocations, f1Funding;
   if (isWeighted) {
-    ({ allocations } = computeWeightedAllocation(
+    ({ allocations, funding: f1Funding } = computeWeightedAllocation(
       projects,
       [{ ...wv, credence: 1.0 }],
       methodEntries,
@@ -154,7 +158,7 @@ for (const wv of worldviews) {
       { drStepSize }
     ));
   } else {
-    ({ allocations } = computeMultiStageAllocation(
+    ({ allocations, funding: f1Funding } = computeMultiStageAllocation(
       projects,
       [{ ...wv, credence: 1.0 }],
       stages,
@@ -163,6 +167,8 @@ for (const wv of worldviews) {
       drStepSize
     ));
   }
+  drChecksPassed &&= checkDrCeilings(projects, incrementM, f1Funding, wv.name);
+  drCheckCount++;
   const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
   console.log(`  top: ${top} (${allocations[top].toFixed(1)}%)`);
   form1Rows.push({
@@ -231,6 +237,12 @@ for (const wv of worldviews) {
     const newRanks = rankDict(newAlloc);
 
     for (const w of worldviews) w.credence = origCredences[w.name];
+
+    const scenFunding = Object.fromEntries(
+      fundIds.map((f) => [f, (newAlloc[f] / 100) * totalBudget])
+    );
+    drChecksPassed &&= checkDrCeilings(projects, incrementM, scenFunding, scenario);
+    drCheckCount++;
 
     const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
     const scaledSi = Math.abs(delta) > 1e-9 ? si / (Math.abs(delta) * 100) : null;
@@ -329,3 +341,8 @@ writeCsv(
   ],
   indexRows
 );
+
+console.log(
+  `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
+);
+if (!drChecksPassed) process.exit(1);

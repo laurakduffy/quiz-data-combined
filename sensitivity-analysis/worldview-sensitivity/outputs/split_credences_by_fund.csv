@@ -1,225 +1,225 @@
 scenario,worldview,bound,credence_base,credence_scenario,project_id,base_alloc,new_alloc,alloc_delta,rank_delta
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,ea_awf,9.10,9.39,0.29,0
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,givewell,7.36,7.99,0.63,0
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,leaf,9.85,10.62,0.77,0
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,longview_ai,21.59,18.54,-3.05,0
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,longview_nuclear,3.08,3.12,0.04,0
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,navigation_fund_cagefree,24.27,25.03,0.76,0
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,navigation_fund_general,15.43,15.67,0.24,0
-Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,sentinel_bio,9.32,9.65,0.33,0
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,ea_awf,9.10,4.91,-4.19,-1
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,givewell,7.36,5.41,-1.95,1
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,leaf,9.85,7.80,-2.05,1
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,longview_ai,21.59,49.15,27.57,1
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,longview_nuclear,3.08,0.74,-2.34,0
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,navigation_fund_cagefree,24.27,19.40,-4.88,-1
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,navigation_fund_general,15.43,6.96,-8.47,-1
-Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,sentinel_bio,9.32,5.62,-3.70,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,ea_awf,9.10,8.58,-0.52,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,givewell,7.36,7.28,-0.08,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,leaf,9.85,10.29,0.44,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,longview_ai,21.59,22.75,1.17,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,longview_nuclear,3.08,3.28,0.20,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,navigation_fund_cagefree,24.27,23.04,-1.23,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,navigation_fund_general,15.43,14.89,-0.54,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,sentinel_bio,9.32,9.89,0.57,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,ea_awf,9.10,10.28,1.18,2
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,givewell,7.36,7.03,-0.33,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,leaf,9.85,8.83,-1.02,-1
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,longview_ai,21.59,19.73,-1.85,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,longview_nuclear,3.08,2.78,-0.30,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,navigation_fund_cagefree,24.27,26.59,2.32,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,navigation_fund_general,15.43,16.45,1.02,0
-"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,sentinel_bio,9.32,8.29,-1.03,-1
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,ea_awf,9.10,6.04,-3.06,-1
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,givewell,7.36,7.28,-0.08,1
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,leaf,9.85,9.98,0.13,0
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,longview_ai,21.59,35.05,13.47,1
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,longview_nuclear,3.08,2.10,-0.98,0
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,navigation_fund_cagefree,24.27,20.68,-3.59,-1
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,navigation_fund_general,15.43,10.18,-5.25,0
-Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,sentinel_bio,9.32,8.69,-0.63,0
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,ea_awf,9.10,10.23,1.13,2
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,givewell,7.36,7.13,-0.23,0
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,leaf,9.85,9.20,-0.65,-1
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,longview_ai,21.59,18.65,-2.93,0
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,longview_nuclear,3.08,2.98,-0.10,0
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,navigation_fund_cagefree,24.27,26.65,2.37,0
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,navigation_fund_general,15.43,16.46,1.03,0
-Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,sentinel_bio,9.32,8.69,-0.63,-1
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,ea_awf,9.10,8.81,-0.29,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,givewell,7.36,7.53,0.17,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,leaf,9.85,10.01,0.16,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,longview_ai,21.59,22.25,0.66,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,longview_nuclear,3.08,3.10,0.02,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,navigation_fund_cagefree,24.27,23.62,-0.66,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,navigation_fund_general,15.43,15.17,-0.26,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,sentinel_bio,9.32,9.51,0.19,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,ea_awf,9.10,10.18,1.08,2
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,givewell,7.36,7.15,-0.21,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,leaf,9.85,9.24,-0.61,-1
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,longview_ai,21.59,18.78,-2.81,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,longview_nuclear,3.08,2.99,-0.09,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,navigation_fund_cagefree,24.27,26.49,2.21,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,navigation_fund_general,15.43,16.45,1.02,0
-"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,sentinel_bio,9.32,8.73,-0.59,-1
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,ea_awf,9.10,8.78,-0.32,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,givewell,7.36,7.53,0.17,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,leaf,9.85,10.18,0.33,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,longview_ai,21.59,22.25,0.66,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,longview_nuclear,3.08,3.10,0.02,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,navigation_fund_cagefree,24.27,23.62,-0.66,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,navigation_fund_general,15.43,15.04,-0.39,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,sentinel_bio,9.32,9.51,0.19,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,ea_awf,9.10,10.24,1.14,2
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,givewell,7.36,6.72,-0.64,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,leaf,9.85,8.94,-0.91,-1
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,longview_ai,21.59,20.10,-1.49,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,longview_nuclear,3.08,2.79,-0.29,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,navigation_fund_cagefree,24.27,26.47,2.20,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,navigation_fund_general,15.43,16.42,0.99,0
-"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,sentinel_bio,9.32,8.33,-0.99,-1
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,ea_awf,9.10,9.28,0.18,0
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,givewell,7.36,7.55,0.19,0
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,leaf,9.85,9.96,0.11,0
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,longview_ai,21.59,20.20,-1.39,0
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,longview_nuclear,3.08,3.10,0.02,0
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,navigation_fund_cagefree,24.27,24.68,0.41,0
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,navigation_fund_general,15.43,15.73,0.30,0
-Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,sentinel_bio,9.32,9.51,0.19,0
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,ea_awf,9.10,4.86,-4.24,-1
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,givewell,7.36,5.71,-1.65,1
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,leaf,9.85,8.09,-1.76,1
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,longview_ai,21.59,48.52,26.94,1
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,longview_nuclear,3.08,0.95,-2.13,0
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,navigation_fund_cagefree,24.27,19.59,-4.69,-1
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,navigation_fund_general,15.43,6.32,-9.11,-1
-Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,sentinel_bio,9.32,5.95,-3.37,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,ea_awf,9.10,9.32,0.22,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,givewell,7.36,7.47,0.11,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,leaf,9.85,9.96,0.11,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,longview_ai,21.59,20.20,-1.39,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,longview_nuclear,3.08,3.10,0.02,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,navigation_fund_cagefree,24.27,24.72,0.45,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,navigation_fund_general,15.43,15.73,0.30,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,sentinel_bio,9.32,9.51,0.19,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,ea_awf,9.10,8.59,-0.51,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,givewell,7.36,6.03,-1.33,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,leaf,9.85,9.11,-0.74,-1
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,longview_ai,21.59,26.22,4.63,1
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,longview_nuclear,3.08,3.61,0.53,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,navigation_fund_cagefree,24.27,22.77,-1.51,-1
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,navigation_fund_general,15.43,14.04,-1.39,0
-Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,sentinel_bio,9.32,9.63,0.31,1
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,ea_awf,9.10,9.28,0.18,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,givewell,7.36,7.55,0.19,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,leaf,9.85,9.96,0.11,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,longview_ai,21.59,21.31,-0.28,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,longview_nuclear,3.08,3.10,0.02,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,navigation_fund_cagefree,24.27,23.57,-0.71,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,navigation_fund_general,15.43,15.73,0.30,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,sentinel_bio,9.32,9.51,0.19,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,ea_awf,9.10,7.40,-1.70,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,givewell,7.36,6.19,-1.17,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,leaf,9.85,9.15,-0.70,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,longview_ai,21.59,28.00,6.42,1
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,longview_nuclear,3.08,2.93,-0.15,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,navigation_fund_cagefree,24.27,27.54,3.26,-1
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,navigation_fund_general,15.43,10.53,-4.90,0
-Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,sentinel_bio,9.32,8.26,-1.06,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,ea_awf,9.10,8.93,-0.17,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,givewell,7.36,7.53,0.17,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,leaf,9.85,9.63,-0.22,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,longview_ai,21.59,22.25,0.66,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,longview_nuclear,3.08,3.10,0.02,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,navigation_fund_cagefree,24.27,23.61,-0.66,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,navigation_fund_general,15.43,15.45,0.02,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,sentinel_bio,9.32,9.51,0.19,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,ea_awf,9.10,9.45,0.35,1
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,givewell,7.36,8.30,0.94,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,leaf,9.85,9.87,0.02,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,longview_ai,21.59,18.78,-2.81,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,longview_nuclear,3.08,2.99,-0.09,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,navigation_fund_cagefree,24.27,26.45,2.18,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,navigation_fund_general,15.43,15.43,0.00,0
-Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,sentinel_bio,9.32,8.73,-0.59,-1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,ea_awf,9.10,9.39,0.29,1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,givewell,7.36,7.75,0.39,1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,leaf,9.85,10.28,0.43,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,longview_ai,21.59,23.07,1.49,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,longview_nuclear,3.08,2.55,-0.54,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,navigation_fund_cagefree,24.27,25.03,0.76,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,navigation_fund_general,15.43,15.63,0.20,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,sentinel_bio,9.32,6.30,-3.01,-2
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,ea_awf,9.10,8.29,-0.81,1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,givewell,7.36,4.13,-3.23,-1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,leaf,9.85,8.10,-1.75,-2
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,longview_ai,21.59,17.49,-4.10,-1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,longview_nuclear,3.08,5.99,2.91,1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,navigation_fund_cagefree,24.27,21.88,-2.39,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,navigation_fund_general,15.43,14.21,-1.23,-1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,sentinel_bio,9.32,19.92,10.60,3
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,ea_awf,9.10,9.60,0.50,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,givewell,7.36,8.28,0.92,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,leaf,9.85,11.13,1.28,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,longview_ai,21.59,16.58,-5.00,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,longview_nuclear,3.08,3.18,0.10,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,navigation_fund_cagefree,24.27,25.65,1.38,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,navigation_fund_general,15.43,15.71,0.28,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,sentinel_bio,9.32,9.87,0.55,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,ea_awf,9.10,8.59,-0.51,1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,givewell,7.36,5.67,-1.69,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,leaf,9.85,8.58,-1.27,-2
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,longview_ai,21.59,26.80,5.21,1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,longview_nuclear,3.08,3.37,0.29,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,navigation_fund_cagefree,24.27,22.64,-1.63,-1
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,navigation_fund_general,15.43,15.14,-0.29,0
-Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,sentinel_bio,9.32,9.21,-0.11,1
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,ea_awf,9.10,9.26,0.16,2
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,givewell,7.36,6.95,-0.41,0
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,leaf,9.85,8.56,-1.29,-2
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,longview_ai,21.59,22.73,1.14,0
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,longview_nuclear,3.08,2.90,-0.18,0
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,navigation_fund_cagefree,24.27,24.67,0.39,0
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,navigation_fund_general,15.43,15.73,0.30,0
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,sentinel_bio,9.32,9.21,-0.11,0
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,ea_awf,9.10,7.94,-1.16,-1
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,givewell,7.36,13.33,5.97,4
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,leaf,9.85,13.22,3.37,0
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,longview_ai,21.59,18.78,-2.81,0
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,longview_nuclear,3.08,3.19,0.11,0
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,navigation_fund_cagefree,24.27,22.69,-1.59,0
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,navigation_fund_general,15.43,11.42,-4.01,-2
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,sentinel_bio,9.32,9.43,0.11,-1
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,ea_awf,9.10,9.31,0.21,1
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,givewell,7.36,6.64,-0.72,0
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,leaf,9.85,8.49,-1.36,-2
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,longview_ai,21.59,22.47,0.88,0
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,longview_nuclear,3.08,3.01,-0.07,0
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,navigation_fund_cagefree,24.27,24.89,0.61,0
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,navigation_fund_general,15.43,15.73,0.30,0
-Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,sentinel_bio,9.32,9.47,0.15,1
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,ea_awf,9.10,8.35,-0.75,-1
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,givewell,7.36,11.15,3.79,2
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,leaf,9.85,14.87,5.02,1
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,longview_ai,21.59,17.67,-3.91,0
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,longview_nuclear,3.08,2.93,-0.15,0
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,navigation_fund_cagefree,24.27,21.99,-2.29,0
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,navigation_fund_general,15.43,14.39,-1.04,-1
-Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,sentinel_bio,9.32,8.64,-0.68,-1
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,ea_awf,9.10,9.60,0.50,1
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,givewell,7.36,5.14,-2.22,0
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,leaf,9.85,6.96,-2.89,-2
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,longview_ai,21.59,23.68,2.10,0
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,longview_nuclear,3.08,3.16,0.08,0
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,navigation_fund_cagefree,24.27,25.69,1.42,0
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,navigation_fund_general,15.43,15.95,0.52,0
-Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,sentinel_bio,9.32,9.81,0.49,1
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,ea_awf,9.10,8.58,-0.52,-1
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,givewell,7.36,10.26,2.90,2
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,leaf,9.85,13.45,3.60,0
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,longview_ai,21.59,18.65,-2.93,0
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,longview_nuclear,3.08,2.98,-0.10,0
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,navigation_fund_cagefree,24.27,22.64,-1.63,0
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,navigation_fund_general,15.43,14.74,-0.69,0
-Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,sentinel_bio,9.32,8.69,-0.63,-1
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,ea_awf,12.78,13.39,0.62,0
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,givewell,12.99,13.80,0.82,0
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,leaf,4.91,5.44,0.53,0
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,longview_ai,23.22,20.37,-2.85,0
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,longview_nuclear,3.82,3.89,0.07,0
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,navigation_fund_cagefree,15.64,15.65,0.01,0
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,navigation_fund_general,18.06,18.59,0.53,0
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000,0.0500,sentinel_bio,8.59,8.87,0.28,0
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,ea_awf,12.78,7.62,-5.15,0
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,givewell,12.99,9.79,-3.20,1
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,leaf,4.91,3.79,-1.12,0
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,longview_ai,23.22,50.50,27.28,0
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,longview_nuclear,3.82,1.30,-2.52,0
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,navigation_fund_cagefree,15.64,13.07,-2.57,1
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,navigation_fund_general,18.06,8.86,-9.20,-2
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,0.1000,0.2500,sentinel_bio,8.59,5.07,-3.52,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,ea_awf,12.78,11.65,-1.13,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,givewell,12.99,13.17,0.18,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,leaf,4.91,4.91,0.00,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,longview_ai,23.22,24.48,1.26,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,longview_nuclear,3.82,4.05,0.23,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,navigation_fund_cagefree,15.64,15.59,-0.05,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,navigation_fund_general,18.06,17.04,-1.02,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,sentinel_bio,8.59,9.11,0.52,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,ea_awf,12.78,15.34,2.56,1
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,givewell,12.99,12.01,-0.97,-1
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,leaf,4.91,4.70,-0.21,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,longview_ai,23.22,21.09,-2.12,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,longview_nuclear,3.82,3.41,-0.42,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,navigation_fund_cagefree,15.64,15.70,0.05,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,navigation_fund_general,18.06,20.09,2.03,0
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,0.1000,0.2000,sentinel_bio,8.59,7.67,-0.92,0
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,ea_awf,12.78,9.12,-3.65,0
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,givewell,12.99,13.26,0.27,2
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,leaf,4.91,4.61,-0.29,0
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,longview_ai,23.22,36.79,13.57,0
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,longview_nuclear,3.82,2.86,-0.97,0
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,navigation_fund_cagefree,15.64,13.18,-2.46,0
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,navigation_fund_general,18.06,12.30,-5.75,-2
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,sentinel_bio,8.59,7.88,-0.72,0
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,ea_awf,12.78,15.30,2.52,1
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,givewell,12.99,11.91,-1.07,-1
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,leaf,4.91,5.09,0.18,0
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,longview_ai,23.22,20.19,-3.02,0
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,longview_nuclear,3.82,3.61,-0.22,0
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,navigation_fund_cagefree,15.64,15.70,0.05,0
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,navigation_fund_general,18.06,20.14,2.08,0
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,0.1000,0.2000,sentinel_bio,8.59,8.07,-0.52,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,ea_awf,12.78,12.15,-0.62,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,givewell,12.99,13.35,0.36,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,leaf,4.91,4.81,-0.10,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,longview_ai,23.22,23.93,0.72,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,longview_nuclear,3.82,3.87,0.04,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,navigation_fund_cagefree,15.64,15.65,0.01,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,navigation_fund_general,18.06,17.48,-0.57,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,sentinel_bio,8.59,8.76,0.16,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,ea_awf,12.78,15.11,2.33,1
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,givewell,12.99,11.97,-1.02,-1
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,leaf,4.91,5.08,0.18,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,longview_ai,23.22,20.33,-2.89,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,longview_nuclear,3.82,3.61,-0.21,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,navigation_fund_cagefree,15.64,15.78,0.14,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,navigation_fund_general,18.06,20.02,1.96,0
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,0.0500,0.1500,sentinel_bio,8.59,8.10,-0.49,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,ea_awf,12.78,12.08,-0.69,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,givewell,12.99,13.27,0.28,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,leaf,4.91,5.03,0.13,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,longview_ai,23.22,23.93,0.72,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,longview_nuclear,3.82,3.87,0.04,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,navigation_fund_cagefree,15.64,15.65,0.01,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,navigation_fund_general,18.06,17.41,-0.65,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,sentinel_bio,8.59,8.76,0.16,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,ea_awf,12.78,15.24,2.47,1
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,givewell,12.99,11.65,-1.34,-1
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,leaf,4.91,4.75,-0.15,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,longview_ai,23.22,21.55,-1.67,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,longview_nuclear,3.82,3.41,-0.41,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,navigation_fund_cagefree,15.64,15.70,0.05,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,navigation_fund_general,18.06,20.00,1.94,0
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,0.0500,0.1500,sentinel_bio,8.59,7.70,-0.89,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,ea_awf,12.78,13.16,0.38,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,givewell,12.99,13.29,0.31,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,leaf,4.91,4.89,-0.02,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,longview_ai,23.22,21.88,-1.34,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,longview_nuclear,3.82,3.86,0.04,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,navigation_fund_cagefree,15.64,15.66,0.02,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,navigation_fund_general,18.06,18.51,0.46,0
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,sentinel_bio,8.59,8.75,0.15,0
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,ea_awf,12.78,7.66,-5.11,0
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,givewell,12.99,10.16,-2.83,1
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,leaf,4.91,4.00,-0.91,0
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,longview_ai,23.22,49.88,26.67,0
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,longview_nuclear,3.82,1.51,-2.31,0
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,navigation_fund_cagefree,15.64,13.16,-2.48,1
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,navigation_fund_general,18.06,8.24,-9.82,-2
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,0.0500,0.2000,sentinel_bio,8.59,5.39,-3.20,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,ea_awf,12.78,13.16,0.38,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,givewell,12.99,13.31,0.32,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,leaf,4.91,4.91,0.00,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,longview_ai,23.22,21.88,-1.34,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,longview_nuclear,3.82,3.87,0.05,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,navigation_fund_cagefree,15.64,15.66,0.02,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,navigation_fund_general,18.06,18.45,0.39,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,0.0500,0.0200,sentinel_bio,8.59,8.76,0.17,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,ea_awf,12.78,11.69,-1.09,1
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,givewell,12.99,10.89,-2.09,-1
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,leaf,4.91,4.74,-0.16,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,longview_ai,23.22,27.67,4.45,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,longview_nuclear,3.82,4.25,0.42,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,navigation_fund_cagefree,15.64,15.57,-0.07,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,navigation_fund_general,18.06,16.18,-1.88,0
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,0.0500,0.1500,sentinel_bio,8.59,9.01,0.42,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,ea_awf,12.78,13.16,0.38,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,givewell,12.99,13.29,0.31,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,leaf,4.91,4.89,-0.02,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,longview_ai,23.22,21.90,-1.31,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,longview_nuclear,3.82,3.86,0.04,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,navigation_fund_cagefree,15.64,15.64,-0.01,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,navigation_fund_general,18.06,18.51,0.46,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,0.0500,0.0200,sentinel_bio,8.59,8.75,0.15,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,ea_awf,12.78,10.18,-2.59,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,givewell,12.99,10.64,-2.35,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,leaf,4.91,5.07,0.17,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,longview_ai,23.22,34.83,11.61,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,longview_nuclear,3.82,3.49,-0.33,0
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,navigation_fund_cagefree,15.64,15.61,-0.03,1
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,navigation_fund_general,18.06,12.47,-5.59,-1
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,sentinel_bio,8.59,7.70,-0.89,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,ea_awf,12.78,12.40,-0.37,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,givewell,12.99,13.35,0.36,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,leaf,4.91,4.16,-0.75,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,longview_ai,23.22,23.93,0.72,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,longview_nuclear,3.82,3.87,0.04,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,navigation_fund_cagefree,15.64,15.64,-0.00,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,navigation_fund_general,18.06,17.90,-0.16,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,0.0500,0.0200,sentinel_bio,8.59,8.76,0.16,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,ea_awf,12.78,13.53,0.76,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,givewell,12.99,14.45,1.47,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,leaf,4.91,5.92,1.02,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,longview_ai,23.22,20.33,-2.89,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,longview_nuclear,3.82,3.61,-0.21,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,navigation_fund_cagefree,15.64,15.66,0.02,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,navigation_fund_general,18.06,18.39,0.33,0
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,0.0500,0.1500,sentinel_bio,8.59,8.10,-0.49,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,ea_awf,12.78,13.39,0.62,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,givewell,12.99,13.66,0.68,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,leaf,4.91,5.10,0.19,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,longview_ai,23.22,24.80,1.58,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,longview_nuclear,3.82,2.77,-1.05,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,navigation_fund_cagefree,15.64,15.65,0.01,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,navigation_fund_general,18.06,18.55,0.49,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,sentinel_bio,8.59,6.08,-2.52,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,ea_awf,12.78,11.01,-1.77,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,givewell,12.99,8.42,-4.57,-2
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,leaf,4.91,4.09,-0.81,-1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,longview_ai,23.22,18.93,-4.29,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,longview_nuclear,3.82,8.32,4.50,1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,navigation_fund_cagefree,15.64,15.54,-0.10,-1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,navigation_fund_general,18.06,16.15,-1.91,-1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,sentinel_bio,8.59,17.54,8.95,4
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,ea_awf,12.78,13.85,1.08,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,givewell,12.99,14.43,1.45,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,leaf,4.91,5.69,0.78,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,longview_ai,23.22,18.49,-4.73,-1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,longview_nuclear,3.82,4.02,0.20,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,navigation_fund_cagefree,15.64,15.68,0.04,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,navigation_fund_general,18.06,18.81,0.75,1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,0.1000,0.0100,sentinel_bio,8.59,9.03,0.43,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,ea_awf,12.78,11.64,-1.13,1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,givewell,12.99,10.43,-2.55,-1
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,leaf,4.91,4.23,-0.68,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,longview_ai,23.22,28.32,5.10,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,longview_nuclear,3.82,3.95,0.13,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,navigation_fund_cagefree,15.64,15.57,-0.08,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,navigation_fund_general,18.06,17.27,-0.79,0
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,sentinel_bio,8.59,8.59,-0.00,0
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,ea_awf,12.78,13.12,0.35,1
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,givewell,12.99,12.05,-0.93,-1
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,leaf,4.91,4.28,-0.63,0
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,longview_ai,23.22,24.33,1.12,0
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,longview_nuclear,3.82,3.66,-0.16,0
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,navigation_fund_cagefree,15.64,15.66,0.02,0
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,navigation_fund_general,18.06,18.45,0.39,0
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,sentinel_bio,8.59,8.45,-0.15,0
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,ea_awf,12.78,11.03,-1.75,0
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,givewell,12.99,21.70,8.71,3
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,leaf,4.91,5.22,0.31,0
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,longview_ai,23.22,20.33,-2.89,-1
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,longview_nuclear,3.82,3.81,-0.01,0
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,navigation_fund_cagefree,15.64,15.53,-0.11,0
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,navigation_fund_general,18.06,13.58,-4.48,-2
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,sentinel_bio,8.59,8.80,0.21,0
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,ea_awf,12.78,13.23,0.46,1
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,givewell,12.99,11.21,-1.77,-1
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,leaf,4.91,4.71,-0.20,0
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,longview_ai,23.22,24.17,0.96,0
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,longview_nuclear,3.82,3.78,-0.04,0
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,navigation_fund_cagefree,15.64,15.66,0.02,0
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,navigation_fund_general,18.06,18.53,0.47,0
+Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,sentinel_bio,8.59,8.71,0.12,0
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,ea_awf,12.78,11.15,-1.62,0
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,givewell,12.99,20.89,7.91,3
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,leaf,4.91,5.38,0.48,0
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,longview_ai,23.22,19.13,-4.09,-1
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,longview_nuclear,3.82,3.49,-0.33,0
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,navigation_fund_cagefree,15.64,15.56,-0.08,-1
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,navigation_fund_general,18.06,16.31,-1.75,-1
+Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,sentinel_bio,8.59,8.08,-0.51,0
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,ea_awf,12.78,13.85,1.08,1
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,givewell,12.99,8.05,-4.93,-2
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,leaf,4.91,4.97,0.06,0
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,longview_ai,23.22,25.49,2.27,0
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,longview_nuclear,3.82,3.99,0.17,0
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,navigation_fund_cagefree,15.64,15.68,0.04,0
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,navigation_fund_general,18.06,19.03,0.98,0
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,0.1000,0.0100,sentinel_bio,8.59,8.94,0.34,1
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,ea_awf,12.78,11.64,-1.13,0
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,givewell,12.99,18.75,5.77,2
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,leaf,4.91,5.29,0.39,0
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,longview_ai,23.22,20.19,-3.02,0
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,longview_nuclear,3.82,3.61,-0.22,0
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,navigation_fund_cagefree,15.64,15.57,-0.08,-1
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,navigation_fund_general,18.06,16.88,-1.18,-1
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,sentinel_bio,8.59,8.07,-0.52,0

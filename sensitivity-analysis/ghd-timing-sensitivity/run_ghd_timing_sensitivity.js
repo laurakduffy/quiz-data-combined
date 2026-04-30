@@ -30,6 +30,7 @@ import {
   rankDict,
   writeCsv,
   parseArgs,
+  checkDrCeilings,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -159,6 +160,18 @@ console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 // Scenario loop
 // ---------------------------------------------------------------------------
 
+let drChecksPassed = true;
+let drCheckCount = 0;
+
+// Check baseline
+{
+  const baseFunding = Object.fromEntries(
+    fundIds.map((f) => [f, (baseAlloc[f] / 100) * totalBudget])
+  );
+  drChecksPassed &&= checkDrCeilings(projects, incrementM, baseFunding, 'baseline');
+  drCheckCount++;
+}
+
 const allocRows = [
   { scenario: 'baseline', ...Object.fromEntries(fundIds.map((f) => [f, baseAlloc[f].toFixed(2)])) },
 ];
@@ -190,6 +203,13 @@ for (const [scenarioName, fundTiming] of Object.entries(timingEffects)) {
     ));
   }
   const newRanks = rankDict(newAlloc);
+
+  // DR arrays live on the base projects (timing patches don't modify DR curves)
+  const scenFunding = Object.fromEntries(
+    fundIds.map((f) => [f, (newAlloc[f] / 100) * totalBudget])
+  );
+  drChecksPassed &&= checkDrCeilings(projects, incrementM, scenFunding, scenarioName);
+  drCheckCount++;
 
   const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
   const mostAff = fundIds.reduce((a, b) =>
@@ -245,3 +265,8 @@ writeCsv(
   ['scenario', 'sensitivity_index', 'most_affected_fund', 'most_affected_delta'],
   indexRows
 );
+
+console.log(
+  `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
+);
+if (!drChecksPassed) process.exit(1);

@@ -30,6 +30,7 @@ import {
   rankDict,
   writeCsv,
   parseArgs,
+  checkDrCeilings,
 } from './sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -181,6 +182,12 @@ for (const fid of sorted) {
 }
 
 // ---------------------------------------------------------------------------
+// DR ceiling tests
+// ---------------------------------------------------------------------------
+
+const drPassed = checkDrCeilings(dataset.projects, dataset.incrementSize, finalFunding, 'baseline');
+
+// ---------------------------------------------------------------------------
 // Write CSVs
 // ---------------------------------------------------------------------------
 
@@ -246,3 +253,8 @@ if (isWeighted) {
     stageRows
   );
 }
+
+console.log(
+  `\nDR ceiling tests: ${drPassed ? 'PASS (1 scenario checked)' : 'FAIL — see errors above'}`
+);
+if (!drPassed) process.exit(1);

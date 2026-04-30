@@ -5,8 +5,8 @@
  *   node run_all.js [--dry-run] [--base PATH] [--worldviews-file PATH] [--approach staged|weighted]
  *
  * All flags are forwarded to each sub-script unchanged.
- * --approach staged (default): sequential staged allocation matching website behaviour.
- * --approach weighted:         credence-weighted average of per-method allocations.
+ * --approach weighted (default): credence-weighted average of per-method allocations.
+ * --approach staged:           sequential staged allocation matching website behaviour.
  */
 
 import { spawnSync } from 'child_process';
@@ -21,12 +21,14 @@ const SCRIPTS = [
   join(__dirname, 'worldview-sensitivity', 'run_wv_sensitivity.js'),
   join(__dirname, 'ghd-timing-sensitivity', 'run_ghd_timing_sensitivity.js'),
   join(__dirname, 'diminishing-returns', 'run_dr_all.js'),
+  join(__dirname, 'across-the-board', 'run_multiply_ce.js'),
 ];
 
 const forwardedArgs = process.argv.slice(2);
 
 const approachArg = forwardedArgs.indexOf('--approach');
-const approach = approachArg !== -1 ? (forwardedArgs[approachArg + 1] ?? 'staged') : 'staged';
+const approach = approachArg !== -1 ? (forwardedArgs[approachArg + 1] ?? 'weighted') : 'weighted';
+if (approachArg === -1) forwardedArgs.push('--approach', 'weighted');
 console.log(`Approach: ${approach}`);
 
 let allPassed = true;

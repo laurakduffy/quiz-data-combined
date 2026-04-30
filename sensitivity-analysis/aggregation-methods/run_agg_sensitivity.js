@@ -38,6 +38,7 @@ import {
   rankDict,
   writeCsv,
   parseArgs,
+  checkDrCeilings,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -96,11 +97,14 @@ if (args.dryRun) {
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Form 1 — Running each method independently (full budget)...');
 
+let drChecksPassed = true;
+let drCheckCount = 0;
+
 const methodAllocs = {};
 for (const m of methods) {
   process.stdout.write(`  ${m.label}...`);
   try {
-    const { allocations } = computeMarcusAllocation(
+    const { allocations, funding: mFunding } = computeMarcusAllocation(
       projects,
       worldviews,
       m.jsKey,
@@ -109,6 +113,8 @@ for (const m of methods) {
       { drStepSize }
     );
     methodAllocs[m.jsKey] = allocations;
+    drChecksPassed &&= checkDrCeilings(projects, incrementM, mFunding, m.label);
+    drCheckCount++;
     const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
     console.log(`  top fund: ${top} (${allocations[top].toFixed(1)}%)`);
   } catch (e) {
@@ -243,6 +249,12 @@ for (const m of methods) {
     }
     const newRanks = rankDict(newAlloc);
 
+    const scenFunding = Object.fromEntries(
+      fundIds.map((f) => [f, (newAlloc[f] / 100) * totalBudget])
+    );
+    drChecksPassed &&= checkDrCeilings(projects, incrementM, scenFunding, scenario);
+    drCheckCount++;
+
     const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
     const scaledSi = Math.abs(delta) > 1e-9 ? si / (Math.abs(delta) * 100) : null;
     const mostAff = fundIds.reduce((a, b) =>
@@ -335,3 +347,8 @@ writeCsv(
   ],
   indexRows
 );
+
+console.log(
+  `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
+);
+if (!drChecksPassed) process.exit(1);

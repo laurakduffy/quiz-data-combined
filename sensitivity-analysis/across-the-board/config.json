@@ -1,0 +1,12 @@
+{
+  "multipliers": {
+    "givewell": [0.25, 0.5, 1.0, 1.5, 2.0],
+    "leaf": [0.25, 0.5, 1.0, 1.5, 2.0],
+    "ea_awf": [0.25, 0.5, 1.0, 1.5, 2.0],
+    "navigation_fund_cagefree": [0.25, 0.5, 1.0, 1.5, 2.0],
+    "navigation_fund_general": [0.25, 0.5, 1.0, 1.5, 2.0],
+    "sentinel_bio": [0.25, 0.5, 1.0, 1.5, 2.0],
+    "longview_ai": [0.25, 0.5, 1.0, 1.5, 2.0],
+    "longview_nuclear": [0.25, 0.5, 1.0, 1.5, 2.0]
+  }
+}

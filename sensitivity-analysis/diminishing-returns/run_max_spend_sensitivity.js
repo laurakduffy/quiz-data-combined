@@ -28,6 +28,7 @@ import {
   rankDict,
   writeCsv,
   parseArgs,
+  checkDrCeilings,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -112,6 +113,18 @@ if (args.dryRun) {
 // Scenario loop
 // ---------------------------------------------------------------------------
 
+let drChecksPassed = true;
+let drCheckCount = 0;
+
+// Check baseline
+{
+  const baseFunding = Object.fromEntries(
+    fundIds.map((f) => [f, (baseAlloc[f] / 100) * totalBudget])
+  );
+  drChecksPassed &&= checkDrCeilings(baseProjects, incrementSize, baseFunding, 'baseline_5x');
+  drCheckCount++;
+}
+
 const allocRows = [
   {
     scenario: 'baseline_5x',
@@ -147,6 +160,13 @@ for (const { label, multiplier } of SCENARIOS) {
     ));
   }
   const newRanks = rankDict(newAlloc);
+
+  // Each scenario has its own DR ceilings — check against scenProjects
+  const scenFunding = Object.fromEntries(
+    fundIds.map((f) => [f, ((newAlloc[f] ?? 0) / 100) * totalBudget])
+  );
+  drChecksPassed &&= checkDrCeilings(scenProjects, incrementSize, scenFunding, label);
+  drCheckCount++;
 
   const si =
     fundIds.reduce((s, f) => s + Math.abs((newAlloc[f] ?? 0) - (baseAlloc[f] ?? 0)), 0) / 2;
@@ -235,3 +255,8 @@ writeCsv(
   ],
   indexRows
 );
+
+console.log(
+  `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
+);
+if (!drChecksPassed) process.exit(1);

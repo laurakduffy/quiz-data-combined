@@ -70,8 +70,50 @@ export function writeCsv(path, fieldnames, rows) {
   console.log(`  Written: ${path}`);
 }
 
+/**
+ * Check that no fund's allocation exceeds the spending ceiling implied by its DR curve.
+ *
+ * dr[i] is the relative CE when i*incrementSize dollars have already been allocated to
+ * the fund (i.e. it is the factor for the (i+1)-th increment).  When dr[firstZero] === 0
+ * the firstZero-th increment and all subsequent ones yield zero marginal value, so the
+ * maximum useful allocation is firstZero * incrementSize dollars.
+ *
+ * Funds whose DR array contains no zero are unconstrained and are skipped.
+ *
+ * @param {Object} projects      - dataset.projects (each entry may have .diminishing_returns)
+ * @param {number} incrementSize - $M per allocation step
+ * @param {Object} funding       - { [fundId]: $M actually allocated }
+ * @param {string} [label]       - scenario label shown in error output
+ * @returns {boolean} true if every constrained fund is within its ceiling
+ */
+export function checkDrCeilings(projects, incrementSize, funding, label = '') {
+  const tol = 1e-6; // floating-point guard (~$1 on a $200M budget)
+  let passed = true;
+
+  for (const [fundId, project] of Object.entries(projects)) {
+    const dr = project.diminishing_returns;
+    if (!dr || !dr.length) continue;
+
+    const firstZero = dr.findIndex((v) => v === 0);
+    if (firstZero === -1) continue; // no hard ceiling for this fund
+
+    const maxFunding = firstZero * incrementSize;
+    const actual = funding[fundId] ?? 0;
+
+    if (actual > maxFunding + tol) {
+      console.error(
+        `  DR ceiling FAIL${label ? ` [${label}]` : ''}: ${fundId} allocated $${actual.toFixed(3)}M` +
+          ` but ceiling is $${maxFunding.toFixed(1)}M (DR zero at index ${firstZero})`
+      );
+      passed = false;
+    }
+  }
+
+  return passed;
+}
+
 export function parseArgs(argv) {
-  const args = { base: null, worldviewsFile: null, dryRun: false, approach: 'staged' };
+  const args = { base: null, worldviewsFile: null, dryRun: false, approach: 'weighted' };
   for (let i = 2; i < argv.length; i++) {
     if (argv[i] === '--dry-run') args.dryRun = true;
     else if (argv[i] === '--base' && argv[i + 1]) args.base = argv[++i];
