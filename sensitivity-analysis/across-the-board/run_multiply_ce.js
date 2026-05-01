@@ -14,7 +14,7 @@
  *
  * Outputs (written to outputs/):
  *   ce_multiplier_allocations.csv  — full allocation vector per (fund_varied, multiplier)
- *   ce_multiplier_si.csv           — SI (max-abs-pp deviation) + per-fund diffs
+ *   ce_multiplier_si.csv           — SI (max-abs-pp deviation), scaled SI (pp per OOM) + per-fund diffs
  */
 
 import { fileURLToPath } from 'url';
@@ -43,7 +43,7 @@ const DATASETS_DIR = join(__dirname, 'outputs', 'datasets');
 const args = parseArgs(process.argv);
 
 // 1.0 uses the baseline directly (no pre-generated file needed).
-const { multipliers: MULTIPLIERS } = loadJson(join(__dirname, 'config.json'));
+const { multipliers: MULTIPLIERS, groups: GROUPS = {} } = loadJson(join(__dirname, 'config.json'));
 
 // ---------------------------------------------------------------------------
 // Load baseline inputs — same sources as the website
@@ -146,8 +146,14 @@ const allocFields = [
 const allocRows = [];
 
 // ce_multiplier_si.csv:
-//   fund_varied, multiplier, si_max_abs_pp, <diff_fundA>, <diff_fundB>, ...
-const siFields = ['fund_varied', 'multiplier', 'si_max_abs_pp', ...fundIds.map((f) => `diff_${f}`)];
+//   fund_varied, multiplier, si_max_abs_pp, si_scaled_pp_per_oom, <diff_fundA>, <diff_fundB>, ...
+const siFields = [
+  'fund_varied',
+  'multiplier',
+  'si_max_abs_pp',
+  'si_scaled_pp_per_oom',
+  ...fundIds.map((f) => `diff_${f}`),
+];
 const siRows = [];
 
 // Add baseline rows (diff = 0 by definition)
@@ -165,6 +171,7 @@ siRows.push({
   fund_varied: 'baseline',
   multiplier: '1.0',
   si_max_abs_pp: '0.0000',
+  si_scaled_pp_per_oom: '0.0000',
   ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, '0.0000'])),
 });
 
@@ -184,7 +191,8 @@ for (const fundToVary of fundIds) {
     if (multiplier === 1.0) {
       dataset = baselineDataset;
     } else {
-      const datasetPath = join(DATASETS_DIR, `${fundToVary}_${multiplier}x.json`);
+      const multiplierTag = String(multiplier).replace('.', '');
+      const datasetPath = join(DATASETS_DIR, `${fundToVary}_${multiplierTag}x.json`);
       if (!existsSync(datasetPath)) {
         console.log(
           `    SKIP  ${multiplier}x — dataset not found (run generate_scaled_datasets.py first)`
@@ -223,6 +231,11 @@ for (const fundToVary of fundIds) {
       if (Math.abs(diff) > siMaxAbs) siMaxAbs = Math.abs(diff);
     }
 
+    // Scaled SI = SI per order of magnitude change in CE (SI / |log10(multiplier)|).
+    // When multiplier === 1.0 both SI and log10 are 0; output 0.
+    const oom = Math.abs(Math.log10(multiplier));
+    const siScaled = oom > 0 ? siMaxAbs / oom : 0;
+
     // Allocation rows (one per recipient fund)
     for (const fid of fundIds) {
       allocRows.push({
@@ -240,12 +253,102 @@ for (const fundToVary of fundIds) {
       fund_varied: fundToVary,
       multiplier: String(multiplier),
       si_max_abs_pp: siMaxAbs.toFixed(4),
+      si_scaled_pp_per_oom: siScaled.toFixed(4),
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
     });
 
     const topFund = fundIds.reduce((a, b) => (staged[a] > staged[b] ? a : b));
     console.log(
-      `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
+      `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
+    );
+  }
+  console.log();
+}
+
+// ---------------------------------------------------------------------------
+// Group sensitivity loop
+// ---------------------------------------------------------------------------
+
+if (Object.keys(GROUPS).length > 0) {
+  console.log(`\n${'-'.repeat(60)}`);
+  console.log('Running group sensitivity scenarios...\n');
+}
+
+for (const [groupName, groupDef] of Object.entries(GROUPS)) {
+  console.log(`  Group: ${groupName}  (${groupDef.funds.join(', ')})`);
+
+  for (const multiplier of groupDef.multipliers) {
+    if (multiplier === 1.0) continue;
+
+    const multiplierTag = String(multiplier).replace('.', '');
+    const datasetPath = join(DATASETS_DIR, `${groupName}_${multiplierTag}x.json`);
+    if (!existsSync(datasetPath)) {
+      console.log(
+        `    SKIP  ${multiplier}x — dataset not found (run generate_scaled_datasets.py first)`
+      );
+      continue;
+    }
+
+    let dataset;
+    try {
+      dataset = loadDataset(datasetPath);
+    } catch (e) {
+      console.log(`    FAIL  ${multiplier}x — ${e.message}`);
+      continue;
+    }
+
+    let staged, perMethod;
+    try {
+      ({ staged, perMethod } = runAllocations(dataset));
+    } catch (e) {
+      console.log(`    FAIL  ${multiplier}x — ${e.message}`);
+      continue;
+    }
+
+    const scenFunding = Object.fromEntries(
+      fundIds.map((f) => [f, (staged[f] / 100) * totalBudget])
+    );
+    drChecksPassed &&= checkDrCeilings(
+      dataset.projects,
+      dataset.incrementSize,
+      scenFunding,
+      `${groupName}_${multiplier}x`
+    );
+    drCheckCount++;
+
+    let siMaxAbs = 0;
+    const diffs = {};
+    for (const fid of fundIds) {
+      const diff = staged[fid] - baseStaged[fid];
+      diffs[fid] = diff;
+      if (Math.abs(diff) > siMaxAbs) siMaxAbs = Math.abs(diff);
+    }
+
+    const oom = Math.abs(Math.log10(multiplier));
+    const siScaled = oom > 0 ? siMaxAbs / oom : 0;
+
+    for (const fid of fundIds) {
+      allocRows.push({
+        fund_varied: groupName,
+        multiplier: String(multiplier),
+        recipient_fund: fid,
+        staged_allocation_pct: staged[fid].toFixed(4),
+        allocation_diff_pp: diffs[fid].toFixed(4),
+        ...Object.fromEntries(methodNames.map((m) => [m, perMethod[m][fid].toFixed(4)])),
+      });
+    }
+
+    siRows.push({
+      fund_varied: groupName,
+      multiplier: String(multiplier),
+      si_max_abs_pp: siMaxAbs.toFixed(4),
+      si_scaled_pp_per_oom: siScaled.toFixed(4),
+      ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
+    });
+
+    const topFund = fundIds.reduce((a, b) => (staged[a] > staged[b] ? a : b));
+    console.log(
+      `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
     );
   }
   console.log();

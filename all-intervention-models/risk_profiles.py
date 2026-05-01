@@ -17,6 +17,8 @@ Formal models (Duffy 2023):
   wlu - moderate — Weighted Linear Utility (c=0.05, moderate concavity)
   wlu - high     — Weighted Linear Utility (c=0.10, high concavity)
   ambiguity — Percentile-based ambiguity aversion (97.5–99.9% decay, zero above 99.9%)
+  ambiguity bilateral — Same as ambiguity but also discounts the lower tail
+              (0.1–2.5% decay, zero below 0.1%)
 
 Usage
 -----
@@ -53,6 +55,7 @@ RISK_PROFILES = [
     "wlu - moderate",
     "wlu - high",
     "ambiguity",
+    "ambiguity bilateral",
 ]
 
 # ---------------------------------------------------------------------------
@@ -121,6 +124,36 @@ def compute_ambiguity(samples):
     return float(np.sum(w * (N / w_sum) * d) / N)
 
 
+def compute_ambiguity_bilateral(samples):
+    """Percentile-based ambiguity aversion applied symmetrically to both tails.
+
+    Weights:
+      below p0.1        → 0.0
+      [p0.1, p2.5)      → exp(-ln(100)/1.5 * (2.5 - percentile))  (lower decay)
+      [p2.5, p97.5]     → 1.0
+      (p97.5, p99.9]    → exp(-ln(100)/1.5 * (percentile - 97.5))  (upper decay)
+      above p99.9       → 0.0
+    """
+    if len(samples) == 0 or np.all(samples == 0):
+        return 0.0
+    d = np.sort(samples)
+    N = len(d)
+    pcts = np.arange(N) / max(N - 1, 1) * 100
+    w = np.ones(N)
+    mask_lower_decay = (pcts >= 0.1) & (pcts < 2.5)
+    if np.any(mask_lower_decay):
+        w[mask_lower_decay] = np.exp(-np.log(100) / 1.5 * (2.5 - pcts[mask_lower_decay]))
+    w[pcts < 0.1] = 0.0
+    mask_upper_decay = (pcts > 97.5) & (pcts <= 99.9)
+    if np.any(mask_upper_decay):
+        w[mask_upper_decay] = np.exp(-np.log(100) / 1.5 * (pcts[mask_upper_decay] - 97.5))
+    w[pcts > 99.9] = 0.0
+    w_sum = np.sum(w)
+    if w_sum <= 0:
+        return float(np.mean(samples))
+    return float(np.sum(w * (N / w_sum) * d) / N)
+
+
 # ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
@@ -174,6 +207,7 @@ def compute_risk_profiles(samples):
     wlu_moderate = compute_wlu(samples, c=WLU_M)
     wlu_high = compute_wlu(samples, c=WLU_H)
     ambiguity = compute_ambiguity(samples)
+    ambiguity_bilateral = compute_ambiguity_bilateral(samples)
 
     return {
         "neutral": neutral,
@@ -185,4 +219,5 @@ def compute_risk_profiles(samples):
         "wlu - moderate": wlu_moderate,
         "wlu - high": wlu_high,
         "ambiguity": ambiguity,
+        "ambiguity bilateral": ambiguity_bilateral,
     }

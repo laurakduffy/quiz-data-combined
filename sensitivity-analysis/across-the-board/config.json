@@ -1,12 +1,22 @@
 {
   "multipliers": {
-    "givewell": [0.25, 0.5, 1.0, 1.5, 2.0],
-    "leaf": [0.25, 0.5, 1.0, 1.5, 2.0],
-    "ea_awf": [0.25, 0.5, 1.0, 1.5, 2.0],
-    "navigation_fund_cagefree": [0.25, 0.5, 1.0, 1.5, 2.0],
-    "navigation_fund_general": [0.25, 0.5, 1.0, 1.5, 2.0],
-    "sentinel_bio": [0.25, 0.5, 1.0, 1.5, 2.0],
-    "longview_ai": [0.25, 0.5, 1.0, 1.5, 2.0],
-    "longview_nuclear": [0.25, 0.5, 1.0, 1.5, 2.0]
+    "givewell": [0.25, 0.5, 1.5, 2.0],
+    "leaf": [0.25, 0.5, 1.5, 2.0],
+    "ea_awf": [0.5, 1.5, 2.0],
+    "navigation_fund_cagefree": [0.5, 1.5, 2.0],
+    "navigation_fund_general": [0.5, 1.5, 2.0],
+    "sentinel_bio": [0.1, 10],
+    "longview_ai": [0.1, 10],
+    "longview_nuclear": [0.1, 10]
+  },
+  "groups": {
+    "all_gcr": {
+      "funds": ["sentinel_bio", "longview_ai", "longview_nuclear"],
+      "multipliers": [0.0001, 0.001, 0.01, 100, 1000, 10000]
+    },
+    "all_aw": {
+      "funds": ["navigation_fund_cagefree", "navigation_fund_general", "ea_awf"],
+      "multipliers": [0.25, 4]
+    }
   }
 }

@@ -393,13 +393,65 @@ function _argmaxProject(scores, tieBreak = 'deterministic', rng = null) {
  * Split `increment` evenly among all projects tied for the highest score.
  * Returns a full allocations object (all projects, zeros for non-winners).
  */
-function _splitAmongTied(scores, increment) {
+function _splitAmongTied(scores, increment, { data, funding, drStepSize, alreadyAllocated } = {}) {
   const bestValue = Math.max(...Object.values(scores));
   const winners = Object.keys(scores).filter((p) => isClose(scores[p], bestValue));
-  const share = increment / winners.length;
+
+  if (!data || !funding) {
+    const share = increment / winners.length;
+    const result = {};
+    for (const p of Object.keys(scores)) result[p] = 0;
+    for (const p of winners) result[p] = share;
+    return result;
+  }
+
+  // Cap each winner's share at its remaining DR capacity and redistribute surplus,
+  // for the same reason as voteSplitCycle: prior fractional splits can leave a fund
+  // at an off-grid level where linear interpolation returns a small positive DR factor
+  // even though the fund is at or near its spending ceiling.
+  //
+  // Capacities and shares are tracked over ALL projects so that if every winner is
+  // already at its ceiling, surplus can overflow to any non-winner with room rather
+  // than being silently dropped.
+  const allProjects = Object.keys(scores);
+  const shares = Object.fromEntries(
+    allProjects.map((p) => [p, winners.includes(p) ? increment / winners.length : 0])
+  );
+  const capacities = {};
+  for (const p of allProjects) {
+    const dr = data[p]?.diminishing_returns;
+    const firstZero = dr?.length ? dr.findIndex((v) => v === 0) : -1;
+    const ceiling = firstZero !== -1 ? firstZero * drStepSize : Infinity;
+    const effectiveFunding = (funding[p] ?? 0) + (alreadyAllocated?.[p] ?? 0);
+    capacities[p] = Math.max(0, ceiling - effectiveFunding);
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    let surplus = 0;
+    for (const p of allProjects) {
+      if (shares[p] > capacities[p] + 1e-9) {
+        surplus += shares[p] - capacities[p];
+        shares[p] = capacities[p];
+        changed = true;
+      }
+    }
+    if (surplus > 1e-9) {
+      const haveRoom = allProjects.filter(
+        (p) => capacities[p] > shares[p] + 1e-9 && scores[p] > 1e-9
+      );
+      if (haveRoom.length > 0) {
+        const bonus = surplus / haveRoom.length;
+        for (const p of haveRoom) shares[p] += bonus;
+      }
+      // If haveRoom is empty every project with positive value is at its ceiling — surplus
+      // cannot be placed anywhere useful and is dropped.
+    }
+  }
+
   const result = {};
-  for (const p of Object.keys(scores)) result[p] = 0;
-  for (const p of winners) result[p] = share;
+  for (const p of allProjects) result[p] = shares[p];
   return result;
 }
 
@@ -524,7 +576,12 @@ function voteCredenceWeightedCustom(
     let key = customWorldviews[i].name || `wv_${i}`;
     if (key in perWorldviewScores) key = `${key} (${i})`;
     perWorldviewScores[key] = marginalValues;
-    const split = _splitAmongTied(marginalValues, share);
+    const split = _splitAmongTied(marginalValues, share, {
+      data,
+      funding,
+      drStepSize,
+      alreadyAllocated: allocations,
+    });
     for (const p of Object.keys(split)) allocations[p] += split[p];
   }
 
@@ -601,7 +658,7 @@ function voteMec(
     }
     expectedScores[projectId] = s;
   }
-  const split = _splitAmongTied(expectedScores, increment);
+  const split = _splitAmongTied(expectedScores, increment, { data, funding, drStepSize });
   for (const p of Object.keys(split)) allocations[p] += split[p];
   allocations.__scores__ = { expectedScores, worldviewScores };
   return allocations;
@@ -657,7 +714,12 @@ function voteMet(
   // best project(s), splitting further if there is a within-worldview tie.
   const sharePerWorldview = increment / selectedIndices.length;
   for (const idx of selectedIndices) {
-    const split = _splitAmongTied(worldviewScores[idx], sharePerWorldview);
+    const split = _splitAmongTied(worldviewScores[idx], sharePerWorldview, {
+      data,
+      funding,
+      drStepSize,
+      alreadyAllocated: allocations,
+    });
     for (const p of Object.keys(split)) allocations[p] += split[p];
   }
   allocations.__scores__ = { selectedIndices, worldviewScores };
@@ -743,7 +805,8 @@ function _computeBudgetByCredenceAllocation(
   budget,
   projects,
   tieBreak,
-  rng
+  rng,
+  { data, funding, drStepSize } = {}
 ) {
   const alloc = {};
   for (const p of projects) alloc[p] = 0;
@@ -751,6 +814,46 @@ function _computeBudgetByCredenceAllocation(
   for (let i = 0; i < credences.length; i++) {
     alloc[bestProjects[i]] += credences[i] * budget;
   }
+
+  if (!data || !funding) return alloc;
+
+  const expectedScores = {};
+  for (const p of projects) {
+    let s = 0;
+    for (let i = 0; i < credences.length; i++) s += credences[i] * worldviewScores[i][p];
+    expectedScores[p] = s;
+  }
+
+  const capacities = {};
+  for (const p of projects) {
+    const dr = data[p]?.diminishing_returns;
+    const firstZero = dr?.length ? dr.findIndex((v) => v === 0) : -1;
+    const ceiling = firstZero !== -1 ? firstZero * drStepSize : Infinity;
+    capacities[p] = Math.max(0, ceiling - (funding[p] ?? 0));
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    let surplus = 0;
+    for (const p of projects) {
+      if (alloc[p] > capacities[p] + 1e-9) {
+        surplus += alloc[p] - capacities[p];
+        alloc[p] = capacities[p];
+        changed = true;
+      }
+    }
+    if (surplus > 1e-9) {
+      const haveRoom = projects.filter(
+        (p) => capacities[p] > alloc[p] + 1e-9 && expectedScores[p] > 1e-9
+      );
+      if (haveRoom.length > 0) {
+        const bonus = surplus / haveRoom.length;
+        for (const p of haveRoom) alloc[p] += bonus;
+      }
+    }
+  }
+
   return alloc;
 }
 
@@ -821,7 +924,8 @@ function voteNashBargaining(
         increment,
         projects,
         tieBreak,
-        rng
+        rng,
+        { data, funding, drStepSize }
       ),
       __scores__: {
         feasibleScores,
@@ -1067,7 +1171,7 @@ function voteBorda(
     }
   }
 
-  const split = _splitAmongTied(bordaScores, increment);
+  const split = _splitAmongTied(bordaScores, increment, { data, funding, drStepSize });
   for (const p of Object.keys(split)) allocations[p] += split[p];
   allocations.__scores__ = { bordaScores, worldviewScores };
   return allocations;
@@ -1176,8 +1280,55 @@ function voteSplitCycle(
     winners = projects.filter((p) => isClose(netScores[p], bestNet));
   }
 
-  const share = increment / winners.length;
-  for (const p of winners) allocations[p] = share;
+  // Distribute the increment among winners, capped at each winner's remaining DR capacity.
+  // A winner can reach an off-grid funding level from prior fractional splits, causing
+  // getDiminishingReturnsFactor to interpolate a small positive value below the DR zero
+  // boundary. Without capping, a full increment share would overshoot that ceiling.
+  // Surplus from capped winners is redistributed to other winners first; if every winner
+  // is at its ceiling, it overflows to any project with a positive expected score and
+  // remaining capacity — never to projects with negative values.
+  const expectedScores = {};
+  for (const p of projects) {
+    let s = 0;
+    for (let idx = 0; idx < worldviewScores.length; idx++)
+      s += credences[idx] * worldviewScores[idx][p];
+    expectedScores[p] = s;
+  }
+
+  const shares = Object.fromEntries(
+    projects.map((p) => [p, winners.includes(p) ? increment / winners.length : 0])
+  );
+  const capacities = {};
+  for (const p of projects) {
+    const dr = data[p]?.diminishing_returns;
+    const firstZero = dr?.length ? dr.findIndex((v) => v === 0) : -1;
+    const ceiling = firstZero !== -1 ? firstZero * drStepSize : Infinity;
+    capacities[p] = Math.max(0, ceiling - (funding[p] ?? 0));
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    let surplus = 0;
+    for (const p of projects) {
+      if (shares[p] > capacities[p] + 1e-9) {
+        surplus += shares[p] - capacities[p];
+        shares[p] = capacities[p];
+        changed = true;
+      }
+    }
+    if (surplus > 1e-9) {
+      const haveRoom = projects.filter(
+        (p) => capacities[p] > shares[p] + 1e-9 && expectedScores[p] > 1e-9
+      );
+      if (haveRoom.length > 0) {
+        const bonus = surplus / haveRoom.length;
+        for (const p of haveRoom) shares[p] += bonus;
+      }
+    }
+  }
+
+  for (const p of projects) allocations[p] = shares[p];
   allocations.__scores__ = { margins, unbeaten, worldviewScores };
   return allocations;
 }

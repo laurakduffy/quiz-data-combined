@@ -79,8 +79,9 @@ def build_all_effects(fund_key="ea_awf", verbose=False):
 
         for period_key in PERIOD_KEYS:
             frac = period_fracs[period_key]
+            period_risk = compute_risk_profiles(draws * frac)
             for rp in RISK_PROFILES:
-                row[f"{rp}_{period_key}"] = risk[rp] * frac
+                row[f"{rp}_{period_key}"] = period_risk[rp]
 
         if verbose:
             print(f"    Neutral: {risk['neutral']:,.0f}  "

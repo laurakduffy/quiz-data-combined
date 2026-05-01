@@ -70,14 +70,15 @@ PROJECT_METADATA = {
 }
 
 RISK_PROFILES = [
-    'neutral',         # Maps to 0: Neutral
-    'wlu - low',       # Maps to 1: WLU Low (0.01)
-    'wlu - moderate',  # Maps to 2: WLU Moderate (0.05)
-    'wlu - high',      # Maps to 3: WLU High (0.1)
-    'upside',          # Maps to 4: Upside Sceptical
-    'downside',        # Maps to 5: Downside Critical
-    'combined',        # Maps to 6: Combined
-    'ambiguity'        # Maps to 7: Continuous Upside Sceptical 
+    'neutral',              # Maps to 0: Neutral
+    'wlu - low',            # Maps to 1: WLU Low (0.01)
+    'wlu - moderate',       # Maps to 2: WLU Moderate (0.05)
+    'wlu - high',           # Maps to 3: WLU High (0.1)
+    'upside',               # Maps to 4: Upside Sceptical
+    'downside',             # Maps to 5: Downside Critical
+    'combined',             # Maps to 6: Combined
+    'ambiguity',            # Maps to 7: Continuous Upside Sceptical
+    'ambiguity bilateral',  # Maps to 8: Ambiguity Bilateral (not yet exposed to users)
 ]
 
 EFFECT_KEY_MAP = {
@@ -268,7 +269,8 @@ final_json_structure = {
     {"value": 4, "label": "Upside Sceptical"},
     {"value": 5, "label": "Downside Critical"},
     {"value": 6, "label": "Combined"},
-    {"value": 7, "label": "Continuous Upside Sceptical"}
+    {"value": 7, "label": "Continuous Upside Sceptical"},
+    {"value": 8, "label": "Ambiguity Bilateral"}
   ],
   "projects": projects_data,
   "clusters": [
@@ -300,6 +302,14 @@ with open('outputs/output_data_{}_{}M.json'.format(GCR_DMR_SCENARIO, DMR_STEP_SI
     json.dump(final_json_structure, f, indent=2)
 
 print("Data successfully mapped and exported to outputs/output_data_{}_{}M.json".format(GCR_DMR_SCENARIO, DMR_STEP_SIZE))
+
+# Copy to config/datasets/YYYYMMDD.json (one level up from all-intervention-models/)
+_datasets_dir = os.path.join(os.path.dirname(__file__), '..', 'config', 'datasets')
+os.makedirs(_datasets_dir, exist_ok=True)
+_dated_path = os.path.join(_datasets_dir, now.strftime('%Y%m%d') + '.json')
+with open(_dated_path, 'w') as f:
+    json.dump(final_json_structure, f, indent=2)
+print("Dataset snapshot saved to config/datasets/{}.json".format(now.strftime('%Y%m%d')))
 
 # Export normalized risk-adjusted data to CSV
 time_labels = ['t0', 't1', 't2', 't3', 't4', 't5']

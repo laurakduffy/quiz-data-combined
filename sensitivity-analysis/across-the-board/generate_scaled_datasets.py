@@ -57,7 +57,9 @@ OUTPUT_DIR    = SCRIPT_DIR / 'outputs' / 'datasets'
 # ─── Configuration ─────────────────────────────────────────────────────────
 
 with open(SCRIPT_DIR / 'config.json') as _f:
-    MULTIPLIERS = json.load(_f)['multipliers']
+    _config = json.load(_f)
+MULTIPLIERS = _config['multipliers']
+GROUPS      = _config.get('groups', {})
 
 # None → vary every fund found in the dataset.
 FUNDS_TO_VARY = None
@@ -276,9 +278,13 @@ n_gen = sum(
     sum(1 for m in MULTIPLIERS.get(f, [1.0]) if m != 1.0)
     for f in funds_to_vary
 )
+n_gen_groups = sum(
+    sum(1 for m in g['multipliers'] if m != 1.0)
+    for g in GROUPS.values()
+)
 print(f"Baseline:          {BASELINE_JSON.name}")
 print(f"Funds to vary:     {funds_to_vary}")
-print(f"Datasets to write: {n_gen}  (multiplier=1.0 skipped — use baseline directly)")
+print(f"Datasets to write: {n_gen} individual + {n_gen_groups} group  (multiplier=1.0 skipped)")
 print()
 
 for fund_to_vary in funds_to_vary:
@@ -333,12 +339,86 @@ for fund_to_vary in funds_to_vary:
                     for rp_idx in range(len(t_row)):
                         t_row[rp_idx] *= multiplier
 
-        out_name = f"{fund_to_vary}_{multiplier}x.json"
+        multiplier_tag = f"{multiplier:g}".replace('.', '')
+        out_name = f"{fund_to_vary}_{multiplier_tag}x.json"
         out_path = OUTPUT_DIR / out_name
         with open(out_path, 'w') as f:
             json.dump(dataset, f, separators=(',', ':'))
 
         mode = 'exact' if npz_data is not None else 'linear-approx'
         print(f"  {fund_to_vary:35s}  ×{multiplier:<5}  →  {out_name}  [{mode}]")
+
+# ─── Group loop ─────────────────────────────────────────────────────────────
+# Each group scales all its member funds by the same multiplier simultaneously.
+
+if GROUPS:
+    print()
+
+for group_name, group_def in GROUPS.items():
+    group_funds       = group_def['funds']
+    group_multipliers = group_def['multipliers']
+
+    # Load raw samples once per fund in the group.
+    group_npz = {}
+    for fund_id in group_funds:
+        spec     = FUND_SAMPLE_SPECS.get(fund_id)
+        npz_path = spec['npz'] if spec else None
+        if npz_path and Path(npz_path).exists():
+            raw = np.load(npz_path)
+            group_npz[fund_id] = {k: raw[k] for k in raw.files}
+        else:
+            if npz_path:
+                print(f"  WARNING: samples not found for {fund_id}, falling back to linear scaling.")
+            group_npz[fund_id] = None
+
+    for multiplier in group_multipliers:
+        if multiplier == 1.0:
+            continue
+
+        dataset   = copy.deepcopy(baseline)
+        all_exact = True
+
+        for fund_id in group_funds:
+            spec             = FUND_SAMPLE_SPECS.get(fund_id)
+            fund_type        = spec['type'] if spec else None
+            npz_data         = group_npz[fund_id]
+            baseline_project = dataset['projects'][fund_id]
+
+            if npz_data is not None:
+                if fund_type == 'gw_leaf':
+                    new_effects = _build_scaled_effects_gw_leaf(
+                        npz_data, spec['effect_map'], baseline_project, multiplier)
+                elif fund_type == 'aw':
+                    new_effects = _build_scaled_effects_aw(
+                        npz_data, baseline_project, multiplier)
+                elif fund_type == 'gcr':
+                    new_effects = _build_scaled_effects_gcr(
+                        npz_data, baseline_project, multiplier)
+                else:
+                    new_effects = None
+                    all_exact   = False
+
+                if new_effects is not None:
+                    dataset['projects'][fund_id]['effects'] = new_effects
+                else:
+                    for effect in baseline_project['effects'].values():
+                        for t_row in effect['values']:
+                            for rp_idx in range(len(t_row)):
+                                t_row[rp_idx] *= multiplier
+            else:
+                all_exact = False
+                for effect in baseline_project['effects'].values():
+                    for t_row in effect['values']:
+                        for rp_idx in range(len(t_row)):
+                            t_row[rp_idx] *= multiplier
+
+        multiplier_tag = f"{multiplier:g}".replace('.', '')
+        out_name = f"{group_name}_{multiplier_tag}x.json"
+        out_path = OUTPUT_DIR / out_name
+        with open(out_path, 'w') as f:
+            json.dump(dataset, f, separators=(',', ':'))
+
+        mode = 'exact' if all_exact else 'mixed/linear-approx'
+        print(f"  {group_name:35s}  ×{multiplier:<5}  →  {out_name}  [{mode}]")
 
 print(f"\nDone.  Datasets saved to {OUTPUT_DIR}")

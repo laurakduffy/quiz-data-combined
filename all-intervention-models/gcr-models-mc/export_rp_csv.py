@@ -58,6 +58,7 @@ SHORT_PERIOD_KEYS = [
 RISK_PROFILES = [
     "neutral", "upside", "downside", "combined",
     "dmreu", "wlu - low", "wlu - moderate", "wlu - high", "ambiguity",
+    "ambiguity bilateral",
 ]
 
 _ABSOLUTE_EV_PERCENTILES = [0.001, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 99.999]
@@ -353,6 +354,7 @@ def write_rp_csv(fund_results, output_path, verbose=True):
         "wlu - moderate": "Risk profile: WLU (moderate, 0.05)",
         "wlu - high": "Risk profile: WLU (high, 0.1)",
         "ambiguity": "Risk profile: AMBIGUITY AVERSION",
+        "ambiguity bilateral": "Risk profile: AMBIGUITY BILATERAL",
     }
     header2 = ["effects at time horizon", "", "", ""]
     for rp in RISK_PROFILES:

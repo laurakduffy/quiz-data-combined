@@ -1,0 +1,396 @@
+{
+    "tests": {
+        "specialblend_to_neutral": {
+            "baseline": {
+                "Total Utilitarianism — Default": "Neutral",
+                "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside", 
+                "Total Utilitarianism — Weighted Linear Utility": "WLU 5", 
+                "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+                "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+                "Non-Utilitarian Consequentialism — Default": "Neutral",
+                "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+                "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+                "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+                "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+                "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+                "Contractualism — Default + cluelessness": "WLU 5",
+                "Kantianism — Low animals": "WLU 10",
+                "Kantianism — Low animals / downside critical": "Combined"
+            }, 
+            "new_version": {
+                "Total Utilitarianism — Default": "Neutral",
+                "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Neutral", 
+                "Total Utilitarianism — Weighted Linear Utility": "Neutral", 
+                "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Neutral",
+                "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+                "Non-Utilitarian Consequentialism — Default": "Neutral",
+                "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+                "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+                "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Neutral",
+                "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Neutral",
+                "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+                "Contractualism — Default + cluelessness": "Neutral",
+                "Kantianism — Low animals": "Neutral",
+                "Kantianism — Low animals / downside critical": "Neutral"
+                }
+            }, 
+
+    "specialblend_to_wlu_5": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 5",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "WLU 5",
+            "Kantianism — Low animals": "WLU 10",
+            "Kantianism — Low animals / downside critical": "Combined"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "WLU 5",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "WLU 5",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 5",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "WLU 5",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "WLU 5",
+            "Non-Utilitarian Consequentialism — Default": "WLU 5",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "WLU 5",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "WLU 5",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "WLU 5",
+            "Contractualism — Default + cluelessness": "WLU 5",
+            "Kantianism — Low animals": "WLU 5",
+            "Kantianism — Low animals / downside critical": "WLU 5"
+        }
+    },
+
+    "specialblend_to_wlu_10": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 5",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "WLU 5",
+            "Kantianism — Low animals": "WLU 10",
+            "Kantianism — Low animals / downside critical": "Combined"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "WLU 10",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "WLU 10",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 10",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "WLU 10",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "WLU 10",
+            "Non-Utilitarian Consequentialism — Default": "WLU 10",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "WLU 10",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "WLU 10",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 10",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "WLU 10",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "WLU 10",
+            "Contractualism — Default + cluelessness": "WLU 10",
+            "Kantianism — Low animals": "WLU 10",
+            "Kantianism — Low animals / downside critical": "WLU 10"
+        }
+    },
+
+    "specialblend_to_cont_upside_skep": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 5",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "WLU 5",
+            "Kantianism — Low animals": "WLU 10",
+            "Kantianism — Low animals / downside critical": "Combined"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "Continuous Upside",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "Continuous Upside",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Continuous Upside",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — Default": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Continuous Upside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Continuous Upside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Continuous Upside",
+            "Contractualism — Default + cluelessness": "Continuous Upside",
+            "Kantianism — Low animals": "Continuous Upside",
+            "Kantianism — Low animals / downside critical": "Continuous Upside"
+        }
+    },
+
+    "specialblend_to_bilateral_skep": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 5",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "WLU 5",
+            "Kantianism — Low animals": "WLU 10",
+            "Kantianism — Low animals / downside critical": "Combined"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "Bilateral Skepticism",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Bilateral Skepticism",
+            "Total Utilitarianism — Weighted Linear Utility": "Bilateral Skepticism",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Bilateral Skepticism",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — Default": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Bilateral Skepticism",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Bilateral Skepticism",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Bilateral Skepticism",
+            "Contractualism — Default + cluelessness": "Bilateral Skepticism",
+            "Kantianism — Low animals": "Bilateral Skepticism",
+            "Kantianism — Low animals / downside critical": "Bilateral Skepticism"
+        }
+    },
+
+    "specialblend_to_downside_critical": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 5",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "WLU 5",
+            "Kantianism — Low animals": "WLU 10",
+            "Kantianism — Low animals / downside critical": "Combined"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "Downside",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Downside",
+            "Total Utilitarianism — Weighted Linear Utility": "Downside",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Downside",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Downside",
+            "Non-Utilitarian Consequentialism — Default": "Downside",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Downside",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Downside",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Downside",
+            "Contractualism — Default + cluelessness": "Downside",
+            "Kantianism — Low animals": "Downside",
+            "Kantianism — Low animals / downside critical": "Downside"
+        }
+    },
+
+    "specialblend_to_combined": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "WLU 5",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "WLU 5",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "WLU 5",
+            "Kantianism — Low animals": "WLU 10",
+            "Kantianism — Low animals / downside critical": "Combined"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "Combined",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Combined",
+            "Total Utilitarianism — Weighted Linear Utility": "Combined",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Combined",
+            "Non-Utilitarian Consequentialism — Default": "Combined",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Combined",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Combined",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Combined",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Combined",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Combined",
+            "Contractualism — Default + cluelessness": "Combined",
+            "Kantianism — Low animals": "Combined",
+            "Kantianism — Low animals / downside critical": "Combined"
+        }
+    },
+
+    "neutral_to_cont_upside_skep": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Neutral",
+            "Total Utilitarianism — Weighted Linear Utility": "Neutral",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Neutral",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "Neutral",
+            "Kantianism — Low animals": "Neutral",
+            "Kantianism — Low animals / downside critical": "Neutral"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "Continuous Upside",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Continuous Upside",
+            "Total Utilitarianism — Weighted Linear Utility": "Continuous Upside",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Continuous Upside",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — Default": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Continuous Upside",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Continuous Upside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Continuous Upside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Continuous Upside",
+            "Contractualism — Default + cluelessness": "Continuous Upside",
+            "Kantianism — Low animals": "Continuous Upside",
+            "Kantianism — Low animals / downside critical": "Continuous Upside"
+        }
+    },
+
+    "neutral_to_bilateral_skep": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Neutral", 
+            "Total Utilitarianism — Weighted Linear Utility": "Neutral", 
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Neutral",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "Neutral",
+            "Kantianism — Low animals": "Neutral",
+            "Kantianism — Low animals / downside critical": "Neutral"
+            }, 
+        "new_version": {
+            "Total Utilitarianism — Default": "Bilateral Skepticism",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Bilateral Skepticism",
+            "Total Utilitarianism — Weighted Linear Utility": "Bilateral Skepticism",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Bilateral Skepticism",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — Default": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Bilateral Skepticism",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Bilateral Skepticism",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Bilateral Skepticism",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Bilateral Skepticism",
+            "Contractualism — Default + cluelessness": "Bilateral Skepticism",
+            "Kantianism — Low animals": "Bilateral Skepticism",
+            "Kantianism — Low animals / downside critical": "Bilateral Skepticism"        
+        }
+    }, 
+    "neutral_to_downside_critical": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Neutral",
+            "Total Utilitarianism — Weighted Linear Utility": "Neutral",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Neutral",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "Neutral",
+            "Kantianism — Low animals": "Neutral",
+            "Kantianism — Low animals / downside critical": "Neutral"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "Downside",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Downside",
+            "Total Utilitarianism — Weighted Linear Utility": "Downside",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Downside",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Downside",
+            "Non-Utilitarian Consequentialism — Default": "Downside",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Downside",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Downside",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Downside",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Downside",
+            "Contractualism — Default + cluelessness": "Downside",
+            "Kantianism — Low animals": "Downside",
+            "Kantianism — Low animals / downside critical": "Downside"
+        }
+    },
+    "neutral_to_combined": {
+        "baseline": {
+            "Total Utilitarianism — Default": "Neutral",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Neutral",
+            "Total Utilitarianism — Weighted Linear Utility": "Neutral",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Neutral",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Neutral",
+            "Non-Utilitarian Consequentialism — Default": "Neutral",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Neutral",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Neutral",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Neutral",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Neutral",
+            "Contractualism — Default + cluelessness": "Neutral",
+            "Kantianism — Low animals": "Neutral",
+            "Kantianism — Low animals / downside critical": "Neutral"
+        },
+        "new_version": {
+            "Total Utilitarianism — Default": "Combined",
+            "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios": "Combined",
+            "Total Utilitarianism — Weighted Linear Utility": "Combined",
+            "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases": "Combined",
+            "Total Utilitarianism — Suffering forward, clueless, and only sentience discount": "Combined",
+            "Non-Utilitarian Consequentialism — Default": "Combined",
+            "Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals": "Combined",
+            "Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness": "Combined",
+            "Non-Utilitarian Consequentialism — Weighted Linear Utility": "Combined",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline": "Combined",
+            "Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral": "Combined",
+            "Contractualism — Default + cluelessness": "Combined",
+            "Kantianism — Low animals": "Combined",
+            "Kantianism — Low animals / downside critical": "Combined"
+        }
+    }
+
+    },
+    "risk_codes": {
+        "Neutral": 0, 
+        "WLU 5": 2, 
+        "WLU 10": 3,
+        "Downside": 5, 
+        "Continuous Upside": 7, 
+        "Combined": 6,
+        "Bilateral Skepticism": 8
+    }
+}

@@ -237,7 +237,8 @@ def apply_risk_adjustments_to_simulations(effect_per_M_by_time):
     metadata_cols = ['project_id', 'near_term_xrisk', 'effect_id', 'recipient_type']
     risk_cols = []
     for rp in ['neutral', 'upside', 'downside', 'combined', 'dmreu',
-               'wlu - low', 'wlu - moderate', 'wlu - high', 'ambiguity']:
+               'wlu - low', 'wlu - moderate', 'wlu - high', 'ambiguity',
+               'ambiguity bilateral']:
         for t in range(6):
             risk_cols.append(f"{rp}_t{t}")
     

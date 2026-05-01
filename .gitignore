@@ -44,6 +44,9 @@ dev.db
 __pycache__/
 .venv/
 
+# Large generated sample files (regenerate with export_rp_csv.py)
+all-intervention-models/gcr-models-mc/outputs/samples/*.npz
+
 # Netlify dev artifacts
 deno.lock
 
