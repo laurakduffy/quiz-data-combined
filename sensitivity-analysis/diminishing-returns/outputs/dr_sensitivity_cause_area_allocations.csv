@@ -1,0 +1,10 @@
+combo,ghd,gcr,aw
+baseline,17.89,35.63,46.48
+gcr_low_power,18.49,35.03,46.48
+gcr_high_power,16.69,36.83,46.48
+aw_low_power,19.62,36.33,44.05
+aw_high_power,18.16,35.11,46.73
+gcr_and_aw_low_power,20.62,35.33,44.05
+gcr_and_aw_high_power,16.93,36.34,46.73
+gcr_low_aw_high_power,18.36,34.91,46.73
+gcr_high_aw_low_power,19.12,36.83,44.05

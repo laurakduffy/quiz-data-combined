@@ -1,0 +1,4 @@
+scenario,sensitivity_index,most_affected_cause,most_affected_delta
+all effects far,1.5260,ghd,-1.53
+health effects near,1.3600,ghd,-1.36
+all effects near,0.0000,aw,0.00

@@ -1,0 +1,5 @@
+scenario,ghd,gcr,aw
+baseline,17.89,35.63,46.48
+all effects far,16.36,36.51,47.13
+all effects near,17.89,35.63,46.48
+health effects near,16.53,36.53,46.94

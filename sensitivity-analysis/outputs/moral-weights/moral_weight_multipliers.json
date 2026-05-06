@@ -1,0 +1,16 @@
+{
+    "upper_bounds": {
+        "chickens_birds": 0.75,
+        "fish": 0.6,
+        "shrimp": 0.25,
+        "non_shrimp_invertebrates": 0.2,
+        "mammals": 0.9
+    }, 
+    "multipliers": {
+        "0.1x": 0.1,
+        "100x": 100,
+        "10x": 10,
+        "5x": 5, 
+        "2x": 2
+    }
+}

@@ -203,7 +203,7 @@ const rows = fundIds.map((fid) => {
   return row;
 });
 writeCsv(
-  join(OUTPUT_DIR, 'baseline_allocation.csv'),
+  join(OUTPUT_DIR, 'baseline_staged.csv'),
   ['fund', ...stages.map((s) => s.method), combinedColName],
   rows
 );

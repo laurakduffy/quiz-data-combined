@@ -14,7 +14,7 @@
  *
  * Outputs (written to outputs/):
  *   ce_multiplier_allocations.csv  — full allocation vector per (fund_varied, multiplier)
- *   ce_multiplier_si.csv           — SI (max-abs-pp deviation), scaled SI (pp per OOM) + per-fund diffs
+ *   ce_multiplier_si.csv           — SI (½ Σ|Δpp| across funds), scaled SI (pp per OOM) + per-fund diffs
  */
 
 import { fileURLToPath } from 'url';
@@ -28,6 +28,7 @@ import {
   computeMarcusAllocation,
   computeMultiStageAllocation,
 } from '../../src/utils/marcusCalculation.js';
+import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
   loadDataset,
@@ -35,12 +36,14 @@ import {
   writeCsv,
   parseArgs,
   checkDrCeilings,
+  groupByCauseArea,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
 const DATASETS_DIR = join(__dirname, 'outputs', 'datasets');
 
 const args = parseArgs(process.argv);
+const isWeighted = args.approach === 'weighted';
 
 // 1.0 uses the baseline directly (no pre-generated file needed).
 const { multipliers: MULTIPLIERS, groups: GROUPS = {} } = loadJson(join(__dirname, 'config.json'));
@@ -60,6 +63,11 @@ const { stages } = loadJson(join(dirname(__dirname), 'baseline.json'));
 const fundIds = Object.keys(baselineDataset.projects).sort();
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 const methodNames = stages.map((s) => s.method);
+const weightedMethods = stages.map((s) => ({
+  jsKey: s.method,
+  weight: s.budget,
+  options: s.options ?? {},
+}));
 
 console.log('\nAcross-the-board CE multiplier sensitivity analysis');
 console.log(`  Baseline:   ${baselinePath.split(/[/\\]/).pop()}`);
@@ -70,35 +78,53 @@ console.log(`  Stages:     ${stages.length}  total $${totalBudget}M`);
 console.log(`  Funds:      ${fundIds.length}  →  ${fundIds.join(', ')}`);
 const allMultiplierValues = [...new Set(Object.values(MULTIPLIERS).flat())].sort((a, b) => a - b);
 console.log(`  Multipliers: ${allMultiplierValues.join(', ')} (per-fund; see config.json)`);
+console.log(`  Approach:    ${isWeighted ? 'weighted-average' : 'staged'}`);
 
 // ---------------------------------------------------------------------------
 // Helper: run both staged + per-method allocations on a dataset
 // ---------------------------------------------------------------------------
 
 function runAllocations(dataset) {
-  const { allocations: staged } = computeMultiStageAllocation(
-    dataset.projects,
-    worldviews,
-    stages,
-    dataset.incrementSize,
-    undefined,
-    dataset.drStepSize
-  );
-
+  let combined;
   const perMethod = {};
-  for (const stage of stages) {
-    const { allocations } = computeMarcusAllocation(
+
+  if (isWeighted) {
+    const result = computeWeightedAllocation(
       dataset.projects,
       worldviews,
-      stage.method,
-      stage.budget,
+      weightedMethods,
+      totalBudget,
       dataset.incrementSize,
       { drStepSize: dataset.drStepSize }
     );
-    perMethod[stage.method] = allocations;
+    combined = result.allocations;
+    for (const [jsKey, detail] of Object.entries(result.perMethod)) {
+      perMethod[jsKey] = detail.allocations;
+    }
+  } else {
+    const { allocations: staged } = computeMultiStageAllocation(
+      dataset.projects,
+      worldviews,
+      stages,
+      dataset.incrementSize,
+      undefined,
+      dataset.drStepSize
+    );
+    combined = staged;
+    for (const stage of stages) {
+      const { allocations } = computeMarcusAllocation(
+        dataset.projects,
+        worldviews,
+        stage.method,
+        stage.budget,
+        dataset.incrementSize,
+        { drStepSize: dataset.drStepSize }
+      );
+      perMethod[stage.method] = allocations;
+    }
   }
 
-  return { staged, perMethod };
+  return { staged: combined, perMethod };
 }
 
 // ---------------------------------------------------------------------------
@@ -110,6 +136,8 @@ console.log('Running baseline allocation...');
 const { staged: baseStaged, perMethod: basePerMethod } = runAllocations(baselineDataset);
 const topBase = fundIds.reduce((a, b) => (baseStaged[a] > baseStaged[b] ? a : b));
 console.log(`  Baseline top fund: ${topBase} (${baseStaged[topBase].toFixed(1)}%)`);
+const baseCauseAlloc = groupByCauseArea(baseStaged);
+const caKeys = ['ghd', 'gcr', 'aw'];
 
 let drChecksPassed = true;
 let drCheckCount = 0;
@@ -133,28 +161,46 @@ let drCheckCount = 0;
 // ---------------------------------------------------------------------------
 
 // ce_multiplier_allocations.csv:
-//   fund_varied, multiplier, recipient_fund, staged_allocation_pct,
+//   fund_varied, multiplier, recipient_fund, {weighted|staged}_allocation_pct,
 //   allocation_diff_pp, <method1>, <method2>, ...
+const allocColName = isWeighted ? 'weighted_allocation_pct' : 'staged_allocation_pct';
 const allocFields = [
   'fund_varied',
   'multiplier',
   'recipient_fund',
-  'staged_allocation_pct',
+  allocColName,
   'allocation_diff_pp',
   ...methodNames,
 ];
 const allocRows = [];
 
 // ce_multiplier_si.csv:
-//   fund_varied, multiplier, si_max_abs_pp, si_scaled_pp_per_oom, <diff_fundA>, <diff_fundB>, ...
+//   fund_varied, multiplier, sensitivity_index, si_scaled_pp_per_oom, <diff_fundA>, <diff_fundB>, ...
 const siFields = [
   'fund_varied',
   'multiplier',
-  'si_max_abs_pp',
+  'sensitivity_index',
   'si_scaled_pp_per_oom',
   ...fundIds.map((f) => `diff_${f}`),
 ];
 const siRows = [];
+
+// cause_area_allocations.csv and cause_area_si.csv
+const causeAllocFields = [
+  'fund_varied',
+  'multiplier',
+  ...caKeys,
+  ...caKeys.map((ca) => `diff_${ca}`),
+];
+const causeAllocRows = [];
+const causeSiFields = [
+  'fund_varied',
+  'multiplier',
+  'sensitivity_index',
+  'si_scaled_pp_per_oom',
+  ...caKeys.map((ca) => `diff_${ca}`),
+];
+const causeSiRows = [];
 
 // Add baseline rows (diff = 0 by definition)
 for (const fid of fundIds) {
@@ -162,7 +208,7 @@ for (const fid of fundIds) {
     fund_varied: 'baseline',
     multiplier: '1.0',
     recipient_fund: fid,
-    staged_allocation_pct: baseStaged[fid].toFixed(4),
+    [allocColName]: baseStaged[fid].toFixed(4),
     allocation_diff_pp: '0.0000',
     ...Object.fromEntries(methodNames.map((m) => [m, basePerMethod[m][fid].toFixed(4)])),
   });
@@ -170,9 +216,22 @@ for (const fid of fundIds) {
 siRows.push({
   fund_varied: 'baseline',
   multiplier: '1.0',
-  si_max_abs_pp: '0.0000',
+  sensitivity_index: '0.0000',
   si_scaled_pp_per_oom: '0.0000',
   ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, '0.0000'])),
+});
+causeAllocRows.push({
+  fund_varied: 'baseline',
+  multiplier: '1.0',
+  ...Object.fromEntries(caKeys.map((ca) => [ca, baseCauseAlloc[ca].toFixed(4)])),
+  ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, '0.0000'])),
+});
+causeSiRows.push({
+  fund_varied: 'baseline',
+  multiplier: '1.0',
+  sensitivity_index: '0.0000',
+  si_scaled_pp_per_oom: '0.0000',
+  ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, '0.0000'])),
 });
 
 // ---------------------------------------------------------------------------
@@ -222,14 +281,17 @@ for (const fundToVary of fundIds) {
     );
     drCheckCount++;
 
-    // SI = maximum absolute deviation (in percentage points) across all funds.
-    let siMaxAbs = 0;
+    // SI = total absolute change across all funds divided by two.
+    // Because allocations sum to 100%, gains always equal losses, so Σ|diff|/2
+    // gives the net amount redistributed in percentage points.
     const diffs = {};
+    let siAbsSum = 0;
     for (const fid of fundIds) {
       const diff = staged[fid] - baseStaged[fid];
       diffs[fid] = diff;
-      if (Math.abs(diff) > siMaxAbs) siMaxAbs = Math.abs(diff);
+      siAbsSum += Math.abs(diff);
     }
+    const siMaxAbs = siAbsSum / 2;
 
     // Scaled SI = SI per order of magnitude change in CE (SI / |log10(multiplier)|).
     // When multiplier === 1.0 both SI and log10 are 0; output 0.
@@ -242,7 +304,7 @@ for (const fundToVary of fundIds) {
         fund_varied: fundToVary,
         multiplier: String(multiplier),
         recipient_fund: fid,
-        staged_allocation_pct: staged[fid].toFixed(4),
+        [allocColName]: staged[fid].toFixed(4),
         allocation_diff_pp: diffs[fid].toFixed(4),
         ...Object.fromEntries(methodNames.map((m) => [m, perMethod[m][fid].toFixed(4)])),
       });
@@ -252,14 +314,37 @@ for (const fundToVary of fundIds) {
     siRows.push({
       fund_varied: fundToVary,
       multiplier: String(multiplier),
-      si_max_abs_pp: siMaxAbs.toFixed(4),
+      sensitivity_index: siMaxAbs.toFixed(4),
       si_scaled_pp_per_oom: siScaled.toFixed(4),
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
     });
 
+    // Cause-area rows
+    {
+      const newCA = groupByCauseArea(staged);
+      const causeDiffs = Object.fromEntries(
+        caKeys.map((ca) => [ca, newCA[ca] - baseCauseAlloc[ca]])
+      );
+      const causeMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
+      const causeSiScaled = oom > 0 ? causeMaxAbs / oom : 0;
+      causeAllocRows.push({
+        fund_varied: fundToVary,
+        multiplier: String(multiplier),
+        ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
+        ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
+      });
+      causeSiRows.push({
+        fund_varied: fundToVary,
+        multiplier: String(multiplier),
+        sensitivity_index: causeMaxAbs.toFixed(4),
+        si_scaled_pp_per_oom: causeSiScaled.toFixed(4),
+        ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
+      });
+    }
+
     const topFund = fundIds.reduce((a, b) => (staged[a] > staged[b] ? a : b));
     console.log(
-      `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
+      `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp (½Σ|Δ|)  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
     );
   }
   console.log();
@@ -316,13 +401,14 @@ for (const [groupName, groupDef] of Object.entries(GROUPS)) {
     );
     drCheckCount++;
 
-    let siMaxAbs = 0;
     const diffs = {};
+    let siAbsSum = 0;
     for (const fid of fundIds) {
       const diff = staged[fid] - baseStaged[fid];
       diffs[fid] = diff;
-      if (Math.abs(diff) > siMaxAbs) siMaxAbs = Math.abs(diff);
+      siAbsSum += Math.abs(diff);
     }
+    const siMaxAbs = siAbsSum / 2;
 
     const oom = Math.abs(Math.log10(multiplier));
     const siScaled = oom > 0 ? siMaxAbs / oom : 0;
@@ -332,7 +418,7 @@ for (const [groupName, groupDef] of Object.entries(GROUPS)) {
         fund_varied: groupName,
         multiplier: String(multiplier),
         recipient_fund: fid,
-        staged_allocation_pct: staged[fid].toFixed(4),
+        [allocColName]: staged[fid].toFixed(4),
         allocation_diff_pp: diffs[fid].toFixed(4),
         ...Object.fromEntries(methodNames.map((m) => [m, perMethod[m][fid].toFixed(4)])),
       });
@@ -341,14 +427,37 @@ for (const [groupName, groupDef] of Object.entries(GROUPS)) {
     siRows.push({
       fund_varied: groupName,
       multiplier: String(multiplier),
-      si_max_abs_pp: siMaxAbs.toFixed(4),
+      sensitivity_index: siMaxAbs.toFixed(4),
       si_scaled_pp_per_oom: siScaled.toFixed(4),
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
     });
 
+    // Cause-area rows
+    {
+      const newCA = groupByCauseArea(staged);
+      const causeDiffs = Object.fromEntries(
+        caKeys.map((ca) => [ca, newCA[ca] - baseCauseAlloc[ca]])
+      );
+      const causeMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
+      const causeSiScaled = oom > 0 ? causeMaxAbs / oom : 0;
+      causeAllocRows.push({
+        fund_varied: groupName,
+        multiplier: String(multiplier),
+        ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
+        ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
+      });
+      causeSiRows.push({
+        fund_varied: groupName,
+        multiplier: String(multiplier),
+        sensitivity_index: causeMaxAbs.toFixed(4),
+        si_scaled_pp_per_oom: causeSiScaled.toFixed(4),
+        ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
+      });
+    }
+
     const topFund = fundIds.reduce((a, b) => (staged[a] > staged[b] ? a : b));
     console.log(
-      `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
+      `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp (½Σ|Δ|)  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
     );
   }
   console.log();
@@ -362,6 +471,8 @@ mkdirSync(OUTPUT_DIR, { recursive: true });
 
 writeCsv(join(OUTPUT_DIR, 'ce_multiplier_allocations.csv'), allocFields, allocRows);
 writeCsv(join(OUTPUT_DIR, 'ce_multiplier_si.csv'), siFields, siRows);
+writeCsv(join(OUTPUT_DIR, 'cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
+writeCsv(join(OUTPUT_DIR, 'cause_area_si.csv'), causeSiFields, causeSiRows);
 
 console.log(
   `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`

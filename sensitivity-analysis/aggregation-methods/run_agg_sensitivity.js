@@ -39,6 +39,7 @@ import {
   writeCsv,
   parseArgs,
   checkDrCeilings,
+  groupByCauseArea,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -97,64 +98,6 @@ if (args.dryRun) {
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Form 1 — Running each method independently (full budget)...');
 
-let drChecksPassed = true;
-let drCheckCount = 0;
-
-const methodAllocs = {};
-for (const m of methods) {
-  process.stdout.write(`  ${m.label}...`);
-  try {
-    const { allocations, funding: mFunding } = computeMarcusAllocation(
-      projects,
-      worldviews,
-      m.jsKey,
-      totalBudget,
-      incrementM,
-      { drStepSize }
-    );
-    methodAllocs[m.jsKey] = allocations;
-    drChecksPassed &&= checkDrCeilings(projects, incrementM, mFunding, m.label);
-    drCheckCount++;
-    const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
-    console.log(`  top fund: ${top} (${allocations[top].toFixed(1)}%)`);
-  } catch (e) {
-    console.log(`  FAILED: ${e.message}`);
-    methodAllocs[m.jsKey] = null;
-  }
-}
-
-// Print Form 1 table
-const validMethods = methods.filter((m) => methodAllocs[m.jsKey] !== null);
-const colW = 10;
-console.log(`\n${'-'.repeat(60)}`);
-console.log('Form 1 — Allocation (%) per method:');
-let hdr = `  ${'Fund'.padEnd(38)}`;
-for (const m of validMethods) hdr += `  ${m.label.slice(0, colW).padStart(colW)}`;
-console.log(hdr);
-for (const fid of fundIds) {
-  let row = `  ${fid.padEnd(38)}`;
-  for (const m of validMethods)
-    row += `  ${(methodAllocs[m.jsKey][fid] ?? 0).toFixed(1).padStart(colW)}`;
-  console.log(row);
-}
-
-// Write Form 1 CSV
-const form1Rows = [];
-for (const m of methods) {
-  if (!methodAllocs[m.jsKey]) continue;
-  const row = { method: m.label };
-  for (const fid of fundIds) row[fid] = (methodAllocs[m.jsKey][fid] ?? 0).toFixed(2);
-  form1Rows.push(row);
-}
-writeCsv(join(OUTPUT_DIR, 'method_allocations.csv'), ['method', ...fundIds], form1Rows);
-
-// ---------------------------------------------------------------------------
-// Form 2 — staged scenarios (matches website methodology)
-// ---------------------------------------------------------------------------
-
-console.log(`\n${'-'.repeat(60)}`);
-console.log('Form 2 — Varying one method credence at a time (staged approach)...');
-
 console.log(
   `\nComputing baseline (${isWeighted ? 'weighted-average' : 'staged'}, best-guess credences)...`
 );
@@ -186,10 +129,110 @@ if (isWeighted) {
 const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
+const baseCauseAlloc = groupByCauseArea(baseAlloc);
+const caKeys = ['ghd', 'gcr', 'aw'];
 
 const byFundRows = [];
 const indexRows = [];
 const form2RawRows = [];
+const form1CauseRows = [];
+const form2CauseRows = [];
+const causeIndexRows = [];
+
+let drChecksPassed = true;
+let drCheckCount = 0;
+
+const methodAllocs = {};
+for (const m of methods) {
+  process.stdout.write(`  ${m.label}...`);
+  try {
+    const { allocations, funding: mFunding } = computeMarcusAllocation(
+      projects,
+      worldviews,
+      m.jsKey,
+      totalBudget,
+      incrementM,
+      { drStepSize }
+    );
+    methodAllocs[m.jsKey] = allocations;
+    drChecksPassed &&= checkDrCeilings(projects, incrementM, mFunding, m.label);
+    drCheckCount++;
+    const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
+    const si1 = fundIds.reduce((s, f) => s + Math.abs(allocations[f] - baseAlloc[f]), 0) / 2;
+    const delta1 = 1.0 - m.best_guess;
+    const scaledSi1 = Math.abs(delta1) > 1e-9 ? si1 / (Math.abs(delta1) * 100) : null;
+    const mostAff1 = fundIds.reduce((a, b) =>
+      Math.abs(allocations[a] - baseAlloc[a]) > Math.abs(allocations[b] - baseAlloc[b]) ? a : b
+    );
+    const newRanks1 = rankDict(allocations);
+    console.log(`  top fund: ${top} (${allocations[top].toFixed(1)}%)  SI=${si1.toFixed(4)}pp`);
+    for (const fid of fundIds) {
+      byFundRows.push({
+        scenario: `${m.label}_single`,
+        method: m.label,
+        bound: 'single',
+        credence_base: m.best_guess.toFixed(4),
+        credence_scenario: '1.0000',
+        project_id: fid,
+        base_alloc: baseAlloc[fid].toFixed(2),
+        new_alloc: allocations[fid].toFixed(2),
+        alloc_delta: (allocations[fid] - baseAlloc[fid]).toFixed(2),
+        rank_delta: baseRanks[fid] - newRanks1[fid],
+      });
+    }
+    indexRows.push({
+      scenario: `${m.label}_single`,
+      method: m.label,
+      bound: 'single',
+      credence_base: m.best_guess.toFixed(4),
+      credence_scenario: '1.0000',
+      sensitivity_index: si1.toFixed(4),
+      scaled_SI: scaledSi1 !== null ? scaledSi1.toFixed(4) : '',
+      most_affected_fund: mostAff1,
+      most_affected_delta: (allocations[mostAff1] - baseAlloc[mostAff1]).toFixed(2),
+    });
+  } catch (e) {
+    console.log(`  FAILED: ${e.message}`);
+    methodAllocs[m.jsKey] = null;
+  }
+}
+
+// Print Form 1 table
+const validMethods = methods.filter((m) => methodAllocs[m.jsKey] !== null);
+const colW = 10;
+console.log(`\n${'-'.repeat(60)}`);
+console.log('Form 1 — Allocation (%) per method:');
+let hdr = `  ${'Fund'.padEnd(38)}`;
+for (const m of validMethods) hdr += `  ${m.label.slice(0, colW).padStart(colW)}`;
+console.log(hdr);
+for (const fid of fundIds) {
+  let row = `  ${fid.padEnd(38)}`;
+  for (const m of validMethods)
+    row += `  ${(methodAllocs[m.jsKey][fid] ?? 0).toFixed(1).padStart(colW)}`;
+  console.log(row);
+}
+
+// Write Form 1 CSV
+const form1Rows = [];
+for (const m of methods) {
+  if (!methodAllocs[m.jsKey]) continue;
+  const row = { method: m.label };
+  for (const fid of fundIds) row[fid] = (methodAllocs[m.jsKey][fid] ?? 0).toFixed(2);
+  form1Rows.push(row);
+  const f1CA = groupByCauseArea(methodAllocs[m.jsKey]);
+  form1CauseRows.push({
+    method: m.label,
+    ...Object.fromEntries(caKeys.map((ca) => [ca, f1CA[ca].toFixed(2)])),
+  });
+}
+writeCsv(join(OUTPUT_DIR, 'method_allocations.csv'), ['method', ...fundIds], form1Rows);
+
+// ---------------------------------------------------------------------------
+// Form 2 — staged scenarios (matches website methodology)
+// ---------------------------------------------------------------------------
+
+console.log(`\n${'-'.repeat(60)}`);
+console.log('Form 2 — Varying one method credence at a time (staged approach)...');
 
 for (const m of methods) {
   for (const bound of ['low', 'high']) {
@@ -288,6 +331,31 @@ for (const m of methods) {
       ...Object.fromEntries(fundIds.map((f) => [f, newAlloc[f].toFixed(2)])),
     });
 
+    const newCA = groupByCauseArea(newAlloc);
+    const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCauseAlloc[ca]), 0) / 2;
+    const mostAffCA = caKeys.reduce((a, b) =>
+      Math.abs(newCA[a] - baseCauseAlloc[a]) > Math.abs(newCA[b] - baseCauseAlloc[b]) ? a : b
+    );
+    form2CauseRows.push({
+      scenario,
+      method: m.label,
+      bound,
+      credence_base: bestVal.toFixed(4),
+      credence_scenario: boundVal.toFixed(4),
+      ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(2)])),
+    });
+    causeIndexRows.push({
+      scenario,
+      method: m.label,
+      bound,
+      credence_base: bestVal.toFixed(4),
+      credence_scenario: boundVal.toFixed(4),
+      sensitivity_index: siCA.toFixed(4),
+      scaled_SI: scaledSi !== null ? (siCA / (Math.abs(delta) * 100)).toFixed(4) : '',
+      most_affected_cause: mostAffCA,
+      most_affected_delta: (newCA[mostAffCA] - baseCauseAlloc[mostAffCA]).toFixed(2),
+    });
+
     indexRows.push({
       scenario,
       method: m.label,
@@ -302,6 +370,17 @@ for (const m of methods) {
   }
 }
 
+indexRows.push({
+  scenario: 'baseline',
+  method: 'baseline',
+  bound: 'baseline',
+  credence_base: '',
+  credence_scenario: '',
+  sensitivity_index: '0.0000',
+  scaled_SI: '',
+  most_affected_fund: '',
+  most_affected_delta: '0.00',
+});
 indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 
 console.log(`\n${'-'.repeat(60)}`);
@@ -346,6 +425,39 @@ writeCsv(
     'most_affected_delta',
   ],
   indexRows
+);
+writeCsv(join(OUTPUT_DIR, 'method_cause_areas.csv'), ['method', ...caKeys], form1CauseRows);
+causeIndexRows.push({
+  scenario: 'baseline',
+  method: 'baseline',
+  bound: 'baseline',
+  credence_base: '',
+  credence_scenario: '',
+  sensitivity_index: '0.0000',
+  scaled_SI: '',
+  most_affected_cause: '',
+  most_affected_delta: '0.00',
+});
+causeIndexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
+writeCsv(
+  join(OUTPUT_DIR, 'split_credences_cause_areas.csv'),
+  ['scenario', 'method', 'bound', 'credence_base', 'credence_scenario', ...caKeys],
+  form2CauseRows
+);
+writeCsv(
+  join(OUTPUT_DIR, 'cause_area_index.csv'),
+  [
+    'scenario',
+    'method',
+    'bound',
+    'credence_base',
+    'credence_scenario',
+    'sensitivity_index',
+    'scaled_SI',
+    'most_affected_cause',
+    'most_affected_delta',
+  ],
+  causeIndexRows
 );
 
 console.log(

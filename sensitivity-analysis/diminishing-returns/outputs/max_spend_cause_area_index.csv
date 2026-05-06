@@ -1,0 +1,4 @@
+scenario,max_addl_spend_multiplier,sensitivity_index,most_affected_cause,most_affected_delta
+max_spend_2_5x,2.5,14.5515,ghd,14.55
+max_spend_7_5x,7.5,3.3660,ghd,-3.37
+max_spend_10x,10,6.8340,gcr,6.83

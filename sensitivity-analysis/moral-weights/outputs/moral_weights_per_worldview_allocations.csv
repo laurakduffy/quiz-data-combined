@@ -1,0 +1,673 @@
+worldview_idx,worldview_name,risk_profile,multiplier,recipient_fund,weighted_allocation_pct,allocation_diff_pp,nashBargaining,credenceWeighted,mec,met,splitCycle,borda
+0,Total Utilitarian,0,1.0,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,1.0,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,1.0,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,1.0,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+0,Total Utilitarian,0,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,1.0,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+0,Total Utilitarian,0,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,100,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,100,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,100,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,100,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+0,Total Utilitarian,0,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,100,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,100,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,10,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,10,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,10,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,10,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+0,Total Utilitarian,0,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,10,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,10,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,5,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,5,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,5,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,5,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+0,Total Utilitarian,0,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,5,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,5,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,2,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,2,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,2,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,2,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+0,Total Utilitarian,0,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,2,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,2,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,1.0,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,1.0,givewell,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,1.0,leaf,2.0000,0.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+1,Total Utilitarian,7,1.0,longview_ai,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+1,Total Utilitarian,7,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,1.0,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+1,Total Utilitarian,7,1.0,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+1,Total Utilitarian,7,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,0.1,ea_awf,10.0000,-7.0000,10.0000,10.0000,10.0000,10.0000,10.0000,10.0000
+1,Total Utilitarian,7,0.1,givewell,57.0000,40.0000,57.0000,57.0000,57.0000,57.0000,57.0000,57.0000
+1,Total Utilitarian,7,0.1,leaf,3.0000,1.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+1,Total Utilitarian,7,0.1,longview_ai,7.0000,1.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+1,Total Utilitarian,7,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,0.1,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+1,Total Utilitarian,7,0.1,navigation_fund_general,7.0000,-35.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+1,Total Utilitarian,7,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,100,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,100,givewell,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,100,leaf,2.0000,0.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+1,Total Utilitarian,7,100,longview_ai,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+1,Total Utilitarian,7,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,100,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+1,Total Utilitarian,7,100,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+1,Total Utilitarian,7,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,10,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,10,givewell,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,10,leaf,2.0000,0.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+1,Total Utilitarian,7,10,longview_ai,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+1,Total Utilitarian,7,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,10,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+1,Total Utilitarian,7,10,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+1,Total Utilitarian,7,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,5,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,5,givewell,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,5,leaf,2.0000,0.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+1,Total Utilitarian,7,5,longview_ai,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+1,Total Utilitarian,7,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,5,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+1,Total Utilitarian,7,5,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+1,Total Utilitarian,7,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,2,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,2,givewell,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+1,Total Utilitarian,7,2,leaf,2.0000,0.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+1,Total Utilitarian,7,2,longview_ai,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+1,Total Utilitarian,7,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,2,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+1,Total Utilitarian,7,2,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+1,Total Utilitarian,7,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,1.0,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+2,Total Utilitarian,2,1.0,givewell,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+2,Total Utilitarian,2,1.0,leaf,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+2,Total Utilitarian,2,1.0,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,1.0,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+2,Total Utilitarian,2,1.0,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+2,Total Utilitarian,2,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,0.1,ea_awf,3.0000,-14.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+2,Total Utilitarian,2,0.1,givewell,78.0000,59.0000,78.0000,78.0000,78.0000,78.0000,78.0000,78.0000
+2,Total Utilitarian,2,0.1,leaf,7.0000,1.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+2,Total Utilitarian,2,0.1,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,0.1,navigation_fund_cagefree,11.0000,-5.0000,11.0000,11.0000,11.0000,11.0000,11.0000,11.0000
+2,Total Utilitarian,2,0.1,navigation_fund_general,1.0000,-41.0000,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000
+2,Total Utilitarian,2,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,100,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+2,Total Utilitarian,2,100,givewell,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+2,Total Utilitarian,2,100,leaf,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+2,Total Utilitarian,2,100,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,100,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+2,Total Utilitarian,2,100,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+2,Total Utilitarian,2,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,10,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+2,Total Utilitarian,2,10,givewell,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+2,Total Utilitarian,2,10,leaf,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+2,Total Utilitarian,2,10,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,10,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+2,Total Utilitarian,2,10,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+2,Total Utilitarian,2,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,5,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+2,Total Utilitarian,2,5,givewell,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+2,Total Utilitarian,2,5,leaf,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+2,Total Utilitarian,2,5,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,5,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+2,Total Utilitarian,2,5,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+2,Total Utilitarian,2,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,2,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+2,Total Utilitarian,2,2,givewell,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+2,Total Utilitarian,2,2,leaf,6.0000,0.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+2,Total Utilitarian,2,2,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,2,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+2,Total Utilitarian,2,2,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+2,Total Utilitarian,2,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,1.0,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+3,Total Utilitarian,6,1.0,givewell,20.0000,0.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000
+3,Total Utilitarian,6,1.0,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+3,Total Utilitarian,6,1.0,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,1.0,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+3,Total Utilitarian,6,1.0,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+3,Total Utilitarian,6,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,0.1,ea_awf,5.0000,-12.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+3,Total Utilitarian,6,0.1,givewell,70.0000,50.0000,70.0000,70.0000,70.0000,70.0000,70.0000,70.0000
+3,Total Utilitarian,6,0.1,leaf,6.0000,1.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+3,Total Utilitarian,6,0.1,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,0.1,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+3,Total Utilitarian,6,0.1,navigation_fund_general,3.0000,-39.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+3,Total Utilitarian,6,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,100,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+3,Total Utilitarian,6,100,givewell,20.0000,0.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000
+3,Total Utilitarian,6,100,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+3,Total Utilitarian,6,100,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,100,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+3,Total Utilitarian,6,100,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+3,Total Utilitarian,6,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,10,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+3,Total Utilitarian,6,10,givewell,20.0000,0.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000
+3,Total Utilitarian,6,10,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+3,Total Utilitarian,6,10,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,10,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+3,Total Utilitarian,6,10,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+3,Total Utilitarian,6,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,5,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+3,Total Utilitarian,6,5,givewell,20.0000,0.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000
+3,Total Utilitarian,6,5,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+3,Total Utilitarian,6,5,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,5,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+3,Total Utilitarian,6,5,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+3,Total Utilitarian,6,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,2,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+3,Total Utilitarian,6,2,givewell,20.0000,0.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000
+3,Total Utilitarian,6,2,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+3,Total Utilitarian,6,2,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,2,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+3,Total Utilitarian,6,2,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+3,Total Utilitarian,6,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,1.0,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+4,Total Utilitarian,0,1.0,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,1.0,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,1.0,longview_ai,25.0000,0.0000,25.0000,25.0000,25.0000,25.0000,25.0000,25.0000
+4,Total Utilitarian,0,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,1.0,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+4,Total Utilitarian,0,1.0,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+4,Total Utilitarian,0,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,0.1,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+4,Total Utilitarian,0,0.1,givewell,4.0000,4.0000,4.0000,4.0000,4.0000,4.0000,4.0000,4.0000
+4,Total Utilitarian,0,0.1,leaf,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+4,Total Utilitarian,0,0.1,longview_ai,40.0000,15.0000,40.0000,40.0000,40.0000,40.0000,40.0000,40.0000
+4,Total Utilitarian,0,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,0.1,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+4,Total Utilitarian,0,0.1,navigation_fund_general,21.0000,-21.0000,21.0000,21.0000,21.0000,21.0000,21.0000,21.0000
+4,Total Utilitarian,0,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,100,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+4,Total Utilitarian,0,100,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,100,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,100,longview_ai,25.0000,0.0000,25.0000,25.0000,25.0000,25.0000,25.0000,25.0000
+4,Total Utilitarian,0,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,100,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+4,Total Utilitarian,0,100,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+4,Total Utilitarian,0,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,10,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+4,Total Utilitarian,0,10,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,10,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,10,longview_ai,25.0000,0.0000,25.0000,25.0000,25.0000,25.0000,25.0000,25.0000
+4,Total Utilitarian,0,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,10,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+4,Total Utilitarian,0,10,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+4,Total Utilitarian,0,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,5,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+4,Total Utilitarian,0,5,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,5,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,5,longview_ai,25.0000,0.0000,25.0000,25.0000,25.0000,25.0000,25.0000,25.0000
+4,Total Utilitarian,0,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,5,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+4,Total Utilitarian,0,5,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+4,Total Utilitarian,0,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,2,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+4,Total Utilitarian,0,2,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,2,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,2,longview_ai,25.0000,0.0000,25.0000,25.0000,25.0000,25.0000,25.0000,25.0000
+4,Total Utilitarian,0,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,2,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+4,Total Utilitarian,0,2,navigation_fund_general,42.0000,0.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+4,Total Utilitarian,0,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,100,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,100,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,100,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,100,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+5,Consequentialism (Non-Utilitarian),0,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,100,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,100,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,10,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,10,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,10,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,10,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+5,Consequentialism (Non-Utilitarian),0,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,10,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,10,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,5,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,5,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,5,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,5,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+5,Consequentialism (Non-Utilitarian),0,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,5,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,5,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,2,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,2,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,2,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,2,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+5,Consequentialism (Non-Utilitarian),0,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,2,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,2,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,100,ea_awf,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+6,Consequentialism (Non-Utilitarian),0,100,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,100,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,100,longview_ai,47.0000,-53.0000,47.0000,47.0000,47.0000,47.0000,47.0000,47.0000
+6,Consequentialism (Non-Utilitarian),0,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,100,navigation_fund_cagefree,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+6,Consequentialism (Non-Utilitarian),0,100,navigation_fund_general,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000
+6,Consequentialism (Non-Utilitarian),0,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,10,ea_awf,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+6,Consequentialism (Non-Utilitarian),0,10,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,10,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,10,longview_ai,89.0000,-11.0000,89.0000,89.0000,89.0000,89.0000,89.0000,89.0000
+6,Consequentialism (Non-Utilitarian),0,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,10,navigation_fund_cagefree,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000
+6,Consequentialism (Non-Utilitarian),0,10,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,5,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,5,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,5,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,5,longview_ai,97.0000,-3.0000,97.0000,97.0000,97.0000,97.0000,97.0000,97.0000
+6,Consequentialism (Non-Utilitarian),0,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,5,navigation_fund_cagefree,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+6,Consequentialism (Non-Utilitarian),0,5,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,2,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,2,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,2,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,2,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+6,Consequentialism (Non-Utilitarian),0,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,2,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,2,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,ea_awf,3.0000,0.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,longview_ai,88.0000,0.0000,88.0000,88.0000,88.0000,88.0000,88.0000,88.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,navigation_fund_cagefree,9.0000,0.0000,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,ea_awf,0.0000,-3.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,longview_ai,100.0000,12.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,navigation_fund_cagefree,0.0000,-9.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,100,ea_awf,17.0000,14.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+7,Consequentialism (Non-Utilitarian),0,100,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,100,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,100,longview_ai,44.0000,-44.0000,44.0000,44.0000,44.0000,44.0000,44.0000,44.0000
+7,Consequentialism (Non-Utilitarian),0,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,100,navigation_fund_cagefree,16.0000,7.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+7,Consequentialism (Non-Utilitarian),0,100,navigation_fund_general,23.0000,23.0000,23.0000,23.0000,23.0000,23.0000,23.0000,23.0000
+7,Consequentialism (Non-Utilitarian),0,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,10,ea_awf,17.0000,14.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+7,Consequentialism (Non-Utilitarian),0,10,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,10,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,10,longview_ai,45.0000,-43.0000,45.0000,45.0000,45.0000,45.0000,45.0000,45.0000
+7,Consequentialism (Non-Utilitarian),0,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,10,navigation_fund_cagefree,16.0000,7.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+7,Consequentialism (Non-Utilitarian),0,10,navigation_fund_general,22.0000,22.0000,22.0000,22.0000,22.0000,22.0000,22.0000,22.0000
+7,Consequentialism (Non-Utilitarian),0,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,5,ea_awf,17.0000,14.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+7,Consequentialism (Non-Utilitarian),0,5,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,5,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,5,longview_ai,53.0000,-35.0000,53.0000,53.0000,53.0000,53.0000,53.0000,53.0000
+7,Consequentialism (Non-Utilitarian),0,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,5,navigation_fund_cagefree,16.0000,7.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+7,Consequentialism (Non-Utilitarian),0,5,navigation_fund_general,14.0000,14.0000,14.0000,14.0000,14.0000,14.0000,14.0000,14.0000
+7,Consequentialism (Non-Utilitarian),0,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,2,ea_awf,8.0000,5.0000,8.0000,8.0000,8.0000,8.0000,8.0000,8.0000
+7,Consequentialism (Non-Utilitarian),0,2,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,2,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,2,longview_ai,71.0000,-17.0000,71.0000,71.0000,71.0000,71.0000,71.0000,71.0000
+7,Consequentialism (Non-Utilitarian),0,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,2,navigation_fund_cagefree,16.0000,7.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+7,Consequentialism (Non-Utilitarian),0,2,navigation_fund_general,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+7,Consequentialism (Non-Utilitarian),0,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,ea_awf,7.0000,0.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,givewell,64.0000,0.0000,64.0000,64.0000,64.0000,64.0000,64.0000,64.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,leaf,8.0000,0.0000,8.0000,8.0000,8.0000,8.0000,8.0000,8.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,navigation_fund_general,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+8,Consequentialism (Non-Utilitarian),2,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,ea_awf,0.0000,-7.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,givewell,91.0000,27.0000,91.0000,91.0000,91.0000,91.0000,91.0000,91.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,leaf,9.0000,1.0000,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,navigation_fund_cagefree,0.0000,-16.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,navigation_fund_general,0.0000,-5.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,100,ea_awf,17.0000,10.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+8,Consequentialism (Non-Utilitarian),2,100,givewell,18.0000,-46.0000,18.0000,18.0000,18.0000,18.0000,18.0000,18.0000
+8,Consequentialism (Non-Utilitarian),2,100,leaf,7.0000,-1.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+8,Consequentialism (Non-Utilitarian),2,100,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,100,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+8,Consequentialism (Non-Utilitarian),2,100,navigation_fund_general,42.0000,37.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+8,Consequentialism (Non-Utilitarian),2,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,10,ea_awf,17.0000,10.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+8,Consequentialism (Non-Utilitarian),2,10,givewell,18.0000,-46.0000,18.0000,18.0000,18.0000,18.0000,18.0000,18.0000
+8,Consequentialism (Non-Utilitarian),2,10,leaf,7.0000,-1.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+8,Consequentialism (Non-Utilitarian),2,10,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,10,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+8,Consequentialism (Non-Utilitarian),2,10,navigation_fund_general,42.0000,37.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+8,Consequentialism (Non-Utilitarian),2,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,5,ea_awf,17.0000,10.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+8,Consequentialism (Non-Utilitarian),2,5,givewell,26.0000,-38.0000,26.0000,26.0000,26.0000,26.0000,26.0000,26.0000
+8,Consequentialism (Non-Utilitarian),2,5,leaf,7.0000,-1.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+8,Consequentialism (Non-Utilitarian),2,5,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,5,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+8,Consequentialism (Non-Utilitarian),2,5,navigation_fund_general,34.0000,29.0000,34.0000,34.0000,34.0000,34.0000,34.0000,34.0000
+8,Consequentialism (Non-Utilitarian),2,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,2,ea_awf,17.0000,10.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+8,Consequentialism (Non-Utilitarian),2,2,givewell,46.0000,-18.0000,46.0000,46.0000,46.0000,46.0000,46.0000,46.0000
+8,Consequentialism (Non-Utilitarian),2,2,leaf,8.0000,0.0000,8.0000,8.0000,8.0000,8.0000,8.0000,8.0000
+8,Consequentialism (Non-Utilitarian),2,2,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,2,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+8,Consequentialism (Non-Utilitarian),2,2,navigation_fund_general,13.0000,8.0000,13.0000,13.0000,13.0000,13.0000,13.0000,13.0000
+8,Consequentialism (Non-Utilitarian),2,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,1.0,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+9,Contractualism,5,1.0,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,1.0,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,1.0,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,1.0,longview_nuclear,15.0000,0.0000,15.0000,15.0000,15.0000,15.0000,15.0000,15.0000
+9,Contractualism,5,1.0,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+9,Contractualism,5,1.0,navigation_fund_general,33.0000,0.0000,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000
+9,Contractualism,5,1.0,sentinel_bio,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+9,Contractualism,5,0.1,ea_awf,7.0000,-10.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+9,Contractualism,5,0.1,givewell,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000
+9,Contractualism,5,0.1,leaf,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+9,Contractualism,5,0.1,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,0.1,longview_nuclear,15.0000,0.0000,15.0000,15.0000,15.0000,15.0000,15.0000,15.0000
+9,Contractualism,5,0.1,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+9,Contractualism,5,0.1,navigation_fund_general,4.0000,-29.0000,4.0000,4.0000,4.0000,4.0000,4.0000,4.0000
+9,Contractualism,5,0.1,sentinel_bio,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+9,Contractualism,5,100,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+9,Contractualism,5,100,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,100,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,100,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,100,longview_nuclear,15.0000,0.0000,15.0000,15.0000,15.0000,15.0000,15.0000,15.0000
+9,Contractualism,5,100,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+9,Contractualism,5,100,navigation_fund_general,33.0000,0.0000,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000
+9,Contractualism,5,100,sentinel_bio,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+9,Contractualism,5,10,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+9,Contractualism,5,10,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,10,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,10,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,10,longview_nuclear,15.0000,0.0000,15.0000,15.0000,15.0000,15.0000,15.0000,15.0000
+9,Contractualism,5,10,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+9,Contractualism,5,10,navigation_fund_general,33.0000,0.0000,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000
+9,Contractualism,5,10,sentinel_bio,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+9,Contractualism,5,5,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+9,Contractualism,5,5,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,5,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,5,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,5,longview_nuclear,15.0000,0.0000,15.0000,15.0000,15.0000,15.0000,15.0000,15.0000
+9,Contractualism,5,5,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+9,Contractualism,5,5,navigation_fund_general,33.0000,0.0000,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000
+9,Contractualism,5,5,sentinel_bio,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+9,Contractualism,5,2,ea_awf,17.0000,0.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+9,Contractualism,5,2,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,2,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,2,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,2,longview_nuclear,15.0000,0.0000,15.0000,15.0000,15.0000,15.0000,15.0000,15.0000
+9,Contractualism,5,2,navigation_fund_cagefree,16.0000,0.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+9,Contractualism,5,2,navigation_fund_general,33.0000,0.0000,33.0000,33.0000,33.0000,33.0000,33.0000,33.0000
+9,Contractualism,5,2,sentinel_bio,19.0000,0.0000,19.0000,19.0000,19.0000,19.0000,19.0000,19.0000
+10,Contractualism,0,1.0,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,1.0,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,1.0,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,1.0,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+10,Contractualism,0,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,1.0,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+10,Contractualism,0,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,100,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,100,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,100,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,100,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+10,Contractualism,0,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,100,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,100,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,10,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,10,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,10,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,10,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+10,Contractualism,0,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,10,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,10,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,5,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,5,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,5,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,5,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+10,Contractualism,0,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,5,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,5,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,2,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,2,givewell,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,2,leaf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,2,longview_ai,100.0000,0.0000,100.0000,100.0000,100.0000,100.0000,100.0000,100.0000
+10,Contractualism,0,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,2,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,2,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,1.0,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,1.0,givewell,93.0000,0.0000,93.0000,93.0000,93.0000,93.0000,93.0000,93.0000
+11,Contractualism,2,1.0,leaf,7.0000,0.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+11,Contractualism,2,1.0,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,1.0,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.1,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.1,givewell,93.0000,0.0000,93.0000,93.0000,93.0000,93.0000,93.0000,93.0000
+11,Contractualism,2,0.1,leaf,7.0000,0.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+11,Contractualism,2,0.1,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.1,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,100,ea_awf,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000,17.0000
+11,Contractualism,2,100,givewell,20.0000,-73.0000,20.0000,20.0000,20.0000,20.0000,20.0000,20.0000
+11,Contractualism,2,100,leaf,5.0000,-2.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+11,Contractualism,2,100,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,100,navigation_fund_cagefree,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+11,Contractualism,2,100,navigation_fund_general,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000,42.0000
+11,Contractualism,2,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,10,ea_awf,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+11,Contractualism,2,10,givewell,66.0000,-27.0000,66.0000,66.0000,66.0000,66.0000,66.0000,66.0000
+11,Contractualism,2,10,leaf,6.0000,-1.0000,6.0000,6.0000,6.0000,6.0000,6.0000,6.0000
+11,Contractualism,2,10,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,10,navigation_fund_cagefree,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+11,Contractualism,2,10,navigation_fund_general,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+11,Contractualism,2,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,5,ea_awf,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+11,Contractualism,2,5,givewell,84.0000,-9.0000,84.0000,84.0000,84.0000,84.0000,84.0000,84.0000
+11,Contractualism,2,5,leaf,7.0000,0.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+11,Contractualism,2,5,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,5,navigation_fund_cagefree,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+11,Contractualism,2,5,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,2,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,2,givewell,92.0000,-1.0000,92.0000,92.0000,92.0000,92.0000,92.0000,92.0000
+11,Contractualism,2,2,leaf,7.0000,0.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+11,Contractualism,2,2,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,2,navigation_fund_cagefree,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000,1.0000
+11,Contractualism,2,2,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,1.0,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,1.0,givewell,95.0000,0.0000,95.0000,95.0000,95.0000,95.0000,95.0000,95.0000
+12,Kantianism,3,1.0,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+12,Kantianism,3,1.0,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,1.0,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.1,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.1,givewell,95.0000,0.0000,95.0000,95.0000,95.0000,95.0000,95.0000,95.0000
+12,Kantianism,3,0.1,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+12,Kantianism,3,0.1,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.1,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,100,ea_awf,10.0000,10.0000,10.0000,10.0000,10.0000,10.0000,10.0000,10.0000
+12,Kantianism,3,100,givewell,63.0000,-32.0000,63.0000,63.0000,63.0000,63.0000,63.0000,63.0000
+12,Kantianism,3,100,leaf,4.0000,-1.0000,4.0000,4.0000,4.0000,4.0000,4.0000,4.0000
+12,Kantianism,3,100,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,100,navigation_fund_cagefree,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+12,Kantianism,3,100,navigation_fund_general,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+12,Kantianism,3,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,10,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,10,givewell,95.0000,0.0000,95.0000,95.0000,95.0000,95.0000,95.0000,95.0000
+12,Kantianism,3,10,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+12,Kantianism,3,10,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,10,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,10,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,5,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,5,givewell,95.0000,0.0000,95.0000,95.0000,95.0000,95.0000,95.0000,95.0000
+12,Kantianism,3,5,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+12,Kantianism,3,5,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,5,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,5,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,2,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,2,givewell,95.0000,0.0000,95.0000,95.0000,95.0000,95.0000,95.0000,95.0000
+12,Kantianism,3,2,leaf,5.0000,0.0000,5.0000,5.0000,5.0000,5.0000,5.0000,5.0000
+12,Kantianism,3,2,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,2,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,2,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,1.0,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,1.0,givewell,97.0000,0.0000,97.0000,97.0000,97.0000,97.0000,97.0000,97.0000
+13,Custom,6,1.0,leaf,3.0000,0.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+13,Custom,6,1.0,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,1.0,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,1.0,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,1.0,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,1.0,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.1,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.1,givewell,97.0000,0.0000,97.0000,97.0000,97.0000,97.0000,97.0000,97.0000
+13,Custom,6,0.1,leaf,3.0000,0.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+13,Custom,6,0.1,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.1,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.1,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.1,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.1,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,100,ea_awf,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000,9.0000
+13,Custom,6,100,givewell,66.0000,-31.0000,66.0000,66.0000,66.0000,66.0000,66.0000,66.0000
+13,Custom,6,100,leaf,2.0000,-1.0000,2.0000,2.0000,2.0000,2.0000,2.0000,2.0000
+13,Custom,6,100,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,100,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,100,navigation_fund_cagefree,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000,16.0000
+13,Custom,6,100,navigation_fund_general,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000,7.0000
+13,Custom,6,100,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,10,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,10,givewell,97.0000,0.0000,97.0000,97.0000,97.0000,97.0000,97.0000,97.0000
+13,Custom,6,10,leaf,3.0000,0.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+13,Custom,6,10,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,10,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,10,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,10,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,10,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,5,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,5,givewell,97.0000,0.0000,97.0000,97.0000,97.0000,97.0000,97.0000,97.0000
+13,Custom,6,5,leaf,3.0000,0.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+13,Custom,6,5,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,5,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,5,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,5,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,5,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,2,ea_awf,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,2,givewell,97.0000,0.0000,97.0000,97.0000,97.0000,97.0000,97.0000,97.0000
+13,Custom,6,2,leaf,3.0000,0.0000,3.0000,3.0000,3.0000,3.0000,3.0000,3.0000
+13,Custom,6,2,longview_ai,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,2,longview_nuclear,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,2,navigation_fund_cagefree,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,2,navigation_fund_general,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,2,sentinel_bio,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000

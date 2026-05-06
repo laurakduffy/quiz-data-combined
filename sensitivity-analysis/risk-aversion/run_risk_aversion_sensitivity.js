@@ -36,6 +36,7 @@ import {
   writeCsv,
   parseArgs,
   checkDrCeilings,
+  groupByCauseArea,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -204,6 +205,8 @@ writeCsv(
 
 const summaryRows = [];
 const byFundRows = [];
+const causeSummaryRows = [];
+const caKeys = ['ghd', 'gcr', 'aw'];
 let drChecksPassed = true;
 let drCheckCount = 0;
 
@@ -265,6 +268,26 @@ for (const [testName, test] of activeTests) {
   }
   summaryRows.push(summaryRow);
 
+  // Cause-area summary row
+  const baseCA = groupByCauseArea(baseAlloc);
+  const newCA = groupByCauseArea(newAlloc);
+  const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCA[ca]), 0) / 2;
+  const mostAffCA = caKeys.reduce((a, b) =>
+    Math.abs(newCA[a] - baseCA[a]) > Math.abs(newCA[b] - baseCA[b]) ? a : b
+  );
+  const causeSummaryRow = {
+    test: testName,
+    sensitivity_index: siCA.toFixed(4),
+    most_affected_cause: mostAffCA,
+    most_affected_delta: (newCA[mostAffCA] - baseCA[mostAffCA]).toFixed(2),
+  };
+  for (const ca of caKeys) {
+    causeSummaryRow[`${ca}_base`] = baseCA[ca].toFixed(2);
+    causeSummaryRow[`${ca}_new`] = newCA[ca].toFixed(2);
+    causeSummaryRow[`${ca}_delta`] = (newCA[ca] - baseCA[ca]).toFixed(2);
+  }
+  causeSummaryRows.push(causeSummaryRow);
+
   // By-fund rows
   for (const fid of fundIds) {
     byFundRows.push({
@@ -320,6 +343,18 @@ writeCsv(
     'rank_delta',
   ],
   byFundRows
+);
+causeSummaryRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
+writeCsv(
+  join(OUTPUT_DIR, 'risk_aversion_cause_area_summary.csv'),
+  [
+    'test',
+    'sensitivity_index',
+    'most_affected_cause',
+    'most_affected_delta',
+    ...caKeys.flatMap((ca) => [`${ca}_base`, `${ca}_new`, `${ca}_delta`]),
+  ],
+  causeSummaryRows
 );
 
 console.log(

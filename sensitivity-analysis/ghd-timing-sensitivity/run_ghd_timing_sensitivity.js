@@ -31,6 +31,7 @@ import {
   writeCsv,
   parseArgs,
   checkDrCeilings,
+  groupByCauseArea,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -155,6 +156,8 @@ if (isWeighted) {
 const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
+const baseCauseAlloc = groupByCauseArea(baseAlloc);
+const caKeys = ['ghd', 'gcr', 'aw'];
 
 // ---------------------------------------------------------------------------
 // Scenario loop
@@ -177,6 +180,13 @@ const allocRows = [
 ];
 const byFundRows = [];
 const indexRows = [];
+const causeAllocRows = [
+  {
+    scenario: 'baseline',
+    ...Object.fromEntries(caKeys.map((ca) => [ca, baseCauseAlloc[ca].toFixed(2)])),
+  },
+];
+const causeIndexRows = [];
 
 console.log(`\n${'-'.repeat(60)}`);
 for (const [scenarioName, fundTiming] of Object.entries(timingEffects)) {
@@ -242,6 +252,22 @@ for (const [scenarioName, fundTiming] of Object.entries(timingEffects)) {
     most_affected_fund: mostAff,
     most_affected_delta: delta.toFixed(2),
   });
+
+  const newCA = groupByCauseArea(newAlloc);
+  const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCauseAlloc[ca]), 0) / 2;
+  const mostAffCA = caKeys.reduce((a, b) =>
+    Math.abs(newCA[a] - baseCauseAlloc[a]) > Math.abs(newCA[b] - baseCauseAlloc[b]) ? a : b
+  );
+  causeAllocRows.push({
+    scenario: scenarioName,
+    ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(2)])),
+  });
+  causeIndexRows.push({
+    scenario: scenarioName,
+    sensitivity_index: siCA.toFixed(4),
+    most_affected_cause: mostAffCA,
+    most_affected_delta: (newCA[mostAffCA] - baseCauseAlloc[mostAffCA]).toFixed(2),
+  });
 }
 
 indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
@@ -264,6 +290,17 @@ writeCsv(
   join(OUTPUT_DIR, 'ghd_timing_index.csv'),
   ['scenario', 'sensitivity_index', 'most_affected_fund', 'most_affected_delta'],
   indexRows
+);
+causeIndexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
+writeCsv(
+  join(OUTPUT_DIR, 'ghd_timing_cause_area_allocations.csv'),
+  ['scenario', ...caKeys],
+  causeAllocRows
+);
+writeCsv(
+  join(OUTPUT_DIR, 'ghd_timing_cause_area_index.csv'),
+  ['scenario', 'sensitivity_index', 'most_affected_cause', 'most_affected_delta'],
+  causeIndexRows
 );
 
 console.log(

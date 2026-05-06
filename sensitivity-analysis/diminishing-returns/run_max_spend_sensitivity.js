@@ -29,6 +29,7 @@ import {
   writeCsv,
   parseArgs,
   checkDrCeilings,
+  groupByCauseArea,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -100,6 +101,8 @@ if (isWeighted) {
 const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
+const baseCauseAlloc = groupByCauseArea(baseAlloc);
+const caKeys = ['ghd', 'gcr', 'aw'];
 
 if (args.dryRun) {
   console.log('\n  DRY RUN — scenarios:');
@@ -133,6 +136,13 @@ const allocRows = [
 ];
 const byFundRows = [];
 const indexRows = [];
+const causeAllocRows = [
+  {
+    scenario: 'baseline_5x',
+    ...Object.fromEntries(caKeys.map((ca) => [ca, baseCauseAlloc[ca].toFixed(2)])),
+  },
+];
+const causeIndexRows = [];
 
 console.log(`\n${'-'.repeat(60)}`);
 for (const { label, multiplier } of SCENARIOS) {
@@ -209,6 +219,23 @@ for (const { label, multiplier } of SCENARIOS) {
     most_affected_fund: mostAff,
     most_affected_delta: mostAffDelta.toFixed(2),
   });
+
+  const newCA = groupByCauseArea(newAlloc);
+  const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCauseAlloc[ca]), 0) / 2;
+  const mostAffCA = caKeys.reduce((a, b) =>
+    Math.abs(newCA[a] - baseCauseAlloc[a]) > Math.abs(newCA[b] - baseCauseAlloc[b]) ? a : b
+  );
+  causeAllocRows.push({
+    scenario: label,
+    ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(2)])),
+  });
+  causeIndexRows.push({
+    scenario: label,
+    max_addl_spend_multiplier: multiplier,
+    sensitivity_index: siCA.toFixed(4),
+    most_affected_cause: mostAffCA,
+    most_affected_delta: (newCA[mostAffCA] - baseCauseAlloc[mostAffCA]).toFixed(2),
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -254,6 +281,22 @@ writeCsv(
     'most_affected_delta',
   ],
   indexRows
+);
+writeCsv(
+  join(OUTPUT_DIR, 'max_spend_cause_area_allocations.csv'),
+  ['scenario', ...caKeys],
+  causeAllocRows
+);
+writeCsv(
+  join(OUTPUT_DIR, 'max_spend_cause_area_index.csv'),
+  [
+    'scenario',
+    'max_addl_spend_multiplier',
+    'sensitivity_index',
+    'most_affected_cause',
+    'most_affected_delta',
+  ],
+  causeIndexRows
 );
 
 console.log(

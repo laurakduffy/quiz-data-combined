@@ -1,0 +1,9 @@
+combo,sensitivity_index,most_affected_cause,most_affected_delta
+gcr_and_aw_low_power,2.7307,ghd,2.73
+aw_low_power,2.4247,aw,-2.42
+gcr_high_aw_low_power,2.4247,aw,-2.42
+gcr_high_power,1.2000,ghd,-1.20
+gcr_and_aw_high_power,0.9617,ghd,-0.96
+gcr_low_aw_high_power,0.7275,gcr,-0.73
+gcr_low_power,0.6000,gcr,-0.60
+aw_high_power,0.5275,gcr,-0.53

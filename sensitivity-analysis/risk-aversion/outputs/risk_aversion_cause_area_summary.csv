@@ -1,0 +1,12 @@
+test,sensitivity_index,most_affected_cause,most_affected_delta,ghd_base,ghd_new,ghd_delta,gcr_base,gcr_new,gcr_delta,aw_base,aw_new,aw_delta
+neutral_to_combined,90.1525,gcr,-90.15,0.00,35.32,35.32,90.15,0.00,-90.15,9.85,64.68,54.84
+neutral_to_cont_upside_skep,80.6950,gcr,-80.69,0.00,28.76,28.76,90.15,9.46,-80.69,9.85,61.79,51.94
+neutral_to_downside_critical,56.1525,gcr,-56.15,0.00,16.43,16.43,90.15,34.00,-56.15,9.85,49.57,39.73
+specialblend_to_neutral,54.5190,gcr,54.52,17.89,0.00,-17.89,35.63,90.15,54.52,46.48,9.85,-36.63
+specialblend_to_bilateral_skep,54.3890,gcr,54.39,17.89,0.00,-17.89,35.63,90.02,54.39,46.48,9.98,-36.50
+specialblend_to_combined,35.6335,gcr,-35.63,17.89,35.32,17.43,35.63,0.00,-35.63,46.48,64.68,18.21
+specialblend_to_wlu_5,35.6295,gcr,-35.63,17.89,37.50,19.61,35.63,0.00,-35.63,46.48,62.49,16.02
+specialblend_to_wlu_10,35.6295,gcr,-35.63,17.89,37.76,19.87,35.63,0.00,-35.63,46.48,62.23,15.76
+specialblend_to_cont_upside_skep,26.1760,gcr,-26.18,17.89,28.76,10.87,35.63,9.46,-26.18,46.48,61.79,15.31
+specialblend_to_downside_critical,3.0973,aw,3.10,17.89,16.43,-1.46,35.63,34.00,-1.63,46.48,49.57,3.10
+neutral_to_bilateral_skep,0.1300,gcr,-0.13,0.00,0.00,0.00,90.15,90.02,-0.13,9.85,9.98,0.13

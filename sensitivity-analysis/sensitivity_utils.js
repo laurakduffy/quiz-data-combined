@@ -112,6 +112,20 @@ export function checkDrCeilings(projects, incrementSize, funding, label = '') {
   return passed;
 }
 
+export const CAUSE_AREA_GROUPS = {
+  ghd: ['givewell', 'leaf'],
+  gcr: ['longview_ai', 'longview_nuclear', 'sentinel_bio'],
+  aw: ['ea_awf', 'navigation_fund_cagefree', 'navigation_fund_general'],
+};
+
+export function groupByCauseArea(allocations) {
+  const result = {};
+  for (const [area, funds] of Object.entries(CAUSE_AREA_GROUPS)) {
+    result[area] = funds.reduce((s, f) => s + (allocations[f] ?? 0), 0);
+  }
+  return result;
+}
+
 export function parseArgs(argv) {
   const args = { base: null, worldviewsFile: null, dryRun: false, approach: 'weighted' };
   for (let i = 2; i < argv.length; i++) {
