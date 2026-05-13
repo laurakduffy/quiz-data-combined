@@ -664,3 +664,245 @@ for fund_id, fyaml, fcsv in fund_output_paths:
 print(f"  Histograms:         {histogram_dir}/ ({len(intervention_samples)} images)")
 print(f"{'=' * 70}")
 print("\nDone!")
+
+# ════════════════════════════════════════════════════════════════════════
+# SUMMARY CSVs
+# Four files written to data/outputs/:
+#   summary_animals_per_dollar.csv   — percentiles of animals affected per $
+#   summary_sy_per_animal.csv        — percentiles of SY avoided per animal
+#   summary_sy_per_dollar.csv        — percentiles of SY avoided per $
+#   summary_fund_allocations.csv     — % of each fund going to each intervention
+#
+# Chicken, policy advocacy, and movement building use a direct DALY estimate
+# with no separate animal-count step, so they are omitted from the first two
+# files. All SY values are pre-moral-weight.
+# ════════════════════════════════════════════════════════════════════════
+
+print("\n" + "=" * 70)
+print("GENERATING SUMMARY CSVs")
+print("=" * 70)
+
+SUMMARY_PERCENTILES = [1, 5, 10, 25, 50, 75, 90, 95, 99]
+SUMMARY_PCT_COLS = ["p1", "p5", "p10", "p25", "p50", "p75", "p90", "p95", "p99", "mean"]
+
+
+def _spct(arr):
+    vals = [float(v) for v in np.percentile(arr, SUMMARY_PERCENTILES)]
+    vals.append(float(np.mean(arr)))
+    return dict(zip(SUMMARY_PCT_COLS, vals))
+
+
+def _write_summary_csv(path, rows, fieldnames):
+    with open(path, "w", newline="") as _f:
+        _w = csv.DictWriter(_f, fieldnames=fieldnames)
+        _w.writeheader()
+        _w.writerows(rows)
+    print(f"  Wrote {path}")
+
+
+# ── Intermediate: animals per dollar ──
+# For shrimp: weighted reach across slaughter and water-quality pathways.
+# Harm sign NOT applied to reach counts (it applies to welfare, not headcount).
+_shrimp_animals_per_dollar = (
+    shrimp_slaughter_pct_funding * shrimp_per_dollar_slaughter
+    + (1 - shrimp_slaughter_pct_funding) * shrimp_per_dollar_sludge
+)
+
+# For BSF: derive from pre-harm SY/$ divided by SY/animal
+_bsf_sy_per_animal_raw = (bsf_hours_suffering / HOURS_PER_YEAR) * bsf_prop_reduced
+_bsf_animals_per_dollar = np.where(
+    _bsf_sy_per_animal_raw > 0, bsf_sy_per_dollar / _bsf_sy_per_animal_raw, 0.0
+)
+
+# For wild mammals and invertebrates: derive from their pre-harm SY/$ / SY/animal
+_wm_sy_per_animal_raw = (wild_mammal_suffering_hrs_per_rat / HOURS_PER_YEAR) * wild_mammal_percent_deaths_averted_if_success
+_wm_animals_per_dollar = np.where(
+    _wm_sy_per_animal_raw > 0, wild_mammal_sy_per_dollar / _wm_sy_per_animal_raw, 0.0
+)
+_wi_sy_per_animal_raw = (wild_invert_hours_suffering / HOURS_PER_YEAR) * wild_invert_prop_reduced
+_wi_animals_per_dollar = np.where(
+    _wi_sy_per_animal_raw > 0, wild_invert_sy_per_dollar / _wi_sy_per_animal_raw, 0.0
+)
+_wild_animals_per_dollar = (
+    wild_share_mammals * _wm_animals_per_dollar
+    + (1 - wild_share_mammals) * _wi_animals_per_dollar
+)
+
+# ── Intermediate: SY per animal (post-harm / animals per dollar) ──
+_shrimp_sy_per_animal = np.where(
+    _shrimp_animals_per_dollar > 0,
+    shrimp_avg_dalys_reduced_per_dollar / _shrimp_animals_per_dollar,
+    0.0,
+)
+_carp_sy_per_animal = carp_sy_per_dollar / carp_affected_per_dollar  # always > 0
+_bsf_sy_per_animal = np.where(
+    _bsf_animals_per_dollar > 0,
+    (bsf_sy_per_1000 / 1000) / _bsf_animals_per_dollar,
+    0.0,
+)
+_wild_sy_per_animal = np.where(
+    _wild_animals_per_dollar > 0,
+    (wild_sy_per_1000 / 1000) / _wild_animals_per_dollar,
+    0.0,
+)
+
+# ── 1. Animals per dollar ──
+_ANOTES = "intervention", "description", "unit", "notes"
+_animals_rows = [
+    {
+        "intervention": "shrimp_welfare",
+        "description": "Shrimp welfare interventions",
+        "unit": "shrimp per $",
+        "notes": "Weighted mix: ~90% slaughter pathway, ~10% water quality; harm sign not applied to reach",
+        **_spct(_shrimp_animals_per_dollar),
+    },
+    {
+        "intervention": "fish_welfare",
+        "description": "Farmed fish welfare (carp proxy)",
+        "unit": "fish per $",
+        "notes": "",
+        **_spct(carp_affected_per_dollar),
+    },
+    {
+        "intervention": "invertebrate_welfare",
+        "description": "Invertebrate welfare (BSF proxy)",
+        "unit": "insects per $",
+        "notes": "Insects affected over persistence period; ~20% P(success); harm sign not applied to reach",
+        **_spct(_bsf_animals_per_dollar),
+    },
+    {
+        "intervention": "wild_animal_welfare",
+        "description": "Wild animal welfare (mixture: mammals + invertebrates)",
+        "unit": "animals per $",
+        "notes": "Mixture of wild mammal and invertebrate models; harm sign not applied to reach",
+        **_spct(_wild_animals_per_dollar),
+    },
+]
+_write_summary_csv(
+    os.path.join(outputs_dir, "summary_animals_per_dollar.csv"),
+    _animals_rows,
+    list(_ANOTES) + SUMMARY_PCT_COLS,
+)
+
+# ── 2. SY per animal ──
+_sy_per_animal_rows = [
+    {
+        "intervention": "shrimp_welfare",
+        "description": "Shrimp welfare interventions",
+        "unit": "SY per shrimp (pre-moral-weight)",
+        "notes": "Negative values possible: ~12.5% P(harm) on water quality pathway",
+        **_spct(_shrimp_sy_per_animal),
+    },
+    {
+        "intervention": "fish_welfare",
+        "description": "Farmed fish welfare (carp proxy)",
+        "unit": "SY per fish (pre-moral-weight)",
+        "notes": "",
+        **_spct(_carp_sy_per_animal),
+    },
+    {
+        "intervention": "invertebrate_welfare",
+        "description": "Invertebrate welfare (BSF proxy)",
+        "unit": "SY per insect (pre-moral-weight)",
+        "notes": "Negative values possible: ~13% P(harm)",
+        **_spct(_bsf_sy_per_animal),
+    },
+    {
+        "intervention": "wild_animal_welfare",
+        "description": "Wild animal welfare (mixture)",
+        "unit": "SY per animal (pre-moral-weight)",
+        "notes": "Negative values possible: ~20% P(harm)",
+        **_spct(_wild_sy_per_animal),
+    },
+]
+_write_summary_csv(
+    os.path.join(outputs_dir, "summary_sy_per_animal.csv"),
+    _sy_per_animal_rows,
+    list(_ANOTES) + SUMMARY_PCT_COLS,
+)
+
+# ── 3. SY per dollar ──
+_sy_per_dollar_rows = [
+    {
+        "intervention": "chicken_corporate_campaigns",
+        "description": "Corporate cage-free and welfare campaigns for chickens",
+        "unit": "SY per $ (pre-moral-weight)",
+        "notes": "Direct DALY estimate; no separate animal-count step",
+        **_spct(chicken_sy_per_1000 / 1000),
+    },
+    {
+        "intervention": "shrimp_welfare",
+        "description": "Shrimp welfare interventions",
+        "unit": "SY per $ (pre-moral-weight)",
+        "notes": "Negative values possible: ~12.5% P(harm) on water quality pathway",
+        **_spct(shrimp_avg_dalys_reduced_per_dollar),
+    },
+    {
+        "intervention": "fish_welfare",
+        "description": "Farmed fish welfare (carp proxy)",
+        "unit": "SY per $ (pre-moral-weight)",
+        "notes": "",
+        **_spct(carp_sy_per_dollar),
+    },
+    {
+        "intervention": "invertebrate_welfare",
+        "description": "Invertebrate welfare (BSF proxy)",
+        "unit": "SY per $ (pre-moral-weight)",
+        "notes": "Negative values possible: ~13% P(harm)",
+        **_spct(bsf_sy_per_1000 / 1000),
+    },
+    {
+        "intervention": "policy_advocacy",
+        "description": "Policy advocacy",
+        "unit": "SY per $ (pre-moral-weight)",
+        "notes": "Derived: 50% of chicken corporate campaigns estimate",
+        **_spct(policy_blend / 1000),
+    },
+    {
+        "intervention": "movement_building",
+        "description": "Movement building",
+        "unit": "SY per $ (pre-moral-weight)",
+        "notes": "Derived: 25% of chicken corporate campaigns estimate",
+        **_spct(movement / 1000),
+    },
+    {
+        "intervention": "wild_animal_welfare",
+        "description": "Wild animal welfare (mixture: mammals + invertebrates)",
+        "unit": "SY per $ (pre-moral-weight)",
+        "notes": "Negative values possible: ~20% P(harm)",
+        **_spct(wild_sy_per_1000 / 1000),
+    },
+]
+_write_summary_csv(
+    os.path.join(outputs_dir, "summary_sy_per_dollar.csv"),
+    _sy_per_dollar_rows,
+    list(_ANOTES) + SUMMARY_PCT_COLS,
+)
+
+# ── 4. Fund allocations ──
+_fund_ids_summary = ["ea_awf", "navigation_fund_general", "navigation_fund_cagefree", "aw_combined"]
+_all_keys = [
+    "chicken_corporate_campaigns", "shrimp_welfare", "fish_welfare",
+    "invertebrate_welfare", "policy_advocacy", "movement_building", "wild_animal_welfare",
+]
+_alloc_rows = []
+for _ikey in _all_keys:
+    _row = {"intervention": _ikey}
+    for _fid in _fund_ids_summary:
+        with open(os.path.join(funds_dir, f"{_fid}.yaml")) as _f:
+            _fcfg = yaml.safe_load(_f)["fund"]
+        _splits = _fcfg["splits"]
+        _total = sum(_splits.values())
+        _norm = {k: v / _total for k, v in _splits.items()} if _total > 0 else _splits
+        _row[_fid] = round(_norm.get(_ikey, 0.0) * 100, 2)
+    _alloc_rows.append(_row)
+
+_alloc_path = os.path.join(outputs_dir, "summary_fund_allocations.csv")
+with open(_alloc_path, "w", newline="") as _f:
+    _w = csv.DictWriter(_f, fieldnames=["intervention"] + _fund_ids_summary)
+    _w.writeheader()
+    _w.writerows(_alloc_rows)
+print(f"  Wrote {_alloc_path}")
+print("  Columns: intervention | ea_awf | navigation_fund_general | navigation_fund_cagefree | aw_combined")
+
+print("\nSummary CSVs done.")

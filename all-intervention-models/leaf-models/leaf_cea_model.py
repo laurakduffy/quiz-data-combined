@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 SCRIPT_DIR = Path(__file__).parent
 
+import csv
 import numpy as np
 import pandas as pd
 import squigglepy as sq
@@ -166,6 +167,89 @@ def create_and_save_histograms(distribution_effect_by_type):
 
 
 # ============================================================================
+# SUMMARY PERCENTILE CSV FUNCTIONS
+# ============================================================================
+
+_SUMMARY_PCTS = [1, 5, 10, 25, 50, 75, 90, 95, 99]
+_PCT_COLS = ["p1", "p5", "p10", "p25", "p50", "p75", "p90", "p95", "p99", "mean"]
+
+
+def _pct_row(arr):
+    vals = [float(v) for v in np.percentile(arr, _SUMMARY_PCTS)]
+    vals.append(float(np.mean(arr)))
+    return dict(zip(_PCT_COLS, vals))
+
+
+def write_summary_percentile_csvs(sample_impacts):
+    """Write percentile CSVs for LEAF.
+
+    sample_impacts is the dict returned by sample_impacts_per_m(), with keys
+    'YLDs_averted', 'life_years_saved', 'income_doublings' — all in natural
+    units per $1M spent.
+
+    Writes three files to leaf-models/outputs/:
+      leaf_life_years_saved_per_M.csv  — life-years saved per $1M
+      leaf_ylds_averted_per_M.csv      — YLDs averted per $1M
+      leaf_income_doublings_per_M.csv  — income doublings per $1M
+
+    Each file has a single data row (LEAF as a whole).
+    Columns: p1, p5, p10, p25, p50, p75, p90, p95, p99, mean.
+    """
+    outputs_dir = SCRIPT_DIR / "outputs"
+    os.makedirs(outputs_dir, exist_ok=True)
+
+    metrics = [
+        ("life_years_saved", "leaf_life_years_saved_per_M.csv", "life-years per $1M"),
+        ("YLDs_averted",     "leaf_ylds_averted_per_M.csv",     "YLDs per $1M"),
+        ("income_doublings", "leaf_income_doublings_per_M.csv",  "income doublings per $1M"),
+    ]
+
+    fieldnames = ["fund", "unit"] + _PCT_COLS
+
+    for effect_key, filename, unit_label in metrics:
+        arr = sample_impacts[effect_key]
+        row = {"fund": "LEAF", "unit": unit_label, **_pct_row(arr)}
+
+        path = str(outputs_dir / filename)
+        with open(path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerow(row)
+        print(f"  Wrote {path}")
+
+
+def write_temporal_breakdown_csv():
+    """Write the deterministic temporal benefit breakdown to leaf_temporal_breakdown.csv.
+
+    Rows: YLDs_averted, YLLs (life_years_saved), income_doublings.
+    Columns: each time period as a percentage of total benefits in that effect type.
+    Values sum to 100 across each row (ignoring floating-point rounding).
+    """
+    time_periods = ["0-5 years", "5-10 years", "10-20 years", "20-100 years", "100-500 years", "500+ years"]
+    effect_labels = {
+        "YLDs_averted":     "YLDs_averted",
+        "life_years_saved": "YLLs (life_years_saved)",
+        "income_doublings": "income_doublings",
+    }
+
+    rows = []
+    for key, label in effect_labels.items():
+        row = {"effect_type": label}
+        for tp in time_periods:
+            row[tp] = round(temporal_breakdown_by_type_dict[key][tp] * 100, 2)
+        rows.append(row)
+
+    outputs_dir = SCRIPT_DIR / "outputs"
+    os.makedirs(outputs_dir, exist_ok=True)
+    path = str(outputs_dir / "leaf_temporal_breakdown.csv")
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["effect_type"] + time_periods)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"  Wrote {path}")
+
+
+# ============================================================================
 # RISK ADJUSTMENT FUNCTIONS
 # ============================================================================
 
@@ -298,7 +382,12 @@ def main():
     print("\n3. Creating summary statistics...")
     summary_statistics = create_summary_statistics(effect_per_M_by_time)
     print("✓ Saved to: summary_statistics.csv")
-    
+
+    # Write summary percentile and temporal breakdown CSVs
+    print("\n4. Writing summary percentile CSVs...")
+    write_summary_percentile_csvs(sample_units_value_per_M)
+    write_temporal_breakdown_csv()
+
     # Apply risk adjustments (NEW)
     risk_adjusted_df = apply_risk_adjustments_to_simulations(effect_per_M_by_time)
     

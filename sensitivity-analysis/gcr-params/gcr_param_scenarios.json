@@ -1,0 +1,237 @@
+{
+    "r_inf_100x_up": {
+        "description": "Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",
+        "world_patches": {
+            "r_inf": {
+                "dist": "loguniform",
+                "ci_90": [1e-6, 5e-3],
+                "bounds": [1e-8, 5e-2]
+            }
+        }
+    },
+
+    "r_inf_100x_down": {
+        "description": "Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",
+        "world_patches": {
+            "r_inf": {
+                "dist": "loguniform",
+                "ci_90": [1e-10, 5e-7],
+                "bounds": [1e-12, 5e-5]
+            }
+        }
+    },
+
+    "no_cubic_growth": {
+        "description": "Degenerate: no stellar expansion at all (p_cubic_growth = 0)",
+        "world_patches": {
+            "p_cubic_growth": {"dist": "constant", "value": 0}
+        }
+    },
+
+    "s_10x_faster": {
+        "description": "Stellar settlement speed 10x faster   (ci_90: [4e-4, 0.1])",
+        "world_patches": {
+            "s": {
+                "dist": "loguniform",
+                "ci_90": [4e-4, 0.1],
+                "bounds": [1e-6, 0.2]
+            }
+        }
+    },
+
+    "s_10x_slower": {
+        "description": "Stellar settlement speed 10x slower (constant at 4e-5, the baseline median)",
+        "world_patches": {
+            "s": {
+                "dist": "constant",
+                "value": 0.00004
+            }
+        }
+    },
+
+    "cause_fractions_equal": {
+        "description": "Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",
+        "world_patches": {
+            "cause_fractions": {
+                "dist": "dirichlet",
+                "means": [0.32, 0.32, 0.32, 0.04],
+                "concentration": 10,
+                "keys": [
+                    "cause_fraction_bio",
+                    "cause_fraction_nuclear",
+                    "cause_fraction_ai",
+                    "cause_fraction_other"
+                ]
+            }
+        }
+    },
+
+    "cause_fractions_bio_nuclear_5x_higher": {
+        "description": "Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",
+        "world_patches": {
+            "cause_fractions": {
+                "dist": "dirichlet",
+                "means": [0.15, 0.15, 0.66, 0.04],
+                "concentration": 10,
+                "keys": [
+                    "cause_fraction_bio",
+                    "cause_fraction_nuclear",
+                    "cause_fraction_ai",
+                    "cause_fraction_other"
+                ]
+            }
+        }
+    },
+
+    "cause_fractions_bio_nuclear_unequal": {
+        "description": "Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",
+        "world_patches": {
+            "cause_fractions": {
+                "dist": "dirichlet",
+                "means": [0.04, 0.02, 0.90, 0.04],
+                "concentration": 10,
+                "keys": [
+                    "cause_fraction_bio",
+                    "cause_fraction_nuclear",
+                    "cause_fraction_ai",
+                    "cause_fraction_other"
+                ]
+            }
+        }
+    },
+
+    "rel_risk_10x_up": {
+        "description": "Relative risk reduction 10x higher for all GCR funds",
+        "rel_risk_reduction_scale": 10
+    },
+
+    "rel_risk_10x_down": {
+        "description": "Relative risk reduction 10x lower for all GCR funds",
+        "rel_risk_reduction_scale": 0.1
+    },
+
+    "rel_risk_100x_down": {
+        "description": "Relative risk reduction 100x lower for all GCR funds",
+        "rel_risk_reduction_scale": 0.01
+    },
+
+    "p_zero_5x_lower": {
+        "description": "p(zero impact) 5x lower; surplus redistributed proportionally",
+        "fund_patches": {
+            "sentinel": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.09, 0.10, 0.81],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_nuclear": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.09, 0.10, 0.81],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_ai": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.27, 0.10, 0.63],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            }
+        }
+    },
+
+    "p_zero_75_pct": {
+        "description": "p(zero impact) =75%; P(harm)/p(positive) ratio unchanged",
+        "fund_patches": {
+            "sentinel": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.025, 0.75, 0.225],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_nuclear": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.025, 0.75, 0.225],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_ai": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.075, 0.75, 0.175],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            }
+        }
+    },
+
+    "p_harm_5pp_higher": {
+        "description": "p(harm) 25 percent higher; p(zero) constant at 50%",
+        "fund_patches": {
+            "sentinel": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.0625, 0.50, 0.385],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_nuclear": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.0625, 0.50, 0.385],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_ai": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.1875, 0.50, 0.3125],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            }
+        }
+    },
+
+    "near_pessimistic_outcomes": {
+        "description": "p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50",
+        "fund_patches": {
+            "sentinel": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.225, 0.50, 0.275],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_nuclear": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.225, 0.50, 0.275],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            },
+            "longview_ai": {
+                "harm_zero_positive": {
+                    "dist": "dirichlet",
+                    "means": [0.225, 0.50, 0.275],
+                    "concentration": 5,
+                    "keys": ["p_harm", "p_zero", "p_positive"]
+                }
+            }
+        }
+    }
+}
