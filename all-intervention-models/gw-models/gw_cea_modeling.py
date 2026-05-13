@@ -355,19 +355,15 @@ def _pct_row(arr):
 
 
 def write_summary_percentile_csvs(sample_units_per_m):
-    """Write per-intervention-type percentile CSVs for GiveWell.
+    """Write a single summary percentile CSV for GiveWell.
 
-    For each effect type, decomposes the portfolio-level CE distribution using
-    each intervention's specific benefit mix from percent_effect_by_type_dict,
-    then converts to natural units via GW moral weights.
+    Computes the funding-weighted average across all GW intervention types for
+    each effect, then converts to natural units via GW moral weights.
 
-    Writes three files to gw-models/outputs/:
-      gw_ylls_per_M.csv              — YLLs (life-years) averted per $1M
-      gw_ylds_averted_per_M.csv      — YLDs averted per $1M
-      gw_income_doublings_per_M.csv  — income doublings per $1M
-
-    Rows: one per GW intervention type + a "Portfolio (weighted average)" row.
-    Columns: p1, p5, p10, p25, p50, p75, p90, p95, p99, mean.
+    Writes one file to gw-models/outputs/:
+      gw_summary_per_M.csv  — YLLs, YLDs, and income doublings per $1M
+                              (one row per effect type, portfolio-weighted)
+    Columns: effect_type, unit, p1, p5, p10, p25, p50, p75, p90, p95, p99, mean.
     """
     outputs_dir = SCRIPT_DIR / "outputs"
     os.makedirs(outputs_dir, exist_ok=True)
@@ -376,31 +372,23 @@ def write_summary_percentile_csvs(sample_units_per_m):
         percent_effect_by_type_dict, percent_funding_by_dist_dict
     )
 
-    # multiplier converts from units-value to natural units; YLLs also multiplies by LIFE_YEARS_PER_LIFE
     metrics = [
-        ("lives_saved",      "lives_saved",      "gw_ylls_per_M.csv",             "YLLs per $1M",                LIFE_YEARS_PER_LIFE),
-        ("YLDs_averted",     "YLDs_averted",     "gw_ylds_averted_per_M.csv",      "YLDs per $1M",                1),
-        ("income_doublings", "income_doublings",  "gw_income_doublings_per_M.csv",  "income doublings per $1M",    1),
+        ("lives_saved",      "lives_saved",      "YLLs",              "YLLs per $1M",               LIFE_YEARS_PER_LIFE),
+        ("YLDs_averted",     "YLDs_averted",     "YLDs_averted",      "YLDs per $1M",               1),
+        ("income_doublings", "income_doublings",  "income_doublings",  "income doublings per $1M",   1),
     ]
 
-    fieldnames = ["intervention_type", "unit"] + _PCT_COLS
+    rows = []
+    for effect_key, weight_key, effect_label, unit_label, extra_multiplier in metrics:
+        arr = sample_units_per_m * weighted_avg[effect_key] / gw_moral_weights[weight_key] * extra_multiplier
+        rows.append({"effect_type": effect_label, "unit": unit_label, **_pct_row(arr)})
 
-    for effect_key, weight_key, filename, unit_label, extra_multiplier in metrics:
-        rows = []
-        for itype, mix in percent_effect_by_type_dict.items():
-            arr = sample_units_per_m * mix[effect_key] / gw_moral_weights[weight_key] * extra_multiplier
-            rows.append({"intervention_type": itype, "unit": unit_label, **_pct_row(arr)})
-
-        # Portfolio weighted-average row
-        arr_portfolio = sample_units_per_m * weighted_avg[effect_key] / gw_moral_weights[weight_key] * extra_multiplier
-        rows.append({"intervention_type": "Portfolio (weighted average)", "unit": unit_label, **_pct_row(arr_portfolio)})
-
-        path = str(outputs_dir / filename)
-        with open(path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(rows)
-        print(f"  Wrote {path}")
+    path = str(outputs_dir / "gw_summary_per_M.csv")
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["effect_type", "unit"] + _PCT_COLS)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"  Wrote {path}")
 
 
 def write_temporal_breakdown_csv():

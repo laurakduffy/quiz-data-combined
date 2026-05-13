@@ -181,41 +181,36 @@ def _pct_row(arr):
 
 
 def write_summary_percentile_csvs(sample_impacts):
-    """Write percentile CSVs for LEAF.
+    """Write a single summary percentile CSV for LEAF.
 
     sample_impacts is the dict returned by sample_impacts_per_m(), with keys
     'YLDs_averted', 'life_years_saved', 'income_doublings' — all in natural
     units per $1M spent.
 
-    Writes three files to leaf-models/outputs/:
-      leaf_life_years_saved_per_M.csv  — life-years saved per $1M
-      leaf_ylds_averted_per_M.csv      — YLDs averted per $1M
-      leaf_income_doublings_per_M.csv  — income doublings per $1M
-
-    Each file has a single data row (LEAF as a whole).
-    Columns: p1, p5, p10, p25, p50, p75, p90, p95, p99, mean.
+    Writes one file to leaf-models/outputs/:
+      leaf_summary_per_M.csv  — YLLs, YLDs, and income doublings per $1M
+                                (one row per effect type)
+    Columns: effect_type, unit, p1, p5, p10, p25, p50, p75, p90, p95, p99, mean.
     """
     outputs_dir = SCRIPT_DIR / "outputs"
     os.makedirs(outputs_dir, exist_ok=True)
 
     metrics = [
-        ("life_years_saved", "leaf_life_years_saved_per_M.csv", "life-years per $1M"),
-        ("YLDs_averted",     "leaf_ylds_averted_per_M.csv",     "YLDs per $1M"),
-        ("income_doublings", "leaf_income_doublings_per_M.csv",  "income doublings per $1M"),
+        ("life_years_saved", "YLLs (life_years_saved)", "YLLs per $1M"),
+        ("YLDs_averted",     "YLDs_averted",            "YLDs per $1M"),
+        ("income_doublings", "income_doublings",         "income doublings per $1M"),
     ]
 
-    fieldnames = ["fund", "unit"] + _PCT_COLS
+    rows = []
+    for effect_key, effect_label, unit_label in metrics:
+        rows.append({"effect_type": effect_label, "unit": unit_label, **_pct_row(sample_impacts[effect_key])})
 
-    for effect_key, filename, unit_label in metrics:
-        arr = sample_impacts[effect_key]
-        row = {"fund": "LEAF", "unit": unit_label, **_pct_row(arr)}
-
-        path = str(outputs_dir / filename)
-        with open(path, "w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerow(row)
-        print(f"  Wrote {path}")
+    path = str(outputs_dir / "leaf_summary_per_M.csv")
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["effect_type", "unit"] + _PCT_COLS)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"  Wrote {path}")
 
 
 def write_temporal_breakdown_csv():
