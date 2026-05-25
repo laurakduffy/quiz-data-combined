@@ -1,3 +1,0 @@
-scenario,ghd,animal_welfare,gcr,diff_ghd,diff_animal_welfare,diff_gcr
-baseline,17.8910,46.4755,35.6335,0.0000,0.0000,0.0000
-r_inf_100x_up,9.7500,14.2417,76.0083,-8.1410,-32.2338,40.3748

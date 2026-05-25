@@ -1,0 +1,12 @@
+test,fund_si,cluster_si,cross_cluster_share
+neutral_to_combined,90.1525,90.1525,1.0
+neutral_to_downside_critical,89.145,56.1525,0.6299
+neutral_to_cont_upside_skep,80.695,80.695,1.0
+specialblend_to_bilateral_skep,66.805,54.389,0.8141
+specialblend_to_neutral,65.9275,54.519,0.827
+specialblend_to_combined,35.7515,35.6335,0.9967
+specialblend_to_wlu_5,35.6295,35.6295,1.0
+specialblend_to_wlu_10,35.6295,35.6295,1.0
+specialblend_to_cont_upside_skep,27.1234,26.176,0.9651
+specialblend_to_downside_critical,26.6763,3.0973,0.1161
+neutral_to_bilateral_skep,1.2025,0.13,0.1081

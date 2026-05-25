@@ -11,11 +11,11 @@
  *
  * Config:  sensitivity-analysis/outputs/moral-weights/moral_weight_multipliers.json
  * Outputs: sensitivity-analysis/moral-weights/outputs/
- *   moral_weights_overall_allocations.csv    — fund allocations + per-method breakdown (Part 1)
- *   moral_weights_overall_si.csv             — fund SI + cause-area SI + eff diffs (Part 1)
- *   moral_weights_per_worldview_allocations.csv — fund allocations + per-method (Part 2)
- *   moral_weights_per_worldview_si.csv       — fund SI + CA SI + eff multipliers (Part 2)
- *   moral_weights_ranked_summary.csv         — non-zero Part 2 rows sorted by SI desc
+ *   fund/moral_weights_overall_si.csv                — Part 1: fund SI + cause-area SI + per-fund deltas
+ *   fund/moral_weights_per_worldview_si.csv          — Part 2: per-worldview fund SI + CA SI + per-fund deltas, grouped by multiplier
+ *   fund/moral_weights_per_worldview_eff_multipliers.csv — Part 2: effective per-species multipliers
+ *   cause/moral_weights_overall_cause_area_si.csv    — Part 1 projected to cause-area SI
+ *   cause/moral_weights_per_worldview_cause_area_si.csv — Part 2 projected to cause-area SI
  *
  * Usage:
  *   node sensitivity-analysis/moral-weights/run_moral_weight_sensitivity.js
@@ -30,10 +30,7 @@ import { mkdirSync } from 'fs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
 
-import {
-  computeMarcusAllocation,
-  computeMultiStageAllocation,
-} from '../../src/utils/marcusCalculation.js';
+import { computeMultiStageAllocation } from '../../src/utils/marcusCalculation.js';
 import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
@@ -47,6 +44,8 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 const CONFIG_PATH = join(
   __dirname,
   '..',
@@ -73,7 +72,6 @@ const { upper_bounds, multipliers } = loadJson(CONFIG_PATH);
 const animalKeys = Object.keys(upper_bounds);
 const fundIds = Object.keys(projects).sort();
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
-const methodNames = stages.map((s) => s.method);
 const weightedMethods = stages.map((s) => ({
   jsKey: s.method,
   weight: s.budget,
@@ -139,47 +137,14 @@ function effectiveMultipliersForWv(wv, multiplier) {
   );
 }
 
-function runAllocWithPerMethod(wvs) {
-  let combined;
-  const perMethod = {};
-
+function runAlloc(wvs) {
   if (isWeighted) {
-    const result = computeWeightedAllocation(
-      projects,
-      wvs,
-      weightedMethods,
-      totalBudget,
-      incrementSize,
-      { drStepSize }
-    );
-    combined = result.allocations;
-    for (const [jsKey, detail] of Object.entries(result.perMethod)) {
-      perMethod[jsKey] = detail.allocations;
-    }
-  } else {
-    const { allocations: staged } = computeMultiStageAllocation(
-      projects,
-      wvs,
-      stages,
-      incrementSize,
-      undefined,
-      drStepSize
-    );
-    combined = staged;
-    for (const stage of stages) {
-      const { allocations } = computeMarcusAllocation(
-        projects,
-        wvs,
-        stage.method,
-        stage.budget,
-        incrementSize,
-        { drStepSize }
-      );
-      perMethod[stage.method] = allocations;
-    }
+    return computeWeightedAllocation(projects, wvs, weightedMethods, totalBudget, incrementSize, {
+      drStepSize,
+    }).allocations;
   }
-
-  return { combined, perMethod };
+  return computeMultiStageAllocation(projects, wvs, stages, incrementSize, undefined, drStepSize)
+    .allocations;
 }
 
 function computeSI(newAlloc, baseAlloc) {
@@ -200,7 +165,7 @@ function computeSI(newAlloc, baseAlloc) {
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Running baseline allocation (full blend, unmodified weights)...');
 
-const { combined: baseAlloc, perMethod: basePerMethod } = runAllocWithPerMethod(worldviews);
+const baseAlloc = runAlloc(worldviews);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
@@ -221,57 +186,32 @@ let drCheckCount = 0;
 // CSV column definitions
 // ---------------------------------------------------------------------------
 
-const allocColName = isWeighted ? 'weighted_allocation_pct' : 'staged_allocation_pct';
-
 // Part 1 — overall (one row per multiplier)
-const p1AllocFields = [
-  'multiplier',
-  'recipient_fund',
-  allocColName,
-  'allocation_diff_pp',
-  ...methodNames,
-];
 const p1SiFields = [
   'multiplier',
   'sensitivity_index',
-  'si_scaled_pp_per_oom',
-  ...fundIds.map((f) => `diff_${f}`),
-  ...caKeys,
   'ca_sensitivity_index',
-  'ca_si_scaled_pp_per_oom',
-  ...caKeys.map((ca) => `diff_${ca}`),
+  ...fundIds.map((f) => `diff_${f}`),
 ];
 
-const p1AllocRows = [];
 const p1SiRows = [];
 
 // Part 2 — per-worldview (one row per worldview × multiplier)
-const p2AllocFields = [
-  'worldview_idx',
-  'worldview_name',
-  'risk_profile',
-  'multiplier',
-  'recipient_fund',
-  allocColName,
-  'allocation_diff_pp',
-  ...methodNames,
-];
 const p2SiFields = [
-  'worldview_idx',
-  'worldview_name',
-  'risk_profile',
   'multiplier',
+  'worldview_name',
+  'worldview_idx',
   'sensitivity_index',
-  'si_scaled_pp_per_oom',
-  ...fundIds.map((f) => `diff_${f}`),
-  ...caKeys,
   'ca_sensitivity_index',
-  'ca_si_scaled_pp_per_oom',
-  ...caKeys.map((ca) => `diff_${ca}`),
+  ...fundIds.map((f) => `diff_${f}`),
+];
+const p2EffMultFields = [
+  'multiplier',
+  'worldview_name',
+  'worldview_idx',
   ...animalKeys.map((k) => `eff_mult_${k}`),
 ];
 
-const p2AllocRows = [];
 const p2SiRows = [];
 
 // ---------------------------------------------------------------------------
@@ -282,15 +222,6 @@ console.log(`\n${'-'.repeat(60)}`);
 console.log('Part 1 — Overall allocation sensitivity...\n');
 
 // Baseline row
-for (const fid of fundIds) {
-  p1AllocRows.push({
-    multiplier: '1.0',
-    recipient_fund: fid,
-    [allocColName]: baseAlloc[fid].toFixed(4),
-    allocation_diff_pp: '0.0000',
-    ...Object.fromEntries(methodNames.map((m) => [m, basePerMethod[m][fid].toFixed(4)])),
-  });
-}
 p1SiRows.push({
   multiplier: '1.0',
   sensitivity_index: '0.0000',
@@ -305,9 +236,9 @@ p1SiRows.push({
 for (const [label, multiplier] of Object.entries(multipliers)) {
   const modifiedWvs = worldviews.map((wv) => applyMultiplier(wv, multiplier));
 
-  let combined, perMethod;
+  let combined;
   try {
-    ({ combined, perMethod } = runAllocWithPerMethod(modifiedWvs));
+    combined = runAlloc(modifiedWvs);
   } catch (e) {
     console.log(`  FAIL  ${label} — ${e.message}`);
     continue;
@@ -328,15 +259,6 @@ for (const [label, multiplier] of Object.entries(multipliers)) {
   const caMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
   const caSiScaled = oom > 0 ? caMaxAbs / oom : 0;
 
-  for (const fid of fundIds) {
-    p1AllocRows.push({
-      multiplier: String(multiplier),
-      recipient_fund: fid,
-      [allocColName]: combined[fid].toFixed(4),
-      allocation_diff_pp: diffs[fid].toFixed(4),
-      ...Object.fromEntries(methodNames.map((m) => [m, perMethod[m][fid].toFixed(4)])),
-    });
-  }
   p1SiRows.push({
     multiplier: String(multiplier),
     sensitivity_index: si.toFixed(4),
@@ -367,7 +289,7 @@ for (const wv of allIndexedWvs) {
   const singleWvBase = [{ ...cleanWv, credence: 1.0 }];
 
   // Baseline for this worldview: unmodified, 100% credence
-  const { combined: wvBase, perMethod: wvBasePerMethod } = runAllocWithPerMethod(singleWvBase);
+  const wvBase = runAlloc(singleWvBase);
   const wvBaseCauseAlloc = groupByCauseArea(wvBase);
 
   drChecksPassed &&= checkDrCeilings(
@@ -383,19 +305,7 @@ for (const wv of allIndexedWvs) {
     `  idx=${wvIdx}  ${wv.name}${rnTag}  baseline top: ${topWvBase} (${wvBase[topWvBase].toFixed(1)}%)`
   );
 
-  // Baseline rows (multiplier = 1.0)
-  for (const fid of fundIds) {
-    p2AllocRows.push({
-      worldview_idx: wvIdx,
-      worldview_name: wv.name,
-      risk_profile: wv.risk_profile,
-      multiplier: '1.0',
-      recipient_fund: fid,
-      [allocColName]: wvBase[fid].toFixed(4),
-      allocation_diff_pp: '0.0000',
-      ...Object.fromEntries(methodNames.map((m) => [m, wvBasePerMethod[m][fid].toFixed(4)])),
-    });
-  }
+  // Baseline row (multiplier = 1.0)
   p2SiRows.push({
     worldview_idx: wvIdx,
     worldview_name: wv.name,
@@ -415,9 +325,9 @@ for (const wv of allIndexedWvs) {
     const modifiedSingleWv = [applyMultiplier({ ...cleanWv, credence: 1.0 }, multiplier)];
     const effMults = effectiveMultipliersForWv(cleanWv, multiplier);
 
-    let combined, perMethod;
+    let combined;
     try {
-      ({ combined, perMethod } = runAllocWithPerMethod(modifiedSingleWv));
+      combined = runAlloc(modifiedSingleWv);
     } catch (e) {
       console.log(`    FAIL  ${label} — ${e.message}`);
       continue;
@@ -442,18 +352,6 @@ for (const wv of allIndexedWvs) {
     const caMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
     const caSiScaled = oom > 0 ? caMaxAbs / oom : 0;
 
-    for (const fid of fundIds) {
-      p2AllocRows.push({
-        worldview_idx: wvIdx,
-        worldview_name: wv.name,
-        risk_profile: wv.risk_profile,
-        multiplier: String(multiplier),
-        recipient_fund: fid,
-        [allocColName]: combined[fid].toFixed(4),
-        allocation_diff_pp: diffs[fid].toFixed(4),
-        ...Object.fromEntries(methodNames.map((m) => [m, perMethod[m][fid].toFixed(4)])),
-      });
-    }
     p2SiRows.push({
       worldview_idx: wvIdx,
       worldview_name: wv.name,
@@ -481,25 +379,61 @@ for (const wv of allIndexedWvs) {
 // Write outputs
 // ---------------------------------------------------------------------------
 
-mkdirSync(OUTPUT_DIR, { recursive: true });
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
 
-writeCsv(join(OUTPUT_DIR, 'moral_weights_overall_allocations.csv'), p1AllocFields, p1AllocRows);
-writeCsv(join(OUTPUT_DIR, 'moral_weights_overall_si.csv'), p1SiFields, p1SiRows);
+writeCsv(join(FUND_DIR, 'moral_weights_overall_si.csv'), p1SiFields, p1SiRows);
+
+// Group per-worldview SI rows by multiplier (ascending), and within each multiplier
+// sort by fund SI descending so the worldviews most sensitive to that perturbation
+// appear at the top of their group.
+const p2SiRowsGrouped = [...p2SiRows].sort((a, b) => {
+  const m = parseFloat(a.multiplier) - parseFloat(b.multiplier);
+  if (m !== 0) return m;
+  return parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index);
+});
+writeCsv(join(FUND_DIR, 'moral_weights_per_worldview_si.csv'), p2SiFields, p2SiRowsGrouped);
+
+// Effective per-species multipliers (one row per worldview × multiplier).
 writeCsv(
-  join(OUTPUT_DIR, 'moral_weights_per_worldview_allocations.csv'),
-  p2AllocFields,
-  p2AllocRows
+  join(FUND_DIR, 'moral_weights_per_worldview_eff_multipliers.csv'),
+  p2EffMultFields,
+  p2SiRowsGrouped
 );
-writeCsv(join(OUTPUT_DIR, 'moral_weights_per_worldview_si.csv'), p2SiFields, p2SiRows);
 
-// Ranked summary: non-zero per-worldview rows, sorted by fund SI descending
-const rankedRows = p2SiRows
-  .filter((r) => r.multiplier !== '1.0' && parseFloat(r.sensitivity_index) > 0)
-  .sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
+// Cause-area SI views — project ca_sensitivity_index → sensitivity_index so the
+// file matches the convention used by every other analysis's outputs/cause/*.csv.
+const p1CauseFields = ['multiplier', 'sensitivity_index', ...caKeys.map((ca) => `diff_${ca}`)];
+const p1CauseRows = p1SiRows.map((r) => ({
+  multiplier: r.multiplier,
+  sensitivity_index: r.ca_sensitivity_index,
+  si_scaled_pp_per_oom: r.ca_si_scaled_pp_per_oom,
+  ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, r[`diff_${ca}`]])),
+}));
+writeCsv(join(CAUSE_DIR, 'moral_weights_overall_cause_area_si.csv'), p1CauseFields, p1CauseRows);
 
-writeCsv(join(OUTPUT_DIR, 'moral_weights_ranked_summary.csv'), p2SiFields, rankedRows);
-console.log(
-  `  Ranked summary: ${rankedRows.length} rows written to moral_weights_ranked_summary.csv`
+const p2CauseFields = [
+  'worldview_idx',
+  'worldview_name',
+  'risk_profile',
+  'multiplier',
+  'sensitivity_index',
+  'si_scaled_pp_per_oom',
+  ...caKeys.map((ca) => `diff_${ca}`),
+];
+const p2CauseRows = p2SiRows.map((r) => ({
+  worldview_idx: r.worldview_idx,
+  worldview_name: r.worldview_name,
+  risk_profile: r.risk_profile,
+  multiplier: r.multiplier,
+  sensitivity_index: r.ca_sensitivity_index,
+  si_scaled_pp_per_oom: r.ca_si_scaled_pp_per_oom,
+  ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, r[`diff_${ca}`]])),
+}));
+writeCsv(
+  join(CAUSE_DIR, 'moral_weights_per_worldview_cause_area_si.csv'),
+  p2CauseFields,
+  p2CauseRows
 );
 
 console.log(

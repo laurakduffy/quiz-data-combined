@@ -61,7 +61,6 @@ const steps = [
   () => runNode(join(__dirname, 'run_dr_sensitivity.js')),
   () => runNode(join(__dirname, 'run_max_spend_sensitivity.js')),
   () => runNode(join(__dirname, 'run_combo_max_spend_sensitivity.js')),
-  () => runPython(join(__dirname, 'make_cutoff_summary.py')),
 ];
 
 let allPassed = true;

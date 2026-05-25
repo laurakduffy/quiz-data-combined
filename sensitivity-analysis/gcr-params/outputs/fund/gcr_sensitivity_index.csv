@@ -1,0 +1,2 @@
+scenario,description,sensitivity_index,si_cluster,diff_ea_awf,diff_givewell,diff_leaf,diff_longview_ai,diff_longview_nuclear,diff_navigation_fund_cagefree,diff_navigation_fund_general,diff_sentinel_bio
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",49.3242,40.3748,-9.5533,-6.2905,-1.8505,49.3242,-3.8230,-6.2675,-16.4130,-5.1263

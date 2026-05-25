@@ -43,6 +43,8 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 
 const args = parseArgs(process.argv);
 const isWeighted = args.approach === 'weighted';
@@ -361,12 +363,13 @@ for (const [groupName, groupDef] of Object.entries(scenarios)) {
 // Write outputs
 // ---------------------------------------------------------------------------
 
-mkdirSync(OUTPUT_DIR, { recursive: true });
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
 
-writeCsv(join(OUTPUT_DIR, 'discount_fund_allocations.csv'), allocFields, allocRows);
-writeCsv(join(OUTPUT_DIR, 'discount_fund_si.csv'), siFields, siRows);
-writeCsv(join(OUTPUT_DIR, 'discount_cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
-writeCsv(join(OUTPUT_DIR, 'discount_cause_area_si.csv'), causeSiFields, causeSiRows);
+writeCsv(join(FUND_DIR, 'discount_fund_allocations.csv'), allocFields, allocRows);
+writeCsv(join(FUND_DIR, 'discount_fund_si.csv'), siFields, siRows);
+writeCsv(join(CAUSE_DIR, 'discount_cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
+writeCsv(join(CAUSE_DIR, 'discount_cause_area_si.csv'), causeSiFields, causeSiRows);
 
 console.log(
   `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`

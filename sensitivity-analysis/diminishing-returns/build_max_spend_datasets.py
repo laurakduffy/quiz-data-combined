@@ -43,7 +43,7 @@ def scenario_name(val):
 def main():
     for val in MAX_SPEND_SCENARIOS:
         name = scenario_name(val)
-        scenario_dir = os.path.join(HERE, name)
+        scenario_dir = os.path.join(HERE, 'datasets', name)
         os.makedirs(scenario_dir, exist_ok=True)
 
         csv_path = os.path.join(scenario_dir, f'diminishing_returns_{name}.csv')

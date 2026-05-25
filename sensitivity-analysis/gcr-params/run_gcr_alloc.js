@@ -6,9 +6,8 @@
  * allocation (same methodology as all other sensitivity analyses), and
  * writes output CSVs that mirror the format of the other sensitivity analyses:
  *
- *   gcr_fund_allocations.csv      — mirrors ce_multiplier_allocations.csv
- *   gcr_cause_area_allocations.csv — mirrors cause_area_allocations.csv
- *   gcr_sensitivity_index.csv     — mirrors ce_multiplier_si.csv
+ *   gcr_sensitivity_index.csv      — fund SI + cluster SI + per-fund deltas
+ *   gcr_cause_area_allocations.csv — per-cluster deltas
  *
  * Usage:
  *   node sensitivity-analysis/gcr-params/run_gcr_alloc.js
@@ -24,6 +23,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
 const SA_DIR = join(__dirname, '..');
 const OUTPUTS_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUTS_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUTS_DIR, 'cause');
 
 import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
@@ -61,36 +62,6 @@ function clusterFunding(funding, clusters) {
   return result;
 }
 
-/** Extract a single scalar perturbation ratio for scaled-SI computation.
- *  Returns null for categorical / Dirichlet scenarios where scaled SI is undefined. */
-function primaryRatio(perturbationRatios) {
-  if (!perturbationRatios || typeof perturbationRatios !== 'object') return null;
-  for (const ratio of Object.values(perturbationRatios)) {
-    if (typeof ratio === 'number' && isFinite(ratio) && ratio > 0 && ratio !== 1) {
-      return ratio;
-    }
-    if (ratio !== null && typeof ratio === 'object') {
-      const vals = Object.values(ratio).filter(
-        (v) => typeof v === 'number' && isFinite(v) && v > 0
-      );
-      if (
-        vals.length > 0 &&
-        new Set(vals.map((v) => Math.round(v * 1e8) / 1e8)).size === 1 &&
-        vals[0] !== 1
-      ) {
-        return vals[0];
-      }
-    }
-  }
-  return null;
-}
-
-function scaledSI(si, ratio) {
-  if (ratio == null || ratio <= 0 || ratio === 1) return null;
-  const logVal = Math.abs(Math.log10(ratio));
-  return logVal > 0 ? si / logVal : null;
-}
-
 function fmt(v, dec = 4) {
   return v == null ? '' : v.toFixed(dec);
 }
@@ -113,19 +84,18 @@ const methods = stages.map((s) => ({
   weight: s.budget / totalBudget,
   options: s.options ?? {},
 }));
-const methodKeys = methods.map((m) => m.jsKey);
 
 console.log('\nGCR sensitivity allocation');
 console.log(`  Dataset:    ${basePath.split(/[/\\]/).pop()}`);
 console.log(`  Worldviews: ${worldviews.length}`);
-console.log(`  Budget:     $${totalBudget}M  (${methodKeys.join(', ')})`);
+console.log(`  Budget:     $${totalBudget}M`);
 console.log(`  drStepSize: $${base.drStepSize}M`);
 
 // ---------------------------------------------------------------------------
 // Baseline allocation
 // ---------------------------------------------------------------------------
 
-const { funding: baseFunding, perMethod: basePerMethod } = computeWeightedAllocation(
+const { funding: baseFunding } = computeWeightedAllocation(
   base.projects,
   worldviews,
   methods,
@@ -147,11 +117,6 @@ const baseClusterPct = Object.fromEntries(
     cid,
     totalBudget > 0 ? (baseClusterFunding[cid] / totalBudget) * 100 : 0,
   ])
-);
-
-// Per-method baseline allocations (as % of totalBudget)
-const basePerMethodPct = Object.fromEntries(
-  methodKeys.map((k) => [k, basePerMethod[k]?.allocations ?? {}])
 );
 
 console.log('\nBaseline fund allocation:');
@@ -193,33 +158,14 @@ const scenarioDirs = readdirSync(__dirname, { withFileTypes: true })
 console.log(`\nFound ${scenarioDirs.length} scenario folder(s).\n`);
 
 // Output row accumulators
-const fundAllocRows = []; // gcr_fund_allocations.csv
 const causeAreaRows = []; // gcr_cause_area_allocations.csv
 const siRows = []; // gcr_sensitivity_index.csv
 
-// Baseline rows
-function baselineFundRows() {
-  return fundIds.map((pid) => {
-    const row = {
-      scenario: 'baseline',
-      recipient_fund: pid,
-      weighted_allocation_pct: fmt(baseAllocPct[pid]),
-      allocation_diff_pp: '0.0000',
-    };
-    for (const k of methodKeys) row[k] = fmt(basePerMethodPct[k][pid] ?? 0);
-    return row;
-  });
-}
-
-function baselineCauseAreaRow() {
-  const row = { scenario: 'baseline' };
-  for (const cid of clusterIds) row[cid] = fmt(baseClusterPct[cid]);
-  for (const cid of clusterIds) row[`diff_${cid}`] = '0.0000';
-  return row;
-}
-
-fundAllocRows.push(...baselineFundRows());
-causeAreaRows.push(baselineCauseAreaRow());
+// Baseline cause-area row (all deltas are zero by construction)
+causeAreaRows.push({
+  scenario: 'baseline',
+  ...Object.fromEntries(clusterIds.map((cid) => [`diff_${cid}`, '0.0000'])),
+});
 
 for (const scenarioName of scenarioDirs) {
   const scenarioJsonPath = join(__dirname, scenarioName, `${scenarioName}.json`);
@@ -233,7 +179,7 @@ for (const scenarioName of scenarioDirs) {
   const sc = loadDatasetWithClusters(scenarioJsonPath);
   const scClusters = sc.clusters.length ? sc.clusters : clusters;
 
-  const { funding: scFunding, perMethod: scPerMethod } = computeWeightedAllocation(
+  const { funding: scFunding } = computeWeightedAllocation(
     sc.projects,
     worldviews,
     methods,
@@ -244,9 +190,6 @@ for (const scenarioName of scenarioDirs) {
 
   const scAllocPct = Object.fromEntries(
     fundIds.map((pid) => [pid, totalBudget > 0 ? (scFunding[pid] / totalBudget) * 100 : 0])
-  );
-  const scPerMethodPct = Object.fromEntries(
-    methodKeys.map((k) => [k, scPerMethod[k]?.allocations ?? {}])
   );
   const scClusterFunding = clusterFunding(scFunding, scClusters);
   const scClusterPct = Object.fromEntries(
@@ -268,36 +211,13 @@ for (const scenarioName of scenarioDirs) {
   const siFund = Object.values(fundDeltas).reduce((s, d) => s + Math.abs(d), 0) / 2;
   const siCluster = Object.values(clusterDeltas).reduce((s, d) => s + Math.abs(d), 0) / 2;
 
-  const ratio = primaryRatio(sc.metadata.perturbation_ratios);
-  const scaledFund = scaledSI(siFund, ratio);
-  const scaledCluster = scaledSI(siCluster, ratio);
-
   const [topFund] = Object.entries(fundDeltas).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))[0];
-  const [topCluster] = Object.entries(clusterDeltas).sort(
-    (a, b) => Math.abs(b[1]) - Math.abs(a[1])
-  )[0];
-
-  const scaledStr =
-    scaledFund != null ? `  scaled=${scaledFund.toFixed(2)} pp/OOM` : '  (categorical)';
   console.log(
-    `si=${siFund.toFixed(2)}pp${scaledStr}  top: ${topFund} ${fundDeltas[topFund] >= 0 ? '+' : ''}${fundDeltas[topFund].toFixed(2)}pp`
+    `si=${siFund.toFixed(2)}pp  cluster_si=${siCluster.toFixed(2)}pp  top: ${topFund} ${fundDeltas[topFund] >= 0 ? '+' : ''}${fundDeltas[topFund].toFixed(2)}pp`
   );
 
-  // Fund allocation rows (one per fund)
-  for (const pid of fundIds) {
-    const row = {
-      scenario: scenarioName,
-      recipient_fund: pid,
-      weighted_allocation_pct: fmt(scAllocPct[pid]),
-      allocation_diff_pp: fmt(fundDeltas[pid]),
-    };
-    for (const k of methodKeys) row[k] = fmt(scPerMethodPct[k][pid] ?? 0);
-    fundAllocRows.push(row);
-  }
-
-  // Cause-area row (one per scenario)
+  // Cause-area row (deltas only, one per scenario)
   const caRow = { scenario: scenarioName };
-  for (const cid of clusterIds) caRow[cid] = fmt(scClusterPct[cid]);
   for (const cid of clusterIds) caRow[`diff_${cid}`] = fmt(clusterDeltas[cid]);
   causeAreaRows.push(caRow);
 
@@ -307,8 +227,6 @@ for (const scenarioName of scenarioDirs) {
     description: sc.metadata.description ?? '',
     sensitivity_index: fmt(siFund),
     si_cluster: fmt(siCluster),
-    si_scaled_pp_per_oom: fmt(scaledFund),
-    si_cluster_scaled: fmt(scaledCluster),
   };
   for (const pid of fundIds) siRow[`diff_${pid}`] = fmt(fundDeltas[pid]);
   siRows.push(siRow);
@@ -321,42 +239,28 @@ siRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity
 // Write output CSVs
 // ---------------------------------------------------------------------------
 
-mkdirSync(OUTPUTS_DIR, { recursive: true });
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
 
-const fundAllocFields = [
-  'scenario',
-  'recipient_fund',
-  'weighted_allocation_pct',
-  'allocation_diff_pp',
-  ...methodKeys,
-];
-writeCsv(join(OUTPUTS_DIR, 'gcr_fund_allocations.csv'), fundAllocFields, fundAllocRows);
-
-const causeAreaFields = ['scenario', ...clusterIds, ...clusterIds.map((cid) => `diff_${cid}`)];
-writeCsv(join(OUTPUTS_DIR, 'gcr_cause_area_allocations.csv'), causeAreaFields, causeAreaRows);
+const causeAreaFields = ['scenario', ...clusterIds.map((cid) => `diff_${cid}`)];
+writeCsv(join(CAUSE_DIR, 'gcr_cause_area_allocations.csv'), causeAreaFields, causeAreaRows);
 
 const siFields = [
   'scenario',
   'description',
   'sensitivity_index',
   'si_cluster',
-  'si_scaled_pp_per_oom',
-  'si_cluster_scaled',
   ...fundIds.map((pid) => `diff_${pid}`),
 ];
-writeCsv(join(OUTPUTS_DIR, 'gcr_sensitivity_index.csv'), siFields, siRows);
+writeCsv(join(FUND_DIR, 'gcr_sensitivity_index.csv'), siFields, siRows);
 
-console.log(`\nWrote CSVs to ${OUTPUTS_DIR}`);
-console.log('  gcr_fund_allocations.csv');
+console.log(`\nWrote CSVs to ${OUTPUTS_DIR}/fund/ and ${OUTPUTS_DIR}/cause/`);
 console.log('  gcr_cause_area_allocations.csv');
 console.log('  gcr_sensitivity_index.csv');
 
 console.log('\nSensitivity ranking (fund-level SI):');
 for (const r of siRows) {
-  const scaled = r.si_scaled_pp_per_oom
-    ? `  scaled=${parseFloat(r.si_scaled_pp_per_oom).toFixed(2)} pp/OOM`
-    : '  (categorical)';
   console.log(
-    `  ${r.scenario.padEnd(45)}  si=${parseFloat(r.sensitivity_index).toFixed(2)}pp${scaled}`
+    `  ${r.scenario.padEnd(45)}  si=${parseFloat(r.sensitivity_index).toFixed(2)}pp  cluster_si=${parseFloat(r.si_cluster).toFixed(2)}pp`
   );
 }

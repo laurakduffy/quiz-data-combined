@@ -1,0 +1,10 @@
+combo,sensitivity_index,ca_sensitivity_index,ea_awf_delta,givewell_delta,leaf_delta,longview_ai_delta,longview_nuclear_delta,navigation_fund_cagefree_delta,navigation_fund_general_delta,sentinel_bio_delta
+gcr_high_aw_low_power,6.6568,2.4247,2.76,0.78,0.46,0.00,-1.47,-0.58,-4.60,2.66
+gcr_and_aw_low_power,5.9435,2.7307,2.76,2.08,0.66,-0.10,0.45,-0.58,-4.60,-0.66
+aw_low_power,5.1872,2.4247,2.76,1.08,0.66,0.00,0.20,-0.58,-4.60,0.50
+gcr_and_aw_high_power,4.8733,0.9617,-2.35,-0.83,-0.13,0.90,-1.56,0.13,2.47,1.37
+gcr_low_aw_high_power,3.4633,0.7275,-2.38,0.57,-0.10,-0.13,0.26,0.13,2.51,-0.85
+aw_high_power,3.0758,0.5275,-2.38,0.37,-0.10,0.07,-0.20,0.13,2.51,-0.40
+gcr_high_power,2.6650,1.2000,0.00,-1.00,-0.20,0.00,-1.47,0.00,0.00,2.66
+gcr_low_power,0.9550,0.6000,0.00,0.60,0.00,-0.10,0.36,0.00,0.00,-0.86
+baseline,0.0000,0.0000,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00

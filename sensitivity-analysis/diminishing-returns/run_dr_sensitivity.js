@@ -14,6 +14,7 @@
 
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { mkdirSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -24,7 +25,6 @@ import {
   loadJson,
   loadWorldviews,
   loadDataset,
-  rankDict,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -32,6 +32,8 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 
 // ---------------------------------------------------------------------------
 // Config
@@ -93,7 +95,6 @@ if (isWeighted) {
     drStepSize
   ));
 }
-const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
@@ -126,22 +127,29 @@ let drCheckCount = 0;
   drCheckCount++;
 }
 
-const allocRows = [
-  { combo: 'baseline', ...Object.fromEntries(fundIds.map((f) => [f, baseAlloc[f].toFixed(2)])) },
-];
-const byFundRows = [];
-const indexRows = [];
-const causeAllocRows = [
+// Combined per-scenario index: fund SI + cause-area SI + per-fund deltas (wide format).
+// Baseline is a zero-delta reference row.
+const byFundRows = [
   {
     combo: 'baseline',
-    ...Object.fromEntries(caKeys.map((ca) => [ca, baseCauseAlloc[ca].toFixed(2)])),
+    sensitivity_index: '0.0000',
+    ca_sensitivity_index: '0.0000',
+    ...Object.fromEntries(fundIds.map((f) => [`${f}_delta`, '0.00'])),
   },
 ];
-const causeIndexRows = [];
+// Per-scenario cause-area index: cause SI + per-cause-area deltas (wide format).
+// Baseline is a zero-delta reference row.
+const causeIndexRows = [
+  {
+    combo: 'baseline',
+    sensitivity_index: '0.0000',
+    ...Object.fromEntries(caKeys.map((ca) => [`${ca}_delta`, '0.00'])),
+  },
+];
 
 console.log(`\n${'-'.repeat(60)}`);
 for (const comboName of comboNames) {
-  const datasetPath = join(__dirname, comboName, `output_data_${comboName}.json`);
+  const datasetPath = join(__dirname, 'datasets', comboName, `output_data_${comboName}.json`);
   const { projects: comboProjects } = loadDataset(datasetPath);
 
   let newAlloc;
@@ -164,7 +172,6 @@ for (const comboName of comboNames) {
       drStepSize
     ));
   }
-  const newRanks = rankDict(newAlloc);
 
   // Check against comboProjects — each combo has its own DR curves and ceilings
   const comboFunding = Object.fromEntries(
@@ -175,59 +182,26 @@ for (const comboName of comboNames) {
 
   const si =
     fundIds.reduce((s, f) => s + Math.abs((newAlloc[f] ?? 0) - (baseAlloc[f] ?? 0)), 0) / 2;
-
-  const mostAff = fundIds.reduce((a, b) =>
-    Math.abs((newAlloc[a] ?? 0) - (baseAlloc[a] ?? 0)) >
-    Math.abs((newAlloc[b] ?? 0) - (baseAlloc[b] ?? 0))
-      ? a
-      : b
-  );
-  const mostAffDelta = (newAlloc[mostAff] ?? 0) - (baseAlloc[mostAff] ?? 0);
-
-  console.log(
-    `\n  ${comboName}\n` +
-      `    SI=${si.toFixed(4)}pp  most affected: ${mostAff} (${mostAffDelta >= 0 ? '+' : ''}${mostAffDelta.toFixed(2)}pp)`
-  );
-
-  allocRows.push({
-    combo: comboName,
-    ...Object.fromEntries(fundIds.map((f) => [f, (newAlloc[f] ?? 0).toFixed(2)])),
-  });
-
-  for (const fid of fundIds) {
-    const base = baseAlloc[fid] ?? 0;
-    const neo = newAlloc[fid] ?? 0;
-    byFundRows.push({
-      combo: comboName,
-      project_id: fid,
-      base_alloc: base.toFixed(2),
-      new_alloc: neo.toFixed(2),
-      alloc_delta: (neo - base).toFixed(2),
-      rank_delta: baseRanks[fid] - newRanks[fid],
-    });
-  }
-
-  indexRows.push({
-    combo: comboName,
-    sensitivity_index: si.toFixed(4),
-    most_affected_fund: mostAff,
-    most_affected_delta: mostAffDelta.toFixed(2),
-  });
-
   const newCA = groupByCauseArea(newAlloc);
   const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCauseAlloc[ca]), 0) / 2;
-  const mostAffCA = caKeys.reduce((a, b) =>
-    Math.abs(newCA[a] - baseCauseAlloc[a]) > Math.abs(newCA[b] - baseCauseAlloc[b]) ? a : b
-  );
-  causeAllocRows.push({
+
+  console.log(`\n  ${comboName}\n    SI=${si.toFixed(4)}pp  caSI=${siCA.toFixed(4)}pp`);
+
+  byFundRows.push({
     combo: comboName,
-    ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(2)])),
+    sensitivity_index: si.toFixed(4),
+    ca_sensitivity_index: siCA.toFixed(4),
+    ...Object.fromEntries(
+      fundIds.map((f) => [`${f}_delta`, ((newAlloc[f] ?? 0) - (baseAlloc[f] ?? 0)).toFixed(2)])
+    ),
   });
+
   causeIndexRows.push({
     combo: comboName,
     sensitivity_index: siCA.toFixed(4),
-    most_affected_cause: mostAffCA,
-    most_affected_delta: (newCA[mostAffCA] - baseCauseAlloc[mostAffCA]).toFixed(2),
+    ...Object.fromEntries(
+      caKeys.map((ca) => [`${ca}_delta`, (newCA[ca] - baseCauseAlloc[ca]).toFixed(2)])
+    ),
   });
 }
 
@@ -235,44 +209,32 @@ for (const comboName of comboNames) {
 // Summary (ranked by SI)
 // ---------------------------------------------------------------------------
 
-indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
+byFundRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Combo ranking by sensitivity index:\n');
-console.log('Combo'.padEnd(22) + 'SI (pp)'.padEnd(10) + 'Most affected fund');
-console.log('-'.repeat(55));
-for (const r of indexRows) {
-  console.log(
-    r.combo.padEnd(22) +
-      r.sensitivity_index.padEnd(10) +
-      `${r.most_affected_fund} (${r.most_affected_delta}pp)`
-  );
+console.log('Combo'.padEnd(22) + 'SI (pp)'.padEnd(10) + 'caSI (pp)');
+console.log('-'.repeat(45));
+for (const r of byFundRows) {
+  console.log(r.combo.padEnd(22) + r.sensitivity_index.padEnd(10) + r.ca_sensitivity_index);
 }
 
 // ---------------------------------------------------------------------------
 // Write outputs
 // ---------------------------------------------------------------------------
 
-writeCsv(join(OUTPUT_DIR, 'dr_sensitivity_allocations.csv'), ['combo', ...fundIds], allocRows);
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
+
 writeCsv(
-  join(OUTPUT_DIR, 'dr_sensitivity_by_fund.csv'),
-  ['combo', 'project_id', 'base_alloc', 'new_alloc', 'alloc_delta', 'rank_delta'],
+  join(FUND_DIR, 'dr_sensitivity_by_fund.csv'),
+  ['combo', 'sensitivity_index', 'ca_sensitivity_index', ...fundIds.map((f) => `${f}_delta`)],
   byFundRows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'dr_sensitivity_index.csv'),
-  ['combo', 'sensitivity_index', 'most_affected_fund', 'most_affected_delta'],
-  indexRows
 );
 causeIndexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 writeCsv(
-  join(OUTPUT_DIR, 'dr_sensitivity_cause_area_allocations.csv'),
-  ['combo', ...caKeys],
-  causeAllocRows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'dr_sensitivity_cause_area_index.csv'),
-  ['combo', 'sensitivity_index', 'most_affected_cause', 'most_affected_delta'],
+  join(CAUSE_DIR, 'dr_sensitivity_cause_area_index.csv'),
+  ['combo', 'sensitivity_index', ...caKeys.map((ca) => `${ca}_delta`)],
   causeIndexRows
 );
 

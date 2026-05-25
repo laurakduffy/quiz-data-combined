@@ -40,7 +40,7 @@ def main():
         combos = json.load(f)
 
     for combo_name, combo in combos.items():
-        combo_dir = os.path.join(HERE, combo_name)
+        combo_dir = os.path.join(HERE, 'datasets', combo_name)
         os.makedirs(combo_dir, exist_ok=True)
 
         csv_path = os.path.join(combo_dir, f'diminishing_returns_{combo_name}.csv')

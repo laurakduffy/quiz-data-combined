@@ -21,6 +21,7 @@
 
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { mkdirSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -35,7 +36,6 @@ import {
   loadWorldviews,
   loadDataset,
   pickDefaultDataset,
-  rankDict,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -43,6 +43,8 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 
 // ---------------------------------------------------------------------------
 // Main
@@ -126,18 +128,14 @@ if (isWeighted) {
     drStepSize
   ));
 }
-const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
 const caKeys = ['ghd', 'gcr', 'aw'];
 
-const byFundRows = [];
 const indexRows = [];
-const form2RawRows = [];
 const form1CauseRows = [];
 const form2CauseRows = [];
-const causeIndexRows = [];
 
 let drChecksPassed = true;
 let drCheckCount = 0;
@@ -159,38 +157,7 @@ for (const m of methods) {
     drCheckCount++;
     const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
     const si1 = fundIds.reduce((s, f) => s + Math.abs(allocations[f] - baseAlloc[f]), 0) / 2;
-    const delta1 = 1.0 - m.best_guess;
-    const scaledSi1 = Math.abs(delta1) > 1e-9 ? si1 / (Math.abs(delta1) * 100) : null;
-    const mostAff1 = fundIds.reduce((a, b) =>
-      Math.abs(allocations[a] - baseAlloc[a]) > Math.abs(allocations[b] - baseAlloc[b]) ? a : b
-    );
-    const newRanks1 = rankDict(allocations);
     console.log(`  top fund: ${top} (${allocations[top].toFixed(1)}%)  SI=${si1.toFixed(4)}pp`);
-    for (const fid of fundIds) {
-      byFundRows.push({
-        scenario: `${m.label}_single`,
-        method: m.label,
-        bound: 'single',
-        credence_base: m.best_guess.toFixed(4),
-        credence_scenario: '1.0000',
-        project_id: fid,
-        base_alloc: baseAlloc[fid].toFixed(2),
-        new_alloc: allocations[fid].toFixed(2),
-        alloc_delta: (allocations[fid] - baseAlloc[fid]).toFixed(2),
-        rank_delta: baseRanks[fid] - newRanks1[fid],
-      });
-    }
-    indexRows.push({
-      scenario: `${m.label}_single`,
-      method: m.label,
-      bound: 'single',
-      credence_base: m.best_guess.toFixed(4),
-      credence_scenario: '1.0000',
-      sensitivity_index: si1.toFixed(4),
-      scaled_SI: scaledSi1 !== null ? scaledSi1.toFixed(4) : '',
-      most_affected_fund: mostAff1,
-      most_affected_delta: (allocations[mostAff1] - baseAlloc[mostAff1]).toFixed(2),
-    });
   } catch (e) {
     console.log(`  FAILED: ${e.message}`);
     methodAllocs[m.jsKey] = null;
@@ -225,7 +192,10 @@ for (const m of methods) {
     ...Object.fromEntries(caKeys.map((ca) => [ca, f1CA[ca].toFixed(2)])),
   });
 }
-writeCsv(join(OUTPUT_DIR, 'method_allocations.csv'), ['method', ...fundIds], form1Rows);
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
+
+writeCsv(join(FUND_DIR, 'method_allocations.csv'), ['method', ...fundIds], form1Rows);
 
 // ---------------------------------------------------------------------------
 // Form 2 — staged scenarios (matches website methodology)
@@ -290,8 +260,6 @@ for (const m of methods) {
         drStepSize
       ));
     }
-    const newRanks = rankDict(newAlloc);
-
     const scenFunding = Object.fromEntries(
       fundIds.map((f) => [f, (newAlloc[f] / 100) * totalBudget])
     );
@@ -300,42 +268,13 @@ for (const m of methods) {
 
     const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
     const scaledSi = Math.abs(delta) > 1e-9 ? si / (Math.abs(delta) * 100) : null;
-    const mostAff = fundIds.reduce((a, b) =>
-      Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b
-    );
-
-    const scaledStr = scaledSi !== null ? `  scaled=${scaledSi.toFixed(2)}pp/pp` : '  (no change)';
-    console.log(`  SI=${si.toFixed(4)}pp${scaledStr}`);
-
-    for (const fid of fundIds) {
-      byFundRows.push({
-        scenario,
-        method: m.label,
-        bound,
-        credence_base: bestVal.toFixed(4),
-        credence_scenario: boundVal.toFixed(4),
-        project_id: fid,
-        base_alloc: baseAlloc[fid].toFixed(2),
-        new_alloc: newAlloc[fid].toFixed(2),
-        alloc_delta: (newAlloc[fid] - baseAlloc[fid]).toFixed(2),
-        rank_delta: baseRanks[fid] - newRanks[fid],
-      });
-    }
-
-    form2RawRows.push({
-      scenario,
-      method: m.label,
-      bound,
-      credence_base: bestVal.toFixed(4),
-      credence_scenario: boundVal.toFixed(4),
-      ...Object.fromEntries(fundIds.map((f) => [f, newAlloc[f].toFixed(2)])),
-    });
 
     const newCA = groupByCauseArea(newAlloc);
     const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCauseAlloc[ca]), 0) / 2;
-    const mostAffCA = caKeys.reduce((a, b) =>
-      Math.abs(newCA[a] - baseCauseAlloc[a]) > Math.abs(newCA[b] - baseCauseAlloc[b]) ? a : b
-    );
+
+    const scaledStr = scaledSi !== null ? `  scaled=${scaledSi.toFixed(2)}pp/pp` : '  (no change)';
+    console.log(`  SI=${si.toFixed(4)}pp  caSI=${siCA.toFixed(4)}pp${scaledStr}`);
+
     form2CauseRows.push({
       scenario,
       method: m.label,
@@ -343,17 +282,6 @@ for (const m of methods) {
       credence_base: bestVal.toFixed(4),
       credence_scenario: boundVal.toFixed(4),
       ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(2)])),
-    });
-    causeIndexRows.push({
-      scenario,
-      method: m.label,
-      bound,
-      credence_base: bestVal.toFixed(4),
-      credence_scenario: boundVal.toFixed(4),
-      sensitivity_index: siCA.toFixed(4),
-      scaled_SI: scaledSi !== null ? (siCA / (Math.abs(delta) * 100)).toFixed(4) : '',
-      most_affected_cause: mostAffCA,
-      most_affected_delta: (newCA[mostAffCA] - baseCauseAlloc[mostAffCA]).toFixed(2),
     });
 
     indexRows.push({
@@ -363,9 +291,11 @@ for (const m of methods) {
       credence_base: bestVal.toFixed(4),
       credence_scenario: boundVal.toFixed(4),
       sensitivity_index: si.toFixed(4),
+      ca_sensitivity_index: siCA.toFixed(4),
       scaled_SI: scaledSi !== null ? scaledSi.toFixed(4) : '',
-      most_affected_fund: mostAff,
-      most_affected_delta: (newAlloc[mostAff] - baseAlloc[mostAff]).toFixed(2),
+      ...Object.fromEntries(
+        fundIds.map((f) => [`${f}_delta`, (newAlloc[f] - baseAlloc[f]).toFixed(2)])
+      ),
     });
   }
 }
@@ -377,9 +307,9 @@ indexRows.push({
   credence_base: '',
   credence_scenario: '',
   sensitivity_index: '0.0000',
+  ca_sensitivity_index: '0.0000',
   scaled_SI: '',
-  most_affected_fund: '',
-  most_affected_delta: '0.00',
+  ...Object.fromEntries(fundIds.map((f) => [`${f}_delta`, '0.00'])),
 });
 indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 
@@ -391,28 +321,7 @@ for (const r of indexRows) {
 }
 
 writeCsv(
-  join(OUTPUT_DIR, 'split_credences_by_fund.csv'),
-  [
-    'scenario',
-    'method',
-    'bound',
-    'credence_base',
-    'credence_scenario',
-    'project_id',
-    'base_alloc',
-    'new_alloc',
-    'alloc_delta',
-    'rank_delta',
-  ],
-  byFundRows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'split_credences_allocations.csv'),
-  ['scenario', 'method', 'bound', 'credence_base', 'credence_scenario', ...fundIds],
-  form2RawRows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'split_credences_index.csv'),
+  join(FUND_DIR, 'split_credences_index.csv'),
   [
     'scenario',
     'method',
@@ -420,44 +329,17 @@ writeCsv(
     'credence_base',
     'credence_scenario',
     'sensitivity_index',
+    'ca_sensitivity_index',
     'scaled_SI',
-    'most_affected_fund',
-    'most_affected_delta',
+    ...fundIds.map((f) => `${f}_delta`),
   ],
   indexRows
 );
-writeCsv(join(OUTPUT_DIR, 'method_cause_areas.csv'), ['method', ...caKeys], form1CauseRows);
-causeIndexRows.push({
-  scenario: 'baseline',
-  method: 'baseline',
-  bound: 'baseline',
-  credence_base: '',
-  credence_scenario: '',
-  sensitivity_index: '0.0000',
-  scaled_SI: '',
-  most_affected_cause: '',
-  most_affected_delta: '0.00',
-});
-causeIndexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
+writeCsv(join(CAUSE_DIR, 'method_cause_areas.csv'), ['method', ...caKeys], form1CauseRows);
 writeCsv(
-  join(OUTPUT_DIR, 'split_credences_cause_areas.csv'),
+  join(CAUSE_DIR, 'split_credences_cause_areas.csv'),
   ['scenario', 'method', 'bound', 'credence_base', 'credence_scenario', ...caKeys],
   form2CauseRows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'cause_area_index.csv'),
-  [
-    'scenario',
-    'method',
-    'bound',
-    'credence_base',
-    'credence_scenario',
-    'sensitivity_index',
-    'scaled_SI',
-    'most_affected_cause',
-    'most_affected_delta',
-  ],
-  causeIndexRows
 );
 
 console.log(

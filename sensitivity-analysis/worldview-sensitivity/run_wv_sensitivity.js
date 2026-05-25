@@ -17,6 +17,7 @@
 
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { mkdirSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -27,7 +28,6 @@ import {
   loadJson,
   loadDataset,
   pickDefaultDataset,
-  rankDict,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -35,6 +35,8 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 
 // ---------------------------------------------------------------------------
 // Main
@@ -132,7 +134,6 @@ if (isWeighted) {
     drStepSize
   ));
 }
-const baseRanks = rankDict(baseAlloc);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
@@ -147,9 +148,7 @@ console.log('Form 1 — Running each worldview at 100% credence (staged)...');
 let drChecksPassed = true;
 let drCheckCount = 0;
 
-const byFundRows = [];
 const indexRows = [];
-const form2RawRows = [];
 const form1CauseRows = [];
 const form2CauseRows = [];
 const causeIndexRows = [];
@@ -181,12 +180,6 @@ for (const wv of worldviews) {
   drCheckCount++;
   const top = fundIds.reduce((a, b) => (allocations[a] > allocations[b] ? a : b));
   const si1 = fundIds.reduce((s, f) => s + Math.abs(allocations[f] - baseAlloc[f]), 0) / 2;
-  const delta1 = 1.0 - wv.credence;
-  const scaledSi1 = Math.abs(delta1) > 1e-9 ? si1 / (Math.abs(delta1) * 100) : null;
-  const mostAff1 = fundIds.reduce((a, b) =>
-    Math.abs(allocations[a] - baseAlloc[a]) > Math.abs(allocations[b] - baseAlloc[b]) ? a : b
-  );
-  const newRanks1 = rankDict(allocations);
   console.log(`  top: ${top} (${allocations[top].toFixed(1)}%)  SI=${si1.toFixed(4)}pp`);
   form1Rows.push({
     worldview: wv.name,
@@ -196,31 +189,6 @@ for (const wv of worldviews) {
   form1CauseRows.push({
     worldview: wv.name,
     ...Object.fromEntries(caKeys.map((ca) => [ca, f1CA[ca].toFixed(2)])),
-  });
-  for (const fid of fundIds) {
-    byFundRows.push({
-      scenario: `${wv.name}_single`,
-      worldview: wv.name,
-      bound: 'single',
-      credence_base: wv.credence.toFixed(4),
-      credence_scenario: '1.0000',
-      project_id: fid,
-      base_alloc: baseAlloc[fid].toFixed(2),
-      new_alloc: allocations[fid].toFixed(2),
-      alloc_delta: (allocations[fid] - baseAlloc[fid]).toFixed(2),
-      rank_delta: baseRanks[fid] - newRanks1[fid],
-    });
-  }
-  indexRows.push({
-    scenario: `${wv.name}_single`,
-    worldview: wv.name,
-    bound: 'single',
-    credence_base: wv.credence.toFixed(4),
-    credence_scenario: '1.0000',
-    sensitivity_index: si1.toFixed(4),
-    scaled_SI: scaledSi1 !== null ? scaledSi1.toFixed(4) : '',
-    most_affected_fund: mostAff1,
-    most_affected_delta: (allocations[mostAff1] - baseAlloc[mostAff1]).toFixed(2),
   });
 }
 
@@ -277,8 +245,6 @@ for (const wv of worldviews) {
         drStepSize
       ));
     }
-    const newRanks = rankDict(newAlloc);
-
     for (const w of worldviews) w.credence = origCredences[w.name];
 
     const scenFunding = Object.fromEntries(
@@ -289,42 +255,12 @@ for (const wv of worldviews) {
 
     const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
     const scaledSi = Math.abs(delta) > 1e-9 ? si / (Math.abs(delta) * 100) : null;
-    const mostAff = fundIds.reduce((a, b) =>
-      Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b
-    );
 
     const scaledStr = scaledSi !== null ? `  scaled=${scaledSi.toFixed(4)}pp/pp` : '  (no change)';
     console.log(`  SI=${si.toFixed(4)}pp${scaledStr}`);
 
-    for (const fid of fundIds) {
-      byFundRows.push({
-        scenario,
-        worldview: name,
-        bound,
-        credence_base: baseCred.toFixed(4),
-        credence_scenario: boundVal.toFixed(4),
-        project_id: fid,
-        base_alloc: baseAlloc[fid].toFixed(2),
-        new_alloc: newAlloc[fid].toFixed(2),
-        alloc_delta: (newAlloc[fid] - baseAlloc[fid]).toFixed(2),
-        rank_delta: baseRanks[fid] - newRanks[fid],
-      });
-    }
-
-    form2RawRows.push({
-      scenario,
-      worldview: name,
-      bound,
-      credence_base: baseCred.toFixed(4),
-      credence_scenario: boundVal.toFixed(4),
-      ...Object.fromEntries(fundIds.map((f) => [f, newAlloc[f].toFixed(2)])),
-    });
-
     const newCA = groupByCauseArea(newAlloc);
     const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCauseAlloc[ca]), 0) / 2;
-    const mostAffCA = caKeys.reduce((a, b) =>
-      Math.abs(newCA[a] - baseCauseAlloc[a]) > Math.abs(newCA[b] - baseCauseAlloc[b]) ? a : b
-    );
     form2CauseRows.push({
       scenario,
       worldview: name,
@@ -341,8 +277,9 @@ for (const wv of worldviews) {
       credence_scenario: boundVal.toFixed(4),
       sensitivity_index: siCA.toFixed(4),
       scaled_SI: scaledSi !== null ? (siCA / (Math.abs(delta) * 100)).toFixed(4) : '',
-      most_affected_cause: mostAffCA,
-      most_affected_delta: (newCA[mostAffCA] - baseCauseAlloc[mostAffCA]).toFixed(2),
+      ...Object.fromEntries(
+        caKeys.map((ca) => [`${ca}_delta`, (newCA[ca] - baseCauseAlloc[ca]).toFixed(2)])
+      ),
     });
 
     indexRows.push({
@@ -353,8 +290,9 @@ for (const wv of worldviews) {
       credence_scenario: boundVal.toFixed(4),
       sensitivity_index: si.toFixed(4),
       scaled_SI: scaledSi !== null ? scaledSi.toFixed(4) : '',
-      most_affected_fund: mostAff,
-      most_affected_delta: (newAlloc[mostAff] - baseAlloc[mostAff]).toFixed(2),
+      ...Object.fromEntries(
+        fundIds.map((f) => [`${f}_delta`, (newAlloc[f] - baseAlloc[f]).toFixed(2)])
+      ),
     });
   }
 }
@@ -367,8 +305,7 @@ indexRows.push({
   credence_scenario: '',
   sensitivity_index: '0.0000',
   scaled_SI: '',
-  most_affected_fund: '',
-  most_affected_delta: '0.00',
+  ...Object.fromEntries(fundIds.map((f) => [`${f}_delta`, '0.00'])),
 });
 indexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 
@@ -379,34 +316,12 @@ for (const r of indexRows.slice(0, 10)) {
   console.log(`  ${r.scenario.slice(0, 60).padEnd(60)}  SI=${r.sensitivity_index}pp${scaledStr}`);
 }
 
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
+
+writeCsv(join(FUND_DIR, 'single_worldview_allocations.csv'), ['worldview', ...fundIds], form1Rows);
 writeCsv(
-  join(OUTPUT_DIR, 'single_worldview_allocations.csv'),
-  ['worldview', ...fundIds],
-  form1Rows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'split_credences_allocations.csv'),
-  ['scenario', 'worldview', 'bound', 'credence_base', 'credence_scenario', ...fundIds],
-  form2RawRows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'split_credences_by_fund.csv'),
-  [
-    'scenario',
-    'worldview',
-    'bound',
-    'credence_base',
-    'credence_scenario',
-    'project_id',
-    'base_alloc',
-    'new_alloc',
-    'alloc_delta',
-    'rank_delta',
-  ],
-  byFundRows
-);
-writeCsv(
-  join(OUTPUT_DIR, 'split_credences_index.csv'),
+  join(FUND_DIR, 'split_credences_index.csv'),
   [
     'scenario',
     'worldview',
@@ -415,13 +330,12 @@ writeCsv(
     'credence_scenario',
     'sensitivity_index',
     'scaled_SI',
-    'most_affected_fund',
-    'most_affected_delta',
+    ...fundIds.map((f) => `${f}_delta`),
   ],
   indexRows
 );
 writeCsv(
-  join(OUTPUT_DIR, 'single_worldview_cause_areas.csv'),
+  join(CAUSE_DIR, 'single_worldview_cause_areas.csv'),
   ['worldview', ...caKeys],
   form1CauseRows
 );
@@ -433,17 +347,16 @@ causeIndexRows.push({
   credence_scenario: '',
   sensitivity_index: '0.0000',
   scaled_SI: '',
-  most_affected_cause: '',
-  most_affected_delta: '0.00',
+  ...Object.fromEntries(caKeys.map((ca) => [`${ca}_delta`, '0.00'])),
 });
 causeIndexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 writeCsv(
-  join(OUTPUT_DIR, 'split_credences_cause_areas.csv'),
+  join(CAUSE_DIR, 'split_credences_cause_areas.csv'),
   ['scenario', 'worldview', 'bound', 'credence_base', 'credence_scenario', ...caKeys],
   form2CauseRows
 );
 writeCsv(
-  join(OUTPUT_DIR, 'cause_area_index.csv'),
+  join(CAUSE_DIR, 'cause_area_index.csv'),
   [
     'scenario',
     'worldview',
@@ -452,8 +365,7 @@ writeCsv(
     'credence_scenario',
     'sensitivity_index',
     'scaled_SI',
-    'most_affected_cause',
-    'most_affected_delta',
+    ...caKeys.map((ca) => `${ca}_delta`),
   ],
   causeIndexRows
 );

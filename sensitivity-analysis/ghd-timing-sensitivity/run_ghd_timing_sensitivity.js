@@ -16,6 +16,7 @@
 
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { mkdirSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -35,6 +36,8 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 
 const TIMEFRAME_ORDER = [
   '0-5 years',
@@ -280,25 +283,28 @@ for (const r of indexRows) {
   );
 }
 
-writeCsv(join(OUTPUT_DIR, 'ghd_timing_allocations.csv'), ['scenario', ...fundIds], allocRows);
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
+
+writeCsv(join(FUND_DIR, 'ghd_timing_allocations.csv'), ['scenario', ...fundIds], allocRows);
 writeCsv(
-  join(OUTPUT_DIR, 'ghd_timing_by_fund.csv'),
+  join(FUND_DIR, 'ghd_timing_by_fund.csv'),
   ['scenario', 'project_id', 'base_alloc', 'new_alloc', 'alloc_delta', 'rank_delta'],
   byFundRows
 );
 writeCsv(
-  join(OUTPUT_DIR, 'ghd_timing_index.csv'),
+  join(FUND_DIR, 'ghd_timing_index.csv'),
   ['scenario', 'sensitivity_index', 'most_affected_fund', 'most_affected_delta'],
   indexRows
 );
 causeIndexRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 writeCsv(
-  join(OUTPUT_DIR, 'ghd_timing_cause_area_allocations.csv'),
+  join(CAUSE_DIR, 'ghd_timing_cause_area_allocations.csv'),
   ['scenario', ...caKeys],
   causeAllocRows
 );
 writeCsv(
-  join(OUTPUT_DIR, 'ghd_timing_cause_area_index.csv'),
+  join(CAUSE_DIR, 'ghd_timing_cause_area_index.csv'),
   ['scenario', 'sensitivity_index', 'most_affected_cause', 'most_affected_delta'],
   causeIndexRows
 );

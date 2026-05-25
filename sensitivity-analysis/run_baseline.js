@@ -13,7 +13,7 @@
 
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
-import { mkdirSync } from 'fs';
+import { mkdirSync, readdirSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
@@ -40,8 +40,13 @@ const args = parseArgs(process.argv);
 // Load inputs — same sources as the website
 // ---------------------------------------------------------------------------
 
-const datasetPath =
-  args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
+const datasetsDir = join(REPO_ROOT, 'config', 'datasets');
+const latestDataset = readdirSync(datasetsDir)
+  .filter((f) => f.endsWith('.json'))
+  .sort()
+  .at(-1);
+if (!latestDataset && !args.base) throw new Error(`No JSON files found in ${datasetsDir}`);
+const datasetPath = args.base ?? join(datasetsDir, latestDataset);
 const dataset = loadDataset(datasetPath);
 const worldviews = loadWorldviews(
   args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
@@ -50,7 +55,7 @@ const { stages } = loadJson(join(__dirname, 'baseline.json'));
 
 const fundIds = Object.keys(dataset.projects).sort();
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged';
 
 console.log('\nBaseline allocation');
 console.log(`  Dataset:    ${datasetPath.split(/[/\\]/).pop()}`);
@@ -258,3 +263,76 @@ console.log(
   `\nDR ceiling tests: ${drPassed ? 'PASS (1 scenario checked)' : 'FAIL — see errors above'}`
 );
 if (!drPassed) process.exit(1);
+
+// ---------------------------------------------------------------------------
+// Increment trace (--trace flag, weighted approach only)
+//
+// For each aggregation method, re-runs computeMarcusAllocation on the full
+// budget with debugTrace enabled, then writes a CSV showing how each $M
+// increment was allocated step-by-step.
+//
+// Usage: node run_baseline.js --trace
+// Output: outputs/baseline_increment_trace.csv
+// ---------------------------------------------------------------------------
+
+if (args.trace) {
+  if (!isWeighted) {
+    console.log('\n--trace is only supported with the weighted approach (default). Skipping.');
+  } else {
+    console.log(`\n${'='.repeat(60)}`);
+    console.log('Increment trace (--trace)');
+    console.log(`  Each method runs on full $${totalBudget}M budget.`);
+    console.log(
+      `  Increment size: $${dataset.incrementSize}M  →  up to ${Math.ceil(totalBudget / dataset.incrementSize)} steps per method`
+    );
+
+    const traceRows = [];
+
+    for (const stage of stages) {
+      process.stdout.write(`  ${stage.method.padEnd(25)} tracing...`);
+      const debugTrace = [];
+      computeMarcusAllocation(
+        dataset.projects,
+        worldviews,
+        stage.method,
+        totalBudget,
+        dataset.incrementSize,
+        { drStepSize: dataset.drStepSize, debugTrace, debugMethod: stage.method }
+      );
+
+      for (let i = 0; i < debugTrace.length; i++) {
+        const entry = debugTrace[i];
+        const row = { method: stage.method, step: i + 1 };
+
+        // Compute per-fund increment and cumulative for this step
+        const winners = [];
+        let incrementTotal = 0;
+        for (const fid of fundIds) {
+          const before = entry.fundingBefore?.[fid] ?? 0;
+          const after = entry.fundingAfter?.[fid] ?? 0;
+          const inc = after - before;
+          row[`${fid}_M`] = inc > 1e-9 ? inc.toFixed(4) : '0';
+          row[`${fid}_cumulative_M`] = after.toFixed(4);
+          if (inc > 1e-9) winners.push(fid);
+          incrementTotal += inc;
+        }
+
+        row.increment_M = incrementTotal.toFixed(4);
+        row.cumulative_M = fundIds
+          .reduce((s, fid) => s + (entry.fundingAfter?.[fid] ?? 0), 0)
+          .toFixed(2);
+        row.winner = entry.stopped ? '(stopped)' : winners.join('+') || '(none)';
+        traceRows.push(row);
+      }
+
+      console.log(` ${debugTrace.length} steps`);
+    }
+
+    const fundCols = fundIds.flatMap((fid) => [`${fid}_M`, `${fid}_cumulative_M`]);
+    writeCsv(
+      join(OUTPUT_DIR, 'baseline_increment_trace.csv'),
+      ['method', 'step', 'increment_M', 'cumulative_M', 'winner', ...fundCols],
+      traceRows
+    );
+  }
+}

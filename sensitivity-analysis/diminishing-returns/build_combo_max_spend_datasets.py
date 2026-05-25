@@ -47,7 +47,7 @@ def main():
     for combo_name, combo in combos.items():
         for val in MAX_SPEND_SCENARIOS:
             name = scenario_name(combo_name, val)
-            scenario_dir = os.path.join(HERE, name)
+            scenario_dir = os.path.join(HERE, 'datasets', name)
             os.makedirs(scenario_dir, exist_ok=True)
 
             json_path = os.path.join(scenario_dir, f'output_data_{name}.json')

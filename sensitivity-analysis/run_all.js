@@ -2,7 +2,7 @@
  * Run all four sensitivity analyses in sequence.
  *
  * Usage:
- *   node run_all.js [--dry-run] [--base PATH] [--worldviews-file PATH] [--approach staged|weighted]
+ *   node run_all.js [--base PATH] [--worldviews-file PATH] [--approach staged|weighted]
  *
  * All flags are forwarded to each sub-script unchanged.
  * --approach weighted (default): credence-weighted average of per-method allocations.
@@ -27,13 +27,7 @@ const SCRIPTS = [
   join(__dirname, 'moral-weights', 'run_moral_weight_sensitivity.js'),
 ];
 
-const PYTHON_REPORTS = [
-  join(__dirname, 'generate_report.py'),
-  join(__dirname, 'generate_cluster_report.py'),
-];
-
 const forwardedArgs = process.argv.slice(2);
-const isDryRun = forwardedArgs.includes('--dry-run');
 
 const approachArg = forwardedArgs.indexOf('--approach');
 const approach = approachArg !== -1 ? (forwardedArgs[approachArg + 1] ?? 'weighted') : 'weighted';
@@ -56,27 +50,6 @@ for (const script of SCRIPTS) {
   if (result.status !== 0) {
     console.error(`\nFAILED: ${label} (exit code ${result.status})`);
     allPassed = false;
-  }
-}
-
-if (!isDryRun) {
-  const pythonExe = process.platform === 'win32' ? 'python' : 'python3';
-
-  for (const script of PYTHON_REPORTS) {
-    const label = script.replace(__dirname + '/', '').replace(__dirname + '\\', '');
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`Running: ${label}`);
-    console.log('='.repeat(60));
-
-    const result = spawnSync(pythonExe, [script], {
-      stdio: 'inherit',
-      env: process.env,
-    });
-
-    if (result.status !== 0) {
-      console.error(`\nFAILED: ${label} (exit code ${result.status})`);
-      allPassed = false;
-    }
   }
 }
 

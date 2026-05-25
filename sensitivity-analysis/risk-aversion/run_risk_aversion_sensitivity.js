@@ -22,6 +22,7 @@
 
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { mkdirSync } from 'fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -40,6 +41,8 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 
 // ---------------------------------------------------------------------------
 // Parse args — extends sensitivity_utils.parseArgs with --test
@@ -193,8 +196,11 @@ for (const r of neutralRows) {
   );
 }
 
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
+
 writeCsv(
-  join(OUTPUT_DIR, 'neutral_baseline_allocation.csv'),
+  join(FUND_DIR, 'neutral_baseline_allocation.csv'),
   ['fund', 'allocation_pct', 'funding_M', 'rank'],
   neutralRows
 );
@@ -204,7 +210,6 @@ writeCsv(
 // ---------------------------------------------------------------------------
 
 const summaryRows = [];
-const byFundRows = [];
 const causeSummaryRows = [];
 const caKeys = ['ghd', 'gcr', 'aw'];
 let drChecksPassed = true;
@@ -243,35 +248,25 @@ for (const [testName, test] of activeTests) {
   drCheckCount++;
 
   const si = fundIds.reduce((s, f) => s + Math.abs(newAlloc[f] - baseAlloc[f]), 0) / 2;
-  const baseRanks = rankDict(baseAlloc);
-  const newRanks = rankDict(newAlloc);
-  const mostAff = fundIds.reduce((a, b) =>
-    Math.abs(newAlloc[a] - baseAlloc[a]) > Math.abs(newAlloc[b] - baseAlloc[b]) ? a : b
-  );
-  const mostAffDelta = newAlloc[mostAff] - baseAlloc[mostAff];
+  console.log(`  SI=${si.toFixed(4)}pp`);
 
-  console.log(
-    `  SI=${si.toFixed(4)}pp  most affected: ${mostAff} (${mostAffDelta >= 0 ? '+' : ''}${mostAffDelta.toFixed(2)}pp)`
-  );
+  // Cause-area allocations + cause-area SI
+  const baseCA = groupByCauseArea(baseAlloc);
+  const newCA = groupByCauseArea(newAlloc);
+  const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCA[ca]), 0) / 2;
 
   // Summary row
   const summaryRow = {
     test: testName,
     sensitivity_index: si.toFixed(4),
-    most_affected_fund: mostAff,
-    most_affected_delta: mostAffDelta.toFixed(2),
+    ca_sensitivity_index: siCA.toFixed(4),
   };
   for (const fid of fundIds) {
-    summaryRow[`${fid}_base`] = baseAlloc[fid].toFixed(2);
-    summaryRow[`${fid}_new`] = newAlloc[fid].toFixed(2);
     summaryRow[`${fid}_delta`] = (newAlloc[fid] - baseAlloc[fid]).toFixed(2);
   }
   summaryRows.push(summaryRow);
 
   // Cause-area summary row
-  const baseCA = groupByCauseArea(baseAlloc);
-  const newCA = groupByCauseArea(newAlloc);
-  const siCA = caKeys.reduce((s, ca) => s + Math.abs(newCA[ca] - baseCA[ca]), 0) / 2;
   const mostAffCA = caKeys.reduce((a, b) =>
     Math.abs(newCA[a] - baseCA[a]) > Math.abs(newCA[b] - baseCA[b]) ? a : b
   );
@@ -287,20 +282,6 @@ for (const [testName, test] of activeTests) {
     causeSummaryRow[`${ca}_delta`] = (newCA[ca] - baseCA[ca]).toFixed(2);
   }
   causeSummaryRows.push(causeSummaryRow);
-
-  // By-fund rows
-  for (const fid of fundIds) {
-    byFundRows.push({
-      test: testName,
-      project_id: fid,
-      base_alloc: baseAlloc[fid].toFixed(2),
-      new_alloc: newAlloc[fid].toFixed(2),
-      alloc_delta: (newAlloc[fid] - baseAlloc[fid]).toFixed(2),
-      base_rank: baseRanks[fid],
-      new_rank: newRanks[fid],
-      rank_delta: baseRanks[fid] - newRanks[fid],
-    });
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -313,7 +294,7 @@ console.log(`\n${'='.repeat(60)}`);
 console.log('Summary (ranked by sensitivity index):');
 for (const r of summaryRows) {
   console.log(
-    `  ${r.test.padEnd(45)}  SI=${r.sensitivity_index}pp  most affected: ${r.most_affected_fund} (${r.most_affected_delta >= 0 ? '+' : ''}${r.most_affected_delta}pp)`
+    `  ${r.test.padEnd(45)}  SI=${r.sensitivity_index}pp  caSI=${r.ca_sensitivity_index}pp`
   );
 }
 
@@ -324,29 +305,14 @@ for (const r of summaryRows) {
 const summaryFields = [
   'test',
   'sensitivity_index',
-  'most_affected_fund',
-  'most_affected_delta',
-  ...fundIds.flatMap((f) => [`${f}_base`, `${f}_new`, `${f}_delta`]),
+  'ca_sensitivity_index',
+  ...fundIds.map((f) => `${f}_delta`),
 ];
-writeCsv(join(OUTPUT_DIR, 'risk_aversion_summary.csv'), summaryFields, summaryRows);
+writeCsv(join(FUND_DIR, 'risk_aversion_summary.csv'), summaryFields, summaryRows);
 
-writeCsv(
-  join(OUTPUT_DIR, 'risk_aversion_by_fund.csv'),
-  [
-    'test',
-    'project_id',
-    'base_alloc',
-    'new_alloc',
-    'alloc_delta',
-    'base_rank',
-    'new_rank',
-    'rank_delta',
-  ],
-  byFundRows
-);
 causeSummaryRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 writeCsv(
-  join(OUTPUT_DIR, 'risk_aversion_cause_area_summary.csv'),
+  join(CAUSE_DIR, 'risk_aversion_cause_area_summary.csv'),
   [
     'test',
     'sensitivity_index',

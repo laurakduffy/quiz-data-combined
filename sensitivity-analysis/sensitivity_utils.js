@@ -127,9 +127,16 @@ export function groupByCauseArea(allocations) {
 }
 
 export function parseArgs(argv) {
-  const args = { base: null, worldviewsFile: null, dryRun: false, approach: 'weighted' };
+  const args = {
+    base: null,
+    worldviewsFile: null,
+    dryRun: false,
+    approach: 'weighted',
+    trace: false,
+  };
   for (let i = 2; i < argv.length; i++) {
     if (argv[i] === '--dry-run') args.dryRun = true;
+    else if (argv[i] === '--trace') args.trace = true;
     else if (argv[i] === '--base' && argv[i + 1]) args.base = argv[++i];
     else if (argv[i] === '--worldviews-file' && argv[i + 1]) args.worldviewsFile = argv[++i];
     else if (argv[i] === '--approach' && argv[i + 1]) args.approach = argv[++i];

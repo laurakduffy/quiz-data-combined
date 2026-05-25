@@ -5,12 +5,14 @@
  * outputs/datasets/, runs the staged multi-method allocation exactly as the
  * website does, and computes the sensitivity index (SI) vs the baseline.
  *
- * Requires: run `python generate_scaled_datasets.py` first.
+ * If any expected per-(fund, multiplier) dataset is missing relative to
+ * config.json, the Python generator (generate_scaled_datasets.py) is invoked
+ * automatically before the analysis runs.
  *
  * Usage:
  *   node sensitivity-analysis/across-the-board/run_multiply_ce.js
  *   node sensitivity-analysis/across-the-board/run_multiply_ce.js \
- *        [--base PATH] [--worldviews-file PATH]
+ *        [--base PATH] [--worldviews-file PATH] [--skip-generate]
  *
  * Outputs (written to outputs/):
  *   ce_multiplier_allocations.csv  — full allocation vector per (fund_varied, multiplier)
@@ -20,6 +22,7 @@
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import { mkdirSync, existsSync } from 'fs';
+import { spawnSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -40,13 +43,97 @@ import {
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
+const FUND_DIR = join(OUTPUT_DIR, 'fund');
+const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 const DATASETS_DIR = join(__dirname, 'outputs', 'datasets');
 
 const args = parseArgs(process.argv);
 const isWeighted = args.approach === 'weighted';
+const skipGenerate = process.argv.includes('--skip-generate');
 
 // 1.0 uses the baseline directly (no pre-generated file needed).
 const { multipliers: MULTIPLIERS, groups: GROUPS = {} } = loadJson(join(__dirname, 'config.json'));
+
+// ---------------------------------------------------------------------------
+// Auto-regenerate any missing dataset files from config.json
+// ---------------------------------------------------------------------------
+// config.json is the source of truth for which (fund × multiplier) and
+// (group × multiplier) scenarios get analyzed and written to CSV. The Python
+// generator materializes one dataset JSON per scenario. If any expected file
+// is missing, we invoke the generator here so editing config.json is enough —
+// the user doesn't have to remember to run two commands.
+
+function expectedDatasetPath(name, multiplier) {
+  const tag = String(multiplier).replace('.', '');
+  return join(DATASETS_DIR, `${name}_${tag}x.json`);
+}
+
+function findMissingDatasets() {
+  const expected = [];
+  for (const [fund, mults] of Object.entries(MULTIPLIERS)) {
+    for (const m of mults) {
+      if (m === 1.0) continue;
+      expected.push({ name: fund, multiplier: m });
+    }
+  }
+  for (const [groupName, groupDef] of Object.entries(GROUPS)) {
+    for (const m of groupDef.multipliers ?? []) {
+      if (m === 1.0) continue;
+      expected.push({ name: groupName, multiplier: m });
+    }
+  }
+  return expected.filter((e) => !existsSync(expectedDatasetPath(e.name, e.multiplier)));
+}
+
+if (!skipGenerate) {
+  const missing = findMissingDatasets();
+  if (missing.length > 0) {
+    console.log(
+      `\nMissing ${missing.length} dataset file(s) — running generate_scaled_datasets.py:`
+    );
+    for (const m of missing) console.log(`  - ${m.name} ×${m.multiplier}`);
+
+    const script = join(__dirname, 'generate_scaled_datasets.py');
+    const candidates =
+      process.platform === 'win32' ? ['python', 'py', 'python3'] : ['python3', 'python'];
+    let ran = false;
+    let lastErr = null;
+    const pyEnv = { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' };
+    for (const cmd of candidates) {
+      const result = spawnSync(cmd, [script], { stdio: 'inherit', env: pyEnv });
+      if (result.error && result.error.code === 'ENOENT') {
+        lastErr = result.error;
+        continue;
+      }
+      if (result.status !== 0) {
+        console.error(`\nERROR: ${cmd} ${script} exited with status ${result.status}.`);
+        console.error('Fix the generator error and re-run, or pass --skip-generate to bypass.');
+        process.exit(1);
+      }
+      ran = true;
+      break;
+    }
+    if (!ran) {
+      console.error(
+        `\nERROR: could not find a Python interpreter (tried: ${candidates.join(', ')}).`
+      );
+      console.error(lastErr ? `Last error: ${lastErr.message}` : '');
+      console.error(
+        'Install Python or run the generator manually, then re-run with --skip-generate.'
+      );
+      process.exit(1);
+    }
+
+    const stillMissing = findMissingDatasets();
+    if (stillMissing.length > 0) {
+      console.error(
+        `\nERROR: generator finished but ${stillMissing.length} dataset(s) are still missing:`
+      );
+      for (const m of stillMissing) console.error(`  - ${m.name} ×${m.multiplier}`);
+      process.exit(1);
+    }
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Load baseline inputs — same sources as the website
@@ -467,12 +554,13 @@ for (const [groupName, groupDef] of Object.entries(GROUPS)) {
 // Write outputs
 // ---------------------------------------------------------------------------
 
-mkdirSync(OUTPUT_DIR, { recursive: true });
+mkdirSync(FUND_DIR, { recursive: true });
+mkdirSync(CAUSE_DIR, { recursive: true });
 
-writeCsv(join(OUTPUT_DIR, 'ce_multiplier_allocations.csv'), allocFields, allocRows);
-writeCsv(join(OUTPUT_DIR, 'ce_multiplier_si.csv'), siFields, siRows);
-writeCsv(join(OUTPUT_DIR, 'cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
-writeCsv(join(OUTPUT_DIR, 'cause_area_si.csv'), causeSiFields, causeSiRows);
+writeCsv(join(FUND_DIR, 'ce_multiplier_allocations.csv'), allocFields, allocRows);
+writeCsv(join(FUND_DIR, 'ce_multiplier_si.csv'), siFields, siRows);
+writeCsv(join(CAUSE_DIR, 'cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
+writeCsv(join(CAUSE_DIR, 'cause_area_si.csv'), causeSiFields, causeSiRows);
 
 console.log(
   `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
