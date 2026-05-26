@@ -1,12 +1,12 @@
 test,sensitivity_index,ca_sensitivity_index,ea_awf_delta,givewell_delta,leaf_delta,longview_ai_delta,longview_nuclear_delta,navigation_fund_cagefree_delta,navigation_fund_general_delta,sentinel_bio_delta
 neutral_to_combined,90.1525,90.1525,14.30,30.50,4.82,-89.14,-0.42,9.43,31.10,-0.59
+neutral_to_wlu_5,90.1485,90.1485,13.41,30.01,7.49,-89.14,-0.42,9.47,29.77,-0.58
+neutral_to_wlu_10,90.1485,90.1485,13.45,31.10,6.66,-89.14,-0.42,9.47,29.46,-0.58
 neutral_to_downside_critical,89.1450,56.1525,14.05,10.21,6.21,-89.14,14.58,9.21,16.46,18.41
 neutral_to_cont_upside_skep,80.6950,80.6950,13.56,24.77,3.99,-79.69,-0.42,9.41,28.97,-0.59
-specialblend_to_bilateral_skep,66.8050,54.3890,-10.53,-12.95,-4.94,66.80,-3.82,-8.78,-17.18,-8.59
 specialblend_to_neutral,65.9275,54.5190,-10.34,-12.95,-4.94,65.93,-3.40,-9.11,-17.18,-8.01
 specialblend_to_combined,35.7515,35.6335,3.96,17.54,-0.12,-23.22,-3.82,0.33,13.92,-8.59
 specialblend_to_wlu_5,35.6295,35.6295,3.07,17.06,2.55,-23.22,-3.82,0.36,12.59,-8.59
 specialblend_to_wlu_10,35.6295,35.6295,3.12,18.15,1.72,-23.22,-3.82,0.36,12.28,-8.59
 specialblend_to_cont_upside_skep,27.1234,26.1760,3.22,11.81,-0.95,-13.76,-3.82,0.30,11.79,-8.59
 specialblend_to_downside_critical,26.6763,3.0973,3.71,-2.74,1.28,-23.22,11.18,0.10,-0.72,10.41
-neutral_to_bilateral_skep,1.2025,0.1300,-0.19,0.00,0.00,0.88,-0.42,0.32,0.00,-0.59

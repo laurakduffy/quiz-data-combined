@@ -29,50 +29,50 @@ all_funds_info = {
     'ea_awf': {
         'baseline_budget': 6.597830*M,
         'power': {
-            'low': 0.635,
-            'med': 0.885,
-            'high': 1.096,
+            'slow': 0.635,
+            'med':  0.885,
+            'fast': 1.096,
             },
         },
     'navigation_fund_cagefree': {
         'baseline_budget': 6.145*M,
         'power': {
-            'low': 1.086/0.885*0.888,
-            'med': 0.888,
-            'high': 0.635/0.885*0.888,
+            'slow': 0.635/0.885*0.888,
+            'med':  0.888,
+            'fast': 1.086/0.885*0.888,
         },
     },
     'navigation_fund_general': {
         'baseline_budget': 16.675*M,
         'power': {
-            'low': 1.086/0.885*1.315,
-            'med': 1.315,
-            'high': 0.635/0.885*1.315,
+            'slow': 0.635/0.885*1.315,
+            'med':  1.315,
+            'fast': 1.086/0.885*1.315,
         },
     },
     'sentinel_bio': {
         'baseline_budget': 7.5*M,
         'power': {
-            'low': 1.3,
-            'med': 0.9,
-            'high': 0.35,
+            'slow': 0.35,
+            'med':  0.9,
+            'fast': 1.3,
         },
 
     },
     'longview_nuclear': {
         'baseline_budget': 5.7*M,
         'power': {
-            'low': 1.3,
-            'med': 0.9,
-            'high': 0.35,
+            'slow': 0.35,
+            'med':  0.9,
+            'fast': 1.3,
         }
     },
     'longview_ai': {
         'baseline_budget': 70*M,
         'power': {
-            'low': 1.3,
-            'med': 0.9,
-            'high': 0.35,
+            'slow': 0.35,
+            'med':  0.9,
+            'fast': 1.3,
         }
     },
 }
@@ -92,7 +92,7 @@ def get_dr_curve_one_fund(fund, spend_points, max_addl_spend=None):
     baseline_budget = fund_info['baseline_budget']
     max_spend = max_addl_spend * baseline_budget
 
-    for level in ['low', 'med', 'high']:
+    for level in ['slow', 'med', 'fast']:
         if 'power' in fund_info:
             power_level = fund_info['power'][level]
         elif 'rfmf' in fund_info:
@@ -123,7 +123,7 @@ def write_combo_dr_csv(combo, output_path, source_csv_path):
     """
     Write a DR CSV combining computed AW/GCR curves with passthrough givewell/leaf rows.
 
-    combo: dict mapping fund name to 'low', 'med', or 'high'.
+    combo: dict mapping fund name to 'slow', 'med', or 'fast'.
            Missing funds default to 'med'.
     output_path: destination CSV path.
     source_csv_path: source CSV to copy givewell and leaf rows from.
@@ -160,7 +160,7 @@ def make_combo_dataset(combo, output_json_path, source_json_path):
     funds explicitly listed in combo.  Funds absent from combo keep their
     original (baseline) DR curves unchanged.
 
-    combo: dict mapping fund_id to 'low', 'med', or 'high'.
+    combo: dict mapping fund_id to 'slow', 'med', or 'fast'.
     """
     with open(source_json_path) as f:
         data = json.load(f)
@@ -237,7 +237,7 @@ def make_combo_max_spend_dataset(combo, max_addl_spend, output_json_path, source
     """
     Build a dataset JSON applying both a power-level combo and a custom max_addl_spend.
 
-    combo: dict mapping fund_id to 'low', 'med', or 'high'.
+    combo: dict mapping fund_id to 'slow', 'med', or 'fast'.
            Funds absent from combo default to 'med'.
            max_addl_spend applies to ALL computed funds (not just those in combo).
 

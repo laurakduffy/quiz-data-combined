@@ -14,8 +14,7 @@
  *        [--base PATH] [--worldviews-file PATH] [--approach weighted|staged]
  *
  * Outputs (written to outputs/):
- *   discount_fund_allocations.csv       — full allocation vector per (scenario_group, multiplier)
- *   discount_fund_si.csv                — SI (½ Σ|Δpp| across funds) + per-fund diffs
+ *   discount_fund_si.csv                — fund-level SI (½ Σ|Δpp| across funds) + cause-area SI + per-fund diffs
  *   discount_cause_area_allocations.csv — cause-area allocations per scenario
  *   discount_cause_area_si.csv          — cause-area SI per scenario
  */
@@ -63,7 +62,6 @@ const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
 
 const fundIds = Object.keys(baselineDataset.projects).sort();
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
-const methodNames = stages.map((s) => s.method);
 const weightedMethods = stages.map((s) => ({
   jsKey: s.method,
   weight: s.budget,
@@ -157,7 +155,7 @@ function runAllocations(wvs) {
 
 console.log(`\n${'-'.repeat(60)}`);
 console.log('Running baseline allocation...');
-const { combined: baseAlloc, perMethod: basePerMethod } = runAllocations(worldviews);
+const { combined: baseAlloc } = runAllocations(worldviews);
 const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Baseline top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
@@ -183,22 +181,11 @@ let drCheckCount = 0;
 // Build output rows — start with the baseline
 // ---------------------------------------------------------------------------
 
-const allocColName = isWeighted ? 'weighted_allocation_pct' : 'staged_allocation_pct';
-const allocFields = [
-  'scenario_group',
-  'multiplier',
-  'recipient_fund',
-  allocColName,
-  'allocation_diff_pp',
-  ...methodNames,
-];
-const allocRows = [];
-
 const siFields = [
   'scenario_group',
   'multiplier',
   'sensitivity_index',
-  'si_scaled_pp_per_oom',
+  'cluster_si',
   ...fundIds.map((f) => `diff_${f}`),
 ];
 const siRows = [];
@@ -220,22 +207,11 @@ const causeSiFields = [
 ];
 const causeSiRows = [];
 
-// Baseline rows (one per fund for allocations, one summary for SI)
-for (const fid of fundIds) {
-  allocRows.push({
-    scenario_group: 'baseline',
-    multiplier: '1.0',
-    recipient_fund: fid,
-    [allocColName]: baseAlloc[fid].toFixed(4),
-    allocation_diff_pp: '0.0000',
-    ...Object.fromEntries(methodNames.map((m) => [m, basePerMethod[m][fid].toFixed(4)])),
-  });
-}
 siRows.push({
   scenario_group: 'baseline',
   multiplier: '1.0',
   sensitivity_index: '0.0000',
-  si_scaled_pp_per_oom: '0.0000',
+  cluster_si: '0.0000',
   ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, '0.0000'])),
 });
 causeAllocRows.push({
@@ -272,9 +248,9 @@ for (const [groupName, groupDef] of Object.entries(scenarios)) {
       ),
     }));
 
-    let combined, perMethod;
+    let combined;
     try {
-      ({ combined, perMethod } = runAllocations(modifiedWvs));
+      ({ combined } = runAllocations(modifiedWvs));
     } catch (e) {
       console.log(`    FAIL  ${label} — ${e.message}`);
       continue;
@@ -291,7 +267,7 @@ for (const [groupName, groupDef] of Object.entries(scenarios)) {
     );
     drCheckCount++;
 
-    // SI = ½ Σ|Δ allocation pp| across all funds
+    // Fund-level SI = ½ Σ|Δ allocation pp| across all funds
     const diffs = {};
     let siAbsSum = 0;
     for (const fid of fundIds) {
@@ -301,59 +277,43 @@ for (const [groupName, groupDef] of Object.entries(scenarios)) {
     }
     const siMaxAbs = siAbsSum / 2;
 
+    // Cause-area SI = ½ Σ|Δpp| across cause areas. Same statistic as cluster_si in combined_si.csv.
+    const newCA = groupByCauseArea(combined);
+    const causeDiffs = Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca] - baseCauseAlloc[ca]]));
+    const causeMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
+
     // Scaled SI = SI per order-of-magnitude change. For multiplier=0, log10(0)=-∞,
     // so si/∞ = 0 naturally in JS (mathematically undefined but numerically consistent).
     const oom = Math.abs(Math.log10(multiplier));
-    const siScaled = oom > 0 ? siMaxAbs / oom : 0;
-
-    // Fund-level allocation rows
-    for (const fid of fundIds) {
-      allocRows.push({
-        scenario_group: groupName,
-        multiplier: String(multiplier),
-        recipient_fund: fid,
-        [allocColName]: combined[fid].toFixed(4),
-        allocation_diff_pp: diffs[fid].toFixed(4),
-        ...Object.fromEntries(methodNames.map((m) => [m, perMethod[m][fid].toFixed(4)])),
-      });
-    }
+    const causeSiScaled = oom > 0 ? causeMaxAbs / oom : 0;
 
     // Fund-level SI row
     siRows.push({
       scenario_group: groupName,
       multiplier: String(multiplier),
       sensitivity_index: siMaxAbs.toFixed(4),
-      si_scaled_pp_per_oom: siScaled.toFixed(4),
+      cluster_si: causeMaxAbs.toFixed(4),
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
     });
 
-    // Cause-area cluster rows
-    {
-      const newCA = groupByCauseArea(combined);
-      const causeDiffs = Object.fromEntries(
-        caKeys.map((ca) => [ca, newCA[ca] - baseCauseAlloc[ca]])
-      );
-      const causeMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
-      const causeSiScaled = oom > 0 ? causeMaxAbs / oom : 0;
-
-      causeAllocRows.push({
-        scenario_group: groupName,
-        multiplier: String(multiplier),
-        ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
-        ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
-      });
-      causeSiRows.push({
-        scenario_group: groupName,
-        multiplier: String(multiplier),
-        sensitivity_index: causeMaxAbs.toFixed(4),
-        si_scaled_pp_per_oom: causeSiScaled.toFixed(4),
-        ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
-      });
-    }
+    // Cause-area rows
+    causeAllocRows.push({
+      scenario_group: groupName,
+      multiplier: String(multiplier),
+      ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
+      ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
+    });
+    causeSiRows.push({
+      scenario_group: groupName,
+      multiplier: String(multiplier),
+      sensitivity_index: causeMaxAbs.toFixed(4),
+      si_scaled_pp_per_oom: causeSiScaled.toFixed(4),
+      ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
+    });
 
     const topFund = fundIds.reduce((a, b) => (combined[a] > combined[b] ? a : b));
     console.log(
-      `    ${label.padEnd(8)}  SI=${siMaxAbs.toFixed(2)}pp (½Σ|Δ|)  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
+      `    ${label.padEnd(8)}  fund_SI=${siMaxAbs.toFixed(2)}pp  cluster_SI=${causeMaxAbs.toFixed(2)}pp  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
     );
   }
   console.log();
@@ -366,7 +326,6 @@ for (const [groupName, groupDef] of Object.entries(scenarios)) {
 mkdirSync(FUND_DIR, { recursive: true });
 mkdirSync(CAUSE_DIR, { recursive: true });
 
-writeCsv(join(FUND_DIR, 'discount_fund_allocations.csv'), allocFields, allocRows);
 writeCsv(join(FUND_DIR, 'discount_fund_si.csv'), siFields, siRows);
 writeCsv(join(CAUSE_DIR, 'discount_cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
 writeCsv(join(CAUSE_DIR, 'discount_cause_area_si.csv'), causeSiFields, causeSiRows);

@@ -5,14 +5,40 @@
         "shrimp": 0.25,
         "non_shrimp_invertebrates": 0.2,
         "mammals": 0.9
-    }, 
+    },
     "multipliers": {
         "0.1x": 0.1,
         "0.2x": 0.2,
-        "0.5x": 0.5,
-        "100x": 100,
-        "10x": 10,
-        "5x": 5,
-        "2x": 2
+        "0.5x": 0.5
+    },
+    "scenarios": {
+        "sentience_only": {
+            "chickens_birds": 0.75,
+            "fish": 0.6,
+            "shrimp": 0.25,
+            "non_shrimp_invertebrates": 0.2,
+            "mammals": 0.9
+        },
+        "low_animals": {
+            "chickens_birds": 0.001,
+            "fish": 0.001,
+            "shrimp": 0.0001,
+            "non_shrimp_invertebrates": 0.0001,
+            "mammals": 0.005
+        },
+        "moderate_high": {
+            "chickens_birds": 0.4,
+            "fish": 0.24,
+            "shrimp": 0.08,
+            "non_shrimp_invertebrates": 0.07,
+            "mammals": 0.44
+        },
+        "moderate": {
+            "chickens_birds": 0.1,
+            "fish": 0.06,
+            "shrimp": 0.02,
+            "non_shrimp_invertebrates": 0.02,
+            "mammals": 0.11
+        }
     }
 }
