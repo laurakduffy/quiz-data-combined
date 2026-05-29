@@ -193,6 +193,134 @@ for (const fid of sorted) {
 const drPassed = checkDrCeilings(dataset.projects, dataset.incrementSize, finalFunding, 'baseline');
 
 // ---------------------------------------------------------------------------
+// Capacity utilization
+//
+// For each fund, capacity = firstZero(DR) * incrementSize — the maximum $M the
+// fund can absorb before DR drives marginal value to zero (typically 5× its
+// baseline budget; see sensitivity-analysis/diminishing-returns/diminishing_returns.py).
+// Funds with no DR zero (e.g. givewell) are unbounded.
+//
+// Reports % of capacity reached by:
+//   - the baseline (blended) allocation
+//   - each worldview individually at 100% credence
+// ---------------------------------------------------------------------------
+
+console.log(`\n${'-'.repeat(60)}`);
+console.log('Capacity utilization (baseline + each worldview at 100% credence)...');
+
+const fundCapacityM = {};
+for (const fid of fundIds) {
+  const dr = dataset.projects[fid]?.diminishing_returns;
+  if (!dr || !dr.length) {
+    fundCapacityM[fid] = null;
+    continue;
+  }
+  const firstZero = dr.findIndex((v) => v === 0);
+  fundCapacityM[fid] = firstZero === -1 ? null : firstZero * dataset.incrementSize;
+}
+
+// Build unique worldview labels (specialBlend has 5 "Total Utilitarian"s, etc.)
+const wvNameCounts = {};
+for (const wv of worldviews) wvNameCounts[wv.name] = (wvNameCounts[wv.name] ?? 0) + 1;
+const wvSeen = {};
+const wvLabels = worldviews.map((wv) => {
+  if (wvNameCounts[wv.name] === 1) return wv.name;
+  wvSeen[wv.name] = (wvSeen[wv.name] ?? 0) + 1;
+  return `${wv.name} #${wvSeen[wv.name]}`;
+});
+
+// Per-worldview funding ($M) at 100% credence, using the same approach as the
+// main run (weighted vs staged).
+const wvFunding = {};
+for (let i = 0; i < worldviews.length; i++) {
+  const wv = worldviews[i];
+  const label = wvLabels[i];
+  process.stdout.write(`  ${label.slice(0, 65).padEnd(65)} ...`);
+  const singleWv = [{ ...wv, credence: 1.0 }];
+  let funding;
+  if (isWeighted) {
+    ({ funding } = computeWeightedAllocation(
+      dataset.projects,
+      singleWv,
+      stages.map((s) => ({
+        jsKey: s.method,
+        weight: s.budget / totalBudget,
+        options: s.options ?? {},
+      })),
+      totalBudget,
+      dataset.incrementSize,
+      { drStepSize: dataset.drStepSize }
+    ));
+  } else {
+    ({ funding } = computeMultiStageAllocation(
+      dataset.projects,
+      singleWv,
+      stages,
+      dataset.incrementSize,
+      undefined,
+      dataset.drStepSize
+    ));
+  }
+  wvFunding[label] = funding;
+  const top = fundIds.reduce((a, b) => (funding[a] > funding[b] ? a : b));
+  console.log(`  top: ${top} ($${funding[top].toFixed(1)}M)`);
+}
+
+const pctOfCap = (allocM, capM) => (capM == null ? '' : ((allocM / capM) * 100).toFixed(2));
+
+const capRows = fundIds.map((fid) => {
+  const capM = fundCapacityM[fid];
+  const row = {
+    fund: fid,
+    capacity_M: capM == null ? '' : capM.toFixed(2),
+    baseline_M: (finalFunding[fid] ?? 0).toFixed(2),
+    baseline_pct_capacity: pctOfCap(finalFunding[fid] ?? 0, capM),
+  };
+  for (const label of wvLabels) {
+    const f = wvFunding[label]?.[fid] ?? 0;
+    row[`${label}_M`] = f.toFixed(2);
+    row[`${label}_pct_capacity`] = pctOfCap(f, capM);
+  }
+  return row;
+});
+
+const capColumns = [
+  'fund',
+  'capacity_M',
+  'baseline_M',
+  'baseline_pct_capacity',
+  ...wvLabels.flatMap((l) => [`${l}_M`, `${l}_pct_capacity`]),
+];
+writeCsv(join(OUTPUT_DIR, 'capacity_utilization.csv'), capColumns, capRows);
+
+console.log('\nCapacity utilization (% of fund capacity reached):');
+console.log(
+  `  ${'fund'.padEnd(28)}  ${'cap $M'.padStart(7)}  ${'base $M'.padStart(8)}  ${'base %'.padStart(7)}  max single-wv %`
+);
+for (const fid of fundIds) {
+  const capM = fundCapacityM[fid];
+  const baseM = finalFunding[fid] ?? 0;
+  const basePct = capM == null ? null : (baseM / capM) * 100;
+  let maxWvPct = null;
+  let maxWvLabel = '';
+  for (const label of wvLabels) {
+    if (capM == null) break;
+    const f = wvFunding[label]?.[fid] ?? 0;
+    const pct = (f / capM) * 100;
+    if (maxWvPct == null || pct > maxWvPct) {
+      maxWvPct = pct;
+      maxWvLabel = label;
+    }
+  }
+  const capStr = capM == null ? 'unbnd' : capM.toFixed(0);
+  const basePctStr = basePct == null ? '   -' : basePct.toFixed(1) + '%';
+  const wvPctStr = maxWvPct == null ? '   -' : `${maxWvPct.toFixed(1)}% (${maxWvLabel})`;
+  console.log(
+    `  ${fid.padEnd(28)}  ${capStr.padStart(7)}  ${baseM.toFixed(1).padStart(8)}  ${basePctStr.padStart(7)}  ${wvPctStr}`
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Write CSVs
 // ---------------------------------------------------------------------------
 

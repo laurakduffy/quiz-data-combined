@@ -12,6 +12,7 @@
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { reportSensitivityBuckets } from './bucket_sensitivities.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -58,5 +59,8 @@ if (allPassed) {
   console.log('All scripts completed successfully.');
 } else {
   console.error('One or more scripts failed.');
-  process.exit(1);
 }
+
+reportSensitivityBuckets();
+
+if (!allPassed) process.exit(1);
