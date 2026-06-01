@@ -1,18 +1,24 @@
 /**
  * Worldview credence sensitivity analysis.
  *
- * Form 1: Run the staged allocation treating each worldview independently —
- *         as if 100% credence in that worldview alone.
+ * Form 1: Run the allocation treating each worldview independently — as if 100%
+ *         credence in that worldview alone.
  *
  * Form 2: Take each worldview's credence to its low / high bound, redistribute
  *         the remainder proportionally across the other worldviews, and evaluate
- *         how the staged allocation changes. Generates 28 scenarios.
+ *         how the allocation changes. Generates 28 scenarios.
  *
  * Stages are loaded from baseline.json (same configuration as the website).
- * Uses computeMultiStageAllocation — identical to the website's staged approach.
+ * Default approach is weighted-average (computeWeightedAllocation); pass
+ * --approach staged to use the website's sequential staged allocation
+ * (computeMultiStageAllocation).
+ *
+ * Worldviews come from sa_specialBlend.json (the SA-owned copy of specialBlend.json
+ * with stable `id`s), via loadSaWorldviews, which aborts if it has drifted from
+ * production specialBlend.json. Credences are merged on by `id`, not array position.
  *
  * Usage:
- *   node run_wv_sensitivity.js [--dry-run] [--base PATH] [--worldviews-file PATH]
+ *   node run_wv_sensitivity.js [--dry-run] [--base PATH] [--approach staged|weighted]
  */
 
 import { fileURLToPath } from 'url';
@@ -28,6 +34,7 @@ import {
   loadJson,
   loadDataset,
   pickDefaultDataset,
+  loadSaWorldviews,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -45,23 +52,26 @@ const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 const args = parseArgs(process.argv);
 
 const wvCreds = loadJson(join(__dirname, 'worldview_credences.json'));
-const specialBlend = loadJson(
-  args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
-);
-const sbWvs = Array.isArray(specialBlend)
-  ? specialBlend
-  : (specialBlend.worldviews ?? Object.values(specialBlend));
+// Load the SA worldview blend (verifies it still matches production specialBlend.json
+// and aborts otherwise), then merge each credence entry onto its definition BY id —
+// not by array position — so credences can never silently attach to the wrong worldview.
+const saWvs = loadSaWorldviews(REPO_ROOT);
+const byId = Object.fromEntries(saWvs.map((w) => [w.id, w]));
 const wvCredEntries = Object.entries(wvCreds);
-if (sbWvs.length !== wvCredEntries.length) {
+const worldviews = wvCredEntries.map(([name, creds]) => {
+  const def = byId[name];
+  if (!def) {
+    throw new Error(
+      `worldview_credences.json key not found as an id in sa_specialBlend.json: "${name}"`
+    );
+  }
+  return { ...def, name, credence: creds.best_guess };
+});
+if (worldviews.length !== saWvs.length) {
   throw new Error(
-    `Mismatch: ${sbWvs.length} worldviews in specialBlend vs ${wvCredEntries.length} entries in worldview_credences.json`
+    `Mismatch: ${worldviews.length} credence entries vs ${saWvs.length} worldviews in sa_specialBlend.json`
   );
 }
-const worldviews = wvCredEntries.map(([name, creds], i) => ({
-  ...sbWvs[i],
-  name,
-  credence: creds.best_guess,
-}));
 const {
   projects,
   incrementSize: incrementM,

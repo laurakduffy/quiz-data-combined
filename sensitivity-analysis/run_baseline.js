@@ -26,7 +26,7 @@ import { computeWeightedAllocation } from './computeWeightedAllocation.js';
 import {
   loadJson,
   loadDataset,
-  loadWorldviews,
+  loadSaWorldviews,
   rankDict,
   writeCsv,
   parseArgs,
@@ -48,9 +48,7 @@ const latestDataset = readdirSync(datasetsDir)
 if (!latestDataset && !args.base) throw new Error(`No JSON files found in ${datasetsDir}`);
 const datasetPath = args.base ?? join(datasetsDir, latestDataset);
 const dataset = loadDataset(datasetPath);
-const worldviews = loadWorldviews(
-  args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
-);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const { stages } = loadJson(join(__dirname, 'baseline.json'));
 
 const fundIds = Object.keys(dataset.projects).sort();

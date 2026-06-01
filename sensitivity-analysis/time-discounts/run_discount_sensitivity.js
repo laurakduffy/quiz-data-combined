@@ -34,7 +34,7 @@ import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
   loadDataset,
-  loadWorldviews,
+  loadSaWorldviews,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -57,7 +57,7 @@ const baselinePath =
 const worldviewsPath = args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json');
 
 const baselineDataset = loadDataset(baselinePath);
-const worldviews = loadWorldviews(worldviewsPath);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
 
 const fundIds = Object.keys(baselineDataset.projects).sort();

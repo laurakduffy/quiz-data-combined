@@ -1,5 +1,5 @@
 scenario,max_addl_spend_multiplier,sensitivity_index,ca_sensitivity_index,ea_awf_delta,givewell_delta,leaf_delta,longview_ai_delta,longview_nuclear_delta,navigation_fund_cagefree_delta,navigation_fund_general_delta,sentinel_bio_delta
 baseline_5x,5,0.0000,0.0000,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00
-max_spend_2_5x,2.5,15.1315,14.5515,-4.07,13.27,1.28,0.58,-1.26,-7.77,-0.28,-1.76
-max_spend_7_5x,7.5,9.7390,3.3660,-0.52,-2.82,-0.55,-0.50,1.24,6.50,-5.35,1.99
-max_spend_10x,10,14.6390,6.8340,-1.07,-3.04,-1.10,-0.50,2.79,7.30,-8.93,4.54
+max_spend_2_5x,2.5,14.7315,14.1515,-4.07,12.87,1.28,0.58,-1.16,-7.77,-0.28,-1.46
+max_spend_7_5x,7.5,9.5390,3.6660,-0.52,-3.12,-0.55,-0.50,1.24,6.50,-4.85,1.79
+max_spend_10x,10,13.2390,5.4340,-0.07,-3.34,-1.10,-0.50,2.49,7.30,-8.23,3.44

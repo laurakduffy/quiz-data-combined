@@ -35,7 +35,7 @@ import {
   loadJson,
   loadDataset,
   pickDefaultDataset,
-  loadWorldviews,
+  loadSaWorldviews,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -64,7 +64,7 @@ const datasetPath = args.base ?? pickDefaultDataset(REPO_ROOT);
 const worldviewsPath = args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json');
 
 const { projects, incrementSize, drStepSize } = loadDataset(datasetPath);
-const worldviews = loadWorldviews(worldviewsPath);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
 const { upper_bounds, multipliers, scenarios = {} } = loadJson(CONFIG_PATH);
 

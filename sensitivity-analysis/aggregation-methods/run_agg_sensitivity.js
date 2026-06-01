@@ -7,7 +7,7 @@
  * Form 2: Vary one method's budget share at a time between its low and high
  *         bound, renormalising the other methods proportionally so the total
  *         budget stays fixed. Runs computeMultiStageAllocation for each
- *         scenario — identical to the website's staged approach.
+ *         scenario — identical to the website's weighted approach.
  *
  * Baseline stages and total budget come from baseline.json. Low/high bounds
  * come from agg_methods_sensitivity.json.
@@ -33,7 +33,7 @@ import {
 import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
-  loadWorldviews,
+  loadSaWorldviews,
   loadDataset,
   pickDefaultDataset,
   writeCsv,
@@ -53,9 +53,7 @@ const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 const args = parseArgs(process.argv);
 
 const methods = loadJson(join(__dirname, 'agg_methods_sensitivity.json'));
-const worldviews = loadWorldviews(
-  args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
-);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const {
   projects,
   incrementSize: incrementM,

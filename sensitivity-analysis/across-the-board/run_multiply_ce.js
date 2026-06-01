@@ -9,9 +9,10 @@
  *   weighted — credence-weighted average of per-method allocations (default).
  *   staged   — sequential staged allocation matching website behaviour.
  *
- * If any expected per-(fund, multiplier) dataset is missing relative to
- * config.json, the Python generator (generate_scaled_datasets.py) is invoked
- * automatically before the analysis runs.
+ * Before analyzing, the Python generator (generate_scaled_datasets.py) is ALWAYS
+ * re-run to regenerate every scaled dataset from the current baseline, so a
+ * changed base dataset can never leave stale per-scenario files behind. Pass
+ * --skip-generate to reuse the existing datasets (fast re-analysis).
  *
  * Usage:
  *   node sensitivity-analysis/across-the-board/run_multiply_ce.js
@@ -39,7 +40,7 @@ import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
   loadDataset,
-  loadWorldviews,
+  loadSaWorldviews,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -106,52 +107,53 @@ function findMissingDatasets() {
 }
 
 if (!skipGenerate) {
-  const missing = findMissingDatasets();
-  if (missing.length > 0) {
-    console.log(
-      `\nMissing ${missing.length} dataset file(s) — running generate_scaled_datasets.py:`
+  // ALWAYS regenerate every scaled dataset from the current baseline, so a changed
+  // base dataset can never leave stale per-scenario files behind (the previous
+  // "only-if-missing" behaviour silently reused stale datasets after a base change).
+  // Pass --skip-generate to reuse the existing datasets for a fast re-analysis.
+  console.log(
+    '\nRegenerating all scaled datasets from the current baseline (generate_scaled_datasets.py)...'
+  );
+
+  const script = join(__dirname, 'generate_scaled_datasets.py');
+  const candidates =
+    process.platform === 'win32' ? ['python', 'py', 'python3'] : ['python3', 'python'];
+  let ran = false;
+  let lastErr = null;
+  const pyEnv = { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' };
+  for (const cmd of candidates) {
+    const result = spawnSync(cmd, [script], { stdio: 'inherit', env: pyEnv });
+    if (result.error && result.error.code === 'ENOENT') {
+      lastErr = result.error;
+      continue;
+    }
+    if (result.status !== 0) {
+      console.error(`\nERROR: ${cmd} ${script} exited with status ${result.status}.`);
+      console.error('Fix the generator error and re-run, or pass --skip-generate to bypass.');
+      process.exit(1);
+    }
+    ran = true;
+    break;
+  }
+  if (!ran) {
+    console.error(
+      `\nERROR: could not find a Python interpreter (tried: ${candidates.join(', ')}).`
     );
-    for (const m of missing) console.log(`  - ${m.name} ×${m.multiplier}`);
+    console.error(lastErr ? `Last error: ${lastErr.message}` : '');
+    console.error(
+      'Install Python or run the generator manually, then re-run with --skip-generate.'
+    );
+    process.exit(1);
+  }
 
-    const script = join(__dirname, 'generate_scaled_datasets.py');
-    const candidates =
-      process.platform === 'win32' ? ['python', 'py', 'python3'] : ['python3', 'python'];
-    let ran = false;
-    let lastErr = null;
-    const pyEnv = { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' };
-    for (const cmd of candidates) {
-      const result = spawnSync(cmd, [script], { stdio: 'inherit', env: pyEnv });
-      if (result.error && result.error.code === 'ENOENT') {
-        lastErr = result.error;
-        continue;
-      }
-      if (result.status !== 0) {
-        console.error(`\nERROR: ${cmd} ${script} exited with status ${result.status}.`);
-        console.error('Fix the generator error and re-run, or pass --skip-generate to bypass.');
-        process.exit(1);
-      }
-      ran = true;
-      break;
-    }
-    if (!ran) {
-      console.error(
-        `\nERROR: could not find a Python interpreter (tried: ${candidates.join(', ')}).`
-      );
-      console.error(lastErr ? `Last error: ${lastErr.message}` : '');
-      console.error(
-        'Install Python or run the generator manually, then re-run with --skip-generate.'
-      );
-      process.exit(1);
-    }
-
-    const stillMissing = findMissingDatasets();
-    if (stillMissing.length > 0) {
-      console.error(
-        `\nERROR: generator finished but ${stillMissing.length} dataset(s) are still missing:`
-      );
-      for (const m of stillMissing) console.error(`  - ${m.name} ×${m.multiplier}`);
-      process.exit(1);
-    }
+  // Sanity: every config scenario should now have a dataset file.
+  const stillMissing = findMissingDatasets();
+  if (stillMissing.length > 0) {
+    console.error(
+      `\nERROR: generator finished but ${stillMissing.length} dataset(s) are still missing:`
+    );
+    for (const m of stillMissing) console.error(`  - ${m.name} ×${m.multiplier}`);
+    process.exit(1);
   }
 }
 
@@ -179,10 +181,8 @@ if (!args.base) {
   }
 }
 
-const worldviewsPath = args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json');
-
 const baselineDataset = loadDataset(baselinePath);
-const worldviews = loadWorldviews(worldviewsPath);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const { stages } = loadJson(join(dirname(__dirname), 'baseline.json'));
 
 const fundIds = Object.keys(baselineDataset.projects).sort();
@@ -196,9 +196,7 @@ const weightedMethods = stages.map((s) => ({
 
 console.log('\nAcross-the-board CE multiplier sensitivity analysis');
 console.log(`  Baseline:   ${baselinePath.split(/[/\\]/).pop()}`);
-console.log(
-  `  Worldviews: ${worldviewsPath.split(/[/\\]/).pop()}  (${worldviews.length} worldviews)`
-);
+console.log(`  Worldviews: sa_specialBlend.json  (${worldviews.length} worldviews)`);
 console.log(`  Stages:     ${stages.length}  total $${totalBudget}M`);
 console.log(`  Funds:      ${fundIds.length}  →  ${fundIds.join(', ')}`);
 const allMultiplierValues = [...new Set(Object.values(MULTIPLIERS).flat())].sort((a, b) => a - b);

@@ -35,6 +35,69 @@ mechanistic argument on its own.
 - **Re-verify:** command or check to confirm it stays fixed.
 ```
 
+## Audit methodology (Layers 0-4)
+
+Each SA module is audited in five layers. **This is the process to repeat for every
+remaining module.**
+
+- **Layer 0 — Map the pipeline.** Read the config + runner; write a plain-English
+  data-flow map (inputs → transform → outputs) and confirm it matches intent with
+  Laura. This is where "code does X but you meant Y" bugs surface. Surface any doc
+  drift (stale README/comments). Note: this often produces a module README.
+- **Layer 1 — Invariants (codified).** Write `audit_invariants.py` in the module dir:
+  stdlib-only Python, reads **only** the output CSVs + config (no calculation code),
+  prints `[PASS]/[FAIL]/[FLAG]` and a summary. Common invariants: allocations sum to
+  100% per scenario; reallocation is zero-sum (Σ deltas ≈ 0); `SI == ½·Σ|Δpp|`;
+  `scaled_SI == SI / (|Δknob|·100)`; every config scenario produces exactly one row +
+  a zeroed baseline (no phantom/missing); cause roll-up = grouped funds; cross-CSV
+  consistency (cause deltas == grouped fund deltas); and for credence-weighted modules,
+  **best-guesses sum to 1.0** (this is what makes proportional renormalisation correct).
+- **Layer 2 — Spot checks / reconstruction.** Hand-recompute or independently
+  reconstruct. If the analysis is **linear** in the varied knob (e.g. method credences),
+  reconstruct each scenario from the per-entity outputs (pure CSV arithmetic — can live
+  in `audit_invariants.py`). If **non-linear** (worldview credences, or CE multipliers
+  through WLU), do a **direct re-run reconstruction** with an independent recompute of
+  the inputs (a `.mjs` using the real engine) + a per-component breakdown.
+- **Layer 3 — Targeted review of the risky bits only.** Re-express the 3-4 subtle
+  functions in prose; confirm intent. Known inherent (not-bug) behaviours: MET is
+  non-monotonic (representative-worldview flips, ATB-3); rank methods (Borda/split-cycle)
+  shift on ordinal flips (ATB-4).
+- **Layer 4 — Config↔output reconciliation.** Confirm every knob flows to a result
+  (usually already covered by Layer-1 reconciliation + a value spot check).
+
+**Conventions.**
+- `audit_invariants.py`: **no non-ASCII glyphs in printed strings** (Windows cp1252
+  console crashes on `→ × ½ Δ` etc. — use `->`, `x`, `1/2`, `delta`).
+- All runners load worldviews via `loadSaWorldviews(REPO_ROOT)` (parity-guarded
+  `sa_specialBlend.json` with stable `id`s), the dataset via `pickDefaultDataset`, and
+  stages from `baseline.json`. Default approach is `weighted`.
+- Workflow norms: **Laura runs regeneration** (`run_all.js` etc.) — Claude runs the
+  audits; **propose fixes for code Laura didn't write, don't edit without OK**; verify
+  every hypothesis with a falsifiable check; a `M`-vs-HEAD diff is *not* evidence of
+  staleness (HEAD predates the GCR edit).
+- Reusable tools: `across-the-board/audit_invariants.py`, `audit_npz_baseline_sync.py`,
+  `audit_met_monotonicity.mjs`; `aggregation-methods/audit_invariants.py`;
+  `worldview-sensitivity/audit_invariants.py` + `audit_methods_applied.mjs`;
+  `catch-errors/compare_baselines.mjs` (re-run + diff two datasets).
+
+## Module progress
+
+| Module | Layers 0-4 | Notes |
+|--------|-----------|-------|
+| gcr-params | partial (GCR-1) | Dirichlet config audited; full module not yet swept |
+| across-the-board | ✅ done | ATB-1…9 |
+| aggregation-methods | ✅ done | AGG-1…3 |
+| worldview-sensitivity | ✅ done | WV-1…4 + loadSaWorldviews rollout |
+| ghd-timing-sensitivity | ⬜ todo | |
+| diminishing-returns | ⬜ todo | most moving parts; uses python build steps |
+| risk-aversion | ⬜ todo | |
+| time-discounts | ⬜ todo | reads `output_data_median_2M.json` directly (ATB-2-style check) |
+| moral-weights | ⬜ todo | |
+
+**Cross-cutting open item:** several runners (`diminishing-returns` ×3, `time-discounts`,
+`gcr-params`) read the dataset from a hardcoded `output_data_median_2M.json` rather than
+`pickDefaultDataset` — apply an ATB-2-style baseline-source check when auditing each.
+
 ## Index
 
 | ID | Module | Issue | Status |
@@ -48,6 +111,14 @@ mechanistic argument on its own.
 | ATB-6 | across-the-board | Multiplier→filename tag collision risk | ✅ Resolved |
 | ATB-7 | across-the-board | `JSON_RISK_PROFILES` count/comment vs 9-col schema | ✅ Resolved |
 | ATB-8 | across-the-board | GiveWell scaling-npz out of sync with baseline (~0.19%) | ✅ Resolved |
+| ATB-9 | across-the-board | Regenerated only *missing* scaled datasets, not stale ones | ✅ Resolved |
+| AGG-1 | aggregation-methods | README described the retired Python implementation | ✅ Resolved |
+| AGG-2 | aggregation-methods | Stale `outputs/combined_si.csv` (not produced by runner) | ✅ Resolved |
+| AGG-3 | aggregation-methods | Staged-approach per-method budget rounding | 📝 Watch (non-default) |
+| WV-1 | worldview-sensitivity | Worldview→definition merge was positional/fragile | ✅ Resolved |
+| WV-2 | worldview-sensitivity | Stale `outputs/combined_si.csv` (not produced by runner) | ✅ Resolved |
+| WV-3 | worldview-sensitivity | Outputs were stale vs the new GCR dataset | ✅ Resolved |
+| WV-4 | worldview-sensitivity | Docstring says "staged" but default is weighted | ✅ Resolved |
 
 ---
 
@@ -285,3 +356,139 @@ mechanistic argument on its own.
   `compute_risk_profiles(gw_npz[key])['neutral'] / baseline_neutral` at K=1; it must come back
   ≈ 1.0000 like AW/LEAF/GCR. If it's still ≈ 1.0019, regenerating the npz did not fix it and the
   baseline needs rebuilding too.
+
+### ATB-9 — Regenerated only *missing* scaled datasets, not stale ones
+- **Module:** `across-the-board/run_multiply_ce.js`
+- **Status / severity:** ✅ Resolved / med
+- **Symptom:** the auto-generation step used `findMissingDatasets()` (filtered on `!existsSync`), so
+  it only created datasets that were absent. If the base dataset changed (e.g. the GCR stellar-value
+  edit) but the per-scenario `outputs/datasets/*.json` already existed, they were silently reused —
+  stale. The ATB-2 guard checks the baseline matches the website dataset but not that the scaled
+  datasets were built from it. (Checked: the datasets happened to be current at audit time, but the
+  hole was real.)
+- **Fix (per Laura):** `run_multiply_ce.js` now ALWAYS re-runs `generate_scaled_datasets.py` before
+  analyzing (regenerating every scaled dataset from the current baseline), matching
+  `diminishing-returns/run_dr_all.js`, which already always re-runs its python build steps.
+  `--skip-generate` still bypasses for fast re-analysis. Surveyed all `run_all.js` runners: the rest
+  either compute in-memory from the current `pickDefaultDataset` (always fresh) or, for
+  diminishing-returns, already always-rebuild — so across-the-board was the only conditional one.
+- **Re-verify:** `node across-the-board/run_multiply_ce.js` prints "Regenerating all scaled
+  datasets…" every run.
+
+---
+
+## aggregation-methods (Layers 0-4 complete)
+
+Audited with the full playbook: Layer 0 (pipeline map → module README; Form-2 renormalisation
+confirmed against Laura's spec), Layer 1 (12 invariants in `audit_invariants.py`), Layer 2 (the C12
+check reconstructs every Form-2 delta from Form-1 + the renorm formula — max 0.005 vs reported),
+Layers 3-4 (renorm + weighting verified; the combined allocation is linear in method credences, so
+Form 2 is inherently monotonic — no MET-style anomaly). Result: **12 pass, 0 fail, 0 flag.**
+
+### AGG-1 — README described the retired Python implementation
+- **Module:** `aggregation-methods/README.md`
+- **Status / severity:** ✅ Resolved / low
+- **Symptom:** README referenced `agg_methods_sensitivity.py` / `run_agg_sensitivity.py` (files are
+  `.json` / `.js`), claimed **15** worldviews (specialBlend has 14), described output files that the
+  runner doesn't produce (`split_credences_allocations.csv`, `split_credences_by_fund.csv`), a
+  `combined_best_guess` row that isn't written, SI "as a decimal" (it's percentage points), a
+  `--budget` flag that doesn't exist, and "legacy Python 4-vs-8-profile patch / met_sim_utils" notes
+  that don't apply to the JS engine.
+- **Verdict:** stale docs from the pre-JS port; logic is fine.
+- **Resolution:** rewrote the README to match the JS implementation; documented Form 2's
+  renormalisation rule with Laura's worked example and the algebraic-equivalence note (the
+  `(1-bound)/Σothers` code form equals delta-redistribution because best-guesses sum to 1).
+
+### AGG-2 — Stale `outputs/combined_si.csv`
+- **Module:** `aggregation-methods/outputs/combined_si.csv`
+- **Status / severity:** ✅ Resolved / low
+- **Symptom:** the file exists but no current script writes it (repo-wide search for `combined_si`
+  in `*.js` finds only a comment in `time-discounts`). Leftover from an older version.
+- **Verdict:** harmless clutter (not read by the runner).
+- **Resolution:** `git rm`'d `outputs/combined_si.csv`.
+
+### AGG-3 — Staged-approach per-method budget rounding
+- **Module:** `aggregation-methods/run_agg_sensitivity.js` (staged branch, `Math.round(cred*total)`)
+- **Status / severity:** 📝 Watch (not a bug) / low
+- **Symptom:** under `--approach staged` each method's stage budget is `Math.round(credence ×
+  totalBudget)`, so the rounded budgets can sum to slightly more/less than the total.
+- **Verdict:** the default approach is `weighted` (unaffected); staged is order-dependent and
+  approximate by nature. Documented; **not fixed** — the fix lives in `run_agg_sensitivity.js`, which
+  Laura did not write and asked not to modify.
+- **Fix (when an owner approves):** in the staged branch, replace
+  `budget: Math.round(newCreds[x.jsKey] * totalBudget)` with either the unrounded fractional value
+  (`computeMultiStageAllocation`'s increment loop tolerates fractional budgets, so they sum to the
+  total exactly) or largest-remainder rounding (floor all, distribute the leftover dollars to the
+  largest fractional parts). Recommended: drop the rounding.
+- **Re-verify:** `python aggregation-methods/audit_invariants.py` (all 12 checks).
+
+---
+
+## worldview-sensitivity (Layers 0-4 complete)
+
+Layer 0 (pipeline map; Form-2 non-linearity confirmed as intended), Layer 1 (13 invariants in
+`audit_invariants.py`, including an sa_specialBlend parity check), Layer 2 (`audit_methods_applied.mjs`
+reconstructs all 28 scenarios from independently-computed renormalised credences — max 0.005 vs
+reported — and prints a per-method breakdown confirming every method is applied with the scenario
+credences), Layers 3-4 (renorm + id-merge verified; config↔output reconciled). Result:
+**13 invariants pass + Layer-2 reconstruction pass, 0 fail.**
+
+### WV-1 — Worldview→definition merge was positional and fragile
+- **Module:** `worldview-sensitivity/run_wv_sensitivity.js`; `sensitivity_utils.js`; new `sa_specialBlend.json`
+- **Status / severity:** ✅ Resolved / high
+- **Symptom:** the runner merged `worldview_credences.json[i]` onto `specialBlend.json[i]` **by array
+  position**, with no identity check. No stored field uniquely identifies a worldview (indices 0 and
+  4 are identical in `presetId` *and* `risk_profile`, differing only in their weight/discount vectors;
+  the descriptive names live only in `worldview_credences.json`). So any reorder of either file would
+  silently attach credences to the wrong worldview definition.
+- **Fix (Laura's design):** created `sensitivity-analysis/sa_specialBlend.json` — a copy of
+  production `specialBlend.json` with a stable `id` (the full descriptive name) added per worldview,
+  generated programmatically so it's byte-faithful except for `id`. Added `loadSaWorldviews()` to
+  `sensitivity_utils.js`, which loads the copy, **asserts it still matches production specialBlend
+  field-for-field (ignoring `id`), index by index, and aborts otherwise**, then returns id-tagged
+  worldviews. `run_wv_sensitivity.js` now merges credences onto definitions **by `id`** (erroring on
+  any missing/duplicate). Verified the id-merge produces worldviews identical to the old index-merge
+  (minus `id`), so the change is behavior-preserving. Production `specialBlend.json` untouched.
+- **Re-verify:** `python worldview-sensitivity/audit_invariants.py` (C0 = sa parity); the runtime
+  guard fires on every run.
+
+### WV-2 — Stale `outputs/combined_si.csv`
+- **Status / severity:** ✅ Resolved / low
+- **Symptom:** present in `outputs/` but not written by the runner (same as AGG-2).
+- **Resolution:** `git rm`'d.
+
+### WV-3 — (Retracted) suspected stale outputs
+- **Status / severity:** ✅ Resolved (not an issue) / n/a
+- **What happened:** validating the (provably inert) id-merge change showed the worldview-sensitivity
+  output CSVs as modified-vs-HEAD, which I initially read as "the regen skipped this module."
+- **Correction:** that was an over-interpretation. The modification is **vs the committed HEAD**,
+  which predates the GCR stellar-value edit; the diff is simply the expected GCR-dataset change
+  (sentinel↓ / nuclear↑ / givewell↑). Because the id-merge is inert and the engine is deterministic,
+  re-running reproduces byte-identical output, so it cannot be shown that the outputs were stale —
+  `run_all.js` includes worldview-sensitivity ([line 22]) and the regen most likely produced these
+  values. No action needed. Lesson: a `M`-vs-HEAD diff is not evidence of staleness here.
+
+### WV-1 rollout — `loadSaWorldviews` adopted across all runners
+- **Status:** ✅ Done
+- Swapped `loadWorldviews(config/specialBlend.json)` → `loadSaWorldviews(REPO_ROOT)` in all 10 SA
+  runners (`run_baseline`, `aggregation-methods`, `across-the-board`, `worldview-sensitivity`,
+  `ghd-timing`, `diminishing-returns` ×3, `time-discounts`, `moral-weights`, `gcr-params`) and the two
+  audit tools (`compare_baselines.mjs`, `audit_met_monotonicity.mjs`). Every SA now runs through the
+  production-parity guard and gets stable worldview `id`s.
+- Verified inert: `loadWorldviews(specialBlend)` deep-equals `loadSaWorldviews()` minus `id`; all 11
+  runners parse; `run_baseline` + `run_agg` + both audit tools run and reproduce their outputs.
+- Not run (regeneration is Laura's): the heavier runners — re-run `node sensitivity-analysis/run_all.js`
+  to refresh + verify; outputs won't change beyond the current dataset.
+- Left as-is: `baseline_consistency.test.js` still imports `loadWorldviews` (a test, not a runner);
+  `loadWorldviews` remains exported. Could be switched for consistency if desired.
+- Noted for later: several runners (`diminishing-returns` ×3, `time-discounts`, `gcr-params`) read the
+  dataset from a hardcoded `output_data_median_2M.json` rather than `pickDefaultDataset` — an ATB-2-style
+  baseline-source inconsistency to check when auditing those modules.
+
+### WV-4 — Docstring says "staged" but the default is weighted
+- **Status / severity:** ✅ Resolved / low
+- **Symptom:** the header comment said "Uses computeMultiStageAllocation … staged," but `--approach`
+  defaults to `weighted`.
+- **Resolution:** rewrote the docstring to state the weighted default (with `--approach staged`
+  available) and to document the `sa_specialBlend.json` / `loadSaWorldviews` / id-merge mechanism;
+  dropped the now-unused `--worldviews-file` from the usage line.

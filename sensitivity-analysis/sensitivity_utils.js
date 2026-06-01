@@ -49,6 +49,61 @@ export function loadWorldviews(path) {
   return wvs;
 }
 
+// Order-independent deep comparison of two parsed-JSON values.
+function _stableStringify(v) {
+  if (Array.isArray(v)) return '[' + v.map(_stableStringify).join(',') + ']';
+  if (v && typeof v === 'object')
+    return (
+      '{' +
+      Object.keys(v)
+        .sort()
+        .map((k) => JSON.stringify(k) + ':' + _stableStringify(v[k]))
+        .join(',') +
+      '}'
+    );
+  return JSON.stringify(v);
+}
+
+/**
+ * Load the SA-owned worldview blend (sensitivity-analysis/sa_specialBlend.json),
+ * which is a copy of config/specialBlend.json with a stable `id` added per
+ * worldview. Before returning, verifies the copy still matches production
+ * specialBlend.json field-for-field (ignoring `id`), index by index, and ABORTS
+ * if production has drifted — so no SA can silently run on a changed blend or a
+ * stale copy. Re-syncing means regenerating sa_specialBlend.json from the new
+ * specialBlend.json (preserving the id ordering).
+ *
+ * Drop-in for loadWorldviews (credences normalised to sum 1) plus an `id` on each
+ * worldview, which the SA merges on instead of relying on array position.
+ */
+export function loadSaWorldviews(repoRoot, { saPath, prodPath } = {}) {
+  const saFile = saPath ?? join(repoRoot, 'sensitivity-analysis', 'sa_specialBlend.json');
+  const prodFile = prodPath ?? join(repoRoot, 'config', 'specialBlend.json');
+  const toList = (d) => (Array.isArray(d) ? d : (d.worldviews ?? Object.values(d)));
+  const sa = toList(JSON.parse(readFileSync(saFile, 'utf8')));
+  const prod = toList(JSON.parse(readFileSync(prodFile, 'utf8')));
+
+  if (sa.length !== prod.length) {
+    throw new Error(
+      `sa_specialBlend.json has ${sa.length} worldviews but config/specialBlend.json has ` +
+        `${prod.length}. specialBlend.json changed — re-sync sa_specialBlend.json.`
+    );
+  }
+  for (let i = 0; i < sa.length; i++) {
+    const { id, ...rest } = sa[i];
+    if (id == null) throw new Error(`sa_specialBlend.json[${i}] is missing an "id" field.`);
+    if (_stableStringify(rest) !== _stableStringify(prod[i])) {
+      throw new Error(
+        `sa_specialBlend.json[${i}] (id="${id}") no longer matches config/specialBlend.json[${i}] ` +
+          `(ignoring id). specialBlend.json changed — re-sync sa_specialBlend.json.`
+      );
+    }
+  }
+
+  const total = sa.reduce((s, w) => s + (w.credence ?? 0), 0);
+  return sa.map((w) => ({ ...w, credence: total > 0 ? (w.credence ?? 0) / total : 0 }));
+}
+
 export function rankDict(alloc) {
   return Object.fromEntries(
     Object.keys(alloc)

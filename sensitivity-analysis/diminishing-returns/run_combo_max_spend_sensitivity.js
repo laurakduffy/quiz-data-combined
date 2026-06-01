@@ -22,7 +22,7 @@ import { computeMultiStageAllocation } from '../../src/utils/marcusCalculation.j
 import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
-  loadWorldviews,
+  loadSaWorldviews,
   loadDataset,
   writeCsv,
   parseArgs,
@@ -42,11 +42,10 @@ const args = parseArgs(process.argv);
 
 const baseJsonPath =
   args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
-const worldviewsFilePath = args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json');
 
 const { projects: baseProjects, incrementSize } = loadDataset(baseJsonPath);
 const drStepSize = incrementSize;
-const worldviews = loadWorldviews(worldviewsFilePath);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
 const combos = loadJson(join(__dirname, 'dr_combinations.json'));
 

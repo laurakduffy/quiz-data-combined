@@ -30,7 +30,7 @@ import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
   loadDataset,
-  loadWorldviews,
+  loadSaWorldviews,
   writeCsv,
   parseArgs,
 } from '../sensitivity_utils.js';
@@ -74,9 +74,7 @@ const basePath =
   args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
 
 const base = loadDatasetWithClusters(basePath);
-const worldviews = loadWorldviews(
-  args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
-);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const { stages } = loadJson(join(SA_DIR, 'baseline.json'));
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 const methods = stages.map((s) => ({

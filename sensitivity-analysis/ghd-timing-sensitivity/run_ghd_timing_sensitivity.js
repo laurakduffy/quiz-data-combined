@@ -25,7 +25,7 @@ import { computeMultiStageAllocation } from '../../src/utils/marcusCalculation.j
 import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
-  loadWorldviews,
+  loadSaWorldviews,
   loadDataset,
   pickDefaultDataset,
   rankDict,
@@ -83,9 +83,7 @@ function patchProjectsTiming(projects, fundTimingDict) {
 const args = parseArgs(process.argv);
 
 const timingEffects = loadJson(join(__dirname, 'ghd_timing_effects.json'));
-const worldviews = loadWorldviews(
-  args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json')
-);
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const {
   projects,
   incrementSize: incrementM,

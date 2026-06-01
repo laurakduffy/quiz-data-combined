@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 import { readFileSync, existsSync } from 'fs';
 
 import { computeMarcusAllocation } from '../../src/utils/marcusCalculation.js';
-import { loadJson, loadDataset, loadWorldviews } from '../sensitivity_utils.js';
+import { loadJson, loadDataset, loadSaWorldviews } from '../sensitivity_utils.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -60,7 +60,7 @@ const groupFunds = Object.fromEntries(
 
 const baselinePath = join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
 const baseDataset = loadDataset(baselinePath);
-const worldviews = loadWorldviews(join(REPO_ROOT, 'config', 'specialBlend.json'));
+const worldviews = loadSaWorldviews(REPO_ROOT);
 const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 
