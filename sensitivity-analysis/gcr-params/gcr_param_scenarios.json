@@ -5,7 +5,7 @@
             "r_inf": {
                 "dist": "loguniform",
                 "ci_90": [1e-6, 5e-3],
-                "bounds": [1e-8, 5e-2]
+                "bounds": [1e-8, 1e-1]
             }
         }
     },
@@ -16,7 +16,7 @@
             "r_inf": {
                 "dist": "loguniform",
                 "ci_90": [1e-10, 5e-7],
-                "bounds": [1e-12, 5e-5]
+                "bounds": [1e-12, 1e-5]
             }
         }
     },
@@ -29,18 +29,18 @@
     },
 
     "s_10x_faster": {
-        "description": "Stellar settlement speed 10x faster   (ci_90: [4e-4, 0.1])",
+        "description": "Stellar settlement speed ~10x faster, but capped at 0.2",
         "world_patches": {
             "s": {
                 "dist": "loguniform",
                 "ci_90": [4e-4, 0.1],
-                "bounds": [1e-6, 0.2]
+                "bounds": [1e-5, 0.2] 
             }
         }
     },
 
-    "s_10x_slower": {
-        "description": "Stellar settlement speed 10x slower (constant at 4e-5, the baseline median)",
+    "s_current_speeds": {
+        "description": "Stellar settlement speed constant at 4e-5, the current speed of ships",
         "world_patches": {
             "s": {
                 "dist": "constant",
@@ -84,11 +84,11 @@
     },
 
     "cause_fractions_bio_nuclear_unequal": {
-        "description": "Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",
+        "description": "Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",
         "world_patches": {
             "cause_fractions": {
                 "dist": "dirichlet",
-                "means": [0.04, 0.02, 0.90, 0.04],
+                "means": [0.02, 0.04, 0.90, 0.04],
                 "concentration": 10,
                 "keys": [
                     "cause_fraction_bio",
@@ -175,13 +175,13 @@
         }
     },
 
-    "p_harm_5pp_higher": {
+    "p_harm_25pct_higher": {
         "description": "p(harm) 25 percent higher; p(zero) constant at 50%",
         "fund_patches": {
             "sentinel": {
                 "harm_zero_positive": {
                     "dist": "dirichlet",
-                    "means": [0.0625, 0.50, 0.385],
+                    "means": [0.0625, 0.50, 0.4375],
                     "concentration": 5,
                     "keys": ["p_harm", "p_zero", "p_positive"]
                 }
@@ -189,7 +189,7 @@
             "longview_nuclear": {
                 "harm_zero_positive": {
                     "dist": "dirichlet",
-                    "means": [0.0625, 0.50, 0.385],
+                    "means": [0.0625, 0.50, 0.4375],
                     "concentration": 5,
                     "keys": ["p_harm", "p_zero", "p_positive"]
                 }

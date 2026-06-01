@@ -65,7 +65,13 @@ GROUPS      = _config.get('groups', {})
 FUNDS_TO_VARY = None
 
 # ─── Risk-profile column order in the JSON values matrix ───────────────────
-# Must match combine_data.py RISK_PROFILES (8 entries; dmreu is excluded).
+# combine_data.py RISK_PROFILES defines 9 columns (indices 0-8). We deliberately
+# emit only columns 0-7 and OMIT index 8 ('ambiguity bilateral'), which is not
+# exposed to users and not referenced by any worldview. Columns 0-7 below must
+# stay in the same order as combine_data.py RISK_PROFILES[0:8].
+# NOTE: regenerated datasets are therefore 8-wide while the baseline is 9-wide;
+# this is safe ONLY while nothing reads column 8. If 'ambiguity bilateral' ever
+# becomes exposed, add it here and revisit _risk_row.
 JSON_RISK_PROFILES = [
     'neutral',       # col 0
     'wlu - low',     # col 1
@@ -74,7 +80,7 @@ JSON_RISK_PROFILES = [
     'upside',        # col 4
     'downside',      # col 5
     'combined',      # col 6
-    'ambiguity',     # col 7
+    'ambiguity',     # col 7  (UI label: "Continuous Upside Sceptical")
 ]
 
 # ─── Per-fund sample metadata ───────────────────────────────────────────────
@@ -185,11 +191,15 @@ def _build_scaled_effects_gw_leaf(npz_data, effect_map, baseline_project, multip
 def _build_scaled_effects_aw(npz_data, baseline_project, multiplier):
     """Return a new effects dict for an AW fund.
 
-    AW samples are pre-temporal (one draw array per effect_id).  The temporal
-    fractions are already baked into the baseline JSON values matrix as linear
-    scalars (risk[rp] * frac).  We recompute risk profiles from K-scaled
-    pre-temporal samples, then re-derive per-period values using the original
-    temporal fractions recovered from the baseline.
+    AW samples are pre-temporal (one draw array per effect_id).  We recompute
+    risk profiles from K-scaled pre-temporal samples, then split them across
+    periods using the model's true temporal fractions.
+
+    The per-period fractions are read directly from the npz ("{effect_id}__period_fracs",
+    written by aw-models/build_dataset.py from allocate_to_periods).  For an older
+    npz that predates this, we fall back to recovering the fractions from the
+    baseline neutral column — valid only because the temporal split is shared
+    across all risk profiles (and fragile if a neutral total is zero/negative).
     """
     new_effects = {}
     for json_effect_id, baseline_effect in baseline_project['effects'].items():
@@ -202,21 +212,22 @@ def _build_scaled_effects_aw(npz_data, baseline_project, multiplier):
             continue
 
         scaled = npz_data[json_effect_id] * multiplier
+        baseline_values = baseline_effect['values']       # 6 × n_profiles
 
-        # Recover per-period temporal fractions from baseline neutral values.
-        # frac[t] = baseline_neutral_t / baseline_neutral_total
-        # We use total neutral (sum across time) as denominator.
-        neutral_col = JSON_RISK_PROFILES.index('neutral')
-        baseline_values = baseline_effect['values']       # 6×8
-        neutral_total = sum(row[neutral_col] for row in baseline_values)
+        frac_key = f'{json_effect_id}__period_fracs'
+        if frac_key in npz_data and len(npz_data[frac_key]) == len(baseline_values):
+            # Canonical fractions from the AW model.
+            fracs = list(npz_data[frac_key])
+        else:
+            # Backward-compat: recover from the baseline neutral column.
+            neutral_col = JSON_RISK_PROFILES.index('neutral')
+            neutral_total = sum(row[neutral_col] for row in baseline_values)
+            fracs = [
+                (row[neutral_col] / neutral_total) if neutral_total else 0.0
+                for row in baseline_values
+            ]
 
-        new_values = []
-        for baseline_row in baseline_values:
-            if neutral_total == 0:
-                frac = 0.0
-            else:
-                frac = baseline_row[neutral_col] / neutral_total
-            new_values.append(_risk_row(scaled * frac))
+        new_values = [_risk_row(scaled * frac) for frac in fracs]
 
         new_effects[json_effect_id] = {
             **baseline_effect,
@@ -261,6 +272,32 @@ if not BASELINE_JSON.exists():
 
 with open(BASELINE_JSON) as f:
     baseline = json.load(f)
+
+# ─── Guard: baseline must match the website's chosen dataset ─────────────────
+# The website serves the newest dated file in config/datasets/ (pickDefaultDataset
+# in sensitivity_utils.js). These scaled datasets are only valid if the baseline
+# is identical to that file. Abort loudly rather than silently scale a stale base.
+import re as _re
+
+_ds_dir = REPO_ROOT / 'config' / 'datasets'
+_dated = sorted(
+    p for p in _ds_dir.glob('*.json') if _re.match(r'^\d{8}.*\.json$', p.name)
+) if _ds_dir.exists() else []
+if not _dated:
+    print(f"ERROR: no dated dataset files found in {_ds_dir}", file=sys.stderr)
+    sys.exit(1)
+_newest = _dated[-1]
+with open(_newest) as _f:
+    _newest_data = json.load(_f)
+if baseline != _newest_data:
+    print(
+        f"ERROR: baseline {BASELINE_JSON.name} differs from the website's current "
+        f"dataset config/datasets/{_newest.name}.\n"
+        f"       Regenerate output_data_median_2M.json so it matches, or the scaled "
+        f"datasets will be anchored to a stale baseline.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 all_fund_ids  = list(baseline['projects'].keys())
 funds_to_vary = FUNDS_TO_VARY if FUNDS_TO_VARY is not None else all_fund_ids
@@ -339,14 +376,14 @@ for fund_to_vary in funds_to_vary:
                     for rp_idx in range(len(t_row)):
                         t_row[rp_idx] *= multiplier
 
-        multiplier_tag = f"{multiplier:g}".replace('.', '')
+        multiplier_tag = f"{multiplier:g}".replace('.', '_')
         out_name = f"{fund_to_vary}_{multiplier_tag}x.json"
         out_path = OUTPUT_DIR / out_name
         with open(out_path, 'w') as f:
             json.dump(dataset, f, separators=(',', ':'))
 
         mode = 'exact' if npz_data is not None else 'linear-approx'
-        print(f"  {fund_to_vary:35s}  ×{multiplier:<5}  →  {out_name}  [{mode}]")
+        print(f"  {fund_to_vary:35s}  x{multiplier:<5}  ->  {out_name}  [{mode}]")
 
 # ─── Group loop ─────────────────────────────────────────────────────────────
 # Each group scales all its member funds by the same multiplier simultaneously.
@@ -412,13 +449,13 @@ for group_name, group_def in GROUPS.items():
                         for rp_idx in range(len(t_row)):
                             t_row[rp_idx] *= multiplier
 
-        multiplier_tag = f"{multiplier:g}".replace('.', '')
+        multiplier_tag = f"{multiplier:g}".replace('.', '_')
         out_name = f"{group_name}_{multiplier_tag}x.json"
         out_path = OUTPUT_DIR / out_name
         with open(out_path, 'w') as f:
             json.dump(dataset, f, separators=(',', ':'))
 
         mode = 'exact' if all_exact else 'mixed/linear-approx'
-        print(f"  {group_name:35s}  ×{multiplier:<5}  →  {out_name}  [{mode}]")
+        print(f"  {group_name:35s}  x{multiplier:<5}  ->  {out_name}  [{mode}]")
 
 print(f"\nDone.  Datasets saved to {OUTPUT_DIR}")

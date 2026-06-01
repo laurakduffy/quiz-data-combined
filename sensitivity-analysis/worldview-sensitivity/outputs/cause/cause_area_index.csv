@@ -4,7 +4,7 @@ Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentiali
 Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,0.1000,0.0500,11.8872,2.3774,-0.02,11.89,-11.87
 Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,0.0500,0.2000,10.4912,0.6994,-2.28,10.49,-8.21
 Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,0.1000,0.2500,9.1591,0.6106,-5.41,9.16,-3.75
-Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,8.9933,0.8993,8.99,-2.69,-6.30
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,0.0500,0.1500,9.0224,0.9022,9.02,-2.69,-6.33
 Kantianism — Low animals_high,Kantianism — Low animals,high,0.0500,0.2000,8.3848,0.5590,8.38,-4.93,-3.46
 Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,0.1000,0.2000,6.1534,0.6153,6.15,-3.76,-2.39
 Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,0.1000,0.2000,5.3252,0.5325,-3.33,5.33,-2.00
@@ -20,7 +20,7 @@ Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,0.1000
 "Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,0.1000,0.0500,2.1931,0.4386,0.19,2.01,-2.19
 Kantianism — Low animals_low,Kantianism — Low animals,low,0.0500,0.0100,2.0068,0.5017,-2.01,1.03,0.98
 Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,0.1000,0.0500,1.9839,0.3968,0.87,-1.98,1.12
-Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,1.7732,0.5911,-1.77,0.99,0.79
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,0.0500,0.0200,1.6932,0.5644,-1.69,0.91,0.79
 "Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,0.0500,0.0200,1.3299,0.4433,0.41,0.92,-1.33
 "Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,0.0500,0.0200,1.1863,0.3954,0.26,0.92,-1.19
 Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,0.0500,0.0200,1.1460,0.3820,0.29,-1.15,0.85

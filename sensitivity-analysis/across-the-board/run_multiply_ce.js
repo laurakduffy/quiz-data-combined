@@ -2,8 +2,12 @@
  * Across-the-board CE multiplier sensitivity analysis.
  *
  * Loads each pre-generated dataset (one per fund × multiplier) from
- * outputs/datasets/, runs the staged multi-method allocation exactly as the
- * website does, and computes the sensitivity index (SI) vs the baseline.
+ * outputs/datasets/, runs the multi-method allocation, and computes the
+ * sensitivity index (SI) vs the baseline.
+ *
+ * Approach is selected via --approach (default: weighted):
+ *   weighted — credence-weighted average of per-method allocations (default).
+ *   staged   — sequential staged allocation matching website behaviour.
  *
  * If any expected per-(fund, multiplier) dataset is missing relative to
  * config.json, the Python generator (generate_scaled_datasets.py) is invoked
@@ -40,7 +44,23 @@ import {
   parseArgs,
   checkDrCeilings,
   groupByCauseArea,
+  pickDefaultDataset,
 } from '../sensitivity_utils.js';
+
+// Key-order-independent deep comparison of two parsed-JSON values.
+function stableStringify(v) {
+  if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+  if (v && typeof v === 'object')
+    return (
+      '{' +
+      Object.keys(v)
+        .sort()
+        .map((k) => JSON.stringify(k) + ':' + stableStringify(v[k]))
+        .join(',') +
+      '}'
+    );
+  return JSON.stringify(v);
+}
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
 const FUND_DIR = join(OUTPUT_DIR, 'fund');
@@ -64,7 +84,7 @@ const { multipliers: MULTIPLIERS, groups: GROUPS = {} } = loadJson(join(__dirnam
 // the user doesn't have to remember to run two commands.
 
 function expectedDatasetPath(name, multiplier) {
-  const tag = String(multiplier).replace('.', '');
+  const tag = String(multiplier).replace('.', '_');
   return join(DATASETS_DIR, `${name}_${tag}x.json`);
 }
 
@@ -141,6 +161,24 @@ if (!skipGenerate) {
 
 const baselinePath =
   args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
+
+// Guard: when using the default baseline, it MUST be identical to the dataset
+// the website actually serves (newest dated file in config/datasets/, chosen by
+// pickDefaultDataset). Otherwise the SA is silently anchored to a stale baseline.
+// Pass --base explicitly to bypass this check intentionally.
+if (!args.base) {
+  const websitePath = pickDefaultDataset(REPO_ROOT);
+  if (stableStringify(loadJson(baselinePath)) !== stableStringify(loadJson(websitePath))) {
+    console.error(
+      `ERROR: baseline output_data_median_2M.json differs from the website's current ` +
+        `dataset (${websitePath.split(/[/\\]/).pop()}).\n` +
+        `       Regenerate output_data_median_2M.json so it matches, or pass --base ` +
+        `explicitly to override.`
+    );
+    process.exit(1);
+  }
+}
+
 const worldviewsPath = args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json');
 
 const baselineDataset = loadDataset(baselinePath);
@@ -337,7 +375,7 @@ for (const fundToVary of fundIds) {
     if (multiplier === 1.0) {
       dataset = baselineDataset;
     } else {
-      const multiplierTag = String(multiplier).replace('.', '');
+      const multiplierTag = String(multiplier).replace('.', '_');
       const datasetPath = join(DATASETS_DIR, `${fundToVary}_${multiplierTag}x.json`);
       if (!existsSync(datasetPath)) {
         console.log(
@@ -452,7 +490,7 @@ for (const [groupName, groupDef] of Object.entries(GROUPS)) {
   for (const multiplier of groupDef.multipliers) {
     if (multiplier === 1.0) continue;
 
-    const multiplierTag = String(multiplier).replace('.', '');
+    const multiplierTag = String(multiplier).replace('.', '_');
     const datasetPath = join(DATASETS_DIR, `${groupName}_${multiplierTag}x.json`);
     if (!existsSync(datasetPath)) {
       console.log(
