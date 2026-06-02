@@ -69,7 +69,7 @@ const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 const DATASETS_DIR = join(__dirname, 'outputs', 'datasets');
 
 const args = parseArgs(process.argv);
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged'; // weighted unless staged is explicitly requested
 const skipGenerate = process.argv.includes('--skip-generate');
 
 // 1.0 uses the baseline directly (no pre-generated file needed).

@@ -39,6 +39,7 @@ import {
   parseArgs,
   checkDrCeilings,
   groupByCauseArea,
+  assertBaselineParity,
 } from '../sensitivity_utils.js';
 
 const OUTPUT_DIR = join(__dirname, 'outputs');
@@ -46,7 +47,7 @@ const FUND_DIR = join(OUTPUT_DIR, 'fund');
 const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
 
 const args = parseArgs(process.argv);
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged'; // weighted unless staged is explicitly requested
 
 // ---------------------------------------------------------------------------
 // Load baseline inputs — same sources as the website
@@ -55,6 +56,10 @@ const isWeighted = args.approach === 'weighted';
 const baselinePath =
   args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
 const worldviewsPath = args.worldviewsFile ?? join(REPO_ROOT, 'config', 'specialBlend.json');
+
+// TD-1: when using the default baseline, abort if it has drifted from the dataset the website
+// actually serves (newest config/datasets/*.json via pickDefaultDataset). See ATB-2 / DR-4.
+if (!args.base) assertBaselineParity(REPO_ROOT, baselinePath);
 
 const baselineDataset = loadDataset(baselinePath);
 const worldviews = loadSaWorldviews(REPO_ROOT);
@@ -277,7 +282,7 @@ for (const [groupName, groupDef] of Object.entries(scenarios)) {
     }
     const siMaxAbs = siAbsSum / 2;
 
-    // Cause-area SI = ½ Σ|Δpp| across cause areas. Same statistic as cluster_si in combined_si.csv.
+    // Cause-area SI = ½ Σ|Δpp| across cause areas (the cluster_si column in discount_fund_si.csv).
     const newCA = groupByCauseArea(combined);
     const causeDiffs = Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca] - baseCauseAlloc[ca]]));
     const causeMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;

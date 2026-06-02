@@ -9,12 +9,17 @@
  *   runs the allocation under modified weights and measures sensitivity vs that
  *   worldview's own unmodified baseline.
  *
- * Config:  sensitivity-analysis/outputs/moral-weights/moral_weight_multipliers.json
+ * Config:  sensitivity-analysis/moral-weights/moral_weight_multipliers.json
+ * All files include a `baseline` anchor row (zero diffs/SI) so diffs are anchored and absolute
+ * allocations are recoverable as baseline + diff.
+ *
  * Outputs: sensitivity-analysis/moral-weights/outputs/
  *   fund/moral_weights_overall_si.csv                — Part 1: fund SI + cause-area SI + per-fund deltas
  *   fund/moral_weights_per_worldview_si.csv          — Part 2: per-worldview fund SI + CA SI + per-fund deltas, grouped by multiplier
  *   cause/moral_weights_overall_cause_area_si.csv    — Part 1 projected to cause-area SI
  *   cause/moral_weights_per_worldview_cause_area_si.csv — Part 2 projected to cause-area SI
+ *   cause/moral_weights_overall_cause_area_allocations.csv      — Part 1 absolute cause-area levels + diffs
+ *   cause/moral_weights_per_worldview_cause_area_allocations.csv — Part 2 absolute cause-area levels + diffs
  *
  * Usage:
  *   node sensitivity-analysis/moral-weights/run_moral_weight_sensitivity.js
@@ -45,16 +50,10 @@ import {
 const OUTPUT_DIR = join(__dirname, 'outputs');
 const FUND_DIR = join(OUTPUT_DIR, 'fund');
 const CAUSE_DIR = join(OUTPUT_DIR, 'cause');
-const CONFIG_PATH = join(
-  __dirname,
-  '..',
-  'outputs',
-  'moral-weights',
-  'moral_weight_multipliers.json'
-);
+const CONFIG_PATH = join(__dirname, 'moral_weight_multipliers.json');
 
 const args = parseArgs(process.argv);
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged'; // weighted unless staged is explicitly requested
 
 // ---------------------------------------------------------------------------
 // Load inputs
@@ -120,6 +119,8 @@ function applyMultiplier(wv, multiplier) {
   const newWeights = { ...wv.moral_weights };
   for (const key of animalKeys) {
     if (key in newWeights) {
+      // upper_bounds caps any multiplier > 1 so an animal weight can never be pushed above the
+      // sentience-only ceiling. (For the configured multipliers, which are all <= 1, this never binds.)
       newWeights[key] = Math.min(newWeights[key] * multiplier, upper_bounds[key]);
     }
   }
@@ -197,6 +198,17 @@ const p1SiFields = [
 
 const p1SiRows = [];
 
+// Baseline anchor row (unmodified weights): zero diffs/SI, absolute cause allocations recorded so
+// the cause-allocations view can show levels and the diffs are recoverable as baseline + diff.
+p1SiRows.push({
+  multiplier: 'baseline',
+  sensitivity_index: '0.0000',
+  ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, '0.0000'])),
+  ...Object.fromEntries(caKeys.map((ca) => [ca, baseCauseAlloc[ca].toFixed(4)])),
+  ca_sensitivity_index: '0.0000',
+  ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, '0.0000'])),
+});
+
 // Part 2 — per-worldview (one row per worldview × multiplier)
 const p2SiFields = [
   'multiplier',
@@ -233,28 +245,23 @@ for (const [label, multiplier] of Object.entries(multipliers)) {
   drCheckCount++;
 
   const { si, diffs } = computeSI(combined, baseAlloc);
-  const oom = Math.abs(Math.log10(multiplier));
-  const siScaled = oom > 0 ? si / oom : 0;
 
   const newCA = groupByCauseArea(combined);
   const causeDiffs = Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca] - baseCauseAlloc[ca]]));
   const caMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
-  const caSiScaled = oom > 0 ? caMaxAbs / oom : 0;
 
   p1SiRows.push({
     multiplier: String(multiplier),
     sensitivity_index: si.toFixed(4),
-    si_scaled_pp_per_oom: siScaled.toFixed(4),
     ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
     ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
     ca_sensitivity_index: caMaxAbs.toFixed(4),
-    ca_si_scaled_pp_per_oom: caSiScaled.toFixed(4),
     ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
   });
 
   const topFund = fundIds.reduce((a, b) => (combined[a] > combined[b] ? a : b));
   console.log(
-    `  ${label.padEnd(8)}  SI=${si.toFixed(2)}pp  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
+    `  ${label.padEnd(8)}  SI=${si.toFixed(2)}pp  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
   );
 }
 
@@ -284,11 +291,9 @@ for (const [label, scenarioWeights] of Object.entries(scenarios)) {
   p1SiRows.push({
     multiplier: label,
     sensitivity_index: si.toFixed(4),
-    si_scaled_pp_per_oom: '',
     ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
     ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
     ca_sensitivity_index: caMaxAbs.toFixed(4),
-    ca_si_scaled_pp_per_oom: '',
     ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
   });
 
@@ -327,6 +332,19 @@ for (const wv of allIndexedWvs) {
     `  idx=${wvIdx}  ${wv.name}${rnTag}  baseline top: ${topWvBase} (${wvBase[topWvBase].toFixed(1)}%)`
   );
 
+  // Baseline anchor row for this worldview (zero diffs/SI, absolute cause allocations recorded).
+  p2SiRows.push({
+    worldview_idx: wvIdx,
+    worldview_name: wv.name,
+    risk_profile: wv.risk_profile,
+    multiplier: 'baseline',
+    sensitivity_index: '0.0000',
+    ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, '0.0000'])),
+    ...Object.fromEntries(caKeys.map((ca) => [ca, wvBaseCauseAlloc[ca].toFixed(4)])),
+    ca_sensitivity_index: '0.0000',
+    ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, '0.0000'])),
+  });
+
   for (const [label, multiplier] of Object.entries(multipliers)) {
     const modifiedSingleWv = [applyMultiplier({ ...cleanWv, credence: 1.0 }, multiplier)];
 
@@ -347,15 +365,12 @@ for (const wv of allIndexedWvs) {
     drCheckCount++;
 
     const { si, diffs } = computeSI(combined, wvBase);
-    const oom = Math.abs(Math.log10(multiplier));
-    const siScaled = oom > 0 ? si / oom : 0;
 
     const newCA = groupByCauseArea(combined);
     const causeDiffs = Object.fromEntries(
       caKeys.map((ca) => [ca, newCA[ca] - wvBaseCauseAlloc[ca]])
     );
     const caMaxAbs = Object.values(causeDiffs).reduce((s, v) => s + Math.abs(v), 0) / 2;
-    const caSiScaled = oom > 0 ? caMaxAbs / oom : 0;
 
     p2SiRows.push({
       worldview_idx: wvIdx,
@@ -363,17 +378,15 @@ for (const wv of allIndexedWvs) {
       risk_profile: wv.risk_profile,
       multiplier: String(multiplier),
       sensitivity_index: si.toFixed(4),
-      si_scaled_pp_per_oom: siScaled.toFixed(4),
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
       ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
       ca_sensitivity_index: caMaxAbs.toFixed(4),
-      ca_si_scaled_pp_per_oom: caSiScaled.toFixed(4),
       ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
     });
 
     const topFund = fundIds.reduce((a, b) => (combined[a] > combined[b] ? a : b));
     console.log(
-      `    ${label.padEnd(8)}  SI=${si.toFixed(2)}pp  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
+      `    ${label.padEnd(8)}  SI=${si.toFixed(2)}pp  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
     );
   }
 
@@ -409,11 +422,9 @@ for (const wv of allIndexedWvs) {
       risk_profile: wv.risk_profile,
       multiplier: label,
       sensitivity_index: si.toFixed(4),
-      si_scaled_pp_per_oom: '',
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
       ...Object.fromEntries(caKeys.map((ca) => [ca, newCA[ca].toFixed(4)])),
       ca_sensitivity_index: caMaxAbs.toFixed(4),
-      ca_si_scaled_pp_per_oom: '',
       ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
     });
 
@@ -439,6 +450,9 @@ writeCsv(join(FUND_DIR, 'moral_weights_overall_si.csv'), p1SiFields, p1SiRows);
 // descending so the worldviews most sensitive to that perturbation appear at
 // the top of their group.
 const p2SiRowsGrouped = [...p2SiRows].sort((a, b) => {
+  // Baseline anchor rows sort first.
+  if (a.multiplier === 'baseline' && b.multiplier !== 'baseline') return -1;
+  if (b.multiplier === 'baseline' && a.multiplier !== 'baseline') return 1;
   const aNum = parseFloat(a.multiplier);
   const bNum = parseFloat(b.multiplier);
   const aIsNum = !isNaN(aNum);
@@ -462,7 +476,6 @@ const p1CauseFields = ['multiplier', 'sensitivity_index', ...caKeys.map((ca) => 
 const p1CauseRows = p1SiRows.map((r) => ({
   multiplier: r.multiplier,
   sensitivity_index: r.ca_sensitivity_index,
-  si_scaled_pp_per_oom: r.ca_si_scaled_pp_per_oom,
   ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, r[`diff_${ca}`]])),
 }));
 writeCsv(join(CAUSE_DIR, 'moral_weights_overall_cause_area_si.csv'), p1CauseFields, p1CauseRows);
@@ -473,7 +486,6 @@ const p2CauseFields = [
   'risk_profile',
   'multiplier',
   'sensitivity_index',
-  'si_scaled_pp_per_oom',
   ...caKeys.map((ca) => `diff_${ca}`),
 ];
 const p2CauseRows = p2SiRows.map((r) => ({
@@ -482,13 +494,48 @@ const p2CauseRows = p2SiRows.map((r) => ({
   risk_profile: r.risk_profile,
   multiplier: r.multiplier,
   sensitivity_index: r.ca_sensitivity_index,
-  si_scaled_pp_per_oom: r.ca_si_scaled_pp_per_oom,
   ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, r[`diff_${ca}`]])),
 }));
 writeCsv(
   join(CAUSE_DIR, 'moral_weights_per_worldview_cause_area_si.csv'),
   p2CauseFields,
   p2CauseRows
+);
+
+// Cause-area ALLOCATIONS views — absolute ghd/gcr/aw levels + diffs, with the baseline anchor row.
+// Parity with time-discounts' discount_cause_area_allocations.csv (the closest analogous analysis).
+const p1CauseAllocFields = ['multiplier', ...caKeys, ...caKeys.map((ca) => `diff_${ca}`)];
+const p1CauseAllocRows = p1SiRows.map((r) => ({
+  multiplier: r.multiplier,
+  ...Object.fromEntries(caKeys.map((ca) => [ca, r[ca]])),
+  ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, r[`diff_${ca}`]])),
+}));
+writeCsv(
+  join(CAUSE_DIR, 'moral_weights_overall_cause_area_allocations.csv'),
+  p1CauseAllocFields,
+  p1CauseAllocRows
+);
+
+const p2CauseAllocFields = [
+  'worldview_idx',
+  'worldview_name',
+  'risk_profile',
+  'multiplier',
+  ...caKeys,
+  ...caKeys.map((ca) => `diff_${ca}`),
+];
+const p2CauseAllocRows = p2SiRows.map((r) => ({
+  worldview_idx: r.worldview_idx,
+  worldview_name: r.worldview_name,
+  risk_profile: r.risk_profile,
+  multiplier: r.multiplier,
+  ...Object.fromEntries(caKeys.map((ca) => [ca, r[ca]])),
+  ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, r[`diff_${ca}`]])),
+}));
+writeCsv(
+  join(CAUSE_DIR, 'moral_weights_per_worldview_cause_area_allocations.csv'),
+  p2CauseAllocFields,
+  p2CauseAllocRows
 );
 
 console.log(

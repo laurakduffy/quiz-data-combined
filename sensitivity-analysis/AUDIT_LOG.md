@@ -86,17 +86,23 @@ remaining module.**
 |--------|-----------|-------|
 | gcr-params | partial (GCR-1) | Dirichlet config audited; full module not yet swept |
 | across-the-board | ✅ done | ATB-1…9 |
-| aggregation-methods | ✅ done | AGG-1…3 |
-| worldview-sensitivity | ✅ done | WV-1…4 + loadSaWorldviews rollout |
+| aggregation-methods | ✅ done | AGG-1…4 |
+| worldview-sensitivity | ✅ done | WV-1…5 + loadSaWorldviews rollout |
 | ghd-timing-sensitivity | ⬜ todo | |
 | diminishing-returns | ✅ done | DR-1…5; Layers 0-4 complete |
-| risk-aversion | ⬜ todo | |
-| time-discounts | ⬜ todo | reads `output_data_median_2M.json` directly (ATB-2-style check) |
-| moral-weights | ⬜ todo | |
+| risk-aversion | ✅ done | RA-1…3; Layers 0-4 complete |
+| time-discounts | ✅ done | TD-1…4; Layers 0-4 complete |
+| moral-weights | ✅ done | MW-1…4; Layers 0-4 complete |
 
-**Cross-cutting open item:** several runners (`diminishing-returns` ×3, `time-discounts`,
-`gcr-params`) read the dataset from a hardcoded `output_data_median_2M.json` rather than
-`pickDefaultDataset` — apply an ATB-2-style baseline-source check when auditing each.
+**Cross-cutting open item:** only `gcr-params` still reads the dataset from a hardcoded
+`output_data_median_2M.json` rather than `pickDefaultDataset` — apply an ATB-2-style baseline-source
+check when auditing it. (`diminishing-returns` ×3 and `time-discounts` now have the guard.)
+
+**Cross-cutting fix (approach default):** all 11 runners now default to **weighted** (`isWeighted =
+args.approach !== 'staged'`); staged must be explicitly requested. Previously 9 runners defaulted to
+*staged* standalone and only matched the website because `run_all.js` force-pushes `--approach
+weighted`. Committed outputs are unchanged (always generated via `run_all`); this only fixes
+direct standalone invocations.
 
 ## Index
 
@@ -108,6 +114,9 @@ remaining module.**
 | DR-3 | diminishing-returns | End-result allocation (greedy reconstruction) | ✅ Verified |
 | DR-4 | diminishing-returns | Base source hardcoded, no parity guard | ✅ Resolved |
 | DR-5 | diminishing-returns | `run_dr_all.js` docstring referenced a missing script | ✅ Resolved |
+| RA-1 | risk-aversion | Positional worldview→risk merge; bypassed sa-guard | ✅ Resolved |
+| RA-2 | risk-aversion | Stale `outputs/combined_si.csv` | ✅ Resolved |
+| RA-3 | risk-aversion | Invariants + end-result reconstruction | ✅ Verified |
 | ATB-1 | across-the-board | Stale leftover dataset files | ✅ Resolved |
 | ATB-2 | across-the-board | Baseline not guaranteed to match website dataset | ✅ Resolved |
 | ATB-3 | across-the-board | MET allocation non-monotonic at extreme multipliers | 📝 Watch (not a bug) |
@@ -117,13 +126,25 @@ remaining module.**
 | ATB-7 | across-the-board | `JSON_RISK_PROFILES` count/comment vs 9-col schema | ✅ Resolved |
 | ATB-8 | across-the-board | GiveWell scaling-npz out of sync with baseline (~0.19%) | ✅ Resolved |
 | ATB-9 | across-the-board | Regenerated only *missing* scaled datasets, not stale ones | ✅ Resolved |
+| ATB-10 | across-the-board | Own-fund monotonicity/sign checks restricted to non-MET (CHECK 5 rebuilt, CHECK 13 added) | ✅ Verified |
 | AGG-1 | aggregation-methods | README described the retired Python implementation | ✅ Resolved |
 | AGG-2 | aggregation-methods | Stale `outputs/combined_si.csv` (not produced by runner) | ✅ Resolved |
 | AGG-3 | aggregation-methods | Staged-approach per-method budget rounding | 📝 Watch (non-default) |
+| AGG-4 | aggregation-methods | Added C13: high vs low credence oppose per fund (directionality) | ✅ Verified |
 | WV-1 | worldview-sensitivity | Worldview→definition merge was positional/fragile | ✅ Resolved |
 | WV-2 | worldview-sensitivity | Stale `outputs/combined_si.csv` (not produced by runner) | ✅ Resolved |
 | WV-3 | worldview-sensitivity | Outputs were stale vs the new GCR dataset | ✅ Resolved |
 | WV-4 | worldview-sensitivity | Docstring says "staged" but default is weighted | ✅ Resolved |
+| WV-5 | worldview-sensitivity | Added C13: high vs low credence oppose for material (>0.5pp) deltas (FLAG) | ✅ Verified |
+| TD-1 | time-discounts | Hardcoded baseline, no parity guard (ATB-2/DR-4 class) | ✅ Resolved |
+| TD-2 | time-discounts | Stale `outputs/combined_si.csv` + misleading inline comment | ✅ Resolved |
+| TD-3 | time-discounts | Standalone default was *staged* (aligned all 11 runners to weighted) | ✅ Resolved |
+| TD-4 | time-discounts | Invariants (12/12) + end-result reconstruction (16/16) | ✅ Verified |
+| MW-1 | moral-weights | Stale `outputs/combined_si.csv` | ✅ Resolved |
+| MW-2 | moral-weights | Input config lived under `outputs/` (moved into module dir) | ✅ Resolved |
+| MW-3 | moral-weights | `si_scaled_pp_per_oom` unwanted + emitted inconsistently (removed) | ✅ Resolved |
+| MW-4 | moral-weights | Invariants (14/14) + end-result reconstruction (105/105) | ✅ Verified |
+| MW-5 | moral-weights | Added baseline anchor rows + cause-area allocations files (parity w/ time-discounts) | ✅ Resolved |
 
 ---
 
@@ -230,6 +251,23 @@ remaining module.**
 - **Re-verify:** `node across-the-board/audit_met_monotonicity.mjs` — PASS = every monotonicity
   violation coincides with a representative-worldview change; it FAILs if a violation ever lacks one
   (the genuinely suspicious case).
+
+- **Addendum (non-extreme instance, now auto-detected).** The same MET mechanism also bites at a
+  **mild** multiplier: scaling `longview_ai` alone ×2.0 *lowers* its own blended allocation −0.468pp
+  (23.218 → 22.750). Per-method decomposition of `ce_multiplier_allocations.csv` shows the drop is
+  **entirely MET** (its longview_ai column collapses 5.0 → 0.0; every other method is flat or rises
+  +0.05). MET's longview_ai column along the whole series is discrete and non-monotone:
+  `×0.1→0, ×1.0→5, ×2.0→0, ×4.0→23, ×10.0→44` — representative-worldview switches, the same
+  WLU/stakes-sensitive turnover documented in the ×1000 table above.
+
+  Because MET is *expected* to be non-monotonic, the across-the-board own-fund monotonicity checks
+  (**CHECK 5** and the sign-anchored **CHECK 13**) were rebuilt to test the **non-MET weighted
+  allocation** only (per-method columns × baseline.json weights, MET dropped). On that non-MET blend
+  the dip vanishes entirely — **0 sign and 0 monotonicity violations across all scenarios** — which
+  itself confirms MET is the *sole* cause and that the averaging methods (and even borda/splitCycle)
+  are well-behaved. A future flag on those checks would therefore signal a genuine averaging-method
+  bug, not MET's discreteness. Confirming the ×2.0 representative is specifically a WLU worldview
+  needs `audit_met_monotonicity.mjs` pointed at the `longview_ai_2x` dataset (engine run).
 
 ### ATB-4 — Borda allocation shifts under GCR scaling
 - **Module:** `src/utils/marcusCalculation.js` → `voteBorda`; surfaced via `across-the-board`
@@ -584,3 +622,154 @@ C10 combo_max_spend). Three reusable scripts: `audit_dr_curves.py`, `audit_invar
 - **Note:** combo-only datasets leave funds *not* in the combo at their baseline DR (coarser
   2-dp-% precision) — the check only verifies funds the dataset actually regenerated.
 - **Re-verify:** `python diminishing-returns/audit_dr_curves.py`
+
+---
+
+## risk-aversion (Layers 0-4 complete)
+
+Each test holds worldviews + credences fixed and swaps their risk profiles (baseline → new_version),
+measuring SI. Reads the dataset via `pickDefaultDataset` (the website dataset directly — no
+base-source/parity concern). Approach: weighted by default, `--approach staged` kept as an option.
+Result: 9 invariants (`audit_invariants.py`) + 11-test reconstruction (`audit_recon.mjs`), all pass.
+
+### RA-1 — Positional worldview→risk merge, bypassing the sa-guard
+- **Module:** `risk-aversion/run_risk_aversion_sensitivity.js`
+- **Status / severity:** ✅ Resolved / high
+- **Symptom:** `buildWorldviews` mapped each test's risk labels to specialBlend worldviews **by array
+  position** (docstring: "names are labels only, not matched by string"), and loaded `specialBlend.json`
+  via `loadJson` (not `loadSaWorldviews`) — so no production-parity guard. Same fragility class as WV-1.
+- **Fix:** switched to `loadSaWorldviews(REPO_ROOT)` (parity-guarded) and match each test's risk label
+  to a worldview **by id** (`riskMap[wv.id]`), erroring on a missing id. Updated the docstring.
+- **Verified inert:** every test map's keys match the sa id set *and* order, so the id-merge produces
+  identical worldviews to the old positional merge — no result change, fragility removed.
+- **Re-verify:** `python risk-aversion/audit_invariants.py` (sa-parity + test-keys==sa-ids checks);
+  `node risk-aversion/audit_recon.mjs`.
+
+### RA-2 — Stale `outputs/combined_si.csv`
+- **Status / severity:** ✅ Resolved / low
+- Not written by the runner (same as AGG-2/WV-2). `git rm`'d.
+
+### RA-3 — Invariants + end-result reconstruction (Layers 1, 2, 4)
+- **Status / severity:** ✅ Verified / n/a
+- **Layer 1 (`audit_invariants.py`, 11/11):** sa_specialBlend parity; every test's worldview keys == sa
+  id set; summary `SI == ½·Σ|fund deltas|`; fund deltas zero-sum; `ca_SI == ½·Σ|grouped fund deltas|`;
+  cause CSV consistent (cause deltas == grouped fund deltas, `new−base==delta`, sums to 100, SI,
+  most-affected); neutral baseline sums to 100%/budget with ordered ranks; summary covers all 11
+  active tests; all risk labels defined in `risk_codes` (verified labels map to the right risk_profile
+  indices). **C9 (directional):** a shift TO a risk-averse profile never raises GCR and a shift TO
+  neutral never lowers it — risk-aversion penalizes GCR's heavy tails (catches "math consistent but
+  behaves backwards"). **C10 (monotonicity):** WLU 10 (c=0.1) exits GCR ≥ WLU 5 (c=0.05) and has SI ≥,
+  at the cause-cluster level. *Note:* both WLU levels **fully** exit GCR (gcr_delta −90.15 either way),
+  so the GCR-exit is **equal**, not strictly increasing, and **per-fund** deltas are NOT monotone
+  (freed budget reshuffles within GHD/AW, e.g. leaf 7.49→6.66) — so C10 is a non-reversal guardrail,
+  not a strict-ordering claim.
+- **Layer 2 (`audit_recon.mjs`):** independently rebuilt all 11 tests' baseline/new_version
+  allocations (id-merge + engine) and reproduced the CSV deltas + SI (max delta diff 0.005 = 2-dp
+  rounding, SI diff 0.000). **Neutral-baseline reconstruction:** rebuilt the all-neutral allocation
+  (every worldview → risk_profile 0) and reproduced `neutral_baseline_allocation.csv` (max 0.005pp).
+  **Null idempotence:** running the same profile map twice gives SI exactly 0.
+- **Layer 3:** risky bits verified (id-merge, `risk_codes` mapping); dataset via `pickDefaultDataset`,
+  so no ATB-2 base-source issue. `--approach staged` retained as a non-default option.
+
+---
+
+### TD-1 — Hardcoded baseline with no parity guard (time-discounts)
+- **Module:** `time-discounts/run_discount_sensitivity.js`
+- **Status / severity:** ✅ Resolved / med
+- The runner defaulted its baseline to `all-intervention-models/outputs/output_data_median_2M.json`
+  with no check that this still equals the dataset the website serves (newest `config/datasets/*.json`
+  via `pickDefaultDataset`) — the ATB-2 / DR-4 class. **Fix:** added `assertBaselineParity(REPO_ROOT,
+  baselinePath)` guarded by `if (!args.base)`. Smoke test (`--dry-run`) passes (baseline == 20260601).
+
+### TD-2 — Stale `combined_si.csv` + misleading comment (time-discounts)
+- **Status / severity:** ✅ Resolved / low
+- `outputs/combined_si.csv` was a leftover the runner never writes (it emits `discount_fund_si.csv`,
+  `discount_cause_area_allocations.csv`, `discount_cause_area_si.csv`) — same class as RA-2/AGG-2/WV-2.
+  An inline comment also referenced `combined_si.csv` for the `cluster_si` statistic. **Fix:** `git rm`
+  the stale file; comment now points to the `cluster_si` column in `discount_fund_si.csv`.
+
+### TD-3 — Standalone default approach was *staged* (cross-cutting)
+- **Module:** all runners (`isWeighted` definition)
+- **Status / severity:** ✅ Resolved / med
+- `isWeighted = args.approach === 'weighted'` meant a direct standalone run with no `--approach`
+  produced **staged** output — the website / `run_all.js` default is weighted. 9 of 11 runners had
+  this; `run_all.js` masked it by force-pushing `--approach weighted`, so committed outputs were
+  always weighted. **Fix:** all 11 runners now use `isWeighted = args.approach !== 'staged'`
+  (weighted by default; staged must be explicitly requested). No output change — standalone-only fix.
+
+### TD-4 — Invariants + end-result reconstruction (Layers 1, 2, 4)
+- **Status / severity:** ✅ Verified / n/a
+- **Layer 0 (intent):** scales the far-future `discount_factors` (idx 5 = 500+ yrs; idx [4,5] =
+  100-500 + 500+) **down** through `{0.1…1e-10, 0}` and measures the allocation shift. Index→horizon
+  labels verified honest. *Observations (not bugs):* (a) the allocation is **flat (0 change) for
+  multipliers 0.1→1e-8** — all movement is at 1e-9/1e-10/0 (a discreteness/threshold effect: the 500+
+  factor is already 0.01 and 2M increments only flip near full elimination); (b) the two scenario
+  groups are **identical except at ×0** (the 100-500 bucket only matters under full elimination).
+- **Layer 1 (`audit_invariants.py`, 12/12):** sa_specialBlend parity + uniform `discount_factors` +
+  config indices in range; fund `SI == ½Σ|fund diffs|`; fund diffs zero-sum; `cluster_si ==
+  ½Σ|grouped diffs| == cause_si.SI`; cause allocations sum to 100 + zero-sum; cause diffs == grouped
+  fund diffs (cross-CSV); cause_si `SI == ½Σ|cause diffs|`; `si_scaled_pp_per_oom == SI/|log10(mult)|`
+  (0 at mult=0); baseline row zeroed; cause alloc `diff == new − baseline`; **config↔output
+  reconciliation (Layer 4): 16 scenarios, all 3 CSVs aligned**; directional: discounting the far
+  future never raises GCR.
+- **Layer 2 (`audit_recon.mjs`):** independently rebuilt all 16 scenarios (clone worldviews, scale
+  `discount_factors[idx]`, weighted allocation) and reproduced the CSV diffs + SI **exactly** (max
+  delta diff 0.000). Used **normalized** method weights while the runner uses **raw** budgets — the
+  exact match confirms `computeWeightedAllocation` normalizes weights internally (Layer-3 concern
+  resolved). The flat-until-1e-9 rows reproduce exactly, so that behavior is genuine, not an artifact.
+
+---
+
+### MW-1 — Stale `combined_si.csv` (moral-weights)
+- **Status / severity:** ✅ Resolved / low
+- Leftover the runner never writes (it emits `moral_weights_overall_si.csv`, `_per_worldview_si.csv`,
+  and two cause CSVs) — same class as RA-2/AGG-2/WV-2/TD-2. **Fix:** `git rm`.
+
+### MW-2 — Input config lived under `outputs/` (moral-weights)
+- **Status / severity:** ✅ Resolved / low
+- `moral_weight_multipliers.json` (hand-authored, no generator) lived at
+  `sensitivity-analysis/outputs/moral-weights/` — a hand-edited *input* inside an `outputs/` dir,
+  at risk of being wiped by an outputs cleanup, and inconsistent with every other module. **Fix:**
+  `git mv` into `moral-weights/`; updated `CONFIG_PATH` and the docstring; removed the empty dir.
+
+### MW-3 — `si_scaled_pp_per_oom` removed (moral-weights)
+- **Status / severity:** ✅ Resolved / low
+- The per-order-of-magnitude scaled SI was computed in both parts but written to only **one** of the
+  four CSVs (per-worldview cause), and is no longer wanted. **Fix:** removed the computation and the
+  lone column. *Committed CSVs still carry the old column until the module is regenerated — cosmetic
+  only (diffs/SI unchanged).*
+
+### MW-4 — Invariants + end-result reconstruction (Layers 1, 2, 4)
+- **Status / severity:** ✅ Verified / n/a
+- **Layer 0 (intent):** two parts — Part 1 perturbs animal weights across all worldviews (SI vs the
+  blend baseline); Part 2 perturbs each worldview alone at 100% credence (SI vs its own baseline).
+  Perturbations: 3 downward multipliers {0.1, 0.2, 0.5} (capped at `upper_bounds`, which only binds
+  for >1 multipliers — a guard, not dead code) + 4 absolute-override scenarios that set the 5 animal
+  weights directly across all worldviews (human weights untouched). (Outputs were originally
+  diff-only with no baseline; see MW-5 for the parity additions.)
+- **Layer 1 (`audit_invariants.py`, 14/14):** sa parity + every worldview carries the 5 animal keys
+  (else the perturbation silently skips it) + scenarios override exactly those keys; Part 1 & Part 2
+  fund `SI == ½Σ|fund diffs|`, fund zero-sum, `ca_SI == ½Σ|grouped diffs|`; both parts' cause CSVs
+  reconcile cross-CSV (cause diff == grouped fund diffs, cause SI == fund ca_SI, zero-sum);
+  **reconciliation (Layer 4):** Part 1 = 3 multipliers + 4 scenarios (fund==cause), Part 2 = 14
+  worldviews × 7 with idx↔name matching sa order (fund==cause); **directional:** reducing animal
+  weights never raises AW (both parts), and Part 1's AW loss is monotone in the multiplier.
+- **Layer 2 (`audit_recon.mjs`):** independently rebuilt all 105 perturbations (7 overall + 14×7
+  per-worldview) — applying the capped multiplier / scenario override and re-running the weighted
+  allocation — and reproduced every CSV diff + SI **exactly** (max delta diff 0.000). Normalized
+  weights matched the runner's raw-budget CSV (internal normalization re-confirmed).
+
+### MW-5 — Baseline anchor rows + cause-area allocations files (parity)
+- **Status / severity:** ✅ Resolved / low (consistency/interpretability)
+- moral-weights was the only module with **no baseline anchor** — diffs floated unanchored and the
+  actual allocation under each scenario was unrecoverable from the CSVs. **Fix (runner):** (1) added
+  a `baseline` row to every output (Part 1: the blend baseline; Part 2: each worldview's own
+  baseline; zero diffs/SI), so absolute = baseline + diff is recoverable and "sums to 100" becomes
+  checkable; (2) added two **cause-area allocations** files (`..._overall_cause_area_allocations.csv`,
+  `..._per_worldview_cause_area_allocations.csv`) with absolute ghd/gcr/aw levels + diffs — parity
+  with time-discounts' `discount_cause_area_allocations.csv`. Absolute *per-fund* columns were
+  deliberately **not** added (time-discounts, the closest analog, doesn't have them either).
+- **Audit update:** reconciliation counts bumped (Part 1: 1 baseline + 7 = 8 rows; Part 2:
+  14 × (1 + 7) = 112); two checks added — **C12** baseline rows zeroed, **C13** cause-allocations
+  levels sum to 100 / `diff == level − baseline` / diffs match the SI files. Layer 1 now **14/14**;
+  reconstruction unchanged at 105/105. Outputs regenerated (single module) to produce the new files.

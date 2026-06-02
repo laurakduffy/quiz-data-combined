@@ -200,6 +200,28 @@ for r in ca_index:
             bad.append(f"{scen[:18]}.{ca}")
 record("FAIL" if bad else "PASS", "Cause deltas == grouped fund deltas (cross-CSV)", "; ".join(bad[:6]))
 
+# C13 — Form 2 directionality (FLAG): raising a worldview's credence (high bound) vs lowering it
+# (low bound) should move each MATERIAL fund delta in opposite directions. Unlike the linear
+# method-blend in aggregation-methods, the worldview blend runs through 6 nonlinear voting methods,
+# so near-zero deltas can legitimately wobble (10/94 sign ties below 0.5pp, but 0/38 at >=0.5pp).
+# Hence a FLAG gated at 0.5pp, not a hard invariant.
+THR = 0.5
+by_wv_bound = {}
+for r in split_index:
+    if r["scenario"] == "baseline":
+        continue
+    by_wv_bound.setdefault(r["worldview"], {})[r["bound"]] = r
+bad = []
+for w, bb in by_wv_bound.items():
+    if "low" not in bb or "high" not in bb:
+        continue
+    for f in FUNDS:
+        dh, dl = fnum(bb["high"][f"{f}_delta"]), fnum(bb["low"][f"{f}_delta"])
+        if abs(dh) > THR and abs(dl) > THR and (dh > 0) == (dl > 0):
+            bad.append(f"{w[:18]}.{f}: high {dh:+.2f} & low {dl:+.2f}")
+record("FLAG" if bad else "PASS",
+       "Form 2: high vs low credence oppose for material (>0.5pp) deltas", "; ".join(bad[:6]))
+
 
 # Report
 print("\n" + "=" * 72)

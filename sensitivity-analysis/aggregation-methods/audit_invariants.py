@@ -207,6 +207,26 @@ else:
     record(status, "Form 2 deltas reproducible from Form 1 + renorm (weighted)",
            f"max |recomputed - reported delta| = {worst:.4f} at {worst_at}")
 
+# C13 — Form 2 directionality: raising a method's credence (high bound) vs lowering it (low bound)
+# must move each fund's allocation in OPPOSITE directions. Under the linear method-blend this is
+# exact: combined(c) is linear in the varied credence c, so delta(c) = (c - best_guess) * K_f and
+# high (c > bg) vs low (c < bg) carry opposite signs. (Empirically 0/39 violations.)
+by_method_bound = {}
+for r in split_index:
+    if r["scenario"] == "baseline":
+        continue
+    by_method_bound.setdefault(r["method"], {})[r["bound"]] = r
+bad = []
+for m, bb in by_method_bound.items():
+    if "low" not in bb or "high" not in bb:
+        continue
+    for f in FUNDS:
+        dh, dl = fnum(bb["high"][f"{f}_delta"]), fnum(bb["low"][f"{f}_delta"])
+        if abs(dh) > 0.05 and abs(dl) > 0.05 and (dh > 0) == (dl > 0):
+            bad.append(f"{m}.{f}: high {dh:+.2f} & low {dl:+.2f} same sign")
+record("FAIL" if bad else "PASS",
+       "Form 2: high vs low credence move funds in opposite directions", "; ".join(bad[:6]))
+
 
 # Report
 print("\n" + "=" * 72)

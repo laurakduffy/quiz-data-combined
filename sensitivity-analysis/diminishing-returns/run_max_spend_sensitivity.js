@@ -60,7 +60,7 @@ const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
 
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 const fundIds = Object.keys(baseProjects).sort();
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged'; // weighted unless staged is explicitly requested
 const methodEntries = stages.map((s) => ({
   jsKey: s.method,
   weight: s.budget / totalBudget,

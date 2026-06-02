@@ -1,0 +1,113 @@
+worldview_idx,worldview_name,risk_profile,multiplier,ghd,gcr,aw,diff_ghd,diff_gcr,diff_aw
+0,Total Utilitarian,0,baseline,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.1,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.2,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,0.5,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,sentience_only,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,low_animals,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,moderate_high,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+0,Total Utilitarian,0,moderate,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,baseline,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,0.1,60.0000,7.0000,33.0000,41.0000,1.0000,-42.0000
+1,Total Utilitarian,7,0.2,43.0000,6.0000,51.0000,24.0000,0.0000,-24.0000
+1,Total Utilitarian,7,0.5,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,sentience_only,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,low_animals,93.0000,7.0000,0.0000,74.0000,1.0000,-75.0000
+1,Total Utilitarian,7,moderate_high,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
+1,Total Utilitarian,7,moderate,54.0000,6.0000,40.0000,35.0000,0.0000,-35.0000
+2,Total Utilitarian,2,baseline,25.0000,0.0000,75.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,0.1,85.0000,0.0000,15.0000,60.0000,0.0000,-60.0000
+2,Total Utilitarian,2,0.2,67.0000,0.0000,33.0000,42.0000,0.0000,-42.0000
+2,Total Utilitarian,2,0.5,45.0000,0.0000,55.0000,20.0000,0.0000,-20.0000
+2,Total Utilitarian,2,sentience_only,25.0000,0.0000,75.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,low_animals,100.0000,0.0000,0.0000,75.0000,0.0000,-75.0000
+2,Total Utilitarian,2,moderate_high,25.0000,0.0000,75.0000,0.0000,0.0000,0.0000
+2,Total Utilitarian,2,moderate,61.0000,0.0000,39.0000,36.0000,0.0000,-36.0000
+3,Total Utilitarian,6,baseline,25.0000,0.0000,75.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,0.1,76.0000,0.0000,24.0000,51.0000,0.0000,-51.0000
+3,Total Utilitarian,6,0.2,59.0000,0.0000,41.0000,34.0000,0.0000,-34.0000
+3,Total Utilitarian,6,0.5,37.0000,0.0000,63.0000,12.0000,0.0000,-12.0000
+3,Total Utilitarian,6,sentience_only,25.0000,0.0000,75.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,low_animals,100.0000,0.0000,0.0000,75.0000,0.0000,-75.0000
+3,Total Utilitarian,6,moderate_high,25.0000,0.0000,75.0000,0.0000,0.0000,0.0000
+3,Total Utilitarian,6,moderate,52.0000,0.0000,48.0000,27.0000,0.0000,-27.0000
+4,Total Utilitarian,0,baseline,0.0000,25.0000,75.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,0.1,6.0000,40.0000,54.0000,6.0000,15.0000,-21.0000
+4,Total Utilitarian,0,0.2,0.0000,30.0000,70.0000,0.0000,5.0000,-5.0000
+4,Total Utilitarian,0,0.5,0.0000,25.0000,75.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,sentience_only,0.0000,25.0000,75.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,low_animals,58.0000,42.0000,0.0000,58.0000,17.0000,-75.0000
+4,Total Utilitarian,0,moderate_high,0.0000,25.0000,75.0000,0.0000,0.0000,0.0000
+4,Total Utilitarian,0,moderate,2.0000,39.0000,59.0000,2.0000,14.0000,-16.0000
+5,Consequentialism (Non-Utilitarian),0,baseline,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.1,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.2,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,0.5,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,sentience_only,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,low_animals,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,moderate_high,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+5,Consequentialism (Non-Utilitarian),0,moderate,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,baseline,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.1,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.2,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,0.5,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,sentience_only,0.0000,44.0000,56.0000,0.0000,-56.0000,56.0000
+6,Consequentialism (Non-Utilitarian),0,low_animals,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+6,Consequentialism (Non-Utilitarian),0,moderate_high,0.0000,56.0000,44.0000,0.0000,-44.0000,44.0000
+6,Consequentialism (Non-Utilitarian),0,moderate,0.0000,88.0000,12.0000,0.0000,-12.0000,12.0000
+7,Consequentialism (Non-Utilitarian),0,baseline,0.0000,88.0000,12.0000,0.0000,0.0000,0.0000
+7,Consequentialism (Non-Utilitarian),0,0.1,0.0000,100.0000,0.0000,0.0000,12.0000,-12.0000
+7,Consequentialism (Non-Utilitarian),0,0.2,0.0000,100.0000,0.0000,0.0000,12.0000,-12.0000
+7,Consequentialism (Non-Utilitarian),0,0.5,0.0000,97.0000,3.0000,0.0000,9.0000,-9.0000
+7,Consequentialism (Non-Utilitarian),0,sentience_only,0.0000,44.0000,56.0000,0.0000,-44.0000,44.0000
+7,Consequentialism (Non-Utilitarian),0,low_animals,0.0000,100.0000,0.0000,0.0000,12.0000,-12.0000
+7,Consequentialism (Non-Utilitarian),0,moderate_high,0.0000,56.0000,44.0000,0.0000,-32.0000,32.0000
+7,Consequentialism (Non-Utilitarian),0,moderate,0.0000,88.0000,12.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,baseline,72.0000,0.0000,28.0000,0.0000,0.0000,0.0000
+8,Consequentialism (Non-Utilitarian),2,0.1,100.0000,0.0000,0.0000,28.0000,0.0000,-28.0000
+8,Consequentialism (Non-Utilitarian),2,0.2,99.0000,0.0000,1.0000,27.0000,0.0000,-27.0000
+8,Consequentialism (Non-Utilitarian),2,0.5,90.0000,0.0000,10.0000,18.0000,0.0000,-18.0000
+8,Consequentialism (Non-Utilitarian),2,sentience_only,25.0000,0.0000,75.0000,-47.0000,0.0000,47.0000
+8,Consequentialism (Non-Utilitarian),2,low_animals,100.0000,0.0000,0.0000,28.0000,0.0000,-28.0000
+8,Consequentialism (Non-Utilitarian),2,moderate_high,39.0000,0.0000,61.0000,-33.0000,0.0000,33.0000
+8,Consequentialism (Non-Utilitarian),2,moderate,72.0000,0.0000,28.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,baseline,0.0000,34.0000,66.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,0.1,39.0000,34.0000,27.0000,39.0000,0.0000,-39.0000
+9,Contractualism,5,0.2,20.0000,34.0000,46.0000,20.0000,0.0000,-20.0000
+9,Contractualism,5,0.5,2.0000,34.0000,64.0000,2.0000,0.0000,-2.0000
+9,Contractualism,5,sentience_only,0.0000,34.0000,66.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,low_animals,66.0000,34.0000,0.0000,66.0000,0.0000,-66.0000
+9,Contractualism,5,moderate_high,0.0000,34.0000,66.0000,0.0000,0.0000,0.0000
+9,Contractualism,5,moderate,16.0000,34.0000,50.0000,16.0000,0.0000,-16.0000
+10,Contractualism,0,baseline,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.1,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.2,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,0.5,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,sentience_only,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,low_animals,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,moderate_high,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+10,Contractualism,0,moderate,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,baseline,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.1,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.2,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,0.5,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,sentience_only,25.0000,0.0000,75.0000,-75.0000,0.0000,75.0000
+11,Contractualism,2,low_animals,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+11,Contractualism,2,moderate_high,25.0000,0.0000,75.0000,-75.0000,0.0000,75.0000
+11,Contractualism,2,moderate,51.0000,0.0000,49.0000,-49.0000,0.0000,49.0000
+12,Kantianism,3,baseline,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.1,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.2,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,0.5,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,sentience_only,25.0000,0.0000,75.0000,-75.0000,0.0000,75.0000
+12,Kantianism,3,low_animals,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+12,Kantianism,3,moderate_high,32.0000,0.0000,68.0000,-68.0000,0.0000,68.0000
+12,Kantianism,3,moderate,67.0000,0.0000,33.0000,-33.0000,0.0000,33.0000
+13,Custom,6,baseline,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.1,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.2,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,0.5,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,sentience_only,25.0000,0.0000,75.0000,-75.0000,0.0000,75.0000
+13,Custom,6,low_animals,100.0000,0.0000,0.0000,0.0000,0.0000,0.0000
+13,Custom,6,moderate_high,32.0000,0.0000,68.0000,-68.0000,0.0000,68.0000
+13,Custom,6,moderate,67.0000,0.0000,33.0000,-33.0000,0.0000,33.0000

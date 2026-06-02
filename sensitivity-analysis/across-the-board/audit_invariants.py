@@ -135,26 +135,49 @@ else:
 
 
 # ---------------------------------------------------------------------------
-# CHECK 5 — own-allocation monotonicity (FLAG, not FAIL: rank-based methods
-# like splitCycle/borda can legitimately be non-monotonic)
+# CHECK 5 — own-allocation monotonicity, NON-MET methods only (FLAG)
 # ---------------------------------------------------------------------------
-# For a single varied fund: as its multiplier rises, its own diff should not fall.
-# For a group: the summed diff of its member funds should not fall.
+# As a varied fund's multiplier rises, its own (non-MET) weighted allocation should not fall;
+# for a group, the summed member allocation should not fall.
+#
+# MET is EXCLUDED. MET is a winner-take-most method that selects a single representative worldview
+# by similarity geometry and is therefore legitimately non-monotonic in cost-effectiveness (see
+# AUDIT_LOG ATB-3) -- including it makes this test flag a known non-bug. We rebuild the own-fund
+# series from the NON-MET weighted allocation (per-method columns in ce_multiplier_allocations.csv
+# x method weights from baseline.json), so a violation here signals a REAL problem in the averaging
+# methods, not MET's expected discreteness. (Empirically: 0 violations once MET is removed.)
 group_funds = {g: d["funds"] for g, d in config.get("groups", {}).items()}
 
-series = defaultdict(list)  # fund_varied -> [(multiplier, own_or_cluster_diff)]
+stages = json.loads((HERE.parent / "baseline.json").read_text())["stages"]
+_tot = sum(s["budget"] for s in stages)
+METHOD_W = {s["method"]: s["budget"] / _tot for s in stages}
+NONMET = [m for m in METHOD_W if m != "met"]
+
+
+def _targets(fv):
+    return group_funds[fv] if fv in group_funds else [fv]
+
+
+def _own_nonmet(fund_varied, mult, target_funds):
+    s = 0.0
+    for r in alloc_rows:
+        if r["fund_varied"] == fund_varied and abs(float(r["multiplier"]) - mult) < 1e-9 \
+                and r["recipient_fund"] in target_funds:
+            s += sum(METHOD_W[m] * fnum(r[m]) for m in NONMET)
+    return s
+
+
+_scn = defaultdict(set)
 for r in si_rows:
-    fv = r["fund_varied"]
-    if fv == "baseline":
-        continue
-    mult = float(r["multiplier"])
-    if fv in group_funds:
-        own = sum(fnum(r[f"diff_{f}"]) for f in group_funds[fv])
-    elif f"diff_{fv}" in r:
-        own = fnum(r[f"diff_{fv}"])
-    else:
-        continue
-    series[fv].append((mult, own))
+    if r["fund_varied"] != "baseline":
+        _scn[r["fund_varied"]].add(float(r["multiplier"]))
+
+series = defaultdict(list)  # fund_varied -> [(multiplier, non-MET own/cluster diff vs baseline)]
+for fv, mults in _scn.items():
+    tf = _targets(fv)
+    base_own = _own_nonmet("baseline", 1.0, tf)
+    for m in mults:
+        series[fv].append((m, _own_nonmet(fv, m, tf) - base_own))
 
 violations = []
 for fv, pts in series.items():
@@ -163,10 +186,10 @@ for fv, pts in series.items():
         if d2 < d1 - TOL:
             violations.append(f"{fv}: x{m1}->{d1:.3f}pp then x{m2}->{d2:.3f}pp (own alloc fell)")
 if violations:
-    record("FLAG", "Own-allocation monotonicity (higher multiplier -> more money)",
+    record("FLAG", "Own-allocation monotonicity, non-MET methods (higher multiplier -> more money)",
            "; ".join(violations))
 else:
-    record("PASS", "Own/cluster allocation rises monotonically with multiplier")
+    record("PASS", "Own/cluster allocation (non-MET) rises monotonically with multiplier")
 
 
 # ---------------------------------------------------------------------------
@@ -341,6 +364,29 @@ else:
         record("FAIL", "Generator baseline matches website dataset",
                f"output_data_median_2M.json DIFFERS from newest config/datasets/{newest.name} "
                f"-> SA is anchored to a stale baseline the website does not use")
+
+
+# ---------------------------------------------------------------------------
+# CHECK 13 — own-fund sign anchored at the 1.0 baseline, NON-MET methods (FLAG)
+# ---------------------------------------------------------------------------
+# CHECK 5 only checks ordering WITHIN a fund's multiplier series. This anchors the sign to the
+# baseline: scaling a fund's CE UP (mult > 1) should not REDUCE its own (non-MET) allocation, and
+# scaling DOWN (mult < 1) should not RAISE it. Uses the same NON-MET `series` built in CHECK 5 (MET
+# excluded -- it is legitimately non-monotonic, ATB-3). With MET included, longview_ai x2.0 dips
+# its own share -0.47pp (MET column 5.0->0.0); on the non-MET blend that dip vanishes, which is
+# exactly why this restriction isolates real bugs. FLAG, not FAIL.
+violations = []
+for fv, pts in series.items():
+    for m, own in pts:
+        if m > 1 and own < -TOL:
+            violations.append(f"{fv} x{m}: own {own:+.3f}pp (mult>1 but own fell)")
+        elif m < 1 and own > TOL:
+            violations.append(f"{fv} x{m}: own {own:+.3f}pp (mult<1 but own rose)")
+if violations:
+    record("FLAG", "Own-fund allocation sign matches multiplier direction (vs baseline)",
+           "; ".join(violations))
+else:
+    record("PASS", "Own-fund allocation sign matches multiplier direction (vs baseline)")
 
 
 # ---------------------------------------------------------------------------

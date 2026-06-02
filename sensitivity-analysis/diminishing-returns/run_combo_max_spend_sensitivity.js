@@ -54,7 +54,7 @@ const combos = loadJson(join(__dirname, 'dr_combinations.json'));
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 const fundIds = Object.keys(baseProjects).sort();
 const comboNames = Object.keys(combos);
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged'; // weighted unless staged is explicitly requested
 const methodEntries = stages.map((s) => ({
   jsKey: s.method,
   weight: s.budget / totalBudget,

@@ -63,7 +63,7 @@ const { stages: baselineStages } = loadJson(join(__dirname, '..', 'baseline.json
 const totalBudget = baselineStages.reduce((s, st) => s + st.budget, 0);
 
 const fundIds = Object.keys(projects).sort();
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged'; // weighted unless staged is explicitly requested
 // Map method jsKey -> options from baseline.json stages (e.g. nashBargaining disagreementPoint)
 const stageOptionsMap = Object.fromEntries(baselineStages.map((s) => [s.method, s.options ?? {}]));
 

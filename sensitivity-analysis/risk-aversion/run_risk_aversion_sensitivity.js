@@ -2,22 +2,27 @@
  * Risk aversion sensitivity analysis.
  *
  * For each test in combinations.json, runs two allocations:
- *   baseline:     specialBlend worldviews with risk profiles from "baseline" map
+ *   baseline:     worldviews with risk profiles from the test's "baseline" map
  *   new_version:  same worldviews + credences, risk profiles from "new_version" map
  *
- * The 14 worldview names in each test map positionally to the 14 worldviews in
- * specialBlend.json — the names are labels only, not matched by string.
+ * Approach is selectable via --approach: weighted (credence-weighted average) or
+ * staged (sequential staged allocation); weighted runs when --approach is omitted.
+ *
+ * Each test's worldview keys are matched BY id to sa_specialBlend.json (verified
+ * against production specialBlend.json), so risk profiles attach to the right
+ * worldview by name — not by array position.
  *
  * Outputs (outputs/ directory):
- *   risk_aversion_summary.csv  — one row per test, SI + per-fund base/new/delta
- *   risk_aversion_by_fund.csv  — one row per (test, fund), with rank shifts
+ *   fund/neutral_baseline_allocation.csv       — all-neutral reference allocation
+ *   fund/risk_aversion_summary.csv             — one row per test: SI + per-fund deltas
+ *   cause/risk_aversion_cause_area_summary.csv — per test: cause-area SI + deltas
  *
  * Usage:
  *   node run_risk_aversion_sensitivity.js
- *   node run_risk_aversion_sensitivity.js --test specialblend_to_bilateral_skep
+ *   node run_risk_aversion_sensitivity.js --test specialblend_to_combined
  *   node run_risk_aversion_sensitivity.js --dry-run
  *   node run_risk_aversion_sensitivity.js --base PATH/to/dataset.json
- *   node run_risk_aversion_sensitivity.js --approach weighted
+ *   node run_risk_aversion_sensitivity.js --approach staged
  */
 
 import { fileURLToPath } from 'url';
@@ -31,6 +36,7 @@ import { computeMultiStageAllocation } from '../../src/utils/marcusCalculation.j
 import { computeWeightedAllocation } from '../computeWeightedAllocation.js';
 import {
   loadJson,
+  loadSaWorldviews,
   loadDataset,
   pickDefaultDataset,
   rankDict,
@@ -57,10 +63,7 @@ const testFilter = testArgIdx !== -1 ? process.argv[testArgIdx + 1] : null;
 // ---------------------------------------------------------------------------
 
 const { tests, risk_codes } = loadJson(join(__dirname, 'combinations.json'));
-const specialBlend = loadJson(join(REPO_ROOT, 'config', 'specialBlend.json'));
-const sbWvs = Array.isArray(specialBlend)
-  ? specialBlend
-  : (specialBlend.worldviews ?? Object.values(specialBlend));
+const sbWvs = loadSaWorldviews(REPO_ROOT);
 
 const { projects, incrementSize, drStepSize } = loadDataset(
   args.base ?? pickDefaultDataset(REPO_ROOT)
@@ -68,7 +71,7 @@ const { projects, incrementSize, drStepSize } = loadDataset(
 const { stages } = loadJson(join(__dirname, '..', 'baseline.json'));
 const totalBudget = stages.reduce((s, st) => s + st.budget, 0);
 const fundIds = Object.keys(projects).sort();
-const isWeighted = args.approach === 'weighted';
+const isWeighted = args.approach !== 'staged'; // weighted unless staged is explicitly requested
 const methodEntries = stages.map((s) => ({
   jsKey: s.method,
   weight: s.budget / totalBudget,
@@ -91,7 +94,7 @@ if (testFilter && activeTests.length === 0) {
 }
 
 console.log('\nRisk aversion sensitivity analysis');
-console.log(`  Worldviews:  ${sbWvs.length} (specialBlend.json)`);
+console.log(`  Worldviews:  ${sbWvs.length} (sa_specialBlend.json)`);
 console.log(`  Funds:       ${fundIds.length}`);
 console.log(`  Increment:   $${incrementSize}M,  drStepSize: $${drStepSize}M`);
 console.log(`  Budget:      $${totalBudget}M`);
@@ -126,14 +129,13 @@ if (args.dryRun) {
 
 function buildWorldviews(test, versionKey) {
   const riskMap = test[versionKey];
-  const wvNames = Object.keys(riskMap);
-  if (wvNames.length !== sbWvs.length) {
-    throw new Error(
-      `Test "${versionKey}" has ${wvNames.length} entries but specialBlend has ${sbWvs.length} worldviews`
-    );
-  }
-  return sbWvs.map((wv, i) => {
-    const label = riskMap[wvNames[i]];
+  // Match BY id (not array position): each worldview's risk profile comes from the
+  // test entry keyed by that worldview's sa_specialBlend id.
+  return sbWvs.map((wv) => {
+    const label = riskMap[wv.id];
+    if (label === undefined) {
+      throw new Error(`Test "${versionKey}" has no entry for worldview id "${wv.id}"`);
+    }
     if (!(label in risk_codes)) {
       throw new Error(`Unknown risk label "${label}" in ${versionKey} — not in risk_codes`);
     }
