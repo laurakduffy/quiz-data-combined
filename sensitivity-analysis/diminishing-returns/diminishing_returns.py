@@ -4,6 +4,7 @@ import csv
 import json
 import math
 import os
+import re
 import numpy as np
 from squigglepy import M
 
@@ -13,6 +14,23 @@ _DATASET_PATH = os.path.join(
 )
 with open(_DATASET_PATH) as _f:
     _dataset_meta = json.load(_f)
+
+# Parity guard (DR-4): the base dataset must match the website's newest dated dataset
+# in config/datasets/, else the DR curves would be built on a stale baseline.
+_CFG_DATASETS = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), '..', '..', 'config', 'datasets'
+)
+_dated = (
+    sorted(f for f in os.listdir(_CFG_DATASETS) if re.match(r'^\d{8}.*\.json$', f))
+    if os.path.isdir(_CFG_DATASETS) else []
+)
+if _dated:
+    with open(os.path.join(_CFG_DATASETS, _dated[-1])) as _wf:
+        if _dataset_meta != json.load(_wf):
+            raise SystemExit(
+                'ERROR: output_data_median_2M.json differs from the website\'s newest dataset '
+                f'(config/datasets/{_dated[-1]}). Re-run combine_data.py so they match.'
+            )
 
 INCREMENT_SIZE = int(_dataset_meta['incrementSize']) * M
 MAX_BUDGET     = int(_dataset_meta['budget']) * M

@@ -104,6 +104,23 @@ export function loadSaWorldviews(repoRoot, { saPath, prodPath } = {}) {
   return sa.map((w) => ({ ...w, credence: total > 0 ? (w.credence ?? 0) / total : 0 }));
 }
 
+/**
+ * Abort if `basePath` (the default base dataset, e.g. output_data_median_2M.json) differs
+ * from the website's newest dated config/datasets file — so a sensitivity analysis can't
+ * silently run on a stale baseline. Callers should only invoke this when NOT using an
+ * explicit --base override. Mirrors the across-the-board (ATB-2) guard.
+ */
+export function assertBaselineParity(repoRoot, basePath) {
+  const websitePath = pickDefaultDataset(repoRoot);
+  if (_stableStringify(loadJson(basePath)) !== _stableStringify(loadJson(websitePath))) {
+    console.error(
+      `ERROR: base dataset (${basePath.split(/[/\\]/).pop()}) differs from the website's current ` +
+        `dataset (${websitePath.split(/[/\\]/).pop()}). Regenerate it so they match, or pass --base to override.`
+    );
+    process.exit(1);
+  }
+}
+
 export function rankDict(alloc) {
   return Object.fromEntries(
     Object.keys(alloc)

@@ -8,7 +8,6 @@
  *   4. node   run_dr_sensitivity.js                 — combo allocation analysis
  *   5. node   run_max_spend_sensitivity.js          — max-spend allocation analysis
  *   6. node   run_combo_max_spend_sensitivity.js    — joint allocation analysis
- *   7. python make_cutoff_summary.py               — CE cutoff vs allocation summary (all three)
  *
  * Python build steps are skipped on --dry-run (JS steps still run with --dry-run).
  *

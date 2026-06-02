@@ -89,7 +89,7 @@ remaining module.**
 | aggregation-methods | ✅ done | AGG-1…3 |
 | worldview-sensitivity | ✅ done | WV-1…4 + loadSaWorldviews rollout |
 | ghd-timing-sensitivity | ⬜ todo | |
-| diminishing-returns | ⬜ todo | most moving parts; uses python build steps |
+| diminishing-returns | ✅ done | DR-1…5; Layers 0-4 complete |
 | risk-aversion | ⬜ todo | |
 | time-discounts | ⬜ todo | reads `output_data_median_2M.json` directly (ATB-2-style check) |
 | moral-weights | ⬜ todo | |
@@ -103,6 +103,11 @@ remaining module.**
 | ID | Module | Issue | Status |
 |----|--------|-------|--------|
 | GCR-1 | gcr-params | Dirichlet means / labels inconsistencies | ✅ Resolved |
+| DR-1 | diminishing-returns | DR-curve formula + cutoff (spot checks) | ✅ Verified |
+| DR-2 | diminishing-returns | Analysis-CSV invariants | ✅ Verified |
+| DR-3 | diminishing-returns | End-result allocation (greedy reconstruction) | ✅ Verified |
+| DR-4 | diminishing-returns | Base source hardcoded, no parity guard | ✅ Resolved |
+| DR-5 | diminishing-returns | `run_dr_all.js` docstring referenced a missing script | ✅ Resolved |
 | ATB-1 | across-the-board | Stale leftover dataset files | ✅ Resolved |
 | ATB-2 | across-the-board | Baseline not guaranteed to match website dataset | ✅ Resolved |
 | ATB-3 | across-the-board | MET allocation non-monotonic at extreme multipliers | 📝 Watch (not a bug) |
@@ -492,3 +497,90 @@ credences), Layers 3-4 (renorm + id-merge verified; config↔output reconciled).
 - **Resolution:** rewrote the docstring to state the weighted default (with `--approach staged`
   available) and to document the `sa_specialBlend.json` / `loadSaWorldviews` / id-merge mechanism;
   dropped the now-unused `--worldviews-file` from the usage line.
+
+---
+
+## diminishing-returns (in progress)
+
+**Layers 0-4 complete.** Pipeline mapped; DR-curve formula + cutoff verified (DR-1); analysis-CSV
+invariants (DR-2); end-result allocation via independent greedy reconstruction (DR-3); base-source
+parity guard added (DR-4); Layer-4 reconciliation codified in `audit_invariants.py` (C9 max_spend,
+C10 combo_max_spend). Three reusable scripts: `audit_dr_curves.py`, `audit_invariants.py` (24/24),
+`audit_allocation_spot.mjs`.
+
+### DR-5 — `run_dr_all.js` docstring referenced a non-existent script
+- **Module:** `diminishing-returns/run_dr_all.js`
+- **Status / severity:** ✅ Resolved / low
+- **Symptom:** the docstring listed a "step 7: `python make_cutoff_summary.py` — CE cutoff vs
+  allocation summary," but that file does not exist and is **not** in the `steps` array (which runs 6
+  steps: 3 `build_*.py` + 3 `run_*.js`). Harmless stale doc drift — the orchestrator never invokes it
+  — but misleading. (`generate_combo_heatmaps.py` exists but is likewise a separate manual tool, not
+  in `run_dr_all.js`.)
+- **Resolution:** removed the phantom step 7 from the docstring so it lists the 6 real steps.
+
+### DR-2 — Analysis-CSV invariants (Layer 1)
+- **Module:** `diminishing-returns/outputs/{fund,cause}/*.csv`
+- **Status / severity:** ✅ Verified / n/a
+- **Checks (`audit_invariants.py`):** across all three analysis families (dr_sensitivity,
+  max_spend, combo_max_spend) — `SI == ½·Σ|fund deltas|`, fund deltas zero-sum,
+  `ca_SI == ½·Σ|grouped fund deltas|`, cause deltas == grouped fund deltas (cross-CSV), cause SI
+  consistent, cause deltas zero-sum, zeroed baseline rows, and dr-combos reconcile with
+  `dr_combinations.json`. **22/22 pass.**
+- **Calibration notes:** zero-sum uses a looser floor (`SUM_TOL=0.06`) since deltas are stored to
+  2 dp and 8 of them accumulate ~0.04 of rounding; `baseline`/`all_med` are allowed reference rows.
+- **Re-verify:** `python diminishing-returns/audit_invariants.py`
+
+### DR-3 — End-result allocation verified by independent greedy reconstruction (Layer 2)
+- **Module:** `diminishing-returns` allocations (marketplace method) via `audit_allocation_spot.mjs`
+- **Status / severity:** ✅ Verified / n/a
+- **What:** the marketplace method spends each increment on argmax `value[fund]·DR(funding)`; at
+  funding 0 the DR factor is 1, so the engine's first-increment scores reveal each fund's raw value.
+  The check extracts those, then runs an INDEPENDENT greedy loop using the DR-1-verified curves at
+  drStepSize=2, and compares its funding to the engine's.
+- **Result:** exact match (max |diff| = 0.000M) for 4 worldviews spanning different valuations on
+  gcr_slow — including cutoffs binding correctly (a WLU worldview saturates nav_general at its 84M
+  cutoff). Confirms the end allocation is the correct greedy-with-DR result, not just a CSV re-run.
+  Asserts **drStepSize == incrementSize == 2**.
+- **Scope:** verifies the marketplace path (the cleanest to reconstruct greedily) — the other five
+  methods are the shared engine's, covered by the across-the-board module audit (ATB-3 etc.).
+- **Re-verify:** `node diminishing-returns/audit_allocation_spot.mjs`
+
+### DR-4 — Base dataset hardcoded with no parity guard (Layer 3 / cross-cutting)
+- **Module:** `diminishing-returns/{build_*.py, diminishing_returns.py, run_*.js}`
+- **Status / severity:** ⚠️ Open / low-med
+- **Symptom:** every build script, `diminishing_returns.py`, and the `run_*.js` analyses read
+  `all-intervention-models/outputs/output_data_median_2M.json` **directly** (not `pickDefaultDataset`)
+  and with **no guard** that it matches the website's newest `config/datasets/` file. Across-the-board
+  has such a guard (ATB-2); this module does not.
+- **Checked:** today they match exactly (`output_data_median_2M.json` deep-equals `20260601.json`),
+  so current DR outputs are built from the correct baseline. Verified the DR source CSV
+  (`all_diminishing_returns_median_2M.csv`) exists too.
+- **Verdict:** consistent now, but a future base change that didn't refresh
+  `output_data_median_2M.json` would silently produce stale DR datasets/outputs.
+- **Resolution:** added a parity guard at the point the base is read. Python: a module-load guard in
+  `diminishing_returns.py` (aborts if `output_data_median_2M.json` != newest `config/datasets/`) —
+  covers all three `build_*.py` since they import it. JS: a shared `assertBaselineParity(repoRoot,
+  basePath)` in `sensitivity_utils.js`, called by `run_dr_sensitivity.js`,
+  `run_max_spend_sensitivity.js`, `run_combo_max_spend_sensitivity.js` when no `--base` override.
+  Validated: JS dry-run + python import both pass the guard (parity holds today); reuses the
+  negative-tested ATB-2 `_stableStringify` comparison.
+- **Re-verify:** run any DR build/analysis with the median file out of sync — it aborts with a clear
+  message. `drStepSize` stays `incrementSize` (=2); `audit_allocation_spot.mjs` asserts it.
+
+### DR-1 — DR-curve formula + cutoff verified (spot checks)
+- **Module:** `diminishing-returns/diminishing_returns.py` → all `datasets/*/output_data_*.json`
+- **Status / severity:** ✅ Verified / n/a
+- **What:** the DR multiplier is `dr[i] = ((spend[i]+B)/B)^(-power)` with a hard zero for
+  `spend > maxAddlSpend·B`, where `spend[i] = i·incrementSize`, `B` = per-fund baseline budget,
+  `power` ∈ {slow, med, fast}, `maxAddlSpend` ∈ {2.5, 5, 7.5, 10}.
+- **Checks (Laura's two flags), codified in `audit_dr_curves.py`:**
+  (1) the multiplier before the cutoff matches the formula at every increment, with a single
+  constant power equal to a configured level; (2) the first MR=0 increment equals
+  `floor(maxAddlSpend·B / incrementSize) + 1`, predicted from the budget alone.
+- **Result:** 198/198 regenerated fund-curves across all 35 generated datasets pass; e.g. Longview
+  AI slow at 102M = `((102+70)/70)^(-0.35)` = 0.730045 (matches), sentinel first-zero at increment 19
+  (= floor(37.5/2)+1). Funds whose cutoff exceeds the array (e.g. longview_ai at maxAddl 5–10) are
+  correctly unconstrained.
+- **Note:** combo-only datasets leave funds *not* in the combo at their baseline DR (coarser
+  2-dp-% precision) — the check only verifies funds the dataset actually regenerated.
+- **Re-verify:** `python diminishing-returns/audit_dr_curves.py`

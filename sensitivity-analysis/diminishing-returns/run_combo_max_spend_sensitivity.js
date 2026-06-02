@@ -24,6 +24,7 @@ import {
   loadJson,
   loadSaWorldviews,
   loadDataset,
+  assertBaselineParity,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -42,6 +43,7 @@ const args = parseArgs(process.argv);
 
 const baseJsonPath =
   args.base ?? join(REPO_ROOT, 'all-intervention-models', 'outputs', 'output_data_median_2M.json');
+if (!args.base) assertBaselineParity(REPO_ROOT, baseJsonPath);
 
 const { projects: baseProjects, incrementSize } = loadDataset(baseJsonPath);
 const drStepSize = incrementSize;
