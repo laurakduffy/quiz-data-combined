@@ -24,6 +24,7 @@ import contextlib
 import csv as csv_module
 import json
 import os
+import re
 import sys
 from copy import deepcopy
 from pathlib import Path
@@ -31,7 +32,8 @@ from pathlib import Path
 import numpy as np
 
 SCRIPT_DIR = Path(__file__).parent
-MODEL_ROOT  = SCRIPT_DIR.parent.parent / "all-intervention-models"
+REPO_ROOT   = SCRIPT_DIR.parent.parent
+MODEL_ROOT  = REPO_ROOT / "all-intervention-models"
 GCR_MC      = MODEL_ROOT / "gcr-models-mc"
 
 sys.path.insert(0, str(GCR_MC))
@@ -44,7 +46,24 @@ from gcr_combine_data import build_scenario_json, write_gcr_risk_adjusted_csv  #
 # Paths
 # ---------------------------------------------------------------------------
 
-BASE_JSON_PATH = MODEL_ROOT / "outputs" / "output_data_median_2M.json"
+def pick_default_dataset(repo_root):
+    """Mirror sensitivity_utils.js pickDefaultDataset: the newest dated dataset
+    (config/datasets/YYYYMMDD*.json) — i.e. the dataset the website actually
+    serves. Keeps the unchanged AW/GHD fund values in each scenario JSON in sync
+    with the baseline used by run_gcr_alloc.js instead of anchoring to a stale
+    output_data_median_2M.json (the ATB-2 / DR-4 drift class — see AUDIT_LOG.md).
+    """
+    datasets_dir = repo_root / "config" / "datasets"
+    dated = sorted(
+        p for p in datasets_dir.glob("*.json")
+        if re.match(r"^\d{8}.*\.json$", p.name)
+    )
+    if not dated:
+        raise FileNotFoundError(f"No dated dataset files found in {datasets_dir}")
+    return dated[-1]
+
+
+BASE_JSON_PATH = pick_default_dataset(REPO_ROOT)
 SCENARIOS_PATH = SCRIPT_DIR / "gcr_param_scenarios.json"
 
 # ---------------------------------------------------------------------------
@@ -309,13 +328,6 @@ def run_scenario(scenario_name, scenario, base_json, n_samples, n_batches, seed,
 # ---------------------------------------------------------------------------
 
 def main():
-    # Pre-flight tests.
-    # Register under the module name so test_sensitivity.py can import from it
-    # without triggering a double-import when running as __main__.
-    sys.modules.setdefault("run_gcr_sensitivity", sys.modules["__main__"])
-    import test_sensitivity
-    test_sensitivity.run_all_tests()
-
     parser = argparse.ArgumentParser(
         description="GCR parameter sensitivity — generate per-scenario JSONs."
     )
@@ -333,8 +345,18 @@ def main():
                         help="Base random seed (default: 43).")
     parser.add_argument("--quiet", action="store_true",
                         help="Suppress per-fund MC progress output.")
+    parser.add_argument("--skip-tests", action="store_true",
+                        help="Skip the pre-flight test suite (used by the parallel runner).")
     args = parser.parse_args()
     verbose = not args.quiet
+
+    # Pre-flight tests (unless skipped).
+    # Register under the module name so test_sensitivity.py can import from it
+    # without triggering a double-import when running as __main__.
+    if not args.skip_tests:
+        sys.modules.setdefault("run_gcr_sensitivity", sys.modules["__main__"])
+        import test_sensitivity
+        test_sensitivity.run_all_tests()
 
     scenarios = load_scenarios()
 
@@ -362,8 +384,8 @@ def main():
 
     # Load base JSON
     if not BASE_JSON_PATH.exists():
-        print(f"Base JSON not found: {BASE_JSON_PATH}")
-        print("Run combine_data.py first.")
+        print(f"Base dataset not found: {BASE_JSON_PATH}")
+        print("Expected a dated dataset in config/datasets/ (see pick_default_dataset).")
         sys.exit(1)
     with open(BASE_JSON_PATH) as f:
         base_json = json.load(f)

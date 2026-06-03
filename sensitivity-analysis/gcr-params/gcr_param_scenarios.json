@@ -1,4 +1,14 @@
 {
+    "baseline": {
+        "description": "No-op baseline — common-random-numbers reference for the SI. Empty patch: GCR is run at the default seed sequence so every scenario shares the same draws and tail noise cancels in the difference.",
+        "world_patches": {}
+    },
+
+    "noise_check": {
+        "description": "No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).",
+        "world_patches": {}
+    },
+
     "r_inf_100x_up": {
         "description": "Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",
         "world_patches": {
