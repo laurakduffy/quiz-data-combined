@@ -1,8 +1,10 @@
 """Export RP-style CSV for all fund profiles.
 
-Produces an RP-format CSV with two sections:
-  1. Diminishing returns: marginal CE multiplier at $1M..$90M steps
-  2. Effects at time horizon: human life years/$1M by period and risk profile
+Produces an RP-format CSV with one section:
+  - Effects at time horizon: human life years/$1M by period and risk profile,
+    for each of the 10 risk profiles × 6 time periods.
+
+(Diminishing-returns CSVs are generated separately by combine_data.py, not here.)
 
 All risk profiles:
 
@@ -323,7 +325,7 @@ def run_fund_and_extract(fund_key, n_samples=1000000, n_batches = 10, verbose=Tr
 # CSV writer
 # ---------------------------------------------------------------------------
 
-TOTAL_COLS = 4 + len(RISK_PROFILES) * 6  # 4 base cols + 9 risk profiles × 6 time periods
+TOTAL_COLS = 4 + len(RISK_PROFILES) * 6  # 4 base cols + 10 risk profiles × 6 time periods
 
 
 def _pad(row):
@@ -715,7 +717,7 @@ def main():
     )
     parser.add_argument(
         "-o", "--output", default=str(Path(__file__).parent / "outputs" / "gcr_output.csv"),
-        help="Output CSV path for effects (default: outputs/gcr_output.csv). Diminishing returns will be saved to diminishing_returns/gcr_diminishing_returns_{N}yr.csv",
+        help="Output CSV path for effects (default: outputs/gcr_output.csv).",
     )
     parser.add_argument(
         "--n-samples", type=int, default=1000000,

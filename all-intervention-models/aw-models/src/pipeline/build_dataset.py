@@ -38,6 +38,9 @@ def build_all_effects(fund_key="ea_awf", verbose=False):
     rows = []
     # Collect pre-temporal draws keyed by effect_id for later npz save.
     raw_samples_by_effect = {}
+    # Collect per-period temporal fractions keyed by effect_id, aligned to the
+    # global 6-period grid (t0-t5), for the sensitivity analysis to consume.
+    period_fracs_by_effect = {}
     for effect in effects:
         samples = effect.get("animal_dalys_per_M_samples")
         pct_dict = effect.get("animal_dalys_per_M_pct", {})
@@ -55,6 +58,15 @@ def build_all_effects(fund_key="ea_awf", verbose=False):
         period_fracs = allocate_to_periods(
             effect["effect_start_year"],
             effect["persistence_years"],
+        )
+
+        # Store fractions on the global 6-period grid (t0-t5). The AW model only
+        # populates the first 4 periods (0_to_5 .. 20_to_100); global periods 4-5
+        # (100-500, 500+) are always 0 for AW. This matches combine_data.py
+        # TIME_MAPPINGS, so the sensitivity analysis can apply these directly to
+        # the 6-row values matrix instead of reverse-engineering them.
+        period_fracs_by_effect[effect["effect_id"]] = np.array(
+            [period_fracs[pk] for pk in PERIOD_KEYS] + [0.0, 0.0], dtype=float
         )
 
         row = {
@@ -100,10 +112,14 @@ def build_all_effects(fund_key="ea_awf", verbose=False):
     # These are the exact draws fed to compute_risk_profiles(), so scaling them
     # by K and recomputing gives exact WLU values for any CE multiplier scenario.
     # Keys: {effect_id}  (one 1-D array per effect, ~10k samples each).
+    # Period fractions are saved alongside under "{effect_id}__period_fracs" keys
+    # so the sensitivity analysis applies the model's true temporal split instead
+    # of recovering it from the baseline neutral column.
     project_id = fund_config["project_id"]
     os.makedirs(_SAMPLES_DIR, exist_ok=True)
     npz_path = str(_SAMPLES_DIR / f'aw_raw_samples_{project_id}.npz')
-    np.savez_compressed(npz_path, **raw_samples_by_effect)
+    frac_arrays = {f'{eid}__period_fracs': fr for eid, fr in period_fracs_by_effect.items()}
+    np.savez_compressed(npz_path, **raw_samples_by_effect, **frac_arrays)
     if verbose:
         print(f"\n  Raw samples saved to: {npz_path}")
 

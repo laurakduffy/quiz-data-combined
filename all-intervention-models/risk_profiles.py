@@ -1,6 +1,6 @@
 """Shared risk profile computations for all intervention models.
 
-Implements the 9 risk-adjusted expected-value summaries used across the
+Implements the 10 risk-adjusted expected-value summaries used across the
 GiveWell, GCR, and Animal Welfare cost-effectiveness models.
 
 Risk profiles
@@ -8,7 +8,7 @@ Risk profiles
 Informal adjustments:
   neutral   — risk-neutral EV (mean)
   upside    — clip upper tail at p99, recompute mean
-  downside  — loss-averse utility (lambda=2.5, reference=0)
+  downside  — loss-averse utility (lambda=5.0, reference=0)
   combined  — percentile-based weight decay (97.5–99.9%) + loss aversion
 
 Formal models (Duffy 2023):
@@ -159,7 +159,7 @@ def compute_ambiguity_bilateral(samples):
 # ---------------------------------------------------------------------------
 
 def compute_risk_profiles(samples):
-    """Compute all 9 risk-adjusted values from an empirical sample array.
+    """Compute all 10 risk-adjusted values from an empirical sample array.
 
     Args:
         samples: 1-D array-like of outcome values (e.g. QALYs/$1M).

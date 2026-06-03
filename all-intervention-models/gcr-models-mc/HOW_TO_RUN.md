@@ -19,7 +19,7 @@ python export_rp_csv.py --quiet
 
 This will:
 - Run all 3 funds (Sentinel Bio, Longview Nuclear, Longview AI)
-- Apply all 9 risk profiles
+- Apply all 10 risk profiles
 - Include sub-extinction tiers
 - Export everything to CSV in RP format
 
@@ -148,8 +148,8 @@ longview_nuclear,TRUE,effect_human_lives_extinction,human_life_years,...
 - `near_term_xrisk`: Whether the effect is near-term x-risk (TRUE/FALSE)
 - `effect_id`: Effect type (extinction vs sub-extinction tier)
 - `recipient_type`: Outcome unit (e.g. `human_life_years`)
-- Risk × time columns: `{risk_profile}_t{0-5}` for each of 9 risk profiles and 6 time periods (t0=0–5yr … t5=500+yr)
-  - Risk profiles: `neutral`, `upside`, `downside`, `combined`, `dmreu`, `wlu - low`, `wlu - moderate`, `wlu - high`, `ambiguity`
+- Risk × time columns: `{risk_profile}_t{0-5}` for each of 10 risk profiles and 6 time periods (t0=0–5yr … t5=500+yr)
+  - Risk profiles: `neutral`, `upside`, `downside`, `combined`, `dmreu`, `wlu - low`, `wlu - moderate`, `wlu - high`, `ambiguity`, `ambiguity bilateral`
 
 ### Interactive Results (from run_fund_and_extract)
 ```python

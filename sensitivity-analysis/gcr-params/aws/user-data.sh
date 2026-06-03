@@ -5,10 +5,13 @@
 # results to S3, and TERMINATES ITSELF. No SSH, nothing to clean up manually.
 #
 # >>> EDIT ONLY THIS LINE: <<<
-BUCKET="REPLACE-WITH-YOUR-BUCKET-NAME"
+BUCKET="gcr-sa-2026"
 #
 # (Optional) bump samples 10x by changing the next line to 10000000:
 NSAMPLES="1000000"
+# Cap concurrent scenarios so peak RAM (~3.8 GB each) fits the box.
+# 12 is safe on m7i.4xlarge (64 GB); raise/remove on a 128 GB box.
+CONCURRENCY="12"
 #
 # Keys within the bucket (defaults are fine):
 BUNDLE_KEY="gcr-aws-bundle.tar.gz"
@@ -33,7 +36,7 @@ find quiz-demo -name '*.sh' -exec sed -i 's/\r$//' {} +
 
 # --- Run the pipeline (installs python/node deps itself) ---
 # '|| true' so we still upload the log even if a scenario fails.
-NSAMPLES="$NSAMPLES" bash quiz-demo/sensitivity-analysis/gcr-params/aws/run_on_ec2.sh || true
+NSAMPLES="$NSAMPLES" CONCURRENCY="$CONCURRENCY" bash quiz-demo/sensitivity-analysis/gcr-params/aws/run_on_ec2.sh || true
 
 # --- Upload results + log (always) ---
 "$AWS" s3 cp /tmp/gcr-results.tar.gz "s3://$BUCKET/$RESULTS_KEY" || true

@@ -54,7 +54,7 @@ python run_all.py --gcr-model gcr-models-mc
 
 | File | Contents |
 |---|---|
-| `outputs/gcr_output.csv` | RP-format effects matrix: 9 risk profiles × 6 time periods per fund, plus diminishing returns section |
+| `outputs/gcr_output.csv` | RP-format effects matrix: 10 risk profiles × 6 time periods per fund (diminishing-returns CSVs are produced separately by `combine_data.py`) |
 | `outputs/gcr_output_summary_stats.csv` | Per-fund percentiles (p1/p5/p10/p50/p90/p95/p99) and mean of total QALYs/$1M |
 | `outputs/gcr_output_absolute_ev_percentiles.csv` | Percentiles of the absolute EV of the future under each intervention |
 | `outputs/param_percentiles.csv` | Parameter prior percentiles and means |
@@ -84,6 +84,7 @@ The final output concatenates all batches before computing risk profiles and per
 | `wlu - high` | Weighted Linear Utility, concavity c=0.10 |
 | `dmreu` | Difference-Making Risk-Weighted EU, p=0.05 |
 | `ambiguity` | Exponential weight decay 97.5–99.9%, zero above 99.9% |
+| `ambiguity bilateral` | As `ambiguity`, but also decays the lower tail (0.1–2.5%), zero below 0.1% |
 
 ## Tests
 

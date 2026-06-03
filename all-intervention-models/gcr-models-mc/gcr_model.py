@@ -8,7 +8,6 @@ accounting for both near-term and long-term (including stellar expansion) value.
 
 import itertools
 from collections import defaultdict
-from tabnanny import verbose
 
 import numpy as np
 from dataclasses import dataclass, field, fields as dc_fields
@@ -140,13 +139,13 @@ class GCRModel:
         else:
             self.rel_rr_from_int = p.bp_reduction_per_bn * 0.0001 / B * p.budget
 
-        self.b2 = p.r_g * (p.d_g - p.d_s)
         self.T_s = p.r_g / p.s
 
-        # v_s, a1, a2 computed during run() once earth value at T_c is known
+        # v_s, a1, a2, b2 computed during run() (depend on v_s)
         self.v_s = None
         self.a1 = None
         self.a2 = None
+        self.b2 = None
 
     # ── Risk trajectory ──
 
@@ -331,15 +330,14 @@ class GCRModel:
             print(f"num_years_per_sim = {num_years_per_sim}")
             print(f"max_num_years = {max_num_years}")
 
-        # Stellar coefficients (need earth value at T_c)
-        self.v_s = np.array(
-            [
-                self.get_earth_value(int(p.T_c[i]), y_const_value)[i]
-                for i in range(n)
-            ]
-        )
+        # Stellar coefficients. v_s is the per-star value, taken as Earth's
+        # maximum capacity (the logistic carrying capacity).
+        self.v_s = p.carrying_capacity
         self.a1 = 4 / 3 * np.pi * p.d_g * self.v_s * p.s**3
         self.a2 = 4 / 3 * np.pi * p.d_s * self.v_s * p.s**3
+        # b2 makes stellar value continuous at the Milky Way handoff t = T_s:
+        # the fixed correction for the galactic core being at density d_g, not d_s.
+        self.b2 = 4 / 3 * np.pi * p.r_g**3 * (p.d_g - p.d_s) * self.v_s
 
         # Risk arrays (kept as float64 — diff_in_survival involves catastrophic
         # cancellation for low-risk scenarios; float32 would lose the signal entirely)
