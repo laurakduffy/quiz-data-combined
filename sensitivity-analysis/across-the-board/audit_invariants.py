@@ -65,6 +65,7 @@ config = json.loads((HERE / "config.json").read_text())
 alloc_rows = load_csv(OUT / "fund" / "ce_multiplier_allocations.csv")
 si_rows = load_csv(OUT / "fund" / "ce_multiplier_si.csv")
 cause_alloc_rows = load_csv(OUT / "cause" / "cause_area_allocations.csv")
+cause_si_rows = load_csv(OUT / "cause" / "cause_area_si.csv")
 combined_rows = load_csv(OUT / "combined_si.csv")
 
 # diff_* columns present in the SI csv -> the canonical fund list
@@ -239,19 +240,73 @@ else:
 
 
 # ---------------------------------------------------------------------------
-# CHECK 8 — cross_cluster_share in [0, 1]
+# CHECK 8 — combined_si.csv is CORRECT and FRESH (hardened)
 # ---------------------------------------------------------------------------
+# combined_si.csv is a DERIVED file (written by reports/regen_combined_si.py /
+# fund_cluster_compare.py, NOT by run_multiply_ce.js). It joins the fund-level SI
+# (ce_multiplier_si.csv) with the cause-level SI (cause_area_si.csv) on
+# (fund_varied, multiplier) and reports cross_cluster_share = cluster_si / fund_si.
+#
+# Reading the file blindly lets a STALE combined_si.csv pass the audit while its
+# inputs have moved on. So we recompute the merge from the two SI CSVs and then
+# (8a) assert the math invariant on the recomputed values, and (8b) assert the
+# on-disk file matches that recompute row-for-row.
+SYNC_TOL = 1e-3  # combined_si values are derived 4dp copies of the SI CSVs -> tight match expected.
+
+fund_si_by = {scenario_key(r): fnum(r["sensitivity_index"]) for r in si_rows}
+cluster_si_by = {scenario_key(r): fnum(r["sensitivity_index"]) for r in cause_si_rows}
+
+# 8a — math invariant (file-independent): aggregating eight fund deltas into three
+# cause-area clusters can only cancel offsetting movement, never amplify it, so
+# cluster_si <= fund_si and therefore cross_cluster_share is always in [0, 1].
 bad = []
-for r in combined_rows:
-    v = fnum(r.get("cross_cluster_share", ""))
-    if v is None:
-        continue
-    if v < -TOL or v > 1 + TOL:
-        bad.append(f"{scenario_key(r)} -> {v}")
+for key, fund_si in fund_si_by.items():
+    cluster_si = cluster_si_by.get(key)
+    if cluster_si is None:
+        bad.append(f"{key}: no cause-area SI row")
+    elif cluster_si > fund_si + TOL:
+        bad.append(f"{key}: cluster_si {cluster_si:.4f} > fund_si {fund_si:.4f}")
 if bad:
-    record("FAIL", "cross_cluster_share in [0,1]", "; ".join(bad[:10]))
+    record("FAIL", "cross_cluster_share in [0,1] (recomputed: cluster_si <= fund_si)",
+           "; ".join(bad[:10]))
 else:
-    record("PASS", "cross_cluster_share within [0,1]")
+    record("PASS", "cross_cluster_share within [0,1] (recomputed from fund/cause SI CSVs)")
+
+# 8b — the on-disk combined_si.csv matches the recompute. A mismatch means the
+# file is stale relative to the SI CSVs it derives from (or hand-edited).
+file_by = {scenario_key(r): r for r in combined_rows}
+recomputed_keys = set(fund_si_by)
+missing = recomputed_keys - set(file_by)   # scenario in SI CSVs but absent from combined_si.csv
+phantom = set(file_by) - recomputed_keys   # row in combined_si.csv with no matching SI-CSV scenario
+mismatch = []
+for key in recomputed_keys & set(file_by):
+    fr = file_by[key]
+    fund_si = fund_si_by[key]
+    cluster_si = cluster_si_by.get(key)
+    exp_share = None if (fund_si is None or fund_si <= 0) else round(cluster_si / fund_si, 4)
+    got_share = fnum(fr.get("cross_cluster_share", ""))
+    if abs((fnum(fr["fund_si"]) or 0.0) - (fund_si or 0.0)) > SYNC_TOL:
+        mismatch.append(f"{key}: fund_si file {fr['fund_si']} vs recomputed {fund_si:.4f}")
+    elif cluster_si is not None and abs((fnum(fr["cluster_si"]) or 0.0) - cluster_si) > SYNC_TOL:
+        mismatch.append(f"{key}: cluster_si file {fr['cluster_si']} vs recomputed {cluster_si:.4f}")
+    elif exp_share is None:
+        if got_share is not None:
+            mismatch.append(f"{key}: share file {got_share} vs blank (fund_si=0)")
+    elif got_share is None or abs(got_share - exp_share) > SYNC_TOL:
+        mismatch.append(f"{key}: share file {fr.get('cross_cluster_share')!r} vs recomputed {exp_share:.4f}")
+if missing or phantom or mismatch:
+    detail = ""
+    if mismatch:
+        detail += f"STALE values ({len(mismatch)}): {mismatch[:6]}. "
+    if missing:
+        detail += f"MISSING from combined_si.csv: {sorted(missing)[:6]}. "
+    if phantom:
+        detail += f"PHANTOM rows in combined_si.csv: {sorted(phantom)[:6]}. "
+    detail += "Re-run reports/regen_combined_si.py (run_multiply_ce.js does this automatically)."
+    record("FAIL", "combined_si.csv matches the current fund/cause SI CSVs", detail)
+else:
+    record("PASS",
+           f"combined_si.csv in sync with fund/cause SI CSVs ({len(recomputed_keys)} scenarios)")
 
 
 # ---------------------------------------------------------------------------
@@ -387,6 +442,26 @@ if violations:
            "; ".join(violations))
 else:
     record("PASS", "Own-fund allocation sign matches multiplier direction (vs baseline)")
+
+
+# ---------------------------------------------------------------------------
+# CHECK 14 — combined_si.csv is at least as new as its input SI CSVs (FLAG)
+# ---------------------------------------------------------------------------
+# A cheap timestamp signal complementing CHECK 8b's content match: if the derived
+# file predates the SI CSVs it is built from, it was probably not refreshed after
+# the last run. FLAG, not FAIL, because mtimes are not preserved across git
+# checkouts (a fresh clone could trip it spuriously) -- CHECK 8b is the
+# authoritative staleness gate; this just points at the likely cause.
+combined_path = OUT / "combined_si.csv"
+input_paths = [OUT / "fund" / "ce_multiplier_si.csv", OUT / "cause" / "cause_area_si.csv"]
+c_mtime = combined_path.stat().st_mtime
+newer_inputs = [p.name for p in input_paths if p.stat().st_mtime > c_mtime + 1]
+if newer_inputs:
+    record("FLAG", "combined_si.csv at least as new as its input SI CSVs",
+           f"combined_si.csv is older than {newer_inputs} -> likely not regenerated after the "
+           f"last run; re-run reports/regen_combined_si.py (CHECK 8b confirms whether values drifted)")
+else:
+    record("PASS", "combined_si.csv is at least as new as its input SI CSVs")
 
 
 # ---------------------------------------------------------------------------

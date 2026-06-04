@@ -1,5 +1,5 @@
 scenario,ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
-baseline,12.78,13.25,4.94,23.22,4.80,15.64,18.06,7.32
-all effects far,13.04,15.80,0.66,23.60,5.04,15.64,18.45,7.76
-all effects near,12.78,13.25,4.94,23.22,4.80,15.64,18.06,7.32
-health effects near,12.94,12.68,4.15,24.12,4.80,15.64,18.36,7.32
+baseline,12.78,13.05,4.94,23.32,4.28,15.64,18.06,7.94
+all effects far,13.04,16.59,0.66,22.72,4.53,15.64,18.41,8.41
+all effects near,12.78,13.05,4.94,23.32,4.28,15.64,18.06,7.94
+health effects near,12.94,12.58,4.15,24.12,4.28,15.64,18.36,7.94

@@ -93,12 +93,20 @@ sizes comparable.
 # 2. regenerate the per-scenario datasets from config.json
 python sensitivity-analysis/across-the-board/generate_scaled_datasets.py
 
-# 3. run the allocation + write result CSVs
+# 3. run the allocation + write result CSVs (also refreshes combined_si.csv)
 node sensitivity-analysis/across-the-board/run_multiply_ce.js
 ```
 
 Outputs land in `outputs/fund/` (per-fund allocations + SI) and `outputs/cause/`
 (per cause-area).
+
+> **`outputs/combined_si.csv` is a *derived* file.** It joins the fund- and
+> cause-level SI CSVs (`cross_cluster_share = cluster_SI / fund_SI`) and is read
+> by `audit_invariants.py` CHECK 8. `run_multiply_ce.js` regenerates it at the
+> end of its run (via `reports/regen_combined_si.py`), so it stays in sync with
+> the SI CSVs whether you run the ACB runner directly or through
+> `node sensitivity-analysis/run_all.js`. To refresh it on its own:
+> `python sensitivity-analysis/reports/regen_combined_si.py`.
 
 ---
 
@@ -109,7 +117,7 @@ command):
 
 | Script | Checks |
 |---|---|
-| `audit_invariants.py` | Structural invariants: allocations sum to 100%, reallocation is zero-sum, SI = ½Σ\|Δ\|, stage budgets conserved, baseline matches the website dataset, every config scenario maps to exactly one output (and vice-versa), no filename collisions. |
+| `audit_invariants.py` | Structural invariants: allocations sum to 100%, reallocation is zero-sum, SI = ½Σ\|Δ\|, stage budgets conserved, baseline matches the website dataset, every config scenario maps to exactly one output (and vice-versa), no filename collisions, and the derived `combined_si.csv` is recomputed from the fund/cause SI CSVs and confirmed in sync (catches a stale file). |
 | `audit_npz_baseline_sync.py` | At K=1, every fund's raw-samples npz reproduces the baseline (catches an npz generated from a stale model state). |
 | `audit_met_monotonicity.mjs` | When a fund's allocation moves the "wrong" way as its multiplier rises, confirms it's because the MET method picked a different representative worldview (an inherent property), not a bug. |
 

@@ -93,12 +93,29 @@
         }
     },
 
-    "cause_fractions_bio_nuclear_unequal": {
-        "description": "Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",
+    "cause_fractions_bio_nuclear_unequal_1": {
+        "description": "Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",
         "world_patches": {
             "cause_fractions": {
                 "dist": "dirichlet",
-                "means": [0.02, 0.04, 0.90, 0.04],
+                "means": [0.04, 0.02, 0.90, 0.04],
+                "concentration": 10,
+                "keys": [
+                    "cause_fraction_bio",
+                    "cause_fraction_nuclear",
+                    "cause_fraction_ai",
+                    "cause_fraction_other"
+                ]
+            }
+        }
+    },
+
+    "cause_fractions_bio_nuclear_unequal_2": {
+        "description": "Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",
+        "world_patches": {
+            "cause_fractions": {
+                "dist": "dirichlet",
+                "means": [0.05, 0.01, 0.90, 0.04],
                 "concentration": 10,
                 "keys": [
                     "cause_fraction_bio",

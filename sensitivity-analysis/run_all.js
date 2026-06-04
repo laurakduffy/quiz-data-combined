@@ -61,6 +61,10 @@ if (allPassed) {
   console.error('One or more scripts failed.');
 }
 
+// Note: the across-the-board runner (run_multiply_ce.js, above) regenerates its
+// own combined_si.csv at the end of its run, so no separate refresh step is
+// needed here.
+
 reportSensitivityBuckets();
 
 if (!allPassed) process.exit(1);

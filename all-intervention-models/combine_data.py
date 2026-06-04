@@ -192,7 +192,7 @@ def parse_effects(df):
                 "effects": {}
             }
             
-        # Build the 6x8 values matrix
+        # Build the 6x9 values matrix (6 time periods x 9 risk profiles)
         values_matrix = []
         for t_std, t_aw in TIME_MAPPINGS:
             time_row = []

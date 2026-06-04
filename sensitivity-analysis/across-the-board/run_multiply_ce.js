@@ -598,6 +598,45 @@ writeCsv(join(FUND_DIR, 'ce_multiplier_si.csv'), siFields, siRows);
 writeCsv(join(CAUSE_DIR, 'cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
 writeCsv(join(CAUSE_DIR, 'cause_area_si.csv'), causeSiFields, causeSiRows);
 
+// ---------------------------------------------------------------------------
+// Refresh the derived combined_si.csv
+// ---------------------------------------------------------------------------
+// combined_si.csv joins the fund- and cause-level SI CSVs just written above
+// (cross_cluster_share = cluster_SI / fund_SI) and is read by
+// audit_invariants.py CHECK 8. It is NOT one of the writeCsv outputs above, so
+// regenerate it here from the canonical merge in reports/fund_cluster_compare.py
+// — otherwise it goes stale the moment the SI CSVs are rewritten. Uses the same
+// Python-interpreter resolution as the dataset generator above.
+{
+  const regenScript = join(dirname(__dirname), 'reports', 'regen_combined_si.py');
+  const candidates =
+    process.platform === 'win32' ? ['python', 'py', 'python3'] : ['python3', 'python'];
+  const pyEnv = { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' };
+  console.log('\nRefreshing combined_si.csv (reports/regen_combined_si.py)...');
+  let ran = false;
+  let lastErr = null;
+  for (const cmd of candidates) {
+    const result = spawnSync(cmd, [regenScript], { stdio: 'inherit', env: pyEnv });
+    if (result.error && result.error.code === 'ENOENT') {
+      lastErr = result.error;
+      continue;
+    }
+    if (result.status !== 0) {
+      console.error(`\nERROR: ${cmd} regen_combined_si.py exited with status ${result.status}.`);
+      process.exit(1);
+    }
+    ran = true;
+    break;
+  }
+  if (!ran) {
+    console.error(
+      `\nERROR: could not find a Python interpreter to refresh combined_si.csv (tried: ${candidates.join(', ')}).`
+    );
+    console.error(lastErr ? `Last error: ${lastErr.message}` : '');
+    process.exit(1);
+  }
+}
+
 console.log(
   `\nDR ceiling tests: ${drChecksPassed ? `PASS (${drCheckCount} scenarios checked)` : 'FAIL — see errors above'}`
 );

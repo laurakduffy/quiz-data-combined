@@ -9,12 +9,12 @@ worldview_idx,worldview_name,risk_profile,multiplier,sensitivity_index,diff_ghd,
 0,Total Utilitarian,0,moderate,0.0000,0.0000,0.0000,0.0000
 1,Total Utilitarian,7,baseline,0.0000,0.0000,0.0000,0.0000
 1,Total Utilitarian,7,0.1,42.0000,41.0000,1.0000,-42.0000
-1,Total Utilitarian,7,0.2,24.0000,24.0000,0.0000,-24.0000
+1,Total Utilitarian,7,0.2,24.0000,23.0000,1.0000,-24.0000
 1,Total Utilitarian,7,0.5,0.0000,0.0000,0.0000,0.0000
 1,Total Utilitarian,7,sentience_only,0.0000,0.0000,0.0000,0.0000
-1,Total Utilitarian,7,low_animals,75.0000,74.0000,1.0000,-75.0000
+1,Total Utilitarian,7,low_animals,75.0000,73.0000,2.0000,-75.0000
 1,Total Utilitarian,7,moderate_high,0.0000,0.0000,0.0000,0.0000
-1,Total Utilitarian,7,moderate,35.0000,35.0000,0.0000,-35.0000
+1,Total Utilitarian,7,moderate,35.0000,34.0000,1.0000,-35.0000
 2,Total Utilitarian,2,baseline,0.0000,0.0000,0.0000,0.0000
 2,Total Utilitarian,2,0.1,60.0000,60.0000,0.0000,-60.0000
 2,Total Utilitarian,2,0.2,42.0000,42.0000,0.0000,-42.0000
@@ -51,7 +51,7 @@ worldview_idx,worldview_name,risk_profile,multiplier,sensitivity_index,diff_ghd,
 6,Consequentialism (Non-Utilitarian),0,0.1,0.0000,0.0000,0.0000,0.0000
 6,Consequentialism (Non-Utilitarian),0,0.2,0.0000,0.0000,0.0000,0.0000
 6,Consequentialism (Non-Utilitarian),0,0.5,0.0000,0.0000,0.0000,0.0000
-6,Consequentialism (Non-Utilitarian),0,sentience_only,56.0000,0.0000,-56.0000,56.0000
+6,Consequentialism (Non-Utilitarian),0,sentience_only,55.0000,0.0000,-55.0000,55.0000
 6,Consequentialism (Non-Utilitarian),0,low_animals,0.0000,0.0000,0.0000,0.0000
 6,Consequentialism (Non-Utilitarian),0,moderate_high,44.0000,0.0000,-44.0000,44.0000
 6,Consequentialism (Non-Utilitarian),0,moderate,12.0000,0.0000,-12.0000,12.0000
@@ -59,7 +59,7 @@ worldview_idx,worldview_name,risk_profile,multiplier,sensitivity_index,diff_ghd,
 7,Consequentialism (Non-Utilitarian),0,0.1,12.0000,0.0000,12.0000,-12.0000
 7,Consequentialism (Non-Utilitarian),0,0.2,12.0000,0.0000,12.0000,-12.0000
 7,Consequentialism (Non-Utilitarian),0,0.5,9.0000,0.0000,9.0000,-9.0000
-7,Consequentialism (Non-Utilitarian),0,sentience_only,44.0000,0.0000,-44.0000,44.0000
+7,Consequentialism (Non-Utilitarian),0,sentience_only,43.0000,0.0000,-43.0000,43.0000
 7,Consequentialism (Non-Utilitarian),0,low_animals,12.0000,0.0000,12.0000,-12.0000
 7,Consequentialism (Non-Utilitarian),0,moderate_high,32.0000,0.0000,-32.0000,32.0000
 7,Consequentialism (Non-Utilitarian),0,moderate,0.0000,0.0000,0.0000,0.0000

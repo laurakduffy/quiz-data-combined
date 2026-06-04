@@ -16,14 +16,12 @@ from typing import Callable, Optional
 
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
-from docx.shared import Inches, Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
+# NOTE: matplotlib and python-docx are imported lazily inside the plotting and
+# docx-section functions below. Keeping them out of module scope means the CSV
+# merge/writer (merge_pair / write_combined_csv / build_all) — and callers like
+# regen_combined_si.py and run_all.js — only need pandas + numpy, not the full
+# Word-report toolchain.
 
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # parent sensitivity-analysis/ — input CSVs live here
@@ -214,6 +212,7 @@ def summary_stats_row(spec: AnalysisSpec, merged_df: pd.DataFrame) -> dict:
 # ── plotting ──────────────────────────────────────────────────────────────────
 
 def _fig_to_stream(fig):
+    import matplotlib.pyplot as plt
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
     buf.seek(0)
@@ -228,6 +227,10 @@ def scatter_fund_vs_cluster(merged_df: pd.DataFrame, title: str):
     sensitivity is cross-cluster; 0 = far above the diagonal = pure
     within-cluster reshuffling).
     """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
     active = merged_df[merged_df["fund_si"] > 0].copy()
     if active.empty:
         return None
@@ -286,6 +289,8 @@ def build_all(write_csvs: bool = True):
 # ── docx section builder ──────────────────────────────────────────────────────
 
 def _shade_row(row, hex_color="D9D9D9"):
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
     for cell in row.cells:
         tc = cell._tc
         tcPr = tc.get_or_add_tcPr()
@@ -297,6 +302,7 @@ def _shade_row(row, hex_color="D9D9D9"):
 
 
 def _add_table(doc, headers, rows, col_widths=None):
+    from docx.shared import Inches, Pt
     t = doc.add_table(rows=1, cols=len(headers))
     t.style = "Table Grid"
     hdr = t.rows[0]
@@ -319,10 +325,12 @@ def _add_table(doc, headers, rows, col_widths=None):
     return t
 
 
-def _add_picture(doc, stream, width=Inches(6)):
+def _add_picture(doc, stream, width=None):
+    from docx.shared import Inches
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
     if stream is None:
         return
-    doc.add_picture(stream, width=width)
+    doc.add_picture(stream, width=width if width is not None else Inches(6))
     doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
@@ -349,6 +357,9 @@ def build_fund_vs_cluster_section(doc, section_number=8, write_csvs=True,
 
     When write_csvs=True, also writes the per-analysis combined_si.csv files.
     """
+    from docx.shared import Inches
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
     h = doc.add_heading(
         f"{section_number}. Fund-Level vs Cluster-Level Sensitivity", level=1)
     h.alignment = WD_ALIGN_PARAGRAPH.LEFT

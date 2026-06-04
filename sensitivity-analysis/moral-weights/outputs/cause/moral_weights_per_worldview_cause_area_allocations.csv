@@ -9,12 +9,12 @@ worldview_idx,worldview_name,risk_profile,multiplier,ghd,gcr,aw,diff_ghd,diff_gc
 0,Total Utilitarian,0,moderate,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
 1,Total Utilitarian,7,baseline,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
 1,Total Utilitarian,7,0.1,60.0000,7.0000,33.0000,41.0000,1.0000,-42.0000
-1,Total Utilitarian,7,0.2,43.0000,6.0000,51.0000,24.0000,0.0000,-24.0000
+1,Total Utilitarian,7,0.2,42.0000,7.0000,51.0000,23.0000,1.0000,-24.0000
 1,Total Utilitarian,7,0.5,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
 1,Total Utilitarian,7,sentience_only,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
-1,Total Utilitarian,7,low_animals,93.0000,7.0000,0.0000,74.0000,1.0000,-75.0000
+1,Total Utilitarian,7,low_animals,92.0000,8.0000,0.0000,73.0000,2.0000,-75.0000
 1,Total Utilitarian,7,moderate_high,19.0000,6.0000,75.0000,0.0000,0.0000,0.0000
-1,Total Utilitarian,7,moderate,54.0000,6.0000,40.0000,35.0000,0.0000,-35.0000
+1,Total Utilitarian,7,moderate,53.0000,7.0000,40.0000,34.0000,1.0000,-35.0000
 2,Total Utilitarian,2,baseline,25.0000,0.0000,75.0000,0.0000,0.0000,0.0000
 2,Total Utilitarian,2,0.1,85.0000,0.0000,15.0000,60.0000,0.0000,-60.0000
 2,Total Utilitarian,2,0.2,67.0000,0.0000,33.0000,42.0000,0.0000,-42.0000
@@ -51,7 +51,7 @@ worldview_idx,worldview_name,risk_profile,multiplier,ghd,gcr,aw,diff_ghd,diff_gc
 6,Consequentialism (Non-Utilitarian),0,0.1,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
 6,Consequentialism (Non-Utilitarian),0,0.2,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
 6,Consequentialism (Non-Utilitarian),0,0.5,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
-6,Consequentialism (Non-Utilitarian),0,sentience_only,0.0000,44.0000,56.0000,0.0000,-56.0000,56.0000
+6,Consequentialism (Non-Utilitarian),0,sentience_only,0.0000,45.0000,55.0000,0.0000,-55.0000,55.0000
 6,Consequentialism (Non-Utilitarian),0,low_animals,0.0000,100.0000,0.0000,0.0000,0.0000,0.0000
 6,Consequentialism (Non-Utilitarian),0,moderate_high,0.0000,56.0000,44.0000,0.0000,-44.0000,44.0000
 6,Consequentialism (Non-Utilitarian),0,moderate,0.0000,88.0000,12.0000,0.0000,-12.0000,12.0000
@@ -59,7 +59,7 @@ worldview_idx,worldview_name,risk_profile,multiplier,ghd,gcr,aw,diff_ghd,diff_gc
 7,Consequentialism (Non-Utilitarian),0,0.1,0.0000,100.0000,0.0000,0.0000,12.0000,-12.0000
 7,Consequentialism (Non-Utilitarian),0,0.2,0.0000,100.0000,0.0000,0.0000,12.0000,-12.0000
 7,Consequentialism (Non-Utilitarian),0,0.5,0.0000,97.0000,3.0000,0.0000,9.0000,-9.0000
-7,Consequentialism (Non-Utilitarian),0,sentience_only,0.0000,44.0000,56.0000,0.0000,-44.0000,44.0000
+7,Consequentialism (Non-Utilitarian),0,sentience_only,0.0000,45.0000,55.0000,0.0000,-43.0000,43.0000
 7,Consequentialism (Non-Utilitarian),0,low_animals,0.0000,100.0000,0.0000,0.0000,12.0000,-12.0000
 7,Consequentialism (Non-Utilitarian),0,moderate_high,0.0000,56.0000,44.0000,0.0000,-32.0000,32.0000
 7,Consequentialism (Non-Utilitarian),0,moderate,0.0000,88.0000,12.0000,0.0000,0.0000,0.0000

@@ -19,6 +19,10 @@ mkdir -p "$LOG_DIR"
 
 CONCURRENCY="${CONCURRENCY:-$(nproc)}"
 NSAMPLES="${NSAMPLES:-1000000}"
+# Batches per fund. Peak RAM per process scales with samples-PER-BATCH
+# (NSAMPLES/NBATCHES), not total — so keep ~100k/batch (~3.8 GB). For 1M use 10,
+# for 10M use 100, etc.
+NBATCHES="${NBATCHES:-10}"
 SEED="${SEED:-43}"
 
 # Scenarios: explicit args, else every key in the JSON except noise_check
@@ -33,20 +37,20 @@ fi
 # NumPy's BLAS. Headless matplotlib backend (export_rp_csv imports pyplot).
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 MPLBACKEND=Agg
 
-echo "Running ${#SCENARIOS[@]} scenario(s), up to $CONCURRENCY at once, ${NSAMPLES} samples, seed ${SEED}."
+echo "Running ${#SCENARIOS[@]} scenario(s), up to $CONCURRENCY at once, ${NSAMPLES} samples in ${NBATCHES} batches, seed ${SEED}."
 echo "Logs: $LOG_DIR"
 start=$(date +%s)
 
 # xargs -P gives a clean process pool and a non-zero exit if any job fails.
 printf '%s\n' "${SCENARIOS[@]}" | xargs -P "$CONCURRENCY" -I {} bash -c '
-  name="$1"; py="$2"; n="$3"; seed="$4"; logdir="$5"
-  if python3 "$py" --scenario "$name" --n-samples "$n" --seed "$seed" --quiet --skip-tests \
+  name="$1"; py="$2"; n="$3"; seed="$4"; logdir="$5"; nb="$6"
+  if python3 "$py" --scenario "$name" --n-samples "$n" --n-batches "$nb" --seed "$seed" --quiet --skip-tests \
        > "$logdir/$name.log" 2> "$logdir/$name.err.log"; then
     echo "[ok]   $name"
   else
     echo "[FAIL] $name  (see $logdir/$name.err.log)"
   fi
-' _ {} "$PY" "$NSAMPLES" "$SEED" "$LOG_DIR"
+' _ {} "$PY" "$NSAMPLES" "$SEED" "$LOG_DIR" "$NBATCHES"
 rc=$?
 
 dur=$(( $(date +%s) - start ))

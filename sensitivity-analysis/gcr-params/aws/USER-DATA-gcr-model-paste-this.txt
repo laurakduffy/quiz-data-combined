@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Refresh the production GCR model at 10M samples, decoupled from the SA.
+# Runs on a SMALL box (e.g. m7i.2xlarge, 8 vCPU / 32 GB) — no vCPU-limit increase
+# needed (single serial process). Uploads gcr_output.csv to S3; then run
+# combine_data.py locally to build config/datasets/<date>.json.
+BUCKET="gcr-sa-2026"
+NSAMPLES="10000000"
+NBATCHES="100"
+SEED="43"
+BUNDLE_KEY="gcr-baseline-bundle.tar.gz"
+OUT_KEY="gcr_output_10M.csv"
+LOG_KEY="gcr-model-run.log"
+
+set -xeuo pipefail
+exec > /var/log/gcr-run.log 2>&1
+
+dnf install -y unzip tar gzip >/dev/null 2>&1 || yum install -y unzip tar gzip
+curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+unzip -q /tmp/awscliv2.zip -d /tmp
+/tmp/aws/install
+AWS=/usr/local/bin/aws
+
+cd /root
+"$AWS" s3 cp "s3://$BUCKET/$BUNDLE_KEY" ./bundle.tar.gz
+tar xzf bundle.tar.gz
+find quiz-demo -name '*.sh' -exec sed -i 's/\r$//' {} +
+
+NSAMPLES="$NSAMPLES" NBATCHES="$NBATCHES" SEED="$SEED" \
+  bash quiz-demo/sensitivity-analysis/gcr-params/aws/run_gcr_model.sh || true
+
+"$AWS" s3 cp quiz-demo/all-intervention-models/gcr-models-mc/outputs/gcr_output.csv \
+  "s3://$BUCKET/$OUT_KEY" || true
+"$AWS" s3 cp /var/log/gcr-run.log "s3://$BUCKET/$LOG_KEY" || true
+
+shutdown -h now

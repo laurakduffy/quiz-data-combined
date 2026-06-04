@@ -11,10 +11,10 @@
 /**
  * Calculate the value of a single effect within a project.
  *
- * @param {Object} effectData - Effect definition with `values` matrix (6 time periods x 4 risk profiles)
+ * @param {Object} effectData - Effect definition with `values` matrix (6 time periods x 9 risk profiles)
  * @param {number} moralWeight - Weight for this effect's recipient type
  * @param {number[]} discountFactors - 6-element array of time period discount factors
- * @param {number} riskProfile - Risk profile index (0-3, selects column in values matrix)
+ * @param {number} riskProfile - Risk profile index (0-8, selects column in values matrix)
  * @returns {number} Weighted value of this effect
  */
 export function calculateSingleEffect(effectData, moralWeight, discountFactors, riskProfile) {
@@ -32,7 +32,7 @@ export function calculateSingleEffect(effectData, moralWeight, discountFactors, 
  * @param {Object} projectData - Project definition with `effects` object
  * @param {Object} moralWeights - Moral weights keyed by recipient type
  * @param {number[]} discountFactors - 6-element array of time period discount factors
- * @param {number} riskProfile - Risk profile index (0-3)
+ * @param {number} riskProfile - Risk profile index (0-8)
  * @returns {number} Total project value
  */
 export function calculateProject(projectData, moralWeights, discountFactors, riskProfile) {
@@ -50,7 +50,7 @@ export function calculateProject(projectData, moralWeights, discountFactors, ris
  * @param {Object} data - All project definitions keyed by project ID
  * @param {Object} moralWeights - Moral weights keyed by recipient type
  * @param {number[]} discountFactors - 6-element array of time period discount factors
- * @param {number} riskProfile - Risk profile index (0-3)
+ * @param {number} riskProfile - Risk profile index (0-8)
  * @returns {Object} Project values keyed by project ID
  */
 export function calculateAllProjects(data, moralWeights, discountFactors, riskProfile) {

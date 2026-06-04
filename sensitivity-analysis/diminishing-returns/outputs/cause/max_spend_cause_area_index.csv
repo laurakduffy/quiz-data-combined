@@ -1,5 +1,5 @@
 scenario,max_addl_spend_multiplier,sensitivity_index,ghd_delta,gcr_delta,aw_delta
 baseline_5x,5,0.0000,0.00,0.00,0.00
-max_spend_2_5x,2.5,14.1515,14.15,-2.04,-12.12
-max_spend_7_5x,7.5,3.6660,-3.67,2.53,1.13
-max_spend_10x,10,5.4340,-4.44,5.43,-1.00
+max_spend_2_5x,2.5,14.1715,14.17,-2.06,-12.12
+max_spend_7_5x,7.5,3.4660,-3.47,2.53,0.93
+max_spend_10x,10,5.8340,-4.24,5.83,-1.60

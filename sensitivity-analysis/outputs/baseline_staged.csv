@@ -1,9 +1,9 @@
 fund,nashBargaining,credenceWeighted,mec,met,splitCycle,borda,weighted_combined
 ea_awf,7.29,7.33,0.00,10.00,12.50,0.00,12.78
-givewell,11.14,10.50,0.00,0.00,0.00,0.00,13.25
+givewell,11.14,10.50,0.00,0.00,0.00,0.00,13.05
 leaf,8.86,9.50,0.00,0.00,0.00,0.00,4.94
-longview_ai,34.86,34.83,0.00,0.00,0.00,0.00,23.22
-longview_nuclear,2.86,3.00,40.00,10.00,0.00,0.00,4.80
+longview_ai,34.86,34.83,0.00,0.00,0.00,0.00,23.32
+longview_nuclear,1.71,1.33,33.33,10.00,0.00,0.00,4.28
 navigation_fund_cagefree,26.71,27.83,0.00,60.00,87.50,100.00,15.64
 navigation_fund_general,1.14,0.00,0.00,0.00,0.00,0.00,18.06
-sentinel_bio,7.14,7.00,60.00,20.00,0.00,0.00,7.32
+sentinel_bio,8.29,8.67,66.67,20.00,0.00,0.00,7.94

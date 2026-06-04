@@ -1,9 +1,9 @@
 fund,nashBargaining_alloc_M,credenceWeighted_alloc_M,mec_alloc_M,met_alloc_M,splitCycle_alloc_M,borda_alloc_M,total_funding_M,allocation_pct
 ea_awf,21.00,21.00,34.00,34.00,34.00,34.00,25.55,12.78
-givewell,30.60,30.60,0.00,26.00,40.20,40.00,26.51,13.25
+givewell,30.60,30.60,0.00,22.00,40.20,40.00,26.11,13.05
 leaf,12.40,12.40,2.00,4.00,11.20,11.00,9.88,4.94
-longview_ai,69.90,69.90,0.00,10.00,0.00,0.00,46.44,23.22
-longview_nuclear,7.20,7.20,30.00,4.00,0.20,0.00,9.60,4.80
+longview_ai,69.90,69.90,0.00,12.00,0.00,0.00,46.64,23.32
+longview_nuclear,5.60,5.60,30.00,4.00,0.20,0.00,8.56,4.28
 navigation_fund_cagefree,30.90,30.90,32.00,32.00,32.00,32.00,31.28,15.64
 navigation_fund_general,15.20,15.20,64.00,84.00,82.20,83.00,36.12,18.06
-sentinel_bio,12.80,12.80,38.00,6.00,0.20,0.00,14.64,7.32
+sentinel_bio,14.40,14.40,38.00,8.00,0.20,0.00,15.88,7.94
