@@ -1,0 +1,134 @@
+scenario,description,method,ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
+baseline,,nashBargaining,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+baseline,,credenceWeighted,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+baseline,,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+baseline,,met,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+baseline,,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+baseline,,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+baseline,,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+cause_fractions_bio_nuclear_5x_higher,"Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",nashBargaining,10.50,15.20,6.20,28.45,5.90,15.45,7.55,10.75
+cause_fractions_bio_nuclear_5x_higher,"Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",credenceWeighted,10.50,15.20,6.20,28.45,5.90,15.45,7.55,10.75
+cause_fractions_bio_nuclear_5x_higher,"Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+cause_fractions_bio_nuclear_5x_higher,"Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",met,17.00,0.00,0.00,0.00,11.00,16.00,37.00,19.00
+cause_fractions_bio_nuclear_5x_higher,"Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",splitCycle,16.89,9.06,5.39,0.00,4.72,16.00,41.39,6.56
+cause_fractions_bio_nuclear_5x_higher,"Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",borda,17.00,13.00,6.00,0.00,2.50,16.00,41.50,4.00
+cause_fractions_bio_nuclear_5x_higher,"Cause fractions 5x higher: bio=0.15, nuclear=0.15, AI=0.66",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+cause_fractions_bio_nuclear_unequal,"Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",nashBargaining,10.50,15.30,6.20,34.95,7.20,15.45,7.60,2.80
+cause_fractions_bio_nuclear_unequal,"Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",credenceWeighted,10.50,15.30,6.20,34.95,7.20,15.45,7.60,2.80
+cause_fractions_bio_nuclear_unequal,"Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+cause_fractions_bio_nuclear_unequal,"Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",met,17.00,14.00,2.00,5.00,3.00,16.00,42.00,1.00
+cause_fractions_bio_nuclear_unequal,"Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+cause_fractions_bio_nuclear_unequal,"Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+cause_fractions_bio_nuclear_unequal,"Cause fractions for bio and nuclear unequal: bio=0.02, nuclear=0.04, AI=0.90",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+cause_fractions_bio_nuclear_unequal_1,"Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",nashBargaining,10.50,15.30,6.20,34.95,0.50,15.45,7.60,9.50
+cause_fractions_bio_nuclear_unequal_1,"Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",credenceWeighted,10.50,15.30,6.20,34.95,0.50,15.45,7.60,9.50
+cause_fractions_bio_nuclear_unequal_1,"Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+cause_fractions_bio_nuclear_unequal_1,"Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",met,17.00,8.00,2.00,6.00,1.00,16.00,42.00,8.00
+cause_fractions_bio_nuclear_unequal_1,"Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+cause_fractions_bio_nuclear_unequal_1,"Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+cause_fractions_bio_nuclear_unequal_1,"Cause fractions for bio and nuclear unequal: bio=0.04, nuclear=0.02, AI=0.90",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+cause_fractions_bio_nuclear_unequal_2,"Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",nashBargaining,10.50,15.30,6.20,34.95,0.00,15.45,7.60,10.00
+cause_fractions_bio_nuclear_unequal_2,"Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",credenceWeighted,10.50,15.30,6.20,34.95,0.00,15.45,7.60,10.00
+cause_fractions_bio_nuclear_unequal_2,"Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+cause_fractions_bio_nuclear_unequal_2,"Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",met,17.00,11.00,2.00,6.00,0.00,16.00,42.00,6.00
+cause_fractions_bio_nuclear_unequal_2,"Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+cause_fractions_bio_nuclear_unequal_2,"Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",borda,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+cause_fractions_bio_nuclear_unequal_2,"Cause fractions for bio and nuclear unequal: bio=0.05, nuclear=0.01, AI=0.90",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+cause_fractions_equal,"Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",nashBargaining,11.61,14.66,6.11,9.80,15.00,15.46,8.36,19.00
+cause_fractions_equal,"Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",credenceWeighted,11.61,14.66,6.11,9.80,15.00,15.46,8.36,19.00
+cause_fractions_equal,"Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+cause_fractions_equal,"Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",met,17.00,0.00,0.00,0.00,11.00,16.00,39.00,17.00
+cause_fractions_equal,"Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",splitCycle,16.78,0.11,0.11,0.00,12.78,16.00,36.78,17.44
+cause_fractions_equal,"Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",borda,17.00,18.00,6.00,0.00,0.00,16.00,42.00,1.00
+cause_fractions_equal,"Cause fractions uniform: bio=0.32, nuclear=0.32, AI=0.32",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+near_pessimistic_outcomes,p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50,nashBargaining,16.15,17.80,7.15,30.00,0.00,15.70,13.20,0.00
+near_pessimistic_outcomes,p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50,credenceWeighted,16.15,17.80,7.15,30.00,0.00,15.70,13.20,0.00
+near_pessimistic_outcomes,p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50,mec,17.00,25.00,6.00,0.00,0.00,16.00,36.00,0.00
+near_pessimistic_outcomes,p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50,met,17.00,22.00,3.00,0.00,0.00,16.00,42.00,0.00
+near_pessimistic_outcomes,p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50,splitCycle,17.00,20.17,5.67,0.00,0.00,16.00,41.17,0.00
+near_pessimistic_outcomes,p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+near_pessimistic_outcomes,p(positive) - p(harm) = 0.05; p_zero unchanged at 0.50,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+no_cubic_growth,Degenerate: no stellar expansion at all (p_cubic_growth = 0),nashBargaining,8.65,15.15,4.85,34.95,9.15,15.35,6.05,5.85
+no_cubic_growth,Degenerate: no stellar expansion at all (p_cubic_growth = 0),credenceWeighted,8.65,15.15,4.85,34.95,9.15,15.35,6.05,5.85
+no_cubic_growth,Degenerate: no stellar expansion at all (p_cubic_growth = 0),mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+no_cubic_growth,Degenerate: no stellar expansion at all (p_cubic_growth = 0),met,17.00,11.00,2.00,6.00,4.00,16.00,42.00,2.00
+no_cubic_growth,Degenerate: no stellar expansion at all (p_cubic_growth = 0),splitCycle,17.00,0.17,0.17,0.00,15.00,16.00,32.67,19.00
+no_cubic_growth,Degenerate: no stellar expansion at all (p_cubic_growth = 0),borda,17.00,15.00,5.67,0.00,2.00,16.00,41.67,2.67
+no_cubic_growth,Degenerate: no stellar expansion at all (p_cubic_growth = 0),lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+noise_check,No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).,nashBargaining,10.50,15.30,6.20,34.95,2.70,15.45,7.60,7.30
+noise_check,No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).,credenceWeighted,10.50,15.30,6.20,34.95,2.70,15.45,7.60,7.30
+noise_check,No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+noise_check,No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).,met,17.00,10.00,2.00,6.00,2.00,16.00,42.00,5.00
+noise_check,No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+noise_check,No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+noise_check,No-op null check. Run at an offset --seed (e.g. 53) so its draws differ from the baseline; its SI vs baseline is then the pure Monte Carlo noise floor (anything below it is not a real signal).,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+p_harm_25pct_higher,p(harm) 25 percent higher; p(zero) constant at 50%,nashBargaining,10.75,15.30,6.25,34.60,2.70,15.45,7.65,7.30
+p_harm_25pct_higher,p(harm) 25 percent higher; p(zero) constant at 50%,credenceWeighted,10.75,15.30,6.25,34.60,2.70,15.45,7.65,7.30
+p_harm_25pct_higher,p(harm) 25 percent higher; p(zero) constant at 50%,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+p_harm_25pct_higher,p(harm) 25 percent higher; p(zero) constant at 50%,met,17.00,16.00,2.00,0.00,2.00,16.00,42.00,5.00
+p_harm_25pct_higher,p(harm) 25 percent higher; p(zero) constant at 50%,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+p_harm_25pct_higher,p(harm) 25 percent higher; p(zero) constant at 50%,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+p_harm_25pct_higher,p(harm) 25 percent higher; p(zero) constant at 50%,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+p_zero_5x_lower,p(zero impact) 5x lower; surplus redistributed proportionally,nashBargaining,10.50,15.30,6.20,35.00,4.00,15.45,7.55,6.00
+p_zero_5x_lower,p(zero impact) 5x lower; surplus redistributed proportionally,credenceWeighted,10.50,15.30,6.20,35.00,4.00,15.45,7.55,6.00
+p_zero_5x_lower,p(zero impact) 5x lower; surplus redistributed proportionally,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+p_zero_5x_lower,p(zero impact) 5x lower; surplus redistributed proportionally,met,17.00,7.00,5.00,0.00,5.00,16.00,42.00,8.00
+p_zero_5x_lower,p(zero impact) 5x lower; surplus redistributed proportionally,splitCycle,16.89,16.06,5.72,0.00,1.56,16.00,41.22,2.56
+p_zero_5x_lower,p(zero impact) 5x lower; surplus redistributed proportionally,borda,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+p_zero_5x_lower,p(zero impact) 5x lower; surplus redistributed proportionally,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+p_zero_75_pct,p(zero impact) =75%; P(harm)/p(positive) ratio unchanged,nashBargaining,10.90,15.30,6.30,34.25,2.40,15.45,7.80,7.60
+p_zero_75_pct,p(zero impact) =75%; P(harm)/p(positive) ratio unchanged,credenceWeighted,10.90,15.30,6.30,34.25,2.40,15.45,7.80,7.60
+p_zero_75_pct,p(zero impact) =75%; P(harm)/p(positive) ratio unchanged,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+p_zero_75_pct,p(zero impact) =75%; P(harm)/p(positive) ratio unchanged,met,17.00,22.00,2.00,0.00,0.00,16.00,42.00,1.00
+p_zero_75_pct,p(zero impact) =75%; P(harm)/p(positive) ratio unchanged,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+p_zero_75_pct,p(zero impact) =75%; P(harm)/p(positive) ratio unchanged,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+p_zero_75_pct,p(zero impact) =75%; P(harm)/p(positive) ratio unchanged,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+r_inf_100x_down,"Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",nashBargaining,10.50,15.30,6.20,34.95,0.20,15.45,7.60,9.80
+r_inf_100x_down,"Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",credenceWeighted,10.50,15.30,6.20,34.95,0.20,15.45,7.60,9.80
+r_inf_100x_down,"Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+r_inf_100x_down,"Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",met,17.00,1.00,2.00,6.00,2.00,16.00,42.00,14.00
+r_inf_100x_down,"Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+r_inf_100x_down,"Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+r_inf_100x_down,"Background x-risk floor 100x lower   (ci_90: [1e-10, 5e-7])",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",nashBargaining,10.55,15.30,6.20,34.80,0.20,15.45,7.70,9.80
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",credenceWeighted,10.55,15.30,6.20,34.80,0.20,15.45,7.70,9.80
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",met,17.00,12.00,2.00,0.00,1.00,16.00,42.00,10.00
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+r_inf_100x_up,"Background x-risk floor 100x higher  (ci_90: [1e-6, 5e-3])",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+rel_risk_100x_down,Relative risk reduction 100x lower for all GCR funds,nashBargaining,12.25,20.00,8.35,25.00,2.80,15.50,8.90,7.20
+rel_risk_100x_down,Relative risk reduction 100x lower for all GCR funds,credenceWeighted,12.25,20.00,8.35,25.00,2.80,15.50,8.90,7.20
+rel_risk_100x_down,Relative risk reduction 100x lower for all GCR funds,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+rel_risk_100x_down,Relative risk reduction 100x lower for all GCR funds,met,17.00,47.00,8.00,0.00,0.00,16.00,12.00,0.00
+rel_risk_100x_down,Relative risk reduction 100x lower for all GCR funds,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+rel_risk_100x_down,Relative risk reduction 100x lower for all GCR funds,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+rel_risk_100x_down,Relative risk reduction 100x lower for all GCR funds,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+rel_risk_10x_down,Relative risk reduction 10x lower for all GCR funds,nashBargaining,12.25,20.00,8.35,25.00,2.80,15.50,8.90,7.20
+rel_risk_10x_down,Relative risk reduction 10x lower for all GCR funds,credenceWeighted,12.25,20.00,8.35,25.00,2.80,15.50,8.90,7.20
+rel_risk_10x_down,Relative risk reduction 10x lower for all GCR funds,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+rel_risk_10x_down,Relative risk reduction 10x lower for all GCR funds,met,17.00,18.00,6.00,0.00,0.00,16.00,42.00,1.00
+rel_risk_10x_down,Relative risk reduction 10x lower for all GCR funds,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+rel_risk_10x_down,Relative risk reduction 10x lower for all GCR funds,borda,17.00,46.00,6.50,0.00,0.00,16.00,14.50,0.00
+rel_risk_10x_down,Relative risk reduction 10x lower for all GCR funds,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+rel_risk_10x_up,Relative risk reduction 10x higher for all GCR funds,nashBargaining,10.45,12.35,4.30,35.00,4.90,15.45,7.45,10.10
+rel_risk_10x_up,Relative risk reduction 10x higher for all GCR funds,credenceWeighted,10.45,12.35,4.30,35.00,4.90,15.45,7.45,10.10
+rel_risk_10x_up,Relative risk reduction 10x higher for all GCR funds,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+rel_risk_10x_up,Relative risk reduction 10x higher for all GCR funds,met,17.00,0.00,0.00,23.00,9.00,16.00,16.00,19.00
+rel_risk_10x_up,Relative risk reduction 10x higher for all GCR funds,splitCycle,16.50,0.00,0.00,14.00,14.33,16.00,20.83,18.33
+rel_risk_10x_up,Relative risk reduction 10x higher for all GCR funds,borda,17.00,19.00,5.50,0.00,0.00,16.00,41.50,1.00
+rel_risk_10x_up,Relative risk reduction 10x higher for all GCR funds,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+s_10x_faster,"Stellar settlement speed ~10x faster, but capped at 0.2",nashBargaining,10.50,15.30,6.20,34.95,0.30,15.45,7.60,9.70
+s_10x_faster,"Stellar settlement speed ~10x faster, but capped at 0.2",credenceWeighted,10.50,15.30,6.20,34.95,0.30,15.45,7.60,9.70
+s_10x_faster,"Stellar settlement speed ~10x faster, but capped at 0.2",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+s_10x_faster,"Stellar settlement speed ~10x faster, but capped at 0.2",met,17.00,1.00,2.00,6.00,2.00,16.00,42.00,14.00
+s_10x_faster,"Stellar settlement speed ~10x faster, but capped at 0.2",splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+s_10x_faster,"Stellar settlement speed ~10x faster, but capped at 0.2",borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+s_10x_faster,"Stellar settlement speed ~10x faster, but capped at 0.2",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+s_current_speeds,"Stellar settlement speed constant at 4e-5, the current speed of ships",nashBargaining,10.50,15.30,6.20,34.95,3.60,15.45,7.60,6.40
+s_current_speeds,"Stellar settlement speed constant at 4e-5, the current speed of ships",credenceWeighted,10.50,15.30,6.20,34.95,3.60,15.45,7.60,6.40
+s_current_speeds,"Stellar settlement speed constant at 4e-5, the current speed of ships",mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+s_current_speeds,"Stellar settlement speed constant at 4e-5, the current speed of ships",met,17.00,12.00,2.00,6.00,2.00,16.00,42.00,3.00
+s_current_speeds,"Stellar settlement speed constant at 4e-5, the current speed of ships",splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+s_current_speeds,"Stellar settlement speed constant at 4e-5, the current speed of ships",borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+s_current_speeds,"Stellar settlement speed constant at 4e-5, the current speed of ships",lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00

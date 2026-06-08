@@ -14,9 +14,10 @@
  *        [--base PATH] [--worldviews-file PATH] [--approach weighted|staged]
  *
  * Outputs (written to outputs/):
- *   discount_fund_si.csv                — fund-level SI (½ Σ|Δpp| across funds) + cause-area SI + per-fund diffs
- *   discount_cause_area_allocations.csv — cause-area allocations per scenario
- *   discount_cause_area_si.csv          — cause-area SI per scenario
+ *   fund/discount_fund_si.csv                — fund-level SI (½ Σ|Δpp| across funds) + cause-area SI + per-fund diffs
+ *   fund/discount_allocations_by_method.csv  — per (scenario_group × multiplier): per-fund allocation % under each of the 7 aggregation methods
+ *   cause/discount_cause_area_allocations.csv — cause-area allocations per scenario
+ *   cause/discount_cause_area_si.csv          — cause-area SI per scenario
  */
 
 import { fileURLToPath } from 'url';
@@ -35,6 +36,8 @@ import {
   loadJson,
   loadDataset,
   loadSaWorldviews,
+  loadAggMethods,
+  allocationsByMethod,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -74,6 +77,30 @@ const weightedMethods = stages.map((s) => ({
 }));
 
 const { scenarios } = loadJson(join(__dirname, 'discount_scenarios.json'));
+
+// Per-aggregation-method breakdown: for each scenario point, how does each of the
+// 7 aggregation methods split the budget? stageOptions preserves nashBargaining's
+// disagreementPoint from baseline.json.
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(weightedMethods.map((m) => [m.jsKey, m.options]));
+const methodRows = []; // discount_allocations_by_method.csv (scenario × method)
+const pushMethodRows = (scenarioGroup, multiplier, wvs) => {
+  for (const { jsKey, allocations } of allocationsByMethod(
+    aggMethods,
+    baselineDataset.projects,
+    wvs,
+    totalBudget,
+    baselineDataset.incrementSize,
+    { drStepSize: baselineDataset.drStepSize, stageOptions }
+  )) {
+    methodRows.push({
+      scenario_group: scenarioGroup,
+      multiplier,
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((f) => [f, (allocations[f] ?? 0).toFixed(2)])),
+    });
+  }
+};
 
 // Normalise each group's index spec: "indeces" or "indices", integer or array.
 function getIndices(groupDef) {
@@ -165,6 +192,8 @@ const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Baseline top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
 const caKeys = ['ghd', 'gcr', 'aw'];
+
+pushMethodRows('baseline', '1.0', worldviews);
 
 let drChecksPassed = true;
 let drCheckCount = 0;
@@ -316,6 +345,8 @@ for (const [groupName, groupDef] of Object.entries(scenarios)) {
       ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
     });
 
+    pushMethodRows(groupName, String(multiplier), modifiedWvs);
+
     const topFund = fundIds.reduce((a, b) => (combined[a] > combined[b] ? a : b));
     console.log(
       `    ${label.padEnd(8)}  fund_SI=${siMaxAbs.toFixed(2)}pp  cluster_SI=${causeMaxAbs.toFixed(2)}pp  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
@@ -332,6 +363,11 @@ mkdirSync(FUND_DIR, { recursive: true });
 mkdirSync(CAUSE_DIR, { recursive: true });
 
 writeCsv(join(FUND_DIR, 'discount_fund_si.csv'), siFields, siRows);
+writeCsv(
+  join(FUND_DIR, 'discount_allocations_by_method.csv'),
+  ['scenario_group', 'multiplier', 'method', ...fundIds],
+  methodRows
+);
 writeCsv(join(CAUSE_DIR, 'discount_cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
 writeCsv(join(CAUSE_DIR, 'discount_cause_area_si.csv'), causeSiFields, causeSiRows);
 

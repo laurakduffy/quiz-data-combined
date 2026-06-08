@@ -98,7 +98,10 @@ node sensitivity-analysis/across-the-board/run_multiply_ce.js
 ```
 
 Outputs land in `outputs/fund/` (per-fund allocations + SI) and `outputs/cause/`
-(per cause-area).
+(per cause-area). `outputs/fund/ce_multiplier_allocations_by_method.csv` additionally
+breaks each scenario's per-fund allocation down by each of the 7 aggregation methods
+(one row per `fund_varied` × `multiplier` × `method`); the combined credence-weighted
+allocation is the budget-weighted blend of those per-method splits.
 
 > **`outputs/combined_si.csv` is a *derived* file.** It joins the fund- and
 > cause-level SI CSVs (`cross_cluster_share = cluster_SI / fund_SI`) and is read

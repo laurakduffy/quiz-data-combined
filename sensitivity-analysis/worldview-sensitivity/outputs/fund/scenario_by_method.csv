@@ -1,0 +1,204 @@
+scenario,worldview,bound,method,credence_scenario,ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
+baseline,baseline,baseline,nashBargaining,,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+baseline,baseline,baseline,credenceWeighted,,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+baseline,baseline,baseline,mec,,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+baseline,baseline,baseline,met,,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+baseline,baseline,baseline,splitCycle,,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+baseline,baseline,baseline,borda,,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+baseline,baseline,baseline,lexicographicMaximin,,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,nashBargaining,0.0500,11.45,16.41,6.49,31.34,2.96,15.46,8.29,7.60
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,credenceWeighted,0.0500,11.45,16.41,6.49,31.34,2.96,15.46,8.29,7.60
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,mec,0.0500,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,met,0.0500,17.00,14.00,5.00,0.00,2.00,16.00,42.00,4.00
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,splitCycle,0.0500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,borda,0.0500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Total Utilitarianism — Default_low,Total Utilitarianism — Default,low,lexicographicMaximin,0.0500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,nashBargaining,0.2500,7.83,11.96,5.38,45.79,2.17,15.29,5.42,6.17
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,credenceWeighted,0.2500,7.83,11.96,5.38,45.79,2.17,15.29,5.42,6.17
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,mec,0.2500,0.00,0.00,0.00,92.00,3.00,0.00,0.00,5.00
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,met,0.2500,17.00,14.00,2.00,6.00,1.00,16.00,42.00,2.00
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,splitCycle,0.2500,6.50,0.00,0.00,71.00,1.50,15.17,3.83,2.00
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,borda,0.2500,17.00,18.08,6.08,0.08,0.08,16.00,41.58,1.08
+Total Utilitarianism — Default_high,Total Utilitarianism — Default,high,lexicographicMaximin,0.2500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,nashBargaining,0.0500,8.77,16.36,5.91,36.89,2.96,15.37,6.14,7.60
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,credenceWeighted,0.0500,8.77,16.36,5.91,36.89,2.96,15.37,6.14,7.60
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,mec,0.0500,17.00,0.00,2.00,0.00,15.00,16.00,31.00,19.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,met,0.0500,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,splitCycle,0.0500,17.00,14.00,6.00,0.00,2.00,16.00,42.00,3.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,borda,0.0500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_low","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",low,lexicographicMaximin,0.0500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,nashBargaining,0.2000,14.44,13.51,6.18,31.07,2.40,15.53,10.38,6.49
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,credenceWeighted,0.2000,14.44,13.51,6.18,31.07,2.40,15.53,10.38,6.49
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,mec,0.2000,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,met,0.2000,17.00,14.00,2.00,6.00,1.00,16.00,42.00,2.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,splitCycle,0.2000,17.00,14.00,5.00,6.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,borda,0.2000,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+"Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios_high","Total Utilitarianism — Person-Affecting/Cluelessness, Sentience-only discounts, Empirical disbelief in upside scenarios",high,lexicographicMaximin,0.2000,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,nashBargaining,0.0500,8.80,16.36,5.91,36.89,2.96,15.36,6.12,7.60
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,credenceWeighted,0.0500,8.80,16.36,5.91,36.89,2.96,15.36,6.12,7.60
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,mec,0.0500,0.00,0.00,0.00,66.00,15.00,0.00,0.00,19.00
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,met,0.0500,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,splitCycle,0.0500,17.00,16.08,5.58,0.08,1.58,16.00,41.08,2.58
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,borda,0.0500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Total Utilitarianism — Weighted Linear Utility_low,Total Utilitarianism — Weighted Linear Utility,low,lexicographicMaximin,0.0500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,nashBargaining,0.2000,14.38,13.51,6.18,31.07,2.40,15.53,10.44,6.49
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,credenceWeighted,0.2000,14.38,13.51,6.18,31.07,2.40,15.53,10.44,6.49
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,mec,0.2000,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,met,0.2000,17.00,14.00,5.00,0.00,2.00,16.00,42.00,4.00
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,splitCycle,0.2000,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,borda,0.2000,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Total Utilitarianism — Weighted Linear Utility_high,Total Utilitarianism — Weighted Linear Utility,high,lexicographicMaximin,0.2000,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,nashBargaining,0.0200,9.54,15.89,6.03,36.05,2.89,15.47,6.70,7.43
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,credenceWeighted,0.0200,9.54,15.89,6.03,36.05,2.89,15.47,6.70,7.43
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,mec,0.0200,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,met,0.0200,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,splitCycle,0.0200,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,borda,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_low","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",low,lexicographicMaximin,0.0200,0.00,94.00,6.00,0.00,0.00,0.00,0.00,0.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,nashBargaining,0.1500,14.09,13.60,6.17,31.27,2.42,15.66,10.26,6.53
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,credenceWeighted,0.1500,14.09,13.60,6.17,31.27,2.42,15.66,10.26,6.53
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,mec,0.1500,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,met,0.1500,17.00,14.00,5.00,0.00,2.00,16.00,42.00,4.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,splitCycle,0.1500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,borda,0.1500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — High life value, risk averse, and skeptical of upside cases_high","Total Utilitarianism — High life value, risk averse, and skeptical of upside cases",high,lexicographicMaximin,0.1500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,nashBargaining,0.0200,9.43,15.89,6.09,36.05,2.89,15.47,6.76,7.43
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,credenceWeighted,0.0200,9.43,15.89,6.09,36.05,2.89,15.47,6.76,7.43
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,mec,0.0200,17.00,0.00,2.00,0.00,15.00,16.00,31.00,19.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,met,0.0200,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,splitCycle,0.0200,17.00,19.10,6.10,0.00,0.10,16.00,41.60,0.10
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,borda,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_low","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",low,lexicographicMaximin,0.0200,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,nashBargaining,0.1500,14.30,13.56,6.17,31.27,2.42,15.53,10.22,6.53
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,credenceWeighted,0.1500,14.30,13.56,6.17,31.27,2.42,15.53,10.22,6.53
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,mec,0.1500,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,met,0.1500,17.00,14.00,2.00,6.00,1.00,16.00,42.00,2.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,splitCycle,0.1500,17.00,9.00,6.00,10.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,borda,0.1500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+"Total Utilitarianism — Suffering forward, clueless, and only sentience discount_high","Total Utilitarianism — Suffering forward, clueless, and only sentience discount",high,lexicographicMaximin,0.1500,0.00,93.00,7.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,nashBargaining,0.0200,11.09,15.94,6.34,32.90,2.89,15.47,7.94,7.43
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,credenceWeighted,0.0200,11.09,15.94,6.34,32.90,2.89,15.47,7.94,7.43
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,mec,0.0200,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,met,0.0200,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,splitCycle,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,borda,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — Default_low,Non-Utilitarian Consequentialism — Default,low,lexicographicMaximin,0.0200,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,nashBargaining,0.2000,8.00,12.13,5.43,45.22,2.27,15.33,5.47,6.15
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,credenceWeighted,0.2000,8.00,12.13,5.43,45.22,2.27,15.33,5.47,6.15
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,mec,0.2000,0.00,0.00,0.00,92.00,3.00,0.00,0.00,5.00
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,met,0.2000,17.00,13.00,2.00,6.00,1.00,16.00,42.00,3.00
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,splitCycle,0.2000,6.00,0.00,2.50,68.00,2.00,16.00,3.50,2.00
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,borda,0.2000,14.00,46.00,6.00,0.00,3.00,16.00,10.00,5.00
+Non-Utilitarian Consequentialism — Default_high,Non-Utilitarian Consequentialism — Default,high,lexicographicMaximin,0.2000,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,nashBargaining,0.0200,11.09,15.94,6.34,32.90,2.89,15.47,7.94,7.43
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,credenceWeighted,0.0200,11.09,15.94,6.34,32.90,2.89,15.47,7.94,7.43
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,mec,0.0200,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,met,0.0200,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,splitCycle,0.0200,17.00,19.20,6.20,0.00,0.20,16.00,41.20,0.20
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,borda,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_low,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,low,lexicographicMaximin,0.0200,0.00,90.00,10.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,nashBargaining,0.1500,8.86,13.20,5.68,41.80,2.42,15.34,6.17,6.53
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,credenceWeighted,0.1500,8.86,13.20,5.68,41.80,2.42,15.34,6.17,6.53
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,mec,0.1500,17.00,0.00,2.00,0.00,15.00,16.00,31.00,19.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,met,0.1500,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,splitCycle,0.1500,16.67,12.00,5.83,0.00,7.50,16.00,31.00,11.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,borda,0.1500,17.00,18.00,6.00,0.00,0.00,16.00,42.00,1.00
+Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals_high,Non-Utilitarian Consequentialism — High Life Value / Cluelessness / Low animals,high,lexicographicMaximin,0.1500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,nashBargaining,0.0200,11.09,15.94,6.34,32.93,2.89,15.44,7.94,7.43
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,credenceWeighted,0.0200,11.09,15.94,6.34,32.93,2.89,15.44,7.94,7.43
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,mec,0.0200,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,met,0.0200,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,splitCycle,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,borda,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_low,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,low,lexicographicMaximin,0.0200,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,nashBargaining,0.2000,7.96,12.13,5.47,45.06,2.27,15.40,5.56,6.15
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,credenceWeighted,0.2000,7.96,12.13,5.47,45.06,2.27,15.40,5.56,6.15
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,mec,0.2000,17.00,0.00,5.00,0.00,15.00,16.00,28.00,19.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,met,0.2000,17.00,14.00,2.00,6.00,1.00,16.00,42.00,2.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,splitCycle,0.2000,7.00,0.00,5.00,64.00,2.00,16.00,4.00,2.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,borda,0.2000,10.00,55.00,7.00,0.00,2.00,16.00,7.00,3.00
+Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness_high,Non-Utilitarian Consequentialism — Person-Affecting/Cluelessness,high,lexicographicMaximin,0.2000,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,nashBargaining,0.0200,9.92,15.89,5.25,36.05,2.89,15.45,7.13,7.43
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,credenceWeighted,0.0200,9.92,15.89,5.25,36.05,2.89,15.45,7.13,7.43
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,mec,0.0200,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,met,0.0200,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,splitCycle,0.0200,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,borda,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_low,Non-Utilitarian Consequentialism — Weighted Linear Utility,low,lexicographicMaximin,0.0200,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,nashBargaining,0.1500,11.66,17.53,6.67,31.27,2.42,15.48,8.45,6.53
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,credenceWeighted,0.1500,11.66,17.53,6.67,31.27,2.42,15.48,8.45,6.53
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,mec,0.1500,17.00,0.00,3.00,0.00,15.00,16.00,30.00,19.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,met,0.1500,17.00,14.00,5.00,0.00,2.00,16.00,42.00,4.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,splitCycle,0.1500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,borda,0.1500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Non-Utilitarian Consequentialism — Weighted Linear Utility_high,Non-Utilitarian Consequentialism — Weighted Linear Utility,high,lexicographicMaximin,0.1500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,nashBargaining,0.0500,11.45,16.41,6.49,36.89,1.05,15.46,8.29,3.95
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,credenceWeighted,0.0500,11.45,16.41,6.49,36.89,1.05,15.46,8.29,3.95
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,mec,0.0500,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,met,0.0500,17.00,13.00,2.00,6.00,1.00,16.00,42.00,3.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,splitCycle,0.0500,17.00,16.00,5.50,4.00,0.00,16.00,41.50,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,borda,0.0500,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,low,lexicographicMaximin,0.0500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,nashBargaining,0.2500,7.83,11.96,5.38,29.13,7.75,15.29,5.42,17.25
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,credenceWeighted,0.2500,7.83,11.96,5.38,29.13,7.75,15.29,5.42,17.25
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,mec,0.2500,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,met,0.2500,17.00,1.00,5.00,0.00,6.00,16.00,42.00,13.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,splitCycle,0.2500,17.00,0.13,0.13,0.00,14.97,16.00,32.80,18.97
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,borda,0.2500,17.00,19.00,6.00,0.00,0.00,16.00,41.50,0.50
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline,high,lexicographicMaximin,0.2500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,nashBargaining,0.0100,12.15,17.38,6.65,28.45,3.08,15.51,8.85,7.92
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,credenceWeighted,0.0100,12.15,17.38,6.65,28.45,3.08,15.51,8.85,7.92
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,mec,0.0100,17.00,0.00,2.00,0.00,15.00,16.00,31.00,19.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,met,0.0100,17.00,13.00,5.00,0.00,2.00,16.00,42.00,5.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,splitCycle,0.0100,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,borda,0.0100,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_low,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,low,lexicographicMaximin,0.0100,0.00,93.00,7.00,0.00,0.00,0.00,0.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,nashBargaining,0.2000,8.76,13.07,5.69,42.18,2.40,15.33,6.09,6.49
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,credenceWeighted,0.2000,8.76,13.07,5.69,42.18,2.40,15.33,6.09,6.49
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,mec,0.2000,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,met,0.2000,17.00,13.00,2.00,6.00,1.00,16.00,42.00,3.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,splitCycle,0.2000,17.00,0.00,3.50,5.00,6.83,16.00,41.67,10.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,borda,0.2000,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral_high,Contractualism — Person-Affecting/Cluelessness and Animals Baseline - Risk Neutral,high,lexicographicMaximin,0.2000,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,nashBargaining,0.0200,11.04,13.81,5.42,36.05,2.89,15.42,7.94,7.43
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,credenceWeighted,0.0200,11.04,13.81,5.42,36.05,2.89,15.42,7.94,7.43
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,mec,0.0200,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,met,0.0200,17.00,13.00,2.00,6.00,1.00,16.00,42.00,3.00
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,splitCycle,0.0200,17.00,13.00,6.00,6.00,0.00,16.00,42.00,0.00
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,borda,0.0200,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Contractualism — Default + cluelessness_low,Contractualism — Default + cluelessness,low,lexicographicMaximin,0.0200,0.00,93.00,7.00,0.00,0.00,0.00,0.00,0.00
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,nashBargaining,0.1500,8.86,23.40,6.01,31.27,2.42,15.34,6.17,6.53
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,credenceWeighted,0.1500,8.86,23.40,6.01,31.27,2.42,15.34,6.17,6.53
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,mec,0.1500,17.00,0.00,2.00,0.00,15.00,16.00,31.00,19.00
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,met,0.1500,17.00,1.00,5.00,0.00,6.00,16.00,42.00,13.00
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,splitCycle,0.1500,8.50,63.50,6.50,0.00,0.00,15.50,6.00,0.00
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,borda,0.1500,17.00,48.00,7.00,0.00,0.00,16.00,12.00,0.00
+Contractualism — Default + cluelessness_high,Contractualism — Default + cluelessness,high,lexicographicMaximin,0.1500,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Kantianism — Low animals_low,Kantianism — Low animals,low,nashBargaining,0.0100,11.20,12.24,6.11,36.42,2.92,15.53,8.08,7.50
+Kantianism — Low animals_low,Kantianism — Low animals,low,credenceWeighted,0.0100,11.20,12.24,6.11,36.42,2.92,15.53,8.08,7.50
+Kantianism — Low animals_low,Kantianism — Low animals,low,mec,0.0100,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Kantianism — Low animals_low,Kantianism — Low animals,low,met,0.0100,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+Kantianism — Low animals_low,Kantianism — Low animals,low,splitCycle,0.0100,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+Kantianism — Low animals_low,Kantianism — Low animals,low,borda,0.0100,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Kantianism — Low animals_low,Kantianism — Low animals,low,lexicographicMaximin,0.0100,0.00,95.00,5.00,0.00,0.00,0.00,0.00,0.00
+Kantianism — Low animals_high,Kantianism — Low animals,high,nashBargaining,0.2000,8.00,27.64,5.71,29.43,2.27,15.33,5.47,6.15
+Kantianism — Low animals_high,Kantianism — Low animals,high,credenceWeighted,0.2000,8.00,27.64,5.71,29.43,2.27,15.33,5.47,6.15
+Kantianism — Low animals_high,Kantianism — Low animals,high,mec,0.2000,17.00,0.00,4.00,0.00,15.00,16.00,29.00,19.00
+Kantianism — Low animals_high,Kantianism — Low animals,high,met,0.2000,17.00,9.00,5.00,0.00,3.00,16.00,42.00,8.00
+Kantianism — Low animals_high,Kantianism — Low animals,high,splitCycle,0.2000,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Kantianism — Low animals_high,Kantianism — Low animals,high,borda,0.2000,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Kantianism — Low animals_high,Kantianism — Low animals,high,lexicographicMaximin,0.2000,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,nashBargaining,0.0100,12.15,7.58,6.45,38.45,3.08,15.51,8.85,7.92
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,credenceWeighted,0.0100,12.15,7.58,6.45,38.45,3.08,15.51,8.85,7.92
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,mec,0.0100,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,met,0.0100,17.00,13.00,2.00,6.00,1.00,16.00,42.00,3.00
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,splitCycle,0.0100,17.00,16.10,5.60,0.00,1.60,16.00,41.10,2.60
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,borda,0.0100,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Kantianism — Low animals / downside critical_low,Kantianism — Low animals / downside critical,low,lexicographicMaximin,0.0100,0.00,97.00,3.00,0.00,0.00,0.00,0.00,0.00
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,nashBargaining,0.2000,8.76,23.98,5.84,31.07,2.40,15.33,6.13,6.49
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,credenceWeighted,0.2000,8.76,23.98,5.84,31.07,2.40,15.33,6.13,6.49
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,mec,0.2000,17.00,0.00,3.00,0.00,15.00,16.00,30.00,19.00
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,met,0.2000,17.00,14.00,5.00,0.00,2.00,16.00,42.00,4.00
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,splitCycle,0.2000,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,borda,0.2000,17.00,19.50,6.00,0.00,0.00,16.00,41.50,0.00
+Kantianism — Low animals / downside critical_high,Kantianism — Low animals / downside critical,high,lexicographicMaximin,0.2000,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00

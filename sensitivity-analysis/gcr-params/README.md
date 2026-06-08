@@ -34,9 +34,9 @@ Written to `outputs/` after step 2:
 
 | File | Description |
 |------|-------------|
-| `gcr_fund_allocations.csv` | Per-fund allocation % and per-method breakdown for each scenario |
-| `gcr_cause_area_allocations.csv` | Per-cluster (GHD / GCR / AW) allocation % for each scenario |
-| `gcr_sensitivity_index.csv` | SI and scaled SI (pp/OOM) for each scenario, with per-fund deltas |
+| `fund/gcr_sensitivity_index.csv` | Fund-level SI + cluster SI for each scenario, with per-fund deltas vs baseline |
+| `fund/gcr_allocations_by_method.csv` | Per-fund allocation % under each of the 7 aggregation methods, one row per (scenario × method). The combined credence-weighted allocation is the budget-weighted blend of these. |
+| `cause/gcr_cause_area_allocations.csv` | Per-cluster (GHD / GCR / AW) allocation deltas for each scenario |
 
 Each scenario also writes a subfolder `{scenario_name}/` containing:
 - `gcr_output.csv` — raw MC output

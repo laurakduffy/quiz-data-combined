@@ -1,4 +1,5 @@
 {
+  "gcr_all_periods_range": [0.01, 10],
   "multipliers": {
     "givewell": [0.5, 1.5, 2],
     "leaf": [0.5, 1.5, 2],

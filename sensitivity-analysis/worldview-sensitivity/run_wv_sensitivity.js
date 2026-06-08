@@ -17,6 +17,11 @@
  * with stable `id`s), via loadSaWorldviews, which aborts if it has drifted from
  * production specialBlend.json. Credences are merged on by `id`, not array position.
  *
+ * Outputs (outputs/fund/) include:
+ *   scenario_by_method.csv — per scenario (baseline + each Form 2 credence shift):
+ *       per-fund allocation % under each of the 7 aggregation methods (one row per
+ *       scenario × method). The combined weighted allocation is the blend of these.
+ *
  * Usage:
  *   node run_wv_sensitivity.js [--dry-run] [--base PATH] [--approach staged|weighted]
  */
@@ -35,6 +40,8 @@ import {
   loadDataset,
   pickDefaultDataset,
   loadSaWorldviews,
+  loadAggMethods,
+  allocationsByMethod,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -163,6 +170,39 @@ const form1CauseRows = [];
 const form2CauseRows = [];
 const causeIndexRows = [];
 
+// Per-aggregation-method breakdown: for a given credence scenario, how does each
+// individual aggregation method (Nash, marketplace, MEC, ...) split the budget
+// across funds? Rows are (scenario × method); columns are funds. The combined
+// allocation above is the budget-weighted blend of these per-method splits.
+//
+// The full set of 7 methods comes from the aggregation-methods analysis config
+// (includes lexicographicMaximin, which is not a baseline stage); per-method
+// options (e.g. Nash's disagreementPoint) are pulled from the baseline stages.
+const methodByScenarioRows = [];
+const stageOptions = Object.fromEntries(methodEntries.map((m) => [m.jsKey, m.options]));
+const aggMethods = loadAggMethods(REPO_ROOT);
+// Compute each method's standalone allocation at the worldviews' current credences.
+const allocByMethod = (wvs) =>
+  allocationsByMethod(aggMethods, projects, wvs, totalBudget, incrementM, {
+    drStepSize,
+    stageOptions,
+  });
+const pushMethodRows = (scenario, worldview, bound, credenceScenario, wvs) => {
+  for (const { jsKey, allocations } of allocByMethod(wvs)) {
+    methodByScenarioRows.push({
+      scenario,
+      worldview,
+      bound,
+      method: jsKey,
+      credence_scenario: credenceScenario,
+      ...Object.fromEntries(fundIds.map((f) => [f, allocations[f].toFixed(2)])),
+    });
+  }
+};
+
+// Baseline scenario (best-guess specialBlend credences) broken down by method.
+pushMethodRows('baseline', 'baseline', 'baseline', '', worldviews);
+
 const form1Rows = [];
 for (const wv of worldviews) {
   process.stdout.write(`  ${wv.name.slice(0, 65)}...`);
@@ -255,6 +295,9 @@ for (const wv of worldviews) {
         drStepSize
       ));
     }
+    // Per-method breakdown for this scenario (credences still applied here).
+    pushMethodRows(scenario, name, bound, boundVal.toFixed(4), worldviews);
+
     for (const w of worldviews) w.credence = origCredences[w.name];
 
     const scenFunding = Object.fromEntries(
@@ -330,6 +373,11 @@ mkdirSync(FUND_DIR, { recursive: true });
 mkdirSync(CAUSE_DIR, { recursive: true });
 
 writeCsv(join(FUND_DIR, 'single_worldview_allocations.csv'), ['worldview', ...fundIds], form1Rows);
+writeCsv(
+  join(FUND_DIR, 'scenario_by_method.csv'),
+  ['scenario', 'worldview', 'bound', 'method', 'credence_scenario', ...fundIds],
+  methodByScenarioRows
+);
 writeCsv(
   join(FUND_DIR, 'split_credences_index.csv'),
   [

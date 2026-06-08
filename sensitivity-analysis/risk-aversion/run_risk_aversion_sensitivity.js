@@ -15,6 +15,7 @@
  * Outputs (outputs/ directory):
  *   fund/neutral_baseline_allocation.csv       — all-neutral reference allocation
  *   fund/risk_aversion_summary.csv             — one row per test: SI + per-fund deltas
+ *   fund/risk_aversion_allocations_by_method.csv — per (test × version): per-fund allocation % under each of the 7 aggregation methods
  *   cause/risk_aversion_cause_area_summary.csv — per test: cause-area SI + deltas
  *
  * Usage:
@@ -39,6 +40,8 @@ import {
   loadSaWorldviews,
   loadDataset,
   pickDefaultDataset,
+  loadAggMethods,
+  allocationsByMethod,
   rankDict,
   writeCsv,
   parseArgs,
@@ -77,6 +80,32 @@ const methodEntries = stages.map((s) => ({
   weight: s.budget / totalBudget,
   options: s.options ?? {},
 }));
+
+// Per-aggregation-method breakdown: for each (projects, worldviews) point at which
+// a combined allocation is computed, also record how each of the 7 aggregation
+// methods would split the budget standalone. Rows are (test × version × method);
+// columns are funds. stageOptions (keyed by jsKey) preserves nashBargaining's
+// disagreementPoint etc. from baseline.json's stages.
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(methodEntries.map((m) => [m.jsKey, m.options]));
+const methodRows = []; // risk_aversion_allocations_by_method.csv (test × version × method)
+const pushMethodRows = (test, version, wvs) => {
+  for (const { jsKey, allocations } of allocationsByMethod(
+    aggMethods,
+    projects,
+    wvs,
+    totalBudget,
+    incrementSize,
+    { drStepSize, stageOptions }
+  )) {
+    methodRows.push({
+      test,
+      version,
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((f) => [f, (allocations[f] ?? 0).toFixed(2)])),
+    });
+  }
+};
 
 // Only run tests that are fully populated (have both baseline and new_version)
 const activeTests = Object.entries(tests).filter(
@@ -217,6 +246,10 @@ const caKeys = ['ghd', 'gcr', 'aw'];
 let drChecksPassed = true;
 let drCheckCount = 0;
 
+// Baseline scenario for the per-method breakdown: the unmodified blend
+// (sa_specialBlend.json worldviews with their original risk profiles).
+pushMethodRows('baseline', 'baseline', sbWvs);
+
 for (const [testName, test] of activeTests) {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`Test: ${testName}`);
@@ -227,6 +260,9 @@ for (const [testName, test] of activeTests) {
 
   const baseWvs = buildWorldviews(test, 'baseline');
   const newWvs = buildWorldviews(test, 'new_version');
+
+  pushMethodRows(testName, 'baseline', baseWvs);
+  pushMethodRows(testName, 'new_version', newWvs);
 
   process.stdout.write('  baseline    ');
   const { allocations: baseAlloc, funding: baseFunding } = runAlloc(baseWvs);
@@ -311,6 +347,12 @@ const summaryFields = [
   ...fundIds.map((f) => `${f}_delta`),
 ];
 writeCsv(join(FUND_DIR, 'risk_aversion_summary.csv'), summaryFields, summaryRows);
+
+writeCsv(
+  join(FUND_DIR, 'risk_aversion_allocations_by_method.csv'),
+  ['test', 'version', 'method', ...fundIds],
+  methodRows
+);
 
 causeSummaryRows.sort((a, b) => parseFloat(b.sensitivity_index) - parseFloat(a.sensitivity_index));
 writeCsv(

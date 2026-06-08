@@ -41,8 +41,9 @@ AWS Console → **IAM** → **Roles** → **Create role**:
 
 ## Step 4 — Launch the instance
 
-First, open [user-data.sh](user-data.sh) and change **one line** —
-`BUCKET="REPLACE-WITH-YOUR-BUCKET-NAME"` — to your bucket from Step 2. Copy the whole file.
+First, open [USER-DATA-10x-paste-this.txt](USER-DATA-10x-paste-this.txt) and copy the
+whole file. (Its `BUCKET=` line is already set to `gcr-sa-2026`; change it only if you
+use a different bucket.)
 
 AWS Console → **EC2** → **Launch instance**:
 - **Name:** `gcr-sensitivity`
@@ -55,7 +56,7 @@ AWS Console → **EC2** → **Launch instance**:
 - **Advanced details** (expand):
   - **IAM instance profile:** select `gcr-sa-runner`.
   - **Shutdown behavior:** **Terminate**  ← important; this is how it self-deletes.
-  - **User data:** paste the edited contents of `user-data.sh`.
+  - **User data:** paste the contents of `USER-DATA-10x-paste-this.txt`.
 - **Launch instance.**
 
 ## Step 5 — Wait, then download results
@@ -85,8 +86,8 @@ Open `sensitivity-analysis\gcr-params\outputs\fund\gcr_sensitivity_index.csv`.
 noise floor. Any scenario at or below it isn't a real signal. If that floor is
 ≤ ~1pp, the analysis is solid at 1M samples.
 
-Want 10× samples (the box has the RAM for it)? Before launching, change one line in
-`user-data.sh`: `NSAMPLES="10000000"`. Everything else is identical.
+The paste file is already set to 10M samples (`NSAMPLES="10000000"`). For a quicker,
+cheaper 1M smoke test, lower `NSAMPLES` to `1000000` before launching.
 
 ---
 

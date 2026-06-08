@@ -31,6 +31,8 @@ import {
   loadJson,
   loadDataset,
   loadSaWorldviews,
+  loadAggMethods,
+  allocationsByMethod,
   pickDefaultDataset,
   writeCsv,
   parseArgs,
@@ -85,6 +87,28 @@ const methods = stages.map((s) => ({
   weight: s.budget / totalBudget,
   options: s.options ?? {},
 }));
+
+// Per-aggregation-method breakdown: for each scenario, how does each individual
+// aggregation method (Nash, marketplace, MEC, ...) split the budget across funds?
+// The combined credence-weighted allocation is the budget-weighted blend of these.
+// Full set of 7 methods from the aggregation-methods analysis config (includes
+// lexicographicMaximin); per-method options (e.g. Nash's disagreementPoint) come
+// from the baseline stages.
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(methods.map((m) => [m.jsKey, m.options]));
+// Returns one { jsKey, allocations } per aggregation method for a given dataset.
+const allocByMethod = (dataset) =>
+  allocationsByMethod(
+    aggMethods,
+    dataset.projects,
+    worldviews,
+    totalBudget,
+    dataset.incrementSize,
+    {
+      drStepSize: dataset.drStepSize,
+      stageOptions,
+    }
+  );
 
 console.log('\nGCR sensitivity allocation');
 console.log(`  Dataset:    ${basePath.split(/[/\\]/).pop()}`);
@@ -211,12 +235,26 @@ console.log(`\nFound ${scenarioDirs.length} scenario folder(s).\n`);
 // Output row accumulators
 const causeAreaRows = []; // gcr_cause_area_allocations.csv
 const siRows = []; // gcr_sensitivity_index.csv
+const methodRows = []; // gcr_allocations_by_method.csv (scenario × method)
 
 // Baseline cause-area row (all deltas are zero by construction)
 causeAreaRows.push({
   scenario: 'baseline',
   ...Object.fromEntries(clusterIds.map((cid) => [`diff_${cid}`, '0.0000'])),
 });
+
+// Baseline per-method rows (canonical base dataset)
+const pushMethodRows = (scenarioName, description, dataset) => {
+  for (const { jsKey, allocations } of allocByMethod(dataset)) {
+    methodRows.push({
+      scenario: scenarioName,
+      description,
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((pid) => [pid, (allocations[pid] ?? 0).toFixed(2)])),
+    });
+  }
+};
+pushMethodRows('baseline', '', base);
 
 for (const scenarioName of scenarioDirs) {
   const scenarioJsonPath = join(__dirname, scenarioName, `${scenarioName}.json`);
@@ -281,6 +319,9 @@ for (const scenarioName of scenarioDirs) {
   };
   for (const pid of fundIds) siRow[`diff_${pid}`] = fmt(fundDeltas[pid]);
   siRows.push(siRow);
+
+  // Per-method breakdown for this scenario's dataset
+  pushMethodRows(scenarioName, sc.metadata.description ?? '', sc);
 }
 
 // Sort SI by sensitivity_index descending
@@ -305,9 +346,13 @@ const siFields = [
 ];
 writeCsv(join(FUND_DIR, 'gcr_sensitivity_index.csv'), siFields, siRows);
 
+const methodFields = ['scenario', 'description', 'method', ...fundIds];
+writeCsv(join(FUND_DIR, 'gcr_allocations_by_method.csv'), methodFields, methodRows);
+
 console.log(`\nWrote CSVs to ${OUTPUTS_DIR}/fund/ and ${OUTPUTS_DIR}/cause/`);
 console.log('  gcr_cause_area_allocations.csv');
 console.log('  gcr_sensitivity_index.csv');
+console.log('  gcr_allocations_by_method.csv');
 
 console.log('\nSensitivity ranking (fund-level SI):');
 for (const r of siRows) {

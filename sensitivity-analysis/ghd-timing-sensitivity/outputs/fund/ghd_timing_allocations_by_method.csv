@@ -1,0 +1,29 @@
+scenario,method,ea_awf,givewell,leaf,longview_ai,longview_nuclear,navigation_fund_cagefree,navigation_fund_general,sentinel_bio
+baseline,nashBargaining,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+baseline,credenceWeighted,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+baseline,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+baseline,met,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+baseline,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+baseline,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+baseline,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+all effects far,nashBargaining,10.90,19.10,1.00,34.95,3.05,15.45,7.85,7.70
+all effects far,credenceWeighted,10.90,19.10,1.00,34.95,3.05,15.45,7.85,7.70
+all effects far,mec,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+all effects far,met,17.00,19.00,0.00,0.00,2.00,16.00,42.00,4.00
+all effects far,splitCycle,17.00,22.17,0.17,0.00,1.17,16.00,41.50,2.00
+all effects far,borda,17.00,25.00,0.00,0.00,0.00,16.00,42.00,0.00
+all effects far,lexicographicMaximin,0.00,99.00,1.00,0.00,0.00,0.00,0.00,0.00
+all effects near,nashBargaining,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+all effects near,credenceWeighted,10.50,15.30,6.20,34.95,2.80,15.45,7.60,7.20
+all effects near,mec,17.00,0.00,1.00,0.00,15.00,16.00,32.00,19.00
+all effects near,met,17.00,11.00,2.00,6.00,2.00,16.00,42.00,4.00
+all effects near,splitCycle,17.00,20.10,5.60,0.00,0.10,16.00,41.10,0.10
+all effects near,borda,17.00,20.00,5.50,0.00,0.00,16.00,41.50,0.00
+all effects near,lexicographicMaximin,0.00,96.00,4.00,0.00,0.00,0.00,0.00,0.00
+health effects near,nashBargaining,10.75,15.65,5.45,34.95,2.80,15.45,7.75,7.20
+health effects near,credenceWeighted,10.75,15.65,5.45,34.95,2.80,15.45,7.75,7.20
+health effects near,mec,17.00,0.00,0.00,0.00,15.00,16.00,33.00,19.00
+health effects near,met,17.00,5.00,0.00,14.00,2.00,16.00,42.00,4.00
+health effects near,splitCycle,17.00,19.10,6.10,0.00,0.10,16.00,41.60,0.10
+health effects near,borda,17.00,19.00,6.00,0.00,0.00,16.00,42.00,0.00
+health effects near,lexicographicMaximin,0.00,97.00,3.00,0.00,0.00,0.00,0.00,0.00

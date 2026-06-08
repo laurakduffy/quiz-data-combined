@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
+import { computeMarcusAllocation } from '../src/utils/marcusCalculation.js';
 
 export function loadJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -196,6 +197,56 @@ export function groupByCauseArea(allocations) {
     result[area] = funds.reduce((s, f) => s + (allocations[f] ?? 0), 0);
   }
   return result;
+}
+
+/**
+ * Load the canonical 7-method aggregation list (the full set considered in the
+ * moral parliament, including lexicographicMaximin) from the aggregation-methods
+ * analysis config. Each entry has { jsKey, label, best_guess, low, high }.
+ */
+export function loadAggMethods(repoRoot) {
+  return loadJson(
+    join(repoRoot, 'sensitivity-analysis', 'aggregation-methods', 'agg_methods_sensitivity.json')
+  );
+}
+
+/**
+ * Per-aggregation-method breakdown for one (dataset × worldviews) point: run each
+ * aggregation method standalone on the full budget and return its fund allocation.
+ * The combined credence-weighted allocation reported elsewhere is the budget-weighted
+ * blend of these per-method splits — this shows what each method recommends alone.
+ *
+ * Allocations are percentages summing to 100 (computeMarcusAllocation normalises by
+ * total spend). Per-method options (e.g. nashBargaining's disagreementPoint) are
+ * pulled from `stageOptions` keyed by jsKey — pass the baseline.json stage options.
+ *
+ * @param {Array}  aggMethods   - list from loadAggMethods (entries with .jsKey)
+ * @param {Object} projects     - dataset.projects
+ * @param {Array}  worldviews   - worldview objects with credences
+ * @param {number} totalBudget  - $M
+ * @param {number} incrementSize- $M per step
+ * @param {Object} [opts]       - { drStepSize, stageOptions }
+ * @returns {Array<{ jsKey: string, allocations: Object }>}
+ */
+export function allocationsByMethod(
+  aggMethods,
+  projects,
+  worldviews,
+  totalBudget,
+  incrementSize,
+  { drStepSize = 10, stageOptions = {} } = {}
+) {
+  return aggMethods.map((m) => {
+    const { allocations } = computeMarcusAllocation(
+      projects,
+      worldviews,
+      m.jsKey,
+      totalBudget,
+      incrementSize,
+      { drStepSize, ...(stageOptions[m.jsKey] ?? {}) }
+    );
+    return { jsKey: m.jsKey, allocations };
+  });
 }
 
 export function parseArgs(argv) {

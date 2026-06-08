@@ -15,6 +15,7 @@
  *
  * Outputs: sensitivity-analysis/moral-weights/outputs/
  *   fund/moral_weights_overall_si.csv                — Part 1: fund SI + cause-area SI + per-fund deltas
+ *   fund/moral_weights_allocations_by_method.csv     — Part 1: per-fund allocation % under each of the 7 aggregation methods (one row per scenario × method)
  *   fund/moral_weights_per_worldview_si.csv          — Part 2: per-worldview fund SI + CA SI + per-fund deltas, grouped by multiplier
  *   cause/moral_weights_overall_cause_area_si.csv    — Part 1 projected to cause-area SI
  *   cause/moral_weights_per_worldview_cause_area_si.csv — Part 2 projected to cause-area SI
@@ -41,6 +42,8 @@ import {
   loadDataset,
   pickDefaultDataset,
   loadSaWorldviews,
+  loadAggMethods,
+  allocationsByMethod,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -75,6 +78,28 @@ const weightedMethods = stages.map((s) => ({
   weight: s.budget,
   options: s.options ?? {},
 }));
+
+// Per-aggregation-method breakdown (Part 1 / overall scenarios): for each
+// perturbation, how does each of the 7 aggregation methods split the budget?
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(weightedMethods.map((m) => [m.jsKey, m.options]));
+const methodRows = []; // moral_weights_allocations_by_method.csv (scenario × method)
+const pushMethodRows = (scenario, wvs) => {
+  for (const { jsKey, allocations } of allocationsByMethod(
+    aggMethods,
+    projects,
+    wvs,
+    totalBudget,
+    incrementSize,
+    { drStepSize, stageOptions }
+  )) {
+    methodRows.push({
+      scenario,
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((f) => [f, (allocations[f] ?? 0).toFixed(2)])),
+    });
+  }
+};
 
 // All worldviews indexed for Part 2
 const allIndexedWvs = worldviews.map((wv, i) => ({ ...wv, _idx: i }));
@@ -173,6 +198,8 @@ console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
 const caKeys = ['ghd', 'gcr', 'aw'];
 
+pushMethodRows('baseline', worldviews);
+
 let drChecksPassed = true;
 let drCheckCount = 0;
 
@@ -259,6 +286,8 @@ for (const [label, multiplier] of Object.entries(multipliers)) {
     ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
   });
 
+  pushMethodRows(String(multiplier), modifiedWvs);
+
   const topFund = fundIds.reduce((a, b) => (combined[a] > combined[b] ? a : b));
   console.log(
     `  ${label.padEnd(8)}  SI=${si.toFixed(2)}pp  top: ${topFund} (${combined[topFund].toFixed(1)}%)`
@@ -296,6 +325,8 @@ for (const [label, scenarioWeights] of Object.entries(scenarios)) {
     ca_sensitivity_index: caMaxAbs.toFixed(4),
     ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
   });
+
+  pushMethodRows(label, modifiedWvs);
 
   const topFund = fundIds.reduce((a, b) => (combined[a] > combined[b] ? a : b));
   console.log(
@@ -444,6 +475,11 @@ mkdirSync(FUND_DIR, { recursive: true });
 mkdirSync(CAUSE_DIR, { recursive: true });
 
 writeCsv(join(FUND_DIR, 'moral_weights_overall_si.csv'), p1SiFields, p1SiRows);
+writeCsv(
+  join(FUND_DIR, 'moral_weights_allocations_by_method.csv'),
+  ['scenario', 'method', ...fundIds],
+  methodRows
+);
 
 // Group per-worldview SI rows by multiplier (ascending numeric first, then
 // scenario labels alphabetically), and within each multiplier sort by fund SI

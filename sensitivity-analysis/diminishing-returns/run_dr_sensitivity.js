@@ -8,6 +8,10 @@
  *
  * Requires: run `python build_combo_datasets.py` first to generate combo JSONs.
  *
+ * Outputs (outputs/fund/) include:
+ *   dr_sensitivity_allocations_by_method.csv — per combo: per-fund allocation %
+ *       under each of the 7 aggregation methods (one row per combo × method)
+ *
  * Usage:
  *   node run_dr_sensitivity.js [--dry-run] [--base PATH] [--worldviews-file PATH]
  */
@@ -25,6 +29,8 @@ import {
   loadJson,
   loadSaWorldviews,
   loadDataset,
+  loadAggMethods,
+  allocationsByMethod,
   assertBaselineParity,
   writeCsv,
   parseArgs,
@@ -61,6 +67,31 @@ const methodEntries = stages.map((s) => ({
   weight: s.budget / totalBudget,
   options: s.options ?? {},
 }));
+
+// Per-aggregation-method breakdown: for each combo, how does each of the 7
+// aggregation methods split the budget across funds? The combined credence-
+// weighted allocation is the budget-weighted blend of these per-method splits.
+// Per-method options (e.g. nashBargaining's disagreementPoint) come from the
+// baseline.json stages.
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(stages.map((s) => [s.method, s.options ?? {}]));
+const methodRows = []; // dr_sensitivity_allocations_by_method.csv (combo × method)
+const pushMethodRows = (combo, scenProjects) => {
+  for (const { jsKey, allocations } of allocationsByMethod(
+    aggMethods,
+    scenProjects,
+    worldviews,
+    totalBudget,
+    incrementSize,
+    { drStepSize, stageOptions }
+  )) {
+    methodRows.push({
+      combo,
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((f) => [f, (allocations[f] ?? 0).toFixed(2)])),
+    });
+  }
+};
 
 console.log('\nDiminishing-returns sensitivity analysis');
 console.log(`  Worldviews:  ${worldviews.length}`);
@@ -100,6 +131,8 @@ const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
 const caKeys = ['ghd', 'gcr', 'aw'];
+
+pushMethodRows('baseline', baseProjects);
 
 if (args.dryRun) {
   console.log('\n  DRY RUN — combos:');
@@ -204,6 +237,8 @@ for (const comboName of comboNames) {
       caKeys.map((ca) => [`${ca}_delta`, (newCA[ca] - baseCauseAlloc[ca]).toFixed(2)])
     ),
   });
+
+  pushMethodRows(comboName, comboProjects);
 }
 
 // ---------------------------------------------------------------------------
@@ -237,6 +272,11 @@ writeCsv(
   join(CAUSE_DIR, 'dr_sensitivity_cause_area_index.csv'),
   ['combo', 'sensitivity_index', ...caKeys.map((ca) => `${ca}_delta`)],
   causeIndexRows
+);
+writeCsv(
+  join(FUND_DIR, 'dr_sensitivity_allocations_by_method.csv'),
+  ['combo', 'method', ...fundIds],
+  methodRows
 );
 
 console.log(

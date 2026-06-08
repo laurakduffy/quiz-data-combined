@@ -41,6 +41,8 @@ import {
   loadJson,
   loadDataset,
   loadSaWorldviews,
+  loadAggMethods,
+  allocationsByMethod,
   writeCsv,
   parseArgs,
   checkDrCeilings,
@@ -73,7 +75,23 @@ const isWeighted = args.approach !== 'staged'; // weighted unless staged is expl
 const skipGenerate = process.argv.includes('--skip-generate');
 
 // 1.0 uses the baseline directly (no pre-generated file needed).
-const { multipliers: MULTIPLIERS, groups: GROUPS = {} } = loadJson(join(__dirname, 'config.json'));
+const {
+  multipliers: MULTIPLIERS,
+  groups: GROUPS = {},
+  gcr_all_periods_range: GCR_RANGE = [0.01, 10],
+} = loadJson(join(__dirname, 'config.json'));
+
+// scaling_scope label: GCR funds (and all-GCR groups) scaled OUTSIDE the band are
+// applied to the 500+ period only (t5_only); everything else scales all periods.
+// Mirrors _gcr_far_future_only in generate_scaled_datasets.py.
+const GCR_FUNDS = new Set(['sentinel_bio', 'longview_nuclear', 'longview_ai']);
+function scalingScope(name, multiplier) {
+  const m = Number(multiplier);
+  const isGcr =
+    GCR_FUNDS.has(name) || (GROUPS[name] && GROUPS[name].funds.every((f) => GCR_FUNDS.has(f)));
+  const [lo, hi] = GCR_RANGE;
+  return isGcr && !(lo <= m && m <= hi) ? 't5_only' : 'all_periods';
+}
 
 // ---------------------------------------------------------------------------
 // Auto-regenerate any missing dataset files from config.json
@@ -204,6 +222,36 @@ console.log(`  Multipliers: ${allMultiplierValues.join(', ')} (per-fund; see con
 console.log(`  Approach:    ${isWeighted ? 'weighted-average' : 'staged'}`);
 
 // ---------------------------------------------------------------------------
+// Per-aggregation-method breakdown
+// ---------------------------------------------------------------------------
+// For every scenario at which we compute a combined allocation from a
+// (projects, worldviews) pair, also compute how each of the 7 individual
+// aggregation methods (Nash, marketplace, MEC, ...) splits the budget across
+// funds. Per-method options (e.g. nashBargaining's disagreementPoint) come from
+// the baseline.json stages. Uses each scenario's OWN incrementSize/drStepSize,
+// since scaled datasets can carry their own step sizes.
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(weightedMethods.map((m) => [m.jsKey, m.options]));
+const methodRows = []; // ce_multiplier_allocations_by_method.csv (scenario × method)
+const pushMethodRows = (fundVaried, multiplier, dataset) => {
+  for (const { jsKey, allocations } of allocationsByMethod(
+    aggMethods,
+    dataset.projects,
+    worldviews,
+    totalBudget,
+    dataset.incrementSize,
+    { drStepSize: dataset.drStepSize, stageOptions }
+  )) {
+    methodRows.push({
+      fund_varied: fundVaried,
+      multiplier: String(multiplier),
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((f) => [f, (allocations[f] ?? 0).toFixed(2)])),
+    });
+  }
+};
+
+// ---------------------------------------------------------------------------
 // Helper: run both staged + per-method allocations on a dataset
 // ---------------------------------------------------------------------------
 
@@ -302,6 +350,7 @@ const allocRows = [];
 const siFields = [
   'fund_varied',
   'multiplier',
+  'scaling_scope',
   'sensitivity_index',
   'si_scaled_pp_per_oom',
   ...fundIds.map((f) => `diff_${f}`),
@@ -339,6 +388,7 @@ for (const fid of fundIds) {
 siRows.push({
   fund_varied: 'baseline',
   multiplier: '1.0',
+  scaling_scope: 'all_periods',
   sensitivity_index: '0.0000',
   si_scaled_pp_per_oom: '0.0000',
   ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, '0.0000'])),
@@ -356,6 +406,9 @@ causeSiRows.push({
   si_scaled_pp_per_oom: '0.0000',
   ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, '0.0000'])),
 });
+
+// Baseline per-method breakdown (unmodified dataset)
+pushMethodRows('baseline', '1.0', baselineDataset);
 
 // ---------------------------------------------------------------------------
 // Sensitivity loop
@@ -437,6 +490,7 @@ for (const fundToVary of fundIds) {
     siRows.push({
       fund_varied: fundToVary,
       multiplier: String(multiplier),
+      scaling_scope: scalingScope(fundToVary, multiplier),
       sensitivity_index: siMaxAbs.toFixed(4),
       si_scaled_pp_per_oom: siScaled.toFixed(4),
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
@@ -464,6 +518,9 @@ for (const fundToVary of fundIds) {
         ...Object.fromEntries(caKeys.map((ca) => [`diff_${ca}`, causeDiffs[ca].toFixed(4)])),
       });
     }
+
+    // Per-method breakdown for this scenario's dataset
+    pushMethodRows(fundToVary, multiplier, dataset);
 
     const topFund = fundIds.reduce((a, b) => (staged[a] > staged[b] ? a : b));
     console.log(
@@ -550,6 +607,7 @@ for (const [groupName, groupDef] of Object.entries(GROUPS)) {
     siRows.push({
       fund_varied: groupName,
       multiplier: String(multiplier),
+      scaling_scope: scalingScope(groupName, multiplier),
       sensitivity_index: siMaxAbs.toFixed(4),
       si_scaled_pp_per_oom: siScaled.toFixed(4),
       ...Object.fromEntries(fundIds.map((f) => [`diff_${f}`, diffs[f].toFixed(4)])),
@@ -578,6 +636,9 @@ for (const [groupName, groupDef] of Object.entries(GROUPS)) {
       });
     }
 
+    // Per-method breakdown for this scenario's dataset
+    pushMethodRows(groupName, multiplier, dataset);
+
     const topFund = fundIds.reduce((a, b) => (staged[a] > staged[b] ? a : b));
     console.log(
       `    ${String(multiplier).padEnd(6)}×  SI=${siMaxAbs.toFixed(2)}pp (½Σ|Δ|)  scaled=${siScaled.toFixed(2)}pp/OOM  top: ${topFund} (${staged[topFund].toFixed(1)}%)`
@@ -595,6 +656,11 @@ mkdirSync(CAUSE_DIR, { recursive: true });
 
 writeCsv(join(FUND_DIR, 'ce_multiplier_allocations.csv'), allocFields, allocRows);
 writeCsv(join(FUND_DIR, 'ce_multiplier_si.csv'), siFields, siRows);
+writeCsv(
+  join(FUND_DIR, 'ce_multiplier_allocations_by_method.csv'),
+  ['fund_varied', 'multiplier', 'method', ...fundIds],
+  methodRows
+);
 writeCsv(join(CAUSE_DIR, 'cause_area_allocations.csv'), causeAllocFields, causeAllocRows);
 writeCsv(join(CAUSE_DIR, 'cause_area_si.csv'), causeSiFields, causeSiRows);
 

@@ -10,6 +10,10 @@
  * Stages are loaded from baseline.json (same configuration as the website).
  * Uses computeMultiStageAllocation — identical to the website's staged approach.
  *
+ * Outputs (outputs/ directory) include:
+ *   fund/ghd_timing_allocations_by_method.csv — per scenario: per-fund allocation %
+ *       under each of the 7 aggregation methods (one row per scenario × method)
+ *
  * Usage:
  *   node run_ghd_timing_sensitivity.js [--dry-run] [--base PATH] [--worldviews-file PATH]
  */
@@ -28,6 +32,8 @@ import {
   loadSaWorldviews,
   loadDataset,
   pickDefaultDataset,
+  loadAggMethods,
+  allocationsByMethod,
   rankDict,
   writeCsv,
   parseArgs,
@@ -101,6 +107,32 @@ const methodEntries = stages.map((s) => ({
   options: s.options ?? {},
 }));
 
+// Per-aggregation-method breakdown: for each scenario (here the DATASET/projects
+// vary, not the worldviews), how does each individual aggregation method split the
+// budget across funds? The combined credence-weighted allocation reported elsewhere
+// is the budget-weighted blend of these per-method splits. Full set of 7 methods
+// from the aggregation-methods config (includes lexicographicMaximin); per-method
+// options (e.g. nashBargaining's disagreementPoint) come from the baseline stages.
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(methodEntries.map((m) => [m.jsKey, m.options]));
+const methodRows = []; // ghd_timing_allocations_by_method.csv (scenario × method)
+const pushMethodRows = (scenario, scenProjects) => {
+  for (const { jsKey, allocations } of allocationsByMethod(
+    aggMethods,
+    scenProjects,
+    worldviews,
+    totalBudget,
+    incrementM,
+    { drStepSize, stageOptions }
+  )) {
+    methodRows.push({
+      scenario,
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((f) => [f, (allocations[f] ?? 0).toFixed(2)])),
+    });
+  }
+};
+
 console.log('\nGHD effect timing sensitivity');
 console.log(`  Worldviews:  ${worldviews.length}`);
 console.log(`  Stages:      ${stages.length}  total $${totalBudget}M (from baseline.json)`);
@@ -159,6 +191,9 @@ const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
 const caKeys = ['ghd', 'gcr', 'aw'];
+
+// Per-method breakdown for the baseline (unpatched dataset).
+pushMethodRows('baseline', projects);
 
 // ---------------------------------------------------------------------------
 // Scenario loop
@@ -236,6 +271,9 @@ for (const [scenarioName, fundTiming] of Object.entries(timingEffects)) {
     ...Object.fromEntries(fundIds.map((f) => [f, newAlloc[f].toFixed(2)])),
   });
 
+  // Per-method breakdown for this scenario's patched dataset.
+  pushMethodRows(scenarioName, patchedProjects);
+
   for (const fid of fundIds) {
     byFundRows.push({
       scenario: scenarioName,
@@ -285,6 +323,11 @@ mkdirSync(FUND_DIR, { recursive: true });
 mkdirSync(CAUSE_DIR, { recursive: true });
 
 writeCsv(join(FUND_DIR, 'ghd_timing_allocations.csv'), ['scenario', ...fundIds], allocRows);
+writeCsv(
+  join(FUND_DIR, 'ghd_timing_allocations_by_method.csv'),
+  ['scenario', 'method', ...fundIds],
+  methodRows
+);
 writeCsv(
   join(FUND_DIR, 'ghd_timing_by_fund.csv'),
   ['scenario', 'project_id', 'base_alloc', 'new_alloc', 'alloc_delta', 'rank_delta'],

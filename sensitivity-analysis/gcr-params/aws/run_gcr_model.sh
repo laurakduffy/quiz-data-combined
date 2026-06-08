@@ -28,8 +28,15 @@ if command -v dnf >/dev/null 2>&1; then
 elif command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update -y >/dev/null && sudo apt-get install -y python3 python3-pip tar gzip >/dev/null
 fi
-python3 -m pip install --quiet numpy scipy matplotlib \
-  || python3 -m pip install --quiet --break-system-packages numpy scipy matplotlib
+# Pin numpy/scipy so the seeded MC is bit-for-bit reproducible. These are the LAST
+# versions supporting Amazon Linux 2023's Python 3.9 — i.e. what the original
+# unpinned baseline run installed, so this reproduces it. (They also install fine on
+# Python 3.10-3.12, so this is robust to a future AMI Python bump.) Override via env.
+NUMPY_SPEC="${NUMPY_SPEC:-numpy==2.0.2}"
+SCIPY_SPEC="${SCIPY_SPEC:-scipy==1.13.1}"
+python3 -m pip install --quiet "$NUMPY_SPEC" "$SCIPY_SPEC" matplotlib \
+  || python3 -m pip install --quiet numpy scipy matplotlib
+python3 -c "import numpy, scipy; print(f'deps: numpy {numpy.__version__}, scipy {scipy.__version__}')"
 echo "deps ready: python $(python3 --version 2>&1)"
 
 # --- run the 3 funds in parallel -> gcr-models-mc/outputs/gcr_output.csv ---

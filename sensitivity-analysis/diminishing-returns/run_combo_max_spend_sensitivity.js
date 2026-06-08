@@ -7,6 +7,10 @@
  *
  * Requires: run `python build_combo_max_spend_datasets.py` first.
  *
+ * Outputs (outputs/fund/) include:
+ *   combo_max_spend_allocations_by_method.csv — per (combo × max_spend): per-fund
+ *       allocation % under each of the 7 aggregation methods (one row per scenario × method)
+ *
  * Usage:
  *   node run_combo_max_spend_sensitivity.js [--dry-run] [--base PATH] [--worldviews-file PATH]
  */
@@ -24,6 +28,8 @@ import {
   loadJson,
   loadSaWorldviews,
   loadDataset,
+  loadAggMethods,
+  allocationsByMethod,
   assertBaselineParity,
   writeCsv,
   parseArgs,
@@ -60,6 +66,32 @@ const methodEntries = stages.map((s) => ({
   weight: s.budget / totalBudget,
   options: s.options ?? {},
 }));
+
+// Per-aggregation-method breakdown: for each scenario, how does each of the 7
+// aggregation methods split the budget across funds? The combined credence-
+// weighted allocation is the budget-weighted blend of these per-method splits.
+// Per-method options (e.g. nashBargaining's disagreementPoint) come from the
+// baseline.json stages.
+const aggMethods = loadAggMethods(REPO_ROOT);
+const stageOptions = Object.fromEntries(stages.map((s) => [s.method, s.options ?? {}]));
+const methodRows = []; // combo_max_spend_allocations_by_method.csv (combo × max_spend × method)
+const pushMethodRows = (combo, maxSpend, scenProjects) => {
+  for (const { jsKey, allocations } of allocationsByMethod(
+    aggMethods,
+    scenProjects,
+    worldviews,
+    totalBudget,
+    incrementSize,
+    { drStepSize, stageOptions }
+  )) {
+    methodRows.push({
+      combo,
+      max_spend_multiplier: maxSpend,
+      method: jsKey,
+      ...Object.fromEntries(fundIds.map((f) => [f, (allocations[f] ?? 0).toFixed(2)])),
+    });
+  }
+};
 
 const MAX_SPEND_VALUES = [2.5, 7.5, 10.0];
 const BASELINE_MAX_SPEND = 5.0;
@@ -117,6 +149,8 @@ const topBase = fundIds.reduce((a, b) => (baseAlloc[a] > baseAlloc[b] ? a : b));
 console.log(`  Top fund: ${topBase} (${baseAlloc[topBase].toFixed(1)}%)`);
 const baseCauseAlloc = groupByCauseArea(baseAlloc);
 const caKeys = ['ghd', 'gcr', 'aw'];
+
+pushMethodRows('all_med', BASELINE_MAX_SPEND, baseProjects);
 
 if (args.dryRun) {
   console.log('\n  DRY RUN — scenarios:');
@@ -227,6 +261,8 @@ for (const { combo, maxSpend, label } of SCENARIOS) {
       caKeys.map((ca) => [`${ca}_delta`, (newCA[ca] - baseCauseAlloc[ca]).toFixed(2)])
     ),
   });
+
+  pushMethodRows(combo, maxSpend, scenProjects);
 }
 
 // ---------------------------------------------------------------------------
@@ -270,6 +306,11 @@ writeCsv(
   join(CAUSE_DIR, 'combo_max_spend_cause_area_index.csv'),
   ['combo', 'max_spend_multiplier', 'sensitivity_index', ...caKeys.map((ca) => `${ca}_delta`)],
   causeIndexRows
+);
+writeCsv(
+  join(FUND_DIR, 'combo_max_spend_allocations_by_method.csv'),
+  ['combo', 'max_spend_multiplier', 'method', ...fundIds],
+  methodRows
 );
 
 console.log(

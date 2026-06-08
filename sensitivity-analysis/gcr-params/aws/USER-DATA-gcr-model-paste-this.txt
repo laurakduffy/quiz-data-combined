@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # Refresh the production GCR model at 10M samples, decoupled from the SA.
 # Runs on a SMALL box (e.g. m7i.2xlarge, 8 vCPU / 32 GB) — no vCPU-limit increase
-# needed (single serial process). Uploads gcr_output.csv to S3; then run
-# combine_data.py locally to build config/datasets/<date>.json.
+# needed. Uploads BOTH gcr_output.csv (for combine_data.py -> config/datasets) AND
+# the raw-sample npz (for the across-the-board SA's exact CE scaling). Use a box
+# with >=30 GB disk: the 10M npz are ~1.7 GB total.
 BUCKET="gcr-sa-2026"
 NSAMPLES="10000000"
 NBATCHES="100"
 SEED="43"
 BUNDLE_KEY="gcr-baseline-bundle.tar.gz"
 OUT_KEY="gcr_output_10M.csv"
+SUMMARY_KEY="gcr_output_summary_stats_10M.csv"
+ABSEV_KEY="gcr_output_absolute_ev_percentiles_10M.csv"
+SAMPLES_KEY="gcr_samples_10M.tar.gz"
 LOG_KEY="gcr-model-run.log"
 
 set -xeuo pipefail
@@ -28,8 +32,13 @@ find quiz-demo -name '*.sh' -exec sed -i 's/\r$//' {} +
 NSAMPLES="$NSAMPLES" NBATCHES="$NBATCHES" SEED="$SEED" \
   bash quiz-demo/sensitivity-analysis/gcr-params/aws/run_gcr_model.sh || true
 
-"$AWS" s3 cp quiz-demo/all-intervention-models/gcr-models-mc/outputs/gcr_output.csv \
-  "s3://$BUCKET/$OUT_KEY" || true
+GCRMC=quiz-demo/all-intervention-models/gcr-models-mc
+"$AWS" s3 cp "$GCRMC/outputs/gcr_output.csv" "s3://$BUCKET/$OUT_KEY" || true
+"$AWS" s3 cp "$GCRMC/outputs/gcr_output_summary_stats.csv" "s3://$BUCKET/$SUMMARY_KEY" || true
+"$AWS" s3 cp "$GCRMC/outputs/gcr_output_absolute_ev_percentiles.csv" "s3://$BUCKET/$ABSEV_KEY" || true
+# Bundle the raw-sample npz (one per fund) and upload as a single archive.
+tar czf /tmp/gcr_samples.tar.gz -C "$GCRMC/outputs" samples || true
+"$AWS" s3 cp /tmp/gcr_samples.tar.gz "s3://$BUCKET/$SAMPLES_KEY" || true
 "$AWS" s3 cp /var/log/gcr-run.log "s3://$BUCKET/$LOG_KEY" || true
 
 shutdown -h now

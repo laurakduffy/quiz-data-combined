@@ -64,6 +64,19 @@ GROUPS      = _config.get('groups', {})
 # None → vary every fund found in the dataset.
 FUNDS_TO_VARY = None
 
+# ─── GCR far-future-only scaling ─────────────────────────────────────────────
+# Empirically (GCR-params SA): a *whole-fund* GCR CE shift is only realistic to
+# ~±1 order of magnitude; larger multiples occur only in the 500+ (t5) stellar
+# value (near-term moves <~10× under any plausible parameter). So for GCR funds,
+# multipliers OUTSIDE this band scale t5 only; inside the band, all periods (as
+# before). Non-GCR funds are unaffected. See sensitivity-analysis/gcr-params/NOTES.md.
+GCR_FUNDS = {'sentinel_bio', 'longview_nuclear', 'longview_ai'}
+GCR_ALL_PERIODS_RANGE = _config.get('gcr_all_periods_range', [0.01, 10])
+
+def _gcr_far_future_only(fund_id, multiplier):
+    lo, hi = GCR_ALL_PERIODS_RANGE
+    return fund_id in GCR_FUNDS and not (lo <= multiplier <= hi)
+
 # ─── Risk-profile column order in the JSON values matrix ───────────────────
 # combine_data.py RISK_PROFILES defines 9 columns (indices 0-8). We deliberately
 # emit only columns 0-7 and OMIT index 8 ('ambiguity bilateral'), which is not
@@ -236,11 +249,16 @@ def _build_scaled_effects_aw(npz_data, baseline_project, multiplier):
     return new_effects
 
 
-def _build_scaled_effects_gcr(npz_data, baseline_project, multiplier):
+def _build_scaled_effects_gcr(npz_data, baseline_project, multiplier, far_future_only=False):
     """Return a new effects dict for a GCR fund.
 
     GCR samples are per-period (key: t{0-5} for the main effect;
     {effect_id}_t{0-5} for sub-extinction tiers).
+
+    When far_future_only is True, the near-term periods (t0-t4) are left at
+    baseline and only the 500+ period (t5 = last index) is scaled — i.e. an
+    extreme multiplier acts on the long-run stellar value alone, not the
+    (near-term) value that no plausible parameter moves by such a multiple.
     """
     new_effects = {}
     for json_effect_id, baseline_effect in baseline_project['effects'].items():
@@ -248,6 +266,10 @@ def _build_scaled_effects_gcr(npz_data, baseline_project, multiplier):
         n_time = len(baseline_values)
         new_values = []
         for t_idx in range(n_time):
+            # far-future-only: keep near-term (t0-t4) at baseline, scale only t5.
+            if far_future_only and t_idx != n_time - 1:
+                new_values.append(list(baseline_values[t_idx]))
+                continue
             # Try sub-extinction-tier key first, then main-effect key.
             key = f'{json_effect_id}_t{t_idx}'
             if key not in npz_data:
@@ -357,7 +379,8 @@ for fund_to_vary in funds_to_vary:
                     npz_data, baseline_project, multiplier)
             elif fund_type == 'gcr':
                 new_effects = _build_scaled_effects_gcr(
-                    npz_data, baseline_project, multiplier)
+                    npz_data, baseline_project, multiplier,
+                    far_future_only=_gcr_far_future_only(fund_to_vary, multiplier))
             else:
                 new_effects = None
 
@@ -393,56 +416,58 @@ if GROUPS:
 
 for group_name, group_def in GROUPS.items():
     group_funds       = group_def['funds']
-    group_multipliers = group_def['multipliers']
+    group_multipliers = [m for m in group_def['multipliers'] if m != 1.0]
 
-    # Load raw samples once per fund in the group.
-    group_npz = {}
+    # Memory-lean: precompute each fund's scaled EFFECTS (small 6×N matrices) by
+    # loading that fund's raw samples ONCE, then freeing them before the next fund.
+    # Keeps peak memory to a single fund's npz (~2 GB at 10M) instead of the whole
+    # group's (~6 GB). Identical results to scaling them together (each fund is
+    # independent; _build_scaled_effects_* don't mutate the baseline).
+    # scaled_by_fund[fund_id][multiplier] = effects dict, or None → linear at assembly.
+    scaled_by_fund = {}
     for fund_id in group_funds:
-        spec     = FUND_SAMPLE_SPECS.get(fund_id)
-        npz_path = spec['npz'] if spec else None
+        spec      = FUND_SAMPLE_SPECS.get(fund_id)
+        fund_type = spec['type'] if spec else None
+        npz_path  = spec['npz'] if spec else None
+
+        npz_data = None
         if npz_path and Path(npz_path).exists():
-            raw = np.load(npz_path)
-            group_npz[fund_id] = {k: raw[k] for k in raw.files}
-        else:
-            if npz_path:
-                print(f"  WARNING: samples not found for {fund_id}, falling back to linear scaling.")
-            group_npz[fund_id] = None
+            with np.load(npz_path) as raw:
+                npz_data = {k: raw[k] for k in raw.files}
+        elif npz_path:
+            print(f"  WARNING: samples not found for {fund_id}, falling back to linear scaling.")
 
+        baseline_project = baseline['projects'][fund_id]
+        per_mult = {}
+        for multiplier in group_multipliers:
+            eff = None
+            if npz_data is not None:
+                if fund_type == 'gw_leaf':
+                    eff = _build_scaled_effects_gw_leaf(
+                        npz_data, spec['effect_map'], baseline_project, multiplier)
+                elif fund_type == 'aw':
+                    eff = _build_scaled_effects_aw(
+                        npz_data, baseline_project, multiplier)
+                elif fund_type == 'gcr':
+                    eff = _build_scaled_effects_gcr(
+                        npz_data, baseline_project, multiplier,
+                        far_future_only=_gcr_far_future_only(fund_id, multiplier))
+            per_mult[multiplier] = eff
+        scaled_by_fund[fund_id] = per_mult
+        del npz_data   # free this fund's samples before loading the next
+
+    # Assemble + write one dataset per multiplier from the small precomputed effects.
     for multiplier in group_multipliers:
-        if multiplier == 1.0:
-            continue
-
         dataset   = copy.deepcopy(baseline)
         all_exact = True
 
         for fund_id in group_funds:
-            spec             = FUND_SAMPLE_SPECS.get(fund_id)
-            fund_type        = spec['type'] if spec else None
-            npz_data         = group_npz[fund_id]
+            new_effects      = scaled_by_fund[fund_id][multiplier]
             baseline_project = dataset['projects'][fund_id]
-
-            if npz_data is not None:
-                if fund_type == 'gw_leaf':
-                    new_effects = _build_scaled_effects_gw_leaf(
-                        npz_data, spec['effect_map'], baseline_project, multiplier)
-                elif fund_type == 'aw':
-                    new_effects = _build_scaled_effects_aw(
-                        npz_data, baseline_project, multiplier)
-                elif fund_type == 'gcr':
-                    new_effects = _build_scaled_effects_gcr(
-                        npz_data, baseline_project, multiplier)
-                else:
-                    new_effects = None
-                    all_exact   = False
-
-                if new_effects is not None:
-                    dataset['projects'][fund_id]['effects'] = new_effects
-                else:
-                    for effect in baseline_project['effects'].values():
-                        for t_row in effect['values']:
-                            for rp_idx in range(len(t_row)):
-                                t_row[rp_idx] *= multiplier
+            if new_effects is not None:
+                dataset['projects'][fund_id]['effects'] = new_effects
             else:
+                # No samples / unknown type → linear scaling of the stored values.
                 all_exact = False
                 for effect in baseline_project['effects'].values():
                     for t_row in effect['values']:

@@ -53,6 +53,7 @@ DIM_COLORS = {
     "Aggregation Methods":      "#8C564B",
     "Time Discounts":           "#17BECF",
     "Moral Weights":            "#BCBD22",
+    "GCR Params":               "#E377C2",
 }
 
 # (dimension, fund_csv, fund_col, cause_csv, cause_col, baseline_filter)
@@ -90,6 +91,10 @@ SOURCES = [
      p("moral-weights",         "outputs", "fund",  "moral_weights_overall_si.csv"),               "sensitivity_index",
      p("moral-weights",         "outputs", "cause", "moral_weights_overall_cause_area_si.csv"),    "sensitivity_index",
      ("multiplier", 1.0)),
+    ("GCR Params",
+     p("gcr-params",            "outputs", "fund",  "gcr_sensitivity_index.csv"), "sensitivity_index",
+     p("gcr-params",            "outputs", "fund",  "gcr_sensitivity_index.csv"), "si_cluster",
+     ("scenario", "noise_check")),
 ]
 
 
