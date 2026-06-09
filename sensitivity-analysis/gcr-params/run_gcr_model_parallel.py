@@ -7,9 +7,11 @@ one process per fund concurrently (~1/3 the wall-clock). It writes:
   - gcr_output.csv                        (effects, for combine_data.py)
   - gcr_output_summary_stats.csv          (per fund/tier: mean + percentiles)
   - gcr_output_absolute_ev_percentiles.csv (absolute EV of the future, person-years)
+  - param_percentiles.csv                 (input-parameter distribution percentiles)
   - gcr_raw_samples_{fund}.npz            (raw samples incl. absolute_total_values,
         for the across-the-board SA's exact CE scaling — always match this baseline)
-It skips only the histogram PNGs. Results are identical to export_rp_csv (same seed).
+This is the FULL export_rp_csv output set minus the histogram PNGs; identical results
+(same seed). param_percentiles is input-side (independent of the MC run / sample count).
 
 Usage
 -----
@@ -43,6 +45,7 @@ from export_rp_csv import (  # noqa: E402
     write_absolute_ev_csv,
     SHORT_PERIOD_KEYS,
 )
+from param_distributions import write_param_percentiles  # noqa: E402
 
 _ALL_PK = SHORT_PERIOD_KEYS + ["after_500_plus"]
 _PERIOD_TO_TIDX = {pk: i for i, pk in enumerate(_ALL_PK)}
@@ -118,6 +121,12 @@ def main():
     print(f"Parallel GCR model: {args.n_samples:,} samples / {args.n_batches} batches / "
           f"seed {args.seed}  ({len(FUND_KEYS)} funds, one process each)")
     print(f"  raw-sample npz: {'(skipped)' if samples_dir is None else samples_dir}")
+
+    # Refresh param_percentiles.csv (input-parameter distribution percentiles). It's
+    # independent of the MC run — emitted here only so the AWS run produces the FULL
+    # export_rp_csv output set (nothing left stale). Writes to gcr-models-mc/outputs/.
+    write_param_percentiles()
+    print("  refreshed param_percentiles.csv")
 
     tasks = [(fk, args.n_samples, args.n_batches, args.seed, samples_dir) for fk in FUND_KEYS]
     with Pool(processes=len(FUND_KEYS)) as pool:

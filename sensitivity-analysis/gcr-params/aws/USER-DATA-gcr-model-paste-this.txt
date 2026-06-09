@@ -12,6 +12,7 @@ BUNDLE_KEY="gcr-baseline-bundle.tar.gz"
 OUT_KEY="gcr_output_10M.csv"
 SUMMARY_KEY="gcr_output_summary_stats_10M.csv"
 ABSEV_KEY="gcr_output_absolute_ev_percentiles_10M.csv"
+PARAM_KEY="param_percentiles_10M.csv"
 SAMPLES_KEY="gcr_samples_10M.tar.gz"
 LOG_KEY="gcr-model-run.log"
 
@@ -36,6 +37,7 @@ GCRMC=quiz-demo/all-intervention-models/gcr-models-mc
 "$AWS" s3 cp "$GCRMC/outputs/gcr_output.csv" "s3://$BUCKET/$OUT_KEY" || true
 "$AWS" s3 cp "$GCRMC/outputs/gcr_output_summary_stats.csv" "s3://$BUCKET/$SUMMARY_KEY" || true
 "$AWS" s3 cp "$GCRMC/outputs/gcr_output_absolute_ev_percentiles.csv" "s3://$BUCKET/$ABSEV_KEY" || true
+"$AWS" s3 cp "$GCRMC/outputs/param_percentiles.csv" "s3://$BUCKET/$PARAM_KEY" || true
 # Bundle the raw-sample npz (one per fund) and upload as a single archive.
 tar czf /tmp/gcr_samples.tar.gz -C "$GCRMC/outputs" samples || true
 "$AWS" s3 cp /tmp/gcr_samples.tar.gz "s3://$BUCKET/$SAMPLES_KEY" || true

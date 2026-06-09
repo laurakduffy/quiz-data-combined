@@ -125,6 +125,16 @@ gains a `scaling_scope` column (`all_periods` / `t5_only`). Expected effect: the
 GCR scenarios' SI drops toward ~0 (t5-only + t5 discounting), correcting the prior
 overstatement from unrealistically scaling near-term CE by 100–10,000×.
 
+**Per-scenario neutral CE multiples (`gcr_neutral_score_deltas.py`):** materializes the
+above as `outputs/fund/gcr_neutral_score_deltas.csv` — one row per (value-scaling
+scenario × GCR fund) with `baseline_score`, `scenario_score`, and `ratio` at the
+**neutral profile** (the direct analogue of an ACB CE multiplier). Excludes the
+harm/zero/positive scenarios (`p_harm`/`p_zero`/`near_pessimistic`) — detected by their
+`harm_zero_positive` patch — since they reshape outcome risk rather than scale value.
+Local post-processing: run it after the scenario JSONs exist (`python
+gcr_neutral_score_deltas.py`; no AWS). At 10M the `noise_check` row reads ~0.98–1.00, so
+the neutral score's own MC wobble is ~±1–2% — ratios inside that band aren't real.
+
 ## Regenerating the canonical baseline (decoupled from the SA)
 
 To refresh the *production* dataset from a high-sample GCR run — without running the
@@ -136,9 +146,14 @@ sensitivity scenarios:
    - `gcr_output.csv` — effects (the CSV `combine_data.py` reads)
    - `gcr_output_summary_stats.csv` — mean + p1/5/10/50/90/95/99 per fund & sub-tier
    - `gcr_output_absolute_ev_percentiles.csv` — absolute EV of the future (person-years)
+   - `param_percentiles.csv` — input-parameter distribution percentiles (input-side,
+     independent of the MC run/sample count; emitted so the run yields the full set)
    - `samples/gcr_raw_samples_{fund}.npz` — raw samples **including
      `absolute_total_values`**, the complete source of truth for the across-the-board
      SA's exact CE scaling (so the npz always match this baseline)
+
+   This is the **full `export_rp_csv` output set minus the histogram PNGs** — so after
+   a baseline run nothing in `gcr-models-mc/outputs/` is stale.
 
    (Same writers/format as a full `export_rp_csv` run; it skips only the histogram PNGs.)
    AWS: `aws/USER-DATA-gcr-model-paste-this.txt` on an `m7i.2xlarge` (8 vCPU/32 GB, **no
